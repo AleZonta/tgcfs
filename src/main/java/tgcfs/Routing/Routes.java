@@ -32,13 +32,11 @@ public class Routes {
     private static Integer number; //number of trajectories analysed
 
     /**
-     * Constructor with zero parameter
-     * The config file is read.
-     * @throws Exception If the reading of the config file encounter in problems an exception is raised
+     * Constructor with one parameter
+     * @param conf the object conf containing the configuration
      */
-    public Routes() throws Exception {
-        this.conf = new ReadConfig();
-        this.conf.readFile();
+    public Routes(ReadConfig conf){
+        this.conf = conf;
         number = 0;
     }
 
@@ -47,7 +45,7 @@ public class Routes {
      * Method that loads trajectories from file.
      * It is reading from a config file which type of trajectories I want.
      * After the loading phase it shuffle them and call the method to analise them (to eliminate the shorter one)
-     * @throws Exception
+     * @throws Exception Loading a trajectory can raise an exception
      */
     public void readTrajectories() throws Exception{
         logger.log(Level.INFO, "Loading Trajectories...");
@@ -62,7 +60,7 @@ public class Routes {
         //shuffle it
         this.tra.shuffle();
         //analysing the trajectories
-        this.tra.analiseAndCheckTrajectory();
+        //this.tra.analiseAndCheckTrajectory();
     }
 
     /**
@@ -94,5 +92,8 @@ public class Routes {
     public Point getNextPosition(Trajectory trajectory){
        return trajectory.getNextPoint(this.storage);
     }
+
+
+
 
 }

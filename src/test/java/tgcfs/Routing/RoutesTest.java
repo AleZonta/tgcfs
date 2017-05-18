@@ -4,6 +4,7 @@ import lgds.trajectories.Point;
 import lgds.trajectories.Trajectory;
 import org.junit.Assert;
 import org.junit.Test;
+import tgcfs.Config.ReadConfig;
 
 import static junit.framework.TestCase.assertNotNull;
 
@@ -20,7 +21,9 @@ import static junit.framework.TestCase.assertNotNull;
 public class RoutesTest {
     @Test
     public void getNextTrajectory() throws Exception {
-        Routes routes = new Routes();
+        ReadConfig conf = new ReadConfig();
+        conf.readFile();
+        Routes routes = new Routes(conf);
         routes.readTrajectories();
         Trajectory tra = routes.getNextTrajectory();
         Trajectory tra1 = routes.getNextTrajectory();
@@ -31,7 +34,9 @@ public class RoutesTest {
 
     @Test
     public void getNextPosition() throws Exception {
-        Routes routes = new Routes();
+        ReadConfig conf = new ReadConfig();
+        conf.readFile();
+        Routes routes = new Routes(conf);
         routes.readTrajectories();
         Trajectory tra = routes.getNextTrajectory();
         Point p1 = routes.getNextPosition(tra);
@@ -43,7 +48,9 @@ public class RoutesTest {
 
     @Test
     public void readTrajectories() throws Exception {
-        Routes routes = new Routes();
+        ReadConfig conf = new ReadConfig();
+        conf.readFile();
+        Routes routes = new Routes(conf);
         routes.readTrajectories();
     }
 

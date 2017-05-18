@@ -23,6 +23,16 @@ import java.nio.file.Paths;
  */
 public class ReadConfig {
     private Integer trajectoriesType;
+    private Integer howManySplitting;
+
+    /**
+     * Constructor with zero parameter
+     * Everything is set to null.
+     */
+    public ReadConfig(){
+        this.trajectoriesType = null;
+        this.howManySplitting = null;
+    }
 
     /**
      * Method that returns the location of the file containing the graph
@@ -34,13 +44,11 @@ public class ReadConfig {
     }
 
 
-    /**
-     * Constructor with zero parameter
-     * Everything is set to null.
-     */
-    public ReadConfig(){
-        this.trajectoriesType = null;
+    public Integer getHowManySplitting() throws Exception {
+        if(this.howManySplitting == null) throw new Exception("Try to access config file before reading it.");
+        return this.howManySplitting;
     }
+
 
     /**
      * Method that reads the file with all the settings.
@@ -72,6 +80,13 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("TrajectoriesType is wrong or missing.");
         }
+        try {
+            // time I split the trajectory
+            this.howManySplitting = ((Long) jsonObject.get("HowManySplitting")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HowManySplitting is wrong or missing.");
+        }
+
     }
 
 
