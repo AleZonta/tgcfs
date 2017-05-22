@@ -44,6 +44,16 @@ public class RoutesTest {
         assertNotNull(p1);
         assertNotNull(p2);
         Assert.assertNotEquals(p1, p2);
+
+        System.out.println(p1.getLongitude() + " " + p1.getLatitude());
+        System.out.println(p2.getLongitude() + " " + p2.getLatitude());
+        Point p3 = routes.getNextPosition(tra);
+        while(p3 != null) {
+            assertNotNull(p3);
+            Assert.assertNotEquals(p3, p1);
+            System.out.println(p3.getLongitude() + " " + p3.getLatitude());
+            p3 = routes.getNextPosition(tra);
+        }
     }
 
     @Test

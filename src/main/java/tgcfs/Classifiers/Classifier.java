@@ -3,6 +3,7 @@ package tgcfs.Classifiers;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.pattern.ElmanPattern;
+import tgcfs.NN.EvolvableNN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,20 +28,20 @@ import java.util.stream.DoubleStream;
  *
  * The Classier is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class Classifier {
+public class Classifier implements EvolvableNN {
     private BasicNetwork elmanNetwork; //the neural network used for the classifier
     private Integer arrayLength; //length of the weight array
     /**
      * Constructor of the classifier. It generates the ElmanNetwork.
      * @param input number  of nodes used as input
-     * @param HiddenLayers number of hidden layer
+     * @param HiddenNeurons number of hidden layer
      * @param output number of nodes used as output
      */
-    public Classifier(Integer input, Integer HiddenLayers, Integer output){
+    public Classifier(Integer input, Integer HiddenNeurons, Integer output){
         ElmanPattern pattern = new ElmanPattern();
         pattern.setActivationFunction(new ActivationSigmoid());
         pattern.setInputNeurons(input);
-        pattern.addHiddenLayer(HiddenLayers);
+        pattern.addHiddenLayer(HiddenNeurons);
         pattern.setOutputNeurons(output);
         this.elmanNetwork = (BasicNetwork) pattern.generate();
         this.arrayLength = this.elmanNetwork.encodedArrayLength(); //get the length of the array
@@ -63,8 +64,7 @@ public class Classifier {
 
 
     /**
-     * Method that returns the weights of the network
-     * @return list of weights
+     * @implNote Implementation from Interface
      */
     public List<Double> getWeights(){
         double[] weightsVector = new double[this.arrayLength];
@@ -75,9 +75,7 @@ public class Classifier {
 
 
     /**
-     * Compute the output of the network having the current input
-     * @param input input list of the network
-     * @return list of Double coding the output
+     * @implNote Implementation from Interface
      */
     public List<Double> computeOutput(List<Double> input){
         //transform list to vector
@@ -89,8 +87,7 @@ public class Classifier {
     }
 
     /**
-     * Getter for the number of weight in the network
-     * @return Integer value
+     * @implNote Implementation from Interface
      */
     public Integer getArrayLength() { return this.arrayLength; }
 }

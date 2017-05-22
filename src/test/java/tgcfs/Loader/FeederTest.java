@@ -26,6 +26,9 @@ public class FeederTest {
         Trajectory trajectory = system.getTrajectory();
         List<InfoNode> nodes = system.fromTrajectoryToNodesInGraph(trajectory);
         assertNotNull(nodes);
+        nodes.forEach(node -> {
+            System.out.println(node.retLat() + ", " + node.retLon());
+        });
     }
 
     @Test

@@ -87,5 +87,26 @@
       <artifactId>encog-core</artifactId>
       <version>3.3.0</version>
     </dependency>
+      <dependency>
+          <groupId>org.deeplearning4j</groupId>
+          <artifactId>rl4j-core</artifactId>
+          <version>0.8.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.deeplearning4j</groupId>
+          <artifactId>deeplearning4j-ui-resources</artifactId>
+          <version>0.8.0</version>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.deeplearning4j</groupId>
+          <artifactId>deeplearning4j-ui-model</artifactId>
+          <version>0.8.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.deeplearning4j</groupId>
+          <artifactId>rl4j-api</artifactId>
+          <version>0.8.0</version>
+      </dependency>
   </dependencies>
 </project>

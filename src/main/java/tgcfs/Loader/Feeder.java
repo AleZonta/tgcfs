@@ -1,5 +1,6 @@
 package tgcfs.Loader;
 
+import gms.GraphML.InfoEdge;
 import gms.GraphML.InfoNode;
 import gms.Loader;
 import gms.Point.Coord;
@@ -84,7 +85,8 @@ public class Feeder {
 
         //first node
         Point pointA = tra.getFirstPoint();
-        Coord coordA = new Coord(pointA.getLongitude(), pointA.getLatitude());
+
+        Coord coordA = new Coord(pointA.getLatitude(), pointA.getLongitude());
         InfoNode initialNode = this.graph.findNodes(coordA);
 
         //second node
@@ -92,23 +94,34 @@ public class Feeder {
 
         //until pointB is null -> ended the trajectory
         while(pointB != null){
-            Coord coordB = new Coord(pointB.getLongitude(), pointB.getLatitude());
+
+            Coord coordB = new Coord(pointB.getLatitude(), pointB.getLongitude());
+            //checking the closest node to the coordinate
             InfoNode finalNode = this.graph.findNodes(coordB);
 
+            if (listAllTheNodesOfThePath.stream().noneMatch(infoNode -> infoNode.getId().equals(finalNode.getId()))) {
+                //It is a new node. Is the right one?
+                //check also the edge from the last node
+                //checking the closest edge to the point.
+                InfoEdge closerEdgeToNode = this.graph.findClosestEdge(coordB, new Coord(initialNode.getLat(), initialNode.getLon()));
+                //who is the closer one? The edge to endNode or the final node?
+                if (this.graph.isEdgeCloser(closerEdgeToNode, finalNode, coordB)) {
+                    InfoNode endNode = closerEdgeToNode.getTarget();
 
-            List<InfoNode> result = this.graph.findPathBetweenNodes(initialNode, finalNode);
-            //if node is not present in the final list, I am adding it
-            result.stream().forEach(node -> {
-                if (listAllTheNodesOfThePath.stream().noneMatch(infoNode -> infoNode.getId().equals(node.getId()))){
-                    listAllTheNodesOfThePath.add(node);
+                    listAllTheNodesOfThePath.add(endNode);
+                    //swap second node with first node
+                    initialNode = endNode.deepCopy();
+                } else {
+                    listAllTheNodesOfThePath.add(finalNode);
+                    //swap second node with first node
+                    initialNode = finalNode.deepCopy();
                 }
-            });
 
-            //swap second node with first node
-            initialNode = finalNode.deepCopy();
+            }
             //find new second node
             pointB = this.routes.getNextPosition(tra);
         }
+
         return listAllTheNodesOfThePath;
     }
 
