@@ -28,7 +28,10 @@ import java.util.List;
  * a.zonta@vu.nl
  *
  * Class representing a fake agent implemented using LSTM Neural Network
+ * The LSMT NN is implemented using the deeplearning4j library
+ * Deeplearning4j Development Team. Deeplearning4j: Open-source distributed deep learning for the JVM, Apache Software Foundation License 2.0. http://deeplearning4j.org
  *
+ * The LSTMAgent is offering the methods to evolve the NN using an evolutionary algorithm
  */
 public class LSTMAgent extends BasicAgent implements EvolvableNN {
     private MultiLayerNetwork net; //neural network, brain of the agent

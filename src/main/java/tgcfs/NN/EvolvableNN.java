@@ -12,7 +12,9 @@ import java.util.List;
  * <p>
  * a.zonta@vu.nl
  *
- * interface for evolvable NN
+ * Interface for evolvable NN
+ * With a Genetic Algorithm the NN is trained evolving the weights of the connection.
+ * A class implementing a NN needs to implement the method to set and get the current set of weights
  */
 public interface EvolvableNN {
 
