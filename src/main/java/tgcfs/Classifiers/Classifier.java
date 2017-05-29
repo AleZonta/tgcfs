@@ -52,6 +52,7 @@ public class Classifier implements EvolvableNN {
      * @param weights list containing all the weights
      * @throws Exception if the length of the list passed as parameter is not correct
      */
+    @Override
     public void setWeights(List<Double> weights) throws Exception {
         if (weights.size() != this.arrayLength){
             throw new Exception("Length list weights is not correct.");
@@ -66,6 +67,7 @@ public class Classifier implements EvolvableNN {
     /**
      * @implNote Implementation from Interface
      */
+    @Override
     public List<Double> getWeights(){
         double[] weightsVector = new double[this.arrayLength];
         //get the weights
@@ -77,6 +79,7 @@ public class Classifier implements EvolvableNN {
     /**
      * @implNote Implementation from Interface
      */
+    @Override
     public List<Double> computeOutput(List<Double> input){
         //transform list to vector
         double[] inputVector = input.stream().mapToDouble(d -> d).toArray();
@@ -89,5 +92,6 @@ public class Classifier implements EvolvableNN {
     /**
      * @implNote Implementation from Interface
      */
+    @Override
     public Integer getArrayLength() { return this.arrayLength; }
 }

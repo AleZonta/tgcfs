@@ -24,6 +24,17 @@ import java.nio.file.Paths;
 public class ReadConfig {
     private Integer trajectoriesType;
     private Integer howManySplitting;
+    //EA config
+    private Integer agentPopulationSize;
+    private Integer agentOffspringSize;
+    private Double agentAlpha;
+    private Integer agentTimeSteps;
+
+    private Integer classifierPopulationSize;
+    private Integer classifierOffspringSize;
+    private Double classifierAlpha;
+    private Integer classifierTimeSteps;
+
 
     /**
      * Constructor with zero parameter
@@ -32,23 +43,115 @@ public class ReadConfig {
     public ReadConfig(){
         this.trajectoriesType = null;
         this.howManySplitting = null;
+        this.agentPopulationSize = null;
+        this.agentOffspringSize = null;
+        this.agentAlpha = null;
+        this.classifierPopulationSize = null;
+        this.classifierOffspringSize = null;
+        this.classifierAlpha = null;
+        this.agentTimeSteps = null;
+        this.classifierTimeSteps = null;
     }
 
     /**
      * Method that returns the location of the file containing the graph
      * @return String with the path
+     * @throws Exception if I am trying to access it before reading it
      */
     public Integer getTrajectoriesType() throws Exception {
         if(this.trajectoriesType == null) throw new Exception("Try to access config file before reading it.");
         return this.trajectoriesType;
     }
 
-
+    /**
+     * Method that returns how many time I split the trajectory
+     * @return Integer numberh
+     * @throws Exception if I am trying to access it before reading it
+     */
     public Integer getHowManySplitting() throws Exception {
         if(this.howManySplitting == null) throw new Exception("Try to access config file before reading it.");
         return this.howManySplitting;
     }
 
+    /**
+     * Getter for the offspring size for the agents
+     * @return Integer number with the size
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getAgentOffspringSize() throws Exception {
+        if(this.agentOffspringSize == null) throw new Exception("Try to access config file before reading it.");
+        return agentOffspringSize;
+    }
+
+    /**
+     * Getter for the population size for the agents
+     * @return Integer number with the size
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getAgentPopulationSize() throws Exception {
+        if(this.agentPopulationSize == null) throw new Exception("Try to access config file before reading it.");
+        return agentPopulationSize;
+    }
+
+    /**
+     * Getter for alpha for the agents
+     * @return Double number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Double getAgentAlpha() throws Exception {
+        if(this.agentAlpha == null) throw new Exception("Try to access config file before reading it.");
+        return agentAlpha;
+    }
+
+    /**
+     * Getter for time steps for the agents
+     * @return Integer number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getAgentTimeSteps() throws Exception {
+        if(this.agentTimeSteps == null) throw new Exception("Try to access config file before reading it.");
+        return agentTimeSteps;
+    }
+
+    /**
+     * Getter for the offspring size for the classifiers
+     * @return Integer number with the size
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getClassifierOffspringSize() throws Exception {
+        if(this.classifierOffspringSize == null) throw new Exception("Try to access config file before reading it.");
+        return classifierOffspringSize;
+    }
+
+    /**
+     * Getter for the population size for the classifiers
+     * @return Integer number with the size
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getClassifierPopulationSize() throws Exception {
+        if(this.classifierPopulationSize == null) throw new Exception("Try to access config file before reading it.");
+        return classifierPopulationSize;
+    }
+
+    /**
+     * Getter for alpha for the classifiers
+     * @return Double number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Double getClassifierAlpha() throws Exception {
+        if(this.classifierAlpha == null) throw new Exception("Try to access config file before reading it.");
+        return classifierAlpha;
+    }
+
+    /**
+     * Getter for time steps for the classifiers
+     * @return Integer number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getClassifierTimeSteps() throws Exception {
+        if(this.classifierTimeSteps == null) throw new Exception("Try to access config file before reading it.");
+        return classifierTimeSteps;
+    }
 
     /**
      * Method that reads the file with all the settings.
@@ -87,6 +190,55 @@ public class ReadConfig {
             throw new Exception("HowManySplitting is wrong or missing.");
         }
 
+        try {
+            // population size
+            this.agentPopulationSize = ((Long) jsonObject.get("AgentPopulationSize")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("AgentPopulationSize is wrong or missing.");
+        }
+        try {
+            // offspring size
+            this.agentOffspringSize = ((Long) jsonObject.get("AgentOffspringSize")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("AgentOffspringSize is wrong or missing.");
+        }
+        try {
+            // alpha
+            this.agentAlpha = ((Double) jsonObject.get("AgentAlphaIntermediateRecombination"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("AgentAlpha is wrong or missing.");
+        }
+        try {
+            // timestep
+            this.agentTimeSteps = ((Long) jsonObject.get("AgentTimeSteps")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("AgentTimeSteps is wrong or missing.");
+        }
+
+        try {
+            // population size
+            this.classifierPopulationSize = ((Long) jsonObject.get("ClassifierPopulationSize")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("ClassifierPopulationSize is wrong or missing.");
+        }
+        try {
+            // offspring size
+            this.classifierOffspringSize = ((Long) jsonObject.get("ClassifierOffspringSize")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("ClassifierOffspringSize is wrong or missing.");
+        }
+        try {
+            // alpha
+            this.classifierAlpha = ((Double) jsonObject.get("ClassifierAlphaIntermediateRecombination"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("ClassifierAlpha is wrong or missing.");
+        }
+        try {
+            // timestep
+            this.classifierTimeSteps = ((Long) jsonObject.get("ClassifierTimeSteps")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("ClassifierTimeSteps is wrong or missing.");
+        }
     }
 
 

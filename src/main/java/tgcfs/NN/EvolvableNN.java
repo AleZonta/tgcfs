@@ -37,4 +37,12 @@ public interface EvolvableNN {
      * @throws Exception if the length of the list passed as parameter is not correct
      */
     void setWeights(List<Double> weights) throws Exception;
+
+
+    /**
+     * Compute the output of the network
+     * @param input list value that are the input of the network
+     * @return list of output of the network
+     */
+    List<Double> computeOutput(List<Double> input);
 }

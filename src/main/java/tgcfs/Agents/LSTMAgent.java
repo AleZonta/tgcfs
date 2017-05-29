@@ -73,7 +73,7 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
         GravesLSTM.Builder inputLayerBuilder = new GravesLSTM.Builder();
         inputLayerBuilder.nIn(inputSize);
         inputLayerBuilder.nOut(hiddenNeurons);
-        inputLayerBuilder.activation(Activation.TANH);
+        inputLayerBuilder.activation(Activation.SOFTSIGN);
         listBuilder.layer(0, inputLayerBuilder.build());
 
         // hidden Layers
@@ -81,7 +81,7 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
             GravesLSTM.Builder hiddenLayerBuilder = new GravesLSTM.Builder();
             hiddenLayerBuilder.nIn(hiddenNeurons);
             hiddenLayerBuilder.nOut(hiddenNeurons);
-            hiddenLayerBuilder.activation(Activation.TANH);
+            hiddenLayerBuilder.activation(Activation.SOFTSIGN);
             listBuilder.layer(i, hiddenLayerBuilder.build());
         }
 
@@ -100,14 +100,18 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
 
     /**
      * @implNote Implementation from Interface
+     * @return Integer value
      */
+    @Override
     public Integer getArrayLength(){
         return this.net.numParams();
     }
 
     /**
      * @implNote Implementation from Interface
+     * @return list weights
      */
+    @Override
     public List<Double> getWeights(){
         INDArray result = this.net.params();
         double[] res = result.data().asDouble();
@@ -117,7 +121,10 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
 
     /**
      * @implNote Implementation from Interface
+     * @param weights list containing all the weights
+     * @throws Exception if the length of the list is not correct
      */
+    @Override
     public void setWeights(List<Double> weights) throws Exception {
         if (weights.size() != this.net.numParams()){
             throw new Exception("Length list weights is not correct.");
@@ -125,6 +132,23 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
         this.net.setParameters(Nd4j.create(weights.stream().mapToDouble(d -> d).toArray()));
     }
 
+    /**
+     * @implNote Implementation from Interface
+     * @param input list value that are the input of the network
+     * @return list of output of the network
+     */
+    @Override
+    public List<Double> computeOutput(List<Double> input) {
+        //If this MultiLayerNetwork contains one or more RNN layers: conduct forward pass (prediction) but using previous stored state for any RNN layers.
+        INDArray result = this.net.rnnTimeStep(Nd4j.create(input.stream().mapToDouble(d -> d).toArray()));
+        double[] res = result.data().asDouble();
+        return Arrays.asList(ArrayUtils.toObject(res));
+    }
 
-
+    /**
+     * clear the rnn state from the previous instance
+     */
+    public void clearPreviousState(){
+        this.net.rnnClearPreviousState();
+    }
 }

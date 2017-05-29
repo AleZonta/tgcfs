@@ -4,8 +4,10 @@ import gms.GraphML.InfoEdge;
 import gms.GraphML.InfoNode;
 import gms.Loader;
 import gms.Point.Coord;
+import lgds.Distance.Distance;
 import lgds.trajectories.Point;
 import lgds.trajectories.Trajectory;
+import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Routing.Routes;
 
@@ -131,6 +133,73 @@ public class Feeder {
      */
     public Trajectory getTrajectory(){
         return this.routes.getNextTrajectory();
+    }
+
+    /**
+     * Method that returns next point of the trajectory
+     * @param tra trajectory where I need next point
+     * @return next point
+     */
+    public Point getNextPoint(Trajectory tra){
+        return this.routes.getNextPosition(tra);
+    }
+
+
+    /**
+     * From a list of points to a list of speedirecitons
+     * It computes the speed of the agent
+     * The speed is computed using the distance between the previous step and this step and the time between them
+     * The bearing is computed checking the future direction where the agent is moving
+     * The bearing is how the crow flies, no consideration about real routing
+     * @param points points to transform
+     * @return list of speeddirection objects
+     */
+    public List<InputNetwork> obtainInput(List<Point> points){
+        List<InputNetwork> totalList = new ArrayList<>();
+        for(int i = 0; i < points.size() - 1; i++){
+            //bearing from this point to next point
+            Point actualPoint = points.get(i);
+            Point nextPoint = points.get(i+1);
+            Double bearing = this.bearing(actualPoint.getLatitude(), actualPoint.getLongitude(), nextPoint.getLatitude(), nextPoint.getLongitude());
+            //speed is the speed I arrived here from previous point
+            Double speed;
+            if(i > 0){
+                Point previousPoint = points.get(i - 1);
+                //speed = distance / time
+                Distance dis = new Distance();
+                Double distance = dis.compute(previousPoint, actualPoint);
+                Double time = 0.2; //TODO check this element
+                try {
+                    time = new Double(actualPoint.differenceInTime(previousPoint));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                speed = distance / time;
+            }else{
+                speed = 0.0;
+            }
+            totalList.add(new InputNetwork(speed, bearing));
+        }
+        return totalList;
+    }
+
+
+    /**
+     * Compute the bearing between two points
+     * @param lat1 latitude first point
+     * @param lon1 longitude first point
+     * @param lat2 latitude second point
+     * @param lon2 longitude second point
+     * @return Double value indicating the bearing
+     */
+    private Double bearing(Double lat1, Double lon1, Double lat2, Double lon2){
+        Double latitude1 = Math.toRadians(lat1);
+        Double latitude2 = Math.toRadians(lat2);
+        Double longDiff= Math.toRadians(lon2 - lon1);
+        Double y= Math.sin(longDiff)*Math.cos(latitude2);
+        Double x=Math.cos(latitude1)*Math.sin(latitude2)-Math.sin(latitude1)*Math.cos(latitude2)*Math.cos(longDiff);
+
+        return (Math.toDegrees(Math.atan2(y, x))+360)%360;
     }
 
 }

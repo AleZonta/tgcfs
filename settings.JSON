@@ -12,6 +12,15 @@
   "fileName": "Rijswijk2.graphml",
   "fileLocation": "/Users/alessandrozonta/PycharmProjects/roadNetwork/data",
   "__Third Section": "Setting used for tgcfs",
-  "trajectoriesType": 0,
-  "HowManySplitting": 10
+  "trajectoriesType": 1,
+  "HowManySplitting": 10,
+  "__Forth Section:": "Setting for the EA algorithm",
+  "AgentPopulationSize": 50,
+  "AgentOffspringSize": 50,
+  "AgentAlphaIntermediateRecombination": 0.5,
+  "AgentTimeSteps": 20,
+  "ClassifierPopulationSize": 50,
+  "ClassifierOffspringSize": 50,
+  "ClassifierAlphaIntermediateRecombination": 0.5,
+  "ClassifierTimeSteps": 20
 }
