@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 16/05/2017.
@@ -156,7 +157,7 @@ public class Feeder {
      */
     public List<InputNetwork> obtainInput(List<Point> points){
         List<InputNetwork> totalList = new ArrayList<>();
-        for(int i = 0; i < points.size() - 1; i++){
+        IntStream.range(0, points.size() - 1).forEach(i -> {
             //bearing from this point to next point
             Point actualPoint = points.get(i);
             Point nextPoint = points.get(i+1);
@@ -179,7 +180,8 @@ public class Feeder {
                 speed = 0.0;
             }
             totalList.add(new InputNetwork(speed, bearing));
-        }
+        });
+
         return totalList;
     }
 

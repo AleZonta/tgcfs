@@ -1,9 +1,9 @@
-package tgcfs.Agents;
+package tgcfs.NN;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by Alessandro Zonta on 17/05/2017.
+ * Created by Alessandro Zonta on 30/05/2017.
  * PhD Situational Analytics
  * <p>
  * Computational Intelligence Group
@@ -12,9 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * a.zonta@vu.nl
  *
- * abstract class representing the agent
+ * abstract class representing a model
+ * It gives an unique ID for every model in the system
  */
-public abstract class BasicAgent {
+public abstract class Models {
     static final AtomicInteger NEXT_ID = new AtomicInteger(0); //A different ID per Istance
     private Integer id; //id of the agent
 
@@ -22,7 +23,7 @@ public abstract class BasicAgent {
     /**
      * Constructor that assign an id to the agent
      */
-    public BasicAgent(){
+    public Models(){
         this.id = NEXT_ID.getAndIncrement();
     }
 
@@ -33,6 +34,4 @@ public abstract class BasicAgent {
     public Integer getId() {
         return this.id;
     }
-
-
 }

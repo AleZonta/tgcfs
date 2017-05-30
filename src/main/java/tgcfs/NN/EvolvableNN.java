@@ -45,4 +45,10 @@ public interface EvolvableNN {
      * @return list of output of the network
      */
     List<Double> computeOutput(List<Double> input);
+
+    /**
+     * Deep copy of the model
+     * @return deep copy of the model used
+     */
+    EvolvableNN deepCopy();
 }

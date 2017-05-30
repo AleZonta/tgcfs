@@ -1,10 +1,10 @@
 package tgcfs.EA;
 
-import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Recombination.DiscreteRecombination;
 import tgcfs.EA.Recombination.IntermediateRecombination;
 import tgcfs.EA.Recombination.Recombination;
+import tgcfs.InputOutput.Transformation;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -50,9 +49,10 @@ public abstract class Algorithm {
 
     /**
      * Generate the population for the EA
+     * @param model the model of the population
      * @throws Exception exception
      */
-    public abstract void generatePopulation() throws Exception;
+    public abstract void generatePopulation(EvolvableNN model) throws Exception;
 
     /**
      * Getter for the config file
@@ -151,54 +151,26 @@ public abstract class Algorithm {
     /**
      * Now we run the individual in order to collect the result.
      * Running an agent means set the weight to the neural network and obtain the results
-     * @param model is the model used for the agent
      * @param input the input of the model
      * @throws Exception if there are problems in reading the info
      */
-    public void runIndividual(EvolvableNN model,  List<InputsNetwork> input) throws Exception {
-        logger.log(Level.INFO, "Running Agents...");
+    public abstract void runIndividuals(List<InputsNetwork> input) throws Exception;
 
-        Integer  size = 0;
-        if(this.getClass() == Agents.class){
-            size = this.configFile.getAgentTimeSteps();
-        }else{
-            size = this.configFile.getClassifierTimeSteps();
-        }
-        final Integer realSize = size;
+    /**
+     * Run the classifier with the current input and obtain the result from the network
+     * @param individual individual with the parameter of the classifier
+     * @param input input to assign to the classifier
+     * @return the output of the classifier
+     * @throws Exception if the nn has problem an exception is raised
+     */
+    public abstract OutputsNetwork runIndividual(Individual individual, List<InputsNetwork> input) throws Exception;
 
-        this.population.forEach(individual -> {
-            try {
-                //set the weights
-                model.setWeights(individual.getObjectiveParameters());
 
-                //compute Output of the network
-                List<Double> lastOutput = null;
-                for (InputsNetwork inputsNetwork : input) {
-                    lastOutput = model.computeOutput(inputsNetwork.serialise());
-                }
-                //now for the number of timestep that I want to check save the output
-                List<OutputsNetwork> outputsNetworks = new ArrayList<>();
-
-                OutputNetwork out = new OutputNetwork();
-                out.deserialise(lastOutput);
-                outputsNetworks.add(out);
-
-                for(int i = 0; i < realSize; i++){ //TODO read number timestep from config file
-                    lastOutput = model.computeOutput(lastOutput);
-
-                    out = new OutputNetwork();
-                    out.deserialise(lastOutput);
-                    outputsNetworks.add(out);
-                }
-                //assign the output to this individual
-                individual.setOutput(outputsNetworks);
-
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
-            }
-
-        });
-    }
-
+    /**
+     * Method to evaluate the individual using the competing population
+     * @param opponent competing population
+     * @param transformation the class that will transform from one output to the new input
+     */
+    public abstract void evaluateIndividuals(Algorithm opponent, Transformation transformation);
 
 }

@@ -4,6 +4,7 @@ import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.pattern.ElmanPattern;
 import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.Models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +29,13 @@ import java.util.stream.DoubleStream;
  *
  * The Classier is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class Classifier implements EvolvableNN {
+public class Classifier extends Models implements EvolvableNN {
     private BasicNetwork elmanNetwork; //the neural network used for the classifier
     private Integer arrayLength; //length of the weight array
+    private Integer input;
+    private Integer hiddenNeurons;
+    private Integer output;
+
     /**
      * Constructor of the classifier. It generates the ElmanNetwork.
      * @param input number  of nodes used as input
@@ -38,6 +43,7 @@ public class Classifier implements EvolvableNN {
      * @param output number of nodes used as output
      */
     public Classifier(Integer input, Integer HiddenNeurons, Integer output){
+        super();
         ElmanPattern pattern = new ElmanPattern();
         pattern.setActivationFunction(new ActivationSigmoid());
         pattern.setInputNeurons(input);
@@ -45,6 +51,9 @@ public class Classifier implements EvolvableNN {
         pattern.setOutputNeurons(output);
         this.elmanNetwork = (BasicNetwork) pattern.generate();
         this.arrayLength = this.elmanNetwork.encodedArrayLength(); //get the length of the array
+        this.input = input;
+        this.hiddenNeurons = HiddenNeurons;
+        this.output = output;
     }
 
     /**
@@ -94,4 +103,13 @@ public class Classifier implements EvolvableNN {
      */
     @Override
     public Integer getArrayLength() { return this.arrayLength; }
+
+    /**
+     * @implNote Implementation from Interface
+     * @return deep copy of the model
+     */
+    @Override
+    public EvolvableNN deepCopy() {
+        return new Classifier(this.input, this.hiddenNeurons, this.output);
+    }
 }

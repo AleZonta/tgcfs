@@ -1,5 +1,7 @@
 package tgcfs.Agents;
 
+import tgcfs.NN.Models;
+
 /**
  * Created by Alessandro Zonta on 17/05/2017.
  * PhD Situational Analytics
@@ -12,7 +14,7 @@ package tgcfs.Agents;
  *
  * Class representing the real agent in the system
  */
-public class Agent extends BasicAgent {
+public class Agent extends Models {
 
     /**
      * Constructor that call the father class constructor

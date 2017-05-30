@@ -1,6 +1,16 @@
 package tgcfs.EA;
 
+import tgcfs.Agents.InputNetwork;
+import tgcfs.Agents.OutputNetwork;
+import tgcfs.InputOutput.Transformation;
+import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.InputsNetwork;
+import tgcfs.NN.OutputsNetwork;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -27,14 +37,124 @@ public class Agents extends Algorithm {
 
     /**
      * @implNote Implementation from Abstract class Algorithm
+     * @param model the model of the population
+     * @throws Exception if the reading of the config file goes wrong
      */
     @Override
-    public void generatePopulation() throws Exception {
+    public void generatePopulation(EvolvableNN model) throws Exception {
         logger.log(Level.INFO, "Generating Agents Population...");
-        for(int i = 0; i < super.getConfigFile().getAgentPopulationSize(); i++ ){
-            Individual newBorn = new Individual();
-            super.addIndividual(newBorn);
-        }
+        IntStream.range(0, super.getConfigFile().getAgentPopulationSize()).forEach( i -> {
+                //create an individual that has the size of the object parameter as the size of the network
+                Individual newBorn = new Individual(model.getArrayLength());
+                //assign the model to the classifier
+                newBorn.setModel(model.deepCopy());
+                super.addIndividual(newBorn);
+        });
     }
 
+    /**
+     * @implNote Implementation from Abstract class Algorithm
+     * @param input the input of the model
+     * @throws Exception if there are problems in reading the info
+     */
+    @Override
+    public void runIndividuals(List<InputsNetwork> input) throws Exception {
+        logger.log(Level.INFO, "Running Agents...");
+
+        super.getPopulation().parallelStream().forEach(individual -> {
+            try {
+                //retrive model from the individual
+                EvolvableNN model = individual.getModel();
+                //set the weights
+                model.setWeights(individual.getObjectiveParameters());
+
+                //compute Output of the network
+                List<Double> lastOutput = null;
+                for (InputsNetwork inputsNetwork : input) {
+                    lastOutput = model.computeOutput(inputsNetwork.serialise());
+                }
+                //now for the number of timestep that I want to check save the output
+                List<OutputsNetwork> outputsNetworks = new ArrayList<>();
+
+                OutputNetwork out = new OutputNetwork();
+                out.deserialise(lastOutput);
+                outputsNetworks.add(out);
+
+                //output has only two fields, input needs three
+                //I am using the last direction present into input I am adding that one to the last output
+                Double directionAPF = ((InputNetwork)input.get(input.size() - 1)).getDirectionAPF(); //TODO is it correct this step?
+                for (int i = 0; i < super.getConfigFile().getAgentTimeSteps(); i++) {
+                    //transform output into input and add the direction
+                    OutputNetwork outLocal = new OutputNetwork();
+                    outLocal.deserialise(lastOutput);
+                    InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
+                    lastOutput = model.computeOutput(inputLocal.serialise());
+
+                    out = new OutputNetwork();
+                    out.deserialise(lastOutput);
+                    outputsNetworks.add(out);
+                }
+                //assign the output to this individual
+                individual.setOutput(outputsNetworks);
+
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
+            }
+
+        });
+    }
+
+
+    /**
+     * @implNote Implementation from Abstract class Algorithm
+     * @param individual individual with the parameter of the classifier
+     * @param input input to assign to the classifier
+     * @return the output of the classifier
+     * @throws Exception if the nn has problem an exception is raised
+     */
+    public OutputsNetwork runIndividual(Individual individual, List<InputsNetwork> input) throws Exception {
+        throw new Exception("Method not usable for a Agent");
+    }
+
+
+    /**
+     * @implNote Implementation from Abstract class Algorithm
+     * Method to evaluate the agent using the classifiers
+     * The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
+     * For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
+     *
+     * At the same time I can evaluate the classifier
+     * The fitness of each classifier is obtained by using it to evaluate each model in the competing population
+     * For each correct judgement, the classifier’s fitness increases by one
+     *
+     * @param opponent competing population
+     * @param transformation the class that will transform from one output to the new input
+     */
+    public void evaluateIndividuals(Algorithm opponent, Transformation transformation){
+        //I need to evaluate the agent using the classifiers
+        super.getPopulation().parallelStream().forEach(individual -> {
+            //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
+            //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
+            opponent.getPopulation().forEach(classifier -> {
+                try {
+                    tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(individual.getOutput()));
+                    //if the classifier is saying true -> it is wrongly judging the agent
+                    if(result.getReal()){
+                        individual.increaseFitness();
+                    }else{
+                        //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
+                        //For each correct judgement, the classifier’s fitness increases by one
+                        classifier.increaseFitness();
+                    }
+
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
+                }
+            });
+        });
+    }
+
+
+
 }
+

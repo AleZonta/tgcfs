@@ -2,6 +2,7 @@ package tgcfs.Classifiers;
 
 import tgcfs.NN.OutputsNetwork;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -16,6 +17,19 @@ import java.util.List;
  */
 public class OutputNetwork implements OutputsNetwork{
     private Boolean real;
+    public static final Integer outputSize = 1; //the size of the output corresponding to the field here
+
+    /**
+     * Contructor zero parameter
+     * check if the numebr express as output size is correct
+     */
+    public OutputNetwork(){
+        Field[] allFields = OutputNetwork.class.getDeclaredFields();
+        if (allFields.length != outputSize + 1){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
+    }
+
 
     /**
      * Getter for real

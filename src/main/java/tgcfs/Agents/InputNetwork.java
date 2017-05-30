@@ -2,6 +2,7 @@ package tgcfs.Agents;
 
 import tgcfs.NN.InputsNetwork;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class InputNetwork implements InputsNetwork {
     private Double directionAPF;
     private Double speed;
     private Double bearing;
+    public static final Integer inputSize = 3; //the size of the input corresponding to the three fields here
 
     /**
      * Constructor with three parameters. all the inputs
@@ -32,6 +34,12 @@ public class InputNetwork implements InputsNetwork {
         this.bearing = bearing;
         this.speed = speed;
         this.directionAPF = directionAPF;
+
+        Field[] allFields = InputNetwork.class.getDeclaredFields();
+        if (allFields.length != inputSize + 1){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
+
     }
 
     /**

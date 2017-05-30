@@ -2,6 +2,7 @@ package tgcfs.Classifiers;
 
 import tgcfs.NN.InputsNetwork;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class InputNetwork implements InputsNetwork{
     private Double speed; //speed of the movement
     private Double direction; //direction of the movement
+    public static final Integer inputSize = 2; //the size of the input corresponding to the two fields here
 
     /**
      * Constructor zero parameter = everything to null
@@ -27,6 +29,11 @@ public class InputNetwork implements InputsNetwork{
     public InputNetwork(){
         this.direction = null;
         this.speed = null;
+
+        Field[] allFields = InputNetwork.class.getDeclaredFields();
+        if (allFields.length != inputSize + 1){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
     }
 
     /**
@@ -35,8 +42,13 @@ public class InputNetwork implements InputsNetwork{
      * @param direction direction parameter
      */
     public InputNetwork(Double speed, Double direction){
-        this.direction = speed;
-        this.speed = direction;
+        this.speed = speed;
+        this.direction = direction;
+
+        Field[] allFields = InputNetwork.class.getDeclaredFields();
+        if (allFields.length != inputSize + 1){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
     }
 
     /**

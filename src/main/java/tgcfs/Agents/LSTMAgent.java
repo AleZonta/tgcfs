@@ -12,9 +12,11 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.Models;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 
 /**
@@ -33,8 +35,12 @@ import java.util.List;
  *
  * The LSTMAgent is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class LSTMAgent extends BasicAgent implements EvolvableNN {
+public class LSTMAgent extends Models implements EvolvableNN {
     private MultiLayerNetwork net; //neural network, brain of the agent
+    private Integer inputSize;
+    private Integer hiddenLayers;
+    private Integer hiddenNeurons;
+    private Integer outputSize;
 
     /**
      * Constructor that call the father class constructor
@@ -42,6 +48,7 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
     public LSTMAgent(){
         super();
     }
+
 
     /**
      * Constructor that calls the method to build the RNN
@@ -51,7 +58,12 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
      * @param outputSize integer value containing how many output neurons the network will have
      */
     public LSTMAgent(Integer inputSize, Integer hiddenLayers, Integer hiddenNeurons, Integer outputSize){
+        super();
         this.loadLSTM(inputSize,hiddenLayers,hiddenNeurons,outputSize);
+        this.inputSize = inputSize;
+        this.hiddenLayers = hiddenLayers;
+        this.hiddenNeurons = hiddenNeurons;
+        this.outputSize = outputSize;
     }
 
     /**
@@ -77,13 +89,13 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
         listBuilder.layer(0, inputLayerBuilder.build());
 
         // hidden Layers
-        for (int i = 1; i < hiddenLayers + 1; i++){
+        IntStream.range(1, hiddenLayers + 1).forEach(i -> {
             GravesLSTM.Builder hiddenLayerBuilder = new GravesLSTM.Builder();
             hiddenLayerBuilder.nIn(hiddenNeurons);
             hiddenLayerBuilder.nOut(hiddenNeurons);
             hiddenLayerBuilder.activation(Activation.SOFTSIGN);
             listBuilder.layer(i, hiddenLayerBuilder.build());
-        }
+        });
 
         // we need to use RnnOutputLayer for our RNN
         RnnOutputLayer.Builder outputLayerBuilder = new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT);
@@ -130,6 +142,8 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
             throw new Exception("Length list weights is not correct.");
         }
         this.net.setParameters(Nd4j.create(weights.stream().mapToDouble(d -> d).toArray()));
+        //automatically clear the previous status
+        this.clearPreviousState();
     }
 
     /**
@@ -150,5 +164,14 @@ public class LSTMAgent extends BasicAgent implements EvolvableNN {
      */
     public void clearPreviousState(){
         this.net.rnnClearPreviousState();
+    }
+
+    /**
+     * @implNote Implementation from Interface
+     * @return deep copy of the model
+     */
+    @Override
+    public EvolvableNN deepCopy() {
+        return new LSTMAgent(this.inputSize, this.hiddenLayers, this.hiddenNeurons, this.outputSize);
     }
 }

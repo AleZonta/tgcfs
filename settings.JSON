@@ -1,5 +1,5 @@
 {
-  "__First Section": "Setting used for lgds",
+  "_____________________________First Section": "Setting used for lgds",
   "IDSATraces": "/Users/alessandrozonta/PycharmProjects/createTraces/traces.txt",
   "translate": 1,
   "GeoLifeTrace": "/Users/alessandrozonta/Downloads/Geolife trajectories 1.3/Data",
@@ -8,13 +8,13 @@
   "GraphHopperName" : "china-latest.osm.pbf",
   "Radio": 40,
   "MaxLength": 999999.0,
-  "__Second Section": "Setting used for gms",
+  "_____________________________Second Section": "Setting used for gms",
   "fileName": "Rijswijk2.graphml",
   "fileLocation": "/Users/alessandrozonta/PycharmProjects/roadNetwork/data",
-  "__Third Section": "Setting used for tgcfs",
+  "_____________________________Third Section": "Setting used for tgcfs",
   "trajectoriesType": 1,
   "HowManySplitting": 10,
-  "__Forth Section:": "Setting for the EA algorithm",
+  "_____________________________Forth Section": "Setting for the EA algorithm",
   "AgentPopulationSize": 50,
   "AgentOffspringSize": 50,
   "AgentAlphaIntermediateRecombination": 0.5,
@@ -22,5 +22,10 @@
   "ClassifierPopulationSize": 50,
   "ClassifierOffspringSize": 50,
   "ClassifierAlphaIntermediateRecombination": 0.5,
-  "ClassifierTimeSteps": 20
+  "ClassifierTimeSteps": 20,
+  "_____________________________Fifth section": "Settings for the models",
+  "HiddenLayersAgent": 1,
+  "HiddenNeuronsAgent": 2,
+  "HiddenNeuronsClassifier": 3
+
 }

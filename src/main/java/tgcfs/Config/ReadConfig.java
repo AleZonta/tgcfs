@@ -35,6 +35,9 @@ public class ReadConfig {
     private Double classifierAlpha;
     private Integer classifierTimeSteps;
 
+    private Integer hiddenLayersAgent;
+    private Integer hiddenNeuronsAgent;
+    private Integer hiddenNeuronsClassifier;
 
     /**
      * Constructor with zero parameter
@@ -43,14 +46,20 @@ public class ReadConfig {
     public ReadConfig(){
         this.trajectoriesType = null;
         this.howManySplitting = null;
+
         this.agentPopulationSize = null;
         this.agentOffspringSize = null;
         this.agentAlpha = null;
+        this.agentTimeSteps = null;
+
         this.classifierPopulationSize = null;
         this.classifierOffspringSize = null;
         this.classifierAlpha = null;
-        this.agentTimeSteps = null;
         this.classifierTimeSteps = null;
+
+        this.hiddenLayersAgent = null;
+        this.hiddenNeuronsAgent = null;
+        this.hiddenNeuronsClassifier = null;
     }
 
     /**
@@ -239,7 +248,55 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("ClassifierTimeSteps is wrong or missing.");
         }
+
+        try {
+            // timestep
+            this.hiddenLayersAgent = ((Long) jsonObject.get("HiddenLayersAgent")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HiddenLayersAgent is wrong or missing.");
+        }
+        try {
+            // timestep
+            this.hiddenNeuronsAgent = ((Long) jsonObject.get("HiddenNeuronsAgent")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HiddenNeuronsAgent is wrong or missing.");
+        }
+        try {
+            // timestep
+            this.hiddenNeuronsClassifier = ((Long) jsonObject.get("HiddenNeuronsClassifier")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HiddenNeuronsClassifier is wrong or missing.");
+        }
+
     }
 
+    /**
+     * getter for the number of hidden layer in the agent model
+     * @return Integer number
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public Integer getHiddenLayersAgent() throws Exception {
+        if(this.hiddenLayersAgent == null) throw new Exception("Try to access config file before reading it.");
+        return this.hiddenLayersAgent;
+    }
 
+    /**
+     * getter for the number of hidden nodes in the hidden layers in the agent model
+     * @return Integer number
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public Integer getHiddenNeuronsAgent() throws Exception {
+        if(this.hiddenNeuronsAgent == null) throw new Exception("Try to access config file before reading it.");
+        return this.hiddenNeuronsAgent;
+    }
+
+    /**
+     * getter for the number of hidden nodes in the hidden layer in the classifier model
+     * @return Integer number
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public Integer getHiddenNeuronsClassifier() throws Exception {
+        if(this.hiddenNeuronsClassifier == null) throw new Exception("Try to access config file before reading it.");
+        return this.hiddenNeuronsClassifier;
+    }
 }
