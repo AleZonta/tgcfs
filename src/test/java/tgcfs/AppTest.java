@@ -10,6 +10,11 @@ import junit.framework.TestSuite;
 public class AppTest 
     extends TestCase
 {
+    public void testLoad() throws Exception {
+        App app = new App();
+        app.load();
+    }
+
     /**
      * Create the test case
      *

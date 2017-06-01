@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 public class ReadConfig {
     private Integer trajectoriesType;
     private Integer howManySplitting;
+    private Integer howManyTrajectories;
     //EA config
     private Integer agentPopulationSize;
     private Integer agentOffspringSize;
@@ -35,9 +36,17 @@ public class ReadConfig {
     private Double classifierAlpha;
     private Integer classifierTimeSteps;
 
+    private Integer maxGenerations;
+
+    //model config
     private Integer hiddenLayersAgent;
     private Integer hiddenNeuronsAgent;
     private Integer hiddenNeuronsClassifier;
+
+    //experiment config
+    private String name;
+    private String experiment;
+    private String path;
 
     /**
      * Constructor with zero parameter
@@ -46,6 +55,7 @@ public class ReadConfig {
     public ReadConfig(){
         this.trajectoriesType = null;
         this.howManySplitting = null;
+        this.howManyTrajectories = null;
 
         this.agentPopulationSize = null;
         this.agentOffspringSize = null;
@@ -56,6 +66,8 @@ public class ReadConfig {
         this.classifierOffspringSize = null;
         this.classifierAlpha = null;
         this.classifierTimeSteps = null;
+
+        this.maxGenerations = null;
 
         this.hiddenLayersAgent = null;
         this.hiddenNeuronsAgent = null;
@@ -243,32 +255,62 @@ public class ReadConfig {
             throw new Exception("ClassifierAlpha is wrong or missing.");
         }
         try {
-            // timestep
+            // classifierTimeSteps
             this.classifierTimeSteps = ((Long) jsonObject.get("ClassifierTimeSteps")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("ClassifierTimeSteps is wrong or missing.");
         }
-
         try {
-            // timestep
+            // hiddenLayersAgent
             this.hiddenLayersAgent = ((Long) jsonObject.get("HiddenLayersAgent")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("HiddenLayersAgent is wrong or missing.");
         }
         try {
-            // timestep
+            // hiddenNeuronsAgent
             this.hiddenNeuronsAgent = ((Long) jsonObject.get("HiddenNeuronsAgent")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("HiddenNeuronsAgent is wrong or missing.");
         }
         try {
-            // timestep
+            // hiddenNeuronsClassifier
             this.hiddenNeuronsClassifier = ((Long) jsonObject.get("HiddenNeuronsClassifier")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("HiddenNeuronsClassifier is wrong or missing.");
         }
+        try {
+            // howManyTrajectories
+            this.howManyTrajectories = ((Long) jsonObject.get("HowManyTrajectories")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HowManyTrajectories is wrong or missing.");
+        }
+        try {
+            // MaxGenerations
+            this.maxGenerations = ((Long) jsonObject.get("MaxGenerations")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("MaxGenerations is wrong or missing.");
+        }
 
+        try {
+            // MaxGenerations
+            this.name = (String) jsonObject.get("Name");
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Name is wrong or missing.");
+        }
+        try {
+            // MaxGenerations
+            this.experiment = (String) jsonObject.get("Experiment");
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Experiment is wrong or missing.");
+        }
+        try {
+            // MaxGenerations
+            this.path = (String) jsonObject.get("Path");
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Path is wrong or missing.");
+        }
     }
+
 
     /**
      * getter for the number of hidden layer in the agent model
@@ -298,5 +340,83 @@ public class ReadConfig {
     public Integer getHiddenNeuronsClassifier() throws Exception {
         if(this.hiddenNeuronsClassifier == null) throw new Exception("Try to access config file before reading it.");
         return this.hiddenNeuronsClassifier;
+    }
+
+    /**
+     * getter for the number of trajectory that I am going to analise
+     * @return Integer number
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public Integer getHowManyTrajectories() throws Exception {
+        if(this.howManyTrajectories == null) throw new Exception("Try to access config file before reading it.");
+        return this.howManyTrajectories;
+    }
+
+    /**
+     * getter for the number of maximum generations allowed
+     * @return Integer number
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public Integer getMaxGenerations() throws Exception {
+        if(this.maxGenerations == null) throw new Exception("Try to access config file before reading it.");
+        return this.maxGenerations;
+    }
+
+    /**
+     * getter for the name of the experiment
+     * @return String value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public String getName() throws Exception {
+        if(this.name == null) throw new Exception("Try to access config file before reading it.");
+        return this.name;
+    }
+
+    /**
+     * getter for the number of the experiment
+     * @return String value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public String getExperiment() throws Exception {
+        if(this.experiment == null) throw new Exception("Try to access config file before reading it.");
+        return this.experiment;
+    }
+
+    /**
+     * getter for the path where to save the files
+     * @return string value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public String getPath() throws Exception {
+        if(this.path == null) throw new Exception("Try to access config file before reading it.");
+        return this.path;
+    }
+
+    /**
+     * Override toString Method in order to print all the setting here
+     * @return String containing all the setting
+     */
+    @Override
+    public String toString() {
+        return "ReadConfig{" + "\n" +
+                "trajectoriesType=" + trajectoriesType + ",\n" +
+                "howManySplitting=" + howManySplitting + ",\n" +
+                "howManyTrajectories=" + howManyTrajectories + ",\n" +
+                "agentPopulationSize=" + agentPopulationSize + ",\n" +
+                "agentOffspringSize=" + agentOffspringSize + ",\n" +
+                "agentAlpha=" + agentAlpha + ",\n" +
+                "agentTimeSteps=" + agentTimeSteps + ",\n" +
+                "classifierPopulationSize=" + classifierPopulationSize + ",\n" +
+                "classifierOffspringSize=" + classifierOffspringSize + ",\n" +
+                "classifierAlpha=" + classifierAlpha + ",n" +
+                "classifierTimeSteps=" + classifierTimeSteps + ",\n" +
+                "maxGenerations=" + maxGenerations + ",\n" +
+                "hiddenLayersAgent=" + hiddenLayersAgent + ",\n" +
+                "hiddenNeuronsAgent=" + hiddenNeuronsAgent + ",\n" +
+                "hiddenNeuronsClassifier=" + hiddenNeuronsClassifier + ",\n" +
+                "name='" + name + '\'' + ",\n" +
+                "experiment='" + experiment + '\'' + ",\n" +
+                "path='" + path + '\'' + "\n" +
+                '}';
     }
 }

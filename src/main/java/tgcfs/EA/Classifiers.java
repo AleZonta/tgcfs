@@ -1,5 +1,6 @@
 package tgcfs.EA;
 
+import tgcfs.Agents.Agent;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.NN.EvolvableNN;
@@ -101,11 +102,10 @@ public class Classifiers extends Algorithm {
      * Evaluate the classifier with the real agent
      * @param agent the real agent
      */
-    public void evaluateRealAgent(Models agent){
+    public void evaluateRealAgent(Models agent, Transformation transformation){
         super.getPopulation().parallelStream().forEach(individual -> {
-            //TODO transform output to input otherwise this will not work
             try {
-                OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, null);
+                OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(((Agent)agent).realOutput()));
                 //if the classifier is saying true -> it is correctly judging the agent
                 if(result.getReal()){
                     individual.increaseFitness();

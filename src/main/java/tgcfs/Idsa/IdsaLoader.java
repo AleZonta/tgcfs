@@ -10,6 +10,7 @@ import nl.tno.idsa.framework.potential_field.save_to_file.LoadParameters;
 import nl.tno.idsa.framework.simulator.TrajectorySim;
 import nl.tno.idsa.framework.world.World;
 import org.json.simple.parser.ParseException;
+import tgcfs.Performances.SaveToFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,6 +37,7 @@ public class IdsaLoader {
     private PotentialField pot; //This is the base instance of the pot
     private ConfigFile configFile; //file containing configuration for IDSA
     private LoadParameters par; //parameter for potential field
+    private Boolean computed; //I can obtain direction only if I computed it before it
 
     /**
      * Constructor that loads all the configurations for the potential field
@@ -47,11 +49,13 @@ public class IdsaLoader {
         //loading config file for Idsa
         this.configFile = new ConfigFile();
         this.configFile.loadFile();
+        SaveToFile.Saver.dumpSetting(this.configFile);
         //load parameter for Potential Field
         //the name of the file is hardcoded
         this.par = new LoadParameters("/par", this.configFile.getSelectPerson(), this.configFile.getSelectUR());
         //set update rule read by parameter files
         this.configFile.setUpdateRules(par.getUpdateRule());
+        this.computed = Boolean.FALSE;
         logger.log(Level.INFO, "Config PF Loaded.");
     }
 
@@ -135,6 +139,7 @@ public class IdsaLoader {
             }
         }
         this.pot.setPointsOfInterest(pois);
+        this.pot.setPreviousPoint(new nl.tno.idsa.framework.world.Point(0.0,0.0));
         logger.log(Level.INFO, "POIs are loaded.");
     }
 
@@ -147,9 +152,29 @@ public class IdsaLoader {
         //need to convert Point from lgds to idsa
         nl.tno.idsa.framework.world.Point translatedPoint = new nl.tno.idsa.framework.world.Point(point.getLatitude(), point.getLongitude());
         this.pot.trackAndUpdate(translatedPoint);
+        this.computed = Boolean.TRUE;
     }
 
 
+    /**
+     * Retrieve direction attraction of the Potential Field
+     * @return Double value meaning the direction
+     * @throws Exception exception is raised if the apf is not computed
+     */
+    public Double returnAttraction(Point lastPoint) throws Exception {
+        if(!this.computed) throw new Exception("The computation of the APF is needed to retrieve the direction of attraction");
+        this.computed = Boolean.FALSE;
+        return this.pot.returnDirectionAttraction(new nl.tno.idsa.framework.world.Point(lastPoint.getLatitude(), lastPoint.getLongitude()));
+    }
+
+
+    /**
+     * Reset the APF setting al the POIs' charge to zero
+     */
+    public void resetAPF(){
+        this.pot.resetPOIs();
+        this.pot.setPreviousPoint(new nl.tno.idsa.framework.world.Point(0.0,0.0));
+    }
 
 
 }

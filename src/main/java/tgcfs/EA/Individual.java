@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 public class Individual {
     private List<Double> objectiveParameters;
     private List<Double> mutationStrengths;
-    private Double fitness;
+    private Integer fitness;
     private List<OutputsNetwork> output;
     private EvolvableNN model;
 
@@ -45,9 +45,9 @@ public class Individual {
 
     /**
      * Getter fot the fitness
-     * @return double value
+     * @return Integer value
      */
-    public Double getFitness() {
+    public Integer getFitness() {
         return this.fitness;
     }
 
@@ -55,7 +55,7 @@ public class Individual {
      * Setter for fitness
      * @param fitness the value to assign to fitness
      */
-    public void setFitness(Double fitness) {
+    public void setFitness(Integer fitness) {
         this.fitness = fitness;
     }
 
@@ -79,7 +79,7 @@ public class Individual {
     public Individual(List<Double> objPar, List<Double> mutStr){
         this.objectiveParameters = objPar;
         this.mutationStrengths = mutStr;
-        this.fitness = 0.0;
+        this.fitness = 0;
         this.model = null;
     }
 
@@ -93,7 +93,7 @@ public class Individual {
         this.objectiveParameters = new Random().doubles(size, -8.0, 8.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.mutationStrengths = new ArrayList<>();
         IntStream.range(0, size).forEach(i -> this.mutationStrengths.add(1.0));
-        this.fitness = 0.0;
+        this.fitness = 0;
         this.model = null;
     }
 
@@ -108,7 +108,7 @@ public class Individual {
         this.objectiveParameters = new Random().doubles(size, -8.0, 8.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.mutationStrengths = new ArrayList<>();
         IntStream.range(0, size).forEach(i -> this.mutationStrengths.add(1.0));
-        this.fitness = 0.0;
+        this.fitness = 0;
         this.model = model;
     }
 
@@ -195,6 +195,6 @@ public class Individual {
      * Reset the fitness to zero
      */
     public void resetFitness(){
-        this.fitness = 0.0;
+        this.fitness = 0;
     }
 }

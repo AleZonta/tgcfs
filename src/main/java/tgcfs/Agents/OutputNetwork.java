@@ -32,6 +32,20 @@ public class OutputNetwork implements OutputsNetwork {
     }
 
     /**
+     * Constructor two parameters
+     * @param speed speed parameter
+     * @param bearing bearing parameter
+     */
+    public OutputNetwork(Double speed, Double bearing){
+        this.speed = speed;
+        this.bearing = bearing;
+        Field[] allFields = OutputNetwork.class.getDeclaredFields();
+        if (allFields.length != outputSize + 1){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
+    }
+
+    /**
      * Getter for speed
      * @return Double value of speed
      */

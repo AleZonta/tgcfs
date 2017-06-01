@@ -173,4 +173,25 @@ public abstract class Algorithm {
      */
     public abstract void evaluateIndividuals(Algorithm opponent, Transformation transformation);
 
+
+    /**
+     * Method to return the fitness of all the individuals
+     * @return list of integer values
+     */
+    public List<Integer> retAllFitness(){
+        List<Integer> list = new ArrayList<>();
+        this.population.forEach(individual -> list.add(individual.getFitness()));
+        return list;
+    }
+
+    /**
+     * Method that returns the best genome in the population
+     * @return list of doubles
+     */
+    public List<Double> retBestGenome(){
+        //sort the list
+        this.population.sort(Comparator.comparing(Individual::getFitness));
+        return this.population.get(0).getObjectiveParameters();
+    }
+
 }

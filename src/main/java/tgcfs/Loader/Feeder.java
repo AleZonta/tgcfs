@@ -4,15 +4,19 @@ import gms.GraphML.InfoEdge;
 import gms.GraphML.InfoNode;
 import gms.Loader;
 import gms.Point.Coord;
-import lgds.Distance.Distance;
 import lgds.trajectories.Point;
+import lgds.trajectories.Trajectories;
 import lgds.trajectories.Trajectory;
-import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
+import tgcfs.Idsa.IdsaLoader;
+import tgcfs.InputOutput.PointToSpeedBearing;
+import tgcfs.NN.InputsNetwork;
+import tgcfs.Performances.SaveToFile;
 import tgcfs.Routing.Routes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -31,6 +35,11 @@ public class Feeder {
     private final Loader graph; //loader of the graph
     private final Routes routes; //loader of the trajectories
     private final ReadConfig conf; //configuration object containing location where to read the graph
+    private Integer position; //I need to remember the position where I am now
+    private Boolean finished; //If the current trajectory is ended
+    private Trajectory currentTrajectory; //current trajectory under investigation
+    private Integer maximumNumberOfTrajectories;
+    private Integer actualNumberOfTrajectory;
     private static final Logger logger = Logger.getLogger(Feeder.class.getName()); //logger for this class
 
     /**
@@ -43,8 +52,13 @@ public class Feeder {
         logger.log(Level.INFO, "Initialising system...");
         this.conf = new ReadConfig();
         this.conf.readFile();
+        SaveToFile.Saver.dumpSetting(this.conf);
         this.graph = new Loader();
         this.routes = new Routes(this.conf);
+        this.position = 0;
+        this.finished = Boolean.FALSE;
+        this.actualNumberOfTrajectory = 0;
+        this.maximumNumberOfTrajectories = this.conf.getHowManyTrajectories();
     }
 
     /**
@@ -69,6 +83,10 @@ public class Feeder {
     private Integer selectPositionInTrajectory(Trajectory tra) throws Exception{
         //decide how many time to analise the trajectory
         Integer split = this.conf.getHowManySplitting() + 1;
+        //need to check if the trajectory is shorter than the split number
+        if(tra.getSize()<=split){
+            split = 2; //I only split in half
+        }
         return (int) Math.floor(tra.getSize() / split);
     }
 
@@ -133,7 +151,25 @@ public class Feeder {
      * @return trajectory
      */
     public Trajectory getTrajectory(){
+        this.actualNumberOfTrajectory++;
         return this.routes.getNextTrajectory();
+    }
+
+
+    /**
+     * Method that returns all the trajectories
+     * @return all the trajectories
+     */
+    public Trajectories getTrajectories(){
+        return this.routes.getTra();
+    }
+
+    /**
+     * Return the maximum number ot trajectories to analise
+     * @return Integer number with maximum number
+     */
+    public Integer getMaximumNumberOfTrajectories() {
+        return this.maximumNumberOfTrajectories;
     }
 
     /**
@@ -155,31 +191,24 @@ public class Feeder {
      * @param points points to transform
      * @return list of speeddirection objects
      */
-    public List<InputNetwork> obtainInput(List<Point> points){
-        List<InputNetwork> totalList = new ArrayList<>();
+    public List<InputsNetwork> obtainInput(List<Point> points, Double attraction){
+        //class that compute the conversion point -> speed/bearing
+        PointToSpeedBearing convertitor = new PointToSpeedBearing();
+        List<InputsNetwork> totalList = new ArrayList<>();
         IntStream.range(0, points.size() - 1).forEach(i -> {
             //bearing from this point to next point
             Point actualPoint = points.get(i);
             Point nextPoint = points.get(i+1);
-            Double bearing = this.bearing(actualPoint.getLatitude(), actualPoint.getLongitude(), nextPoint.getLatitude(), nextPoint.getLongitude());
+            Double bearing = convertitor.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
             Double speed;
             if(i > 0){
                 Point previousPoint = points.get(i - 1);
-                //speed = distance / time
-                Distance dis = new Distance();
-                Double distance = dis.compute(previousPoint, actualPoint);
-                Double time = 0.2; //TODO check this element
-                try {
-                    time = new Double(actualPoint.differenceInTime(previousPoint));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                speed = distance / time;
+                speed = convertitor.obtainSpeed(previousPoint, actualPoint);
             }else{
                 speed = 0.0;
             }
-            totalList.add(new InputNetwork(speed, bearing));
+            totalList.add(new tgcfs.Agents.InputNetwork(attraction, speed, bearing));
         });
 
         return totalList;
@@ -187,21 +216,88 @@ public class Feeder {
 
 
     /**
-     * Compute the bearing between two points
-     * @param lat1 latitude first point
-     * @param lon1 longitude first point
-     * @param lat2 latitude second point
-     * @param lon2 longitude second point
-     * @return Double value indicating the bearing
+     * Return the number of step required from the current trajectory
+     * @param trajectory trajectory under evaluation
+     * @return list of coordinate
+     * @throws Exception if there are errors reading the config
      */
-    private Double bearing(Double lat1, Double lon1, Double lat2, Double lon2){
-        Double latitude1 = Math.toRadians(lat1);
-        Double latitude2 = Math.toRadians(lat2);
-        Double longDiff= Math.toRadians(lon2 - lon1);
-        Double y= Math.sin(longDiff)*Math.cos(latitude2);
-        Double x=Math.cos(latitude1)*Math.sin(latitude2)-Math.sin(latitude1)*Math.cos(latitude2)*Math.cos(longDiff);
-
-        return (Math.toDegrees(Math.atan2(y, x))+360)%360;
+    public List<Point> obtainSectionTrajectory(Trajectory trajectory) throws Exception {
+        List<Point> point = new ArrayList<>();
+        //Every how many time step I return the trajectory
+        Integer count = this.selectPositionInTrajectory(trajectory);
+        IntStream.range(this.position, this.position + count).forEach(i -> {
+            Point p = this.getNextPoint(trajectory);
+            //If it not null I add the element to the list
+            if(p != null){
+                point.add(p);
+            }else{
+                //if it is null I have finished the trajectory
+                this.finished = Boolean.TRUE;
+            }
+        });
+        this.position += count;
+        return point;
     }
 
+    /**
+     * Getter if the trajectory under evaluation is finished
+     * @return boolean value
+     */
+    public Boolean getFinished() {
+        return finished;
+    }
+
+
+    /**
+     * Feeder method
+     * If I have to use a new trajectory it load it
+     * It obtains the section of the trajectory that I need right now
+     * It translate the trajectory' points into the imput format for the framework
+     * @param idsaLoader reference IDSA system
+     * @return list of input formats
+     * @throws Exception if there are problems with the config file or we reached the maximum number of trajectories usable
+     */
+    public List<InputsNetwork> feeder(IdsaLoader idsaLoader) throws Exception {
+        //retrieve trajectory
+        //if the trajectory is yet not ended I do not need to load the next one
+        if (!this.finished) {
+            //If I have reached the maximum number of trajectory usable raise an exception
+            if(Objects.equals(this.actualNumberOfTrajectory, this.maximumNumberOfTrajectories)){
+                throw new ReachedMaximumNumberException("Reached Maximum Number Of trajectories");
+            }
+            this.currentTrajectory = this.getTrajectory();
+            //new trajectory new apf
+            idsaLoader.resetAPF();
+        }
+        //retrieve section form the trajectory
+        List<Point> actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
+        while(actualPoint.size() == 0){
+            actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
+        }
+
+        //compute the potential field for the actualPoint
+        actualPoint.forEach(idsaLoader::compute);
+
+        //return the list of input network
+        return  this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)));
+
+    }
+
+    /**
+     * Method to return the real part of the trajectory under analysis for the real agent
+     * @return the list of points
+     * @throws Exception if there are problems with the conf
+     */
+    public List<Point> obtainRealAgentSectionTrajectory() throws Exception {
+        //I have trajectory and I have current position.
+        //I just need to retrieve next n position
+        List<Point> realPoint = new ArrayList<>();
+        IntStream.range(this.position, this.position + this.conf.getAgentTimeSteps()).forEach(i -> {
+            Point nextPoint = this.getNextPoint(this.currentTrajectory);
+            if (nextPoint != null){
+                realPoint.add(nextPoint);
+            }
+        });
+        return realPoint;
+    }
 }

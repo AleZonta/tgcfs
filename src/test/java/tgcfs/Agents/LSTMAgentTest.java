@@ -8,8 +8,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by Alessandro Zonta on 22/05/2017.
@@ -22,6 +21,32 @@ import static org.junit.Assert.assertNotNull;
  * a.zonta@vu.nl
  */
 public class LSTMAgentTest {
+    @Test
+    public void computeOutput() throws Exception {
+        LSTMAgent agent = new LSTMAgent(2,1,1,1);
+        List<Double> list = new ArrayList<>();
+        list.add(5.0);
+        list.add(6.0);
+        List<Double> out = agent.computeOutput(list);
+        assertNotNull(out);
+        assertFalse(list.equals(out));
+        assertTrue(out.size() == 1);
+
+    }
+
+    @Test
+    public void clearPreviousState() throws Exception {
+        LSTMAgent agent = new LSTMAgent(2,1,1,1);
+        agent.clearPreviousState();
+    }
+
+    @Test
+    public void deepCopy() throws Exception {
+        LSTMAgent agent = new LSTMAgent(2,1,1,1);
+        LSTMAgent secondAgent = (LSTMAgent) agent.deepCopy();
+        assertFalse(agent.equals(secondAgent));
+    }
+
     @Test
     public void setWeights() throws Exception {
         Random random = new Random();

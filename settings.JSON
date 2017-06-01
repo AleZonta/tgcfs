@@ -14,6 +14,7 @@
   "_____________________________Third Section": "Setting used for tgcfs",
   "trajectoriesType": 1,
   "HowManySplitting": 10,
+  "HowManyTrajectories": 50,
   "_____________________________Forth Section": "Setting for the EA algorithm",
   "AgentPopulationSize": 50,
   "AgentOffspringSize": 50,
@@ -23,9 +24,14 @@
   "ClassifierOffspringSize": 50,
   "ClassifierAlphaIntermediateRecombination": 0.5,
   "ClassifierTimeSteps": 20,
+  "MaxGenerations": 1000,
   "_____________________________Fifth section": "Settings for the models",
   "HiddenLayersAgent": 1,
   "HiddenNeuronsAgent": 2,
-  "HiddenNeuronsClassifier": 3
+  "HiddenNeuronsClassifier": 3,
+  "_____________________________Sixth section": "Settings for where to save the performances",
+  "Name": "Test",
+  "Experiment": "1",
+  "Path": "/Users/alessandrozonta/Desktop"
 
 }
