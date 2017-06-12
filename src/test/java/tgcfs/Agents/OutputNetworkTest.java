@@ -1,6 +1,7 @@
 package tgcfs.Agents;
 
 import org.junit.Test;
+import tgcfs.InputOutput.Normalisation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,31 +20,65 @@ import static org.junit.Assert.assertEquals;
  */
 public class OutputNetworkTest {
     @Test
+    public void getDistance() throws Exception {
+        OutputNetwork outputNetwork = new OutputNetwork();
+        List<Double> list = new ArrayList<>();
+        list.add(1.0); // speed
+        list.add(0.5); // bearing
+        try {
+            outputNetwork.deserialise(list);
+        }catch (Error e){
+            assertEquals("List size is not correct",e.getMessage());
+        }
+        list.add(0.7); // distance
+        outputNetwork.deserialise(list);
+        assertEquals(Normalisation.decodeDistance(0.7),outputNetwork.getDistance());
+    }
+
+    @Test
     public void getSpeed() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
         List<Double> list = new ArrayList<>();
-        list.add(10.0); // speed
-        list.add(50.0); // bearing
+        list.add(1.0); // speed
+        list.add(0.5); // bearing
+        try {
+            outputNetwork.deserialise(list);
+        }catch (Error e){
+            assertEquals("List size is not correct",e.getMessage());
+        }
+        list.add(0.7); // distance
         outputNetwork.deserialise(list);
-        assertEquals(new Double(10.0),outputNetwork.getSpeed());
+        assertEquals(Normalisation.decodeSpeed(1.0),outputNetwork.getSpeed());
     }
 
     @Test
     public void getBearing() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
         List<Double> list = new ArrayList<>();
-        list.add(30.0); // speed
-        list.add(60.0); // bearing
+        list.add(1.0); // speed
+        list.add(0.5); // bearing
+        try {
+            outputNetwork.deserialise(list);
+        }catch (Error e){
+            assertEquals("List size is not correct",e.getMessage());
+        }
+        list.add(0.7); // distance
         outputNetwork.deserialise(list);
-        assertEquals(new Double(60.0),outputNetwork.getBearing());
+        assertEquals(Normalisation.decodeDirectionData(0.5),outputNetwork.getBearing());
     }
 
     @Test
     public void deserialise() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
         List<Double> list = new ArrayList<>();
-        list.add(10.0); // speed
-        list.add(50.0); // bearing
+        list.add(1.0); // speed
+        list.add(0.5); // bearing
+        try {
+            outputNetwork.deserialise(list);
+        }catch (Error e){
+            assertEquals("List size is not correct",e.getMessage());
+        }
+        list.add(0.7); // distance
         outputNetwork.deserialise(list);
     }
 

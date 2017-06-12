@@ -4,6 +4,7 @@ import lgds.trajectories.Point;
 import lgds.trajectories.Trajectory;
 import org.junit.Test;
 import tgcfs.Config.ReadConfig;
+import tgcfs.Performances.SaveToFile;
 import tgcfs.Routing.Routes;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -21,6 +22,12 @@ import static junit.framework.TestCase.assertNotNull;
 public class IdsaLoaderTest {
     @Test
     public void returnAttraction() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         IdsaLoader loader = new IdsaLoader();
 
         loader = new IdsaLoader(20);
@@ -47,6 +54,12 @@ public class IdsaLoaderTest {
 
     @Test
     public void resetAPF() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         IdsaLoader loader = new IdsaLoader();
         loader = new IdsaLoader(20);
         ReadConfig conf = new ReadConfig();
@@ -60,6 +73,12 @@ public class IdsaLoaderTest {
 
     @Test
     public void compute() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         IdsaLoader loader = new IdsaLoader();
 
         loader = new IdsaLoader(20);
@@ -84,6 +103,12 @@ public class IdsaLoaderTest {
 
     @Test
     public void initPotentialField() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         IdsaLoader loader = new IdsaLoader();
 
         loader = new IdsaLoader(20);

@@ -9,6 +9,7 @@ import lgds.trajectories.Trajectories;
 import lgds.trajectories.Trajectory;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Performances.SaveToFile;
@@ -193,18 +194,18 @@ public class Feeder {
      */
     public List<InputsNetwork> obtainInput(List<Point> points, Double attraction){
         //class that compute the conversion point -> speed/bearing
-        PointToSpeedBearing convertitor = new PointToSpeedBearing();
+        PointToSpeedBearing conversion = new PointToSpeedBearing();
         List<InputsNetwork> totalList = new ArrayList<>();
         IntStream.range(0, points.size() - 1).forEach(i -> {
             //bearing from this point to next point
             Point actualPoint = points.get(i);
             Point nextPoint = points.get(i+1);
-            Double bearing = convertitor.obtainBearing(actualPoint,nextPoint);
+            Double bearing = conversion.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
             Double speed;
             if(i > 0){
                 Point previousPoint = points.get(i - 1);
-                speed = convertitor.obtainSpeed(previousPoint, actualPoint);
+                speed = conversion.obtainSpeed(previousPoint, actualPoint);
             }else{
                 speed = 0.0;
             }
@@ -299,5 +300,58 @@ public class Feeder {
             }
         });
         return realPoint;
+    }
+
+
+    /**
+     * Find the next location given actual position, distance and direction
+     * @param whereIam position where I am
+     * @param speed speed I am moving
+     * @param distance distance I have travelled
+     * @param direction direction I am moving
+     * @return next point
+     */
+    public Point getNextLocation(Point whereIam, Double speed, Double distance, Double direction){
+        //find position where I am
+        Coord coordA = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
+        InfoNode initialNode = this.graph.findNodes(coordA);
+
+        //find all the edge connected to this node
+        List<InfoNode> endNodes = this.graph.retAllEndEdges(initialNode);
+        List<Double> angles = new ArrayList<>();
+        Coord IamHere = new Coord(whereIam.getLatitude(),whereIam.getLongitude());
+        //compute all the angles
+        endNodes.forEach(node -> {
+            angles.add(IamHere.angleWith(node.getCoord()));
+        });
+        //find id closest ending node
+        final Integer[] index = {0};
+        final Double[] minDifference = {Double.MAX_VALUE};
+        IntStream.range(0, angles.size()).forEach(i -> {
+            Double difference = Math.abs(Normalisation.fromHalfPItoTotalPI(direction) - Normalisation.fromHalfPItoTotalPI(angles.get(i)));
+            if(difference < minDifference[0]){
+                minDifference[0] = difference;
+                index[0] = i;
+            }
+        });
+        //now I now index closest nodes, find if the point is inside this edge
+        InfoNode closestNode = endNodes.get(index[0]);
+        //need to find edge and its distance
+        Double dis = this.graph.findDistanceBetweenNodesConnected(initialNode, closestNode);
+        if(distance < dis){
+            //the new point is in the middle somewhere in this edge
+            Coord position = this.graph.findPointInEdge(initialNode, closestNode, distance);
+            //find time from previous point
+            //distance / speed
+            Double plusTime = distance / speed;
+            //TODO add time
+            
+
+            return new Point(position.getLat(), position.getLon()); //TODO add here the time
+        }else{
+            //the new point is not here
+            return this.getNextLocation(new Point(closestNode.getLat(), closestNode.getLon()), speed, distance - dis, direction);
+        }
+
     }
 }

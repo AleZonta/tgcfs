@@ -37,7 +37,7 @@
   "SourceData": "../..",
   "DestinationData": ".",
   "SelectorSourceTracks_explanation" : "zero is IDSA, one is China",
-  "SelectorSourceTracks": 1,
+  "SelectorSourceTracks": 0,
   "WayPoints_explanation" : "//zero is yes, one is no",
   "WayPoints": 1,
   "POIsAreClustered": true,

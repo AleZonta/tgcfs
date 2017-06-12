@@ -142,8 +142,8 @@ public abstract class Algorithm {
         }
         //sort the list
         this.population.sort(Comparator.comparing(Individual::getFitness));
-        while(this.population.size() == size){
-            this.population.remove(size + 1);
+        while(this.population.size() != size){
+            this.population.remove(this.population.size() - 1);
         }
         //now the population is again under the maximum size allowed and containing only the element with highest fitness.
     }
@@ -193,5 +193,6 @@ public abstract class Algorithm {
         this.population.sort(Comparator.comparing(Individual::getFitness));
         return this.population.get(0).getObjectiveParameters();
     }
+
 
 }

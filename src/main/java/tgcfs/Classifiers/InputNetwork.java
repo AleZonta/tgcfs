@@ -1,5 +1,6 @@
 package tgcfs.Classifiers;
 
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.InputsNetwork;
 
 import java.lang.reflect.Field;
@@ -42,8 +43,8 @@ public class InputNetwork implements InputsNetwork{
      * @param direction direction parameter
      */
     public InputNetwork(Double speed, Double direction){
-        this.speed = speed;
-        this.direction = direction;
+        this.speed = Normalisation.convertSpeed(speed);
+        this.direction = Normalisation.convertDirectionData(direction);
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
         if (allFields.length != inputSize + 1){

@@ -41,11 +41,13 @@ public class OutputNetwork implements OutputsNetwork{
 
     /**
      * @implNote Implementation from Abstract class Algorithm
+     * If the list in input does not have the right length an error is thrown
      * @param out list containing all the fields
      */
     @Override
     public void deserialise(List<Double> out) {
-        if(out.get(0) >= 0.5){
+        if (out.size() != outputSize) throw new Error("List size is not correct");
+        if(out.get(0) >= 0.0){
             this.real = Boolean.TRUE;
         }else{
             this.real = Boolean.FALSE;

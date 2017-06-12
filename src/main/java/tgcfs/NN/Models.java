@@ -20,6 +20,7 @@ public abstract class Models {
     private Integer id; //id of the agent
 
 
+
     /**
      * Constructor that assign an id to the agent
      */
@@ -34,4 +35,5 @@ public abstract class Models {
     public Integer getId() {
         return this.id;
     }
+
 }

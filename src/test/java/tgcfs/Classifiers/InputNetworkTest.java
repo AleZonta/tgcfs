@@ -1,6 +1,7 @@
 package tgcfs.Classifiers;
 
 import org.junit.Test;
+import tgcfs.InputOutput.Normalisation;
 
 import java.util.List;
 
@@ -20,21 +21,21 @@ public class InputNetworkTest {
     @Test
     public void getSpeed() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
-        assertEquals(new Double(10.0), inputNetwork.getSpeed());
+        assertEquals(Normalisation.convertSpeed(10.0), inputNetwork.getSpeed());
     }
 
     @Test
     public void getDirection() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
-        assertEquals(new Double(30.0), inputNetwork.getDirection());
+        assertEquals(Normalisation.convertDirectionData(30.0), inputNetwork.getDirection());
     }
 
     @Test
     public void serialise() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
         List<Double> list = inputNetwork.serialise();
-        assertEquals(new Double(10.0),list.get(0));
-        assertEquals(new Double(30.0),list.get(1));
+        assertEquals(Normalisation.convertSpeed(10.0),list.get(0));
+        assertEquals(Normalisation.convertDirectionData(30.0),list.get(1));
 
     }
 

@@ -73,7 +73,7 @@ public class Agents extends Algorithm {
                 for (InputsNetwork inputsNetwork : input) {
                     lastOutput = model.computeOutput(inputsNetwork.serialise());
                 }
-                //now for the number of timestep that I want to check save the output
+                //now for the number of time step that I want to check save the output
                 List<OutputsNetwork> outputsNetworks = new ArrayList<>();
 
                 OutputNetwork out = new OutputNetwork();
@@ -148,13 +148,11 @@ public class Agents extends Algorithm {
                     }
 
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
+                    logger.log(Level.SEVERE, "Error " + e.getMessage());
                 }
             });
         });
     }
-
-
 
 }
 

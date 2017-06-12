@@ -1,5 +1,6 @@
 package tgcfs.Agents;
 
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.InputsNetwork;
 
 import java.lang.reflect.Field;
@@ -26,14 +27,15 @@ public class InputNetwork implements InputsNetwork {
 
     /**
      * Constructor with three parameters. all the inputs
+     * It is also normalising the input in the range ±1 for the NN
      * @param directionAPF Double number corresponding to the direction retrieved form the apf
      * @param speed Double number corresponding to the speed
      * @param bearing Double number corresponding to the bearing
      */
     public InputNetwork(Double directionAPF, Double speed, Double bearing){
-        this.bearing = bearing;
-        this.speed = speed;
-        this.directionAPF = directionAPF;
+        this.bearing = Normalisation.convertDirectionData(bearing);
+        this.speed = Normalisation.convertSpeed(speed);
+        this.directionAPF = Normalisation.convertDirectionData(directionAPF);
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
         if (allFields.length != inputSize + 1){

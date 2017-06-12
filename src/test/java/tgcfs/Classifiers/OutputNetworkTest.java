@@ -36,7 +36,7 @@ public class OutputNetworkTest {
         assertTrue(outputNetwork.getReal());
 
         list = new ArrayList<>();
-        list.add(0.3);
+        list.add(-0.5);
         outputNetwork.deserialise(list);
         assertNotNull(outputNetwork.getReal());
         assertFalse(outputNetwork.getReal());

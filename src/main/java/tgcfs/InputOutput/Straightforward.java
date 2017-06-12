@@ -19,7 +19,7 @@ import java.util.List;
  * a.zonta@vu.nl
  *
  * Implementation of the mapping process
- * From the ouput of the agents the indications need to be transformed into the input of the second
+ * From the output of the agents the indications need to be transformed into the input of the second
  * This is for test use, does not follow the real path on the graph of the routes
  */
 public class Straightforward implements Transformation {
@@ -39,6 +39,7 @@ public class Straightforward implements Transformation {
         //direction
 
         //In this case no transformation are needed, it is one to one
+        //also no conversion are needed since they are already between -1 and +1
         //speed -> speed
         //direction -> direction
 

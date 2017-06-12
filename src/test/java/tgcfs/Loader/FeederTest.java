@@ -1,11 +1,12 @@
 package tgcfs.Loader;
 
-import gms.GraphML.InfoNode;
 import lgds.trajectories.Point;
 import lgds.trajectories.Trajectory;
 import org.junit.Test;
+import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.NN.InputsNetwork;
+import tgcfs.Performances.SaveToFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +27,24 @@ import static junit.framework.TestCase.*;
 public class FeederTest {
     @Test
     public void getMaximumNumberOfTrajectories() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         assertNotNull(system.getMaximumNumberOfTrajectories());
     }
 
     @Test
     public void feeder() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         system.loadSystem();
 
@@ -51,6 +64,12 @@ public class FeederTest {
 
     @Test
     public void getFinished() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         system.loadSystem();
         Trajectory trajectory = system.getTrajectory();
@@ -70,6 +89,12 @@ public class FeederTest {
 
     @Test
     public void getNextPoint() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         system.loadSystem();
         Trajectory trajectory = system.getTrajectory();
@@ -78,6 +103,12 @@ public class FeederTest {
 
     @Test
     public void obtainSectionTrajectory() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         system.loadSystem();
         Trajectory trajectory = system.getTrajectory();
@@ -99,7 +130,12 @@ public class FeederTest {
     }
 
     @Test
-    public void getTrajectories() throws Exception {
+    public void getTrajectories() throws Exception {//initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         system.loadSystem();
         assertNotNull(system.getTrajectories());
@@ -107,6 +143,12 @@ public class FeederTest {
 
     @Test
     public void getTrajectory() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         system.loadSystem();
         assertNotNull(system.getTrajectory());
@@ -114,6 +156,12 @@ public class FeederTest {
 
     @Test
     public void obtainInput() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         system.loadSystem();
         Trajectory a = system.getTrajectory();
@@ -127,18 +175,31 @@ public class FeederTest {
 
     @Test
     public void fromTrajectoryToNodesInGraph() throws Exception {
-        Feeder system = new Feeder();
-        system.loadSystem();
-        Trajectory trajectory = system.getTrajectory();
-        List<InfoNode> nodes = system.fromTrajectoryToNodesInGraph(trajectory);
-        assertNotNull(nodes);
-        nodes.forEach(node -> {
-            System.out.println(node.retLat() + ", " + node.retLon());
-        });
+        //initialise the saving class
+//        ReadConfig configFile = new ReadConfig();
+//        configFile.readFile();
+//
+//        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+//
+//        Feeder system = new Feeder();
+//        system.loadSystem();
+//        Trajectory trajectory = system.getTrajectory();
+//        List<InfoNode> nodes = system.fromTrajectoryToNodesInGraph(trajectory);
+//        assertNotNull(nodes);
+//        nodes.forEach(node -> {
+//            System.out.println(node.retLat() + ", " + node.retLon());
+//        });
+        //not used
     }
 
     @Test
     public void loadSystem() throws Exception {
+        //initialise the saving class
+        ReadConfig configFile = new ReadConfig();
+        configFile.readFile();
+
+        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+
         Feeder system = new Feeder();
         system.loadSystem();
     }

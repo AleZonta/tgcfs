@@ -21,6 +21,11 @@ import static org.junit.Assert.assertNotNull;
  */
 public class AgentTest {
     @Test
+    public void getLastPoint() throws Exception {
+        throw new Exception("Not implemented");
+    }
+
+    @Test
     public void setRealOutput() throws Exception {
         List<Point> points = new ArrayList<>();
         points.add(new Point(5d,5d));

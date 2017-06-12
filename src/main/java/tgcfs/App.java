@@ -9,7 +9,7 @@ import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Classifiers;
 import tgcfs.Idsa.IdsaLoader;
-import tgcfs.InputOutput.Straightforward;
+import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.Loader.Feeder;
 import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.NN.EvolvableNN;
@@ -118,8 +118,8 @@ public class App {
         //execution agents
         this.agents.runIndividuals(inputList);
         //classifier are executed and evaluated during agents evaluations
-        this.agents.evaluateIndividuals(this.classifiers, new Straightforward());
-        this.classifiers.evaluateRealAgent(this.realAgent, new Straightforward());
+        this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
+        this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
         //save the fitness of all the population and the best genome
         SaveToFile.Saver.saveFitness(this.agents.getClass().getName(),this.agents.retAllFitness());
         SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(),this.classifiers.retAllFitness());
@@ -147,8 +147,8 @@ public class App {
                 //execution agents
                 this.agents.runIndividuals(inputList);
                 //classifier are executed and evaluated during agents evaluations
-                this.agents.evaluateIndividuals(this.classifiers, new Straightforward());
-                this.classifiers.evaluateRealAgent(this.realAgent, new Straightforward());
+                this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
+                this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
 
             /* { SELECT individuals next generation } */
                 this.agents.selectParents();

@@ -92,7 +92,7 @@ public class Classifier extends Models implements EvolvableNN {
     public List<Double> computeOutput(List<Double> input){
         //transform list to vector
         double[] inputVector = input.stream().mapToDouble(d -> d).toArray();
-        double[] outputVector = new double[this.arrayLength];
+        double[] outputVector = new double[this.output];
         //compute the output
         this.elmanNetwork.compute(inputVector, outputVector);
         return DoubleStream.of(outputVector).boxed().collect(Collectors.toCollection(ArrayList::new));

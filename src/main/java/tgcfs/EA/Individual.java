@@ -186,8 +186,10 @@ public class Individual {
 
     /**
      * Increase Fitness by one
+     * @exception Exception if the individual is not initialised
      */
-    public void increaseFitness(){
+    public void increaseFitness() throws Exception {
+        if(this.fitness == null) throw new Exception("Individual not correctly initialised");
         this.fitness++;
     }
 

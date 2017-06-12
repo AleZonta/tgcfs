@@ -1,6 +1,7 @@
 package tgcfs.Agents;
 
 import org.junit.Test;
+import tgcfs.InputOutput.Normalisation;
 
 import java.util.List;
 
@@ -20,28 +21,28 @@ public class InputNetworkTest {
     @Test
     public void getDirectionAPF() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(5.0,10.0,30.0);
-        assertEquals(new Double(5.0), inputNetwork.getDirectionAPF());
+        assertEquals(Normalisation.convertDirectionData(5.0), inputNetwork.getDirectionAPF());
     }
 
     @Test
     public void getSpeed() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(5.0,10.0,30.0);
-        assertEquals(new Double(10.0), inputNetwork.getSpeed());
+        assertEquals(Normalisation.convertSpeed(10.0), inputNetwork.getSpeed());
     }
 
     @Test
     public void getBearing() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(5.0,10.0,30.0);
-        assertEquals(new Double(30.0), inputNetwork.getBearing());
+        assertEquals(Normalisation.convertDirectionData(30.0), inputNetwork.getBearing());
     }
 
     @Test
     public void serialise() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(5.0,10.0,30.0);
         List<Double> result = inputNetwork.serialise();
-        assertEquals(new Double(10.0), result.get(0));
-        assertEquals(new Double(30.0), result.get(1));
-        assertEquals(new Double(5), result.get(2));
+        assertEquals(Normalisation.convertSpeed(10.0), result.get(0));
+        assertEquals(Normalisation.convertDirectionData(30.0), result.get(1));
+        assertEquals(Normalisation.convertDirectionData(5.0), result.get(2));
     }
 
 }

@@ -1,5 +1,6 @@
 package tgcfs.Agents;
 
+import lgds.Distance.Distance;
 import lgds.trajectories.Point;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.Models;
@@ -41,13 +42,15 @@ public class Agent extends Models {
     }
 
     /**
-     * Obtain the output from the agent that has the real movement of the persone
-     * @return llist of outputNetwork
+     * Obtain the output from the agent that has the real movement of the person
+     * @return list of outputNetwork
      */
     public List<OutputsNetwork> realOutput(){
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing convertitor = new PointToSpeedBearing();
         List<OutputsNetwork> totalList = new ArrayList<>();
+        Distance distance = new Distance();
+
         IntStream.range(0, this.realOutput.size() - 1).forEach(i -> {
             //bearing from this point to next point
             Point actualPoint = this.realOutput.get(i);
@@ -55,14 +58,28 @@ public class Agent extends Models {
             Double bearing = convertitor.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
             Double speed;
+            Double dist;
             if(i > 0){
                 Point previousPoint = this.realOutput.get(i - 1);
                 speed = convertitor.obtainSpeed(previousPoint, actualPoint);
+
+                dist = distance.compute(previousPoint,actualPoint);
             }else{
                 speed = 0.0;
+                dist = 0.0;
             }
-            totalList.add(new OutputNetwork(speed, bearing));
+            //compute the distance
+
+            totalList.add(new OutputNetwork(speed, bearing, dist));
         });
         return totalList;
+    }
+
+    /**
+     * Return last point of the real trajectory
+     * @return point object
+     */
+    public Point getLastPoint(){
+        return this.realOutput.get(this.realOutput.size() - 1);
     }
 }

@@ -24,7 +24,7 @@ public class StraightforwardTest {
     public void transform() throws Exception {
         List<OutputsNetwork> outputNetworks = new ArrayList<>();
         OutputNetwork out = new OutputNetwork();
-        List<Double> list = new ArrayList<>(Arrays.asList(5.0,7.0));
+        List<Double> list = new ArrayList<>(Arrays.asList(1.0,0.5,0.2));
         out.deserialise(list);
         outputNetworks.add(out);
 

@@ -1,5 +1,6 @@
 package tgcfs.Agents;
 
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.OutputsNetwork;
 
 import java.lang.reflect.Field;
@@ -18,7 +19,8 @@ import java.util.List;
 public class OutputNetwork implements OutputsNetwork {
     private Double speed;
     private Double bearing;
-    public static final Integer outputSize = 2; //the size of the output corresponding to the two fields here
+    private Double distance;
+    public static final Integer outputSize = 3; //the size of the output corresponding to the two fields here
 
     /**
      * Constructor zero parameter
@@ -36,9 +38,10 @@ public class OutputNetwork implements OutputsNetwork {
      * @param speed speed parameter
      * @param bearing bearing parameter
      */
-    public OutputNetwork(Double speed, Double bearing){
+    public OutputNetwork(Double speed, Double bearing, Double distance){
         this.speed = speed;
         this.bearing = bearing;
+        this.distance = distance;
         Field[] allFields = OutputNetwork.class.getDeclaredFields();
         if (allFields.length != outputSize + 1){
             throw new Error("Number of fields and variable expressing that do not correspond.");
@@ -62,12 +65,21 @@ public class OutputNetwork implements OutputsNetwork {
     }
 
     /**
+     * Getter for distance
+     * @return Double value of distance
+     */
+    public Double getDistance() { return this.distance;}
+
+    /**
      * @implNote Implementation from Abstract class Algorithm
+     * If the list in input does not have the right length an error is thrown
      * @param out list containing all the fields
      */
     @Override
     public void deserialise(List<Double> out) {
-        this.speed = out.get(0);
-        this.bearing = out.get(1);
+        if (out.size() != outputSize) throw new Error("List size is not correct");
+        this.speed = Normalisation.decodeSpeed(out.get(0));
+        this.bearing = Normalisation.decodeDirectionData(out.get(1));
+        this.distance = Normalisation.decodeDistance(out.get(2));
     }
 }
