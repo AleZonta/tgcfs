@@ -27,10 +27,24 @@ public class LSTMAgentTest {
         List<Double> list = new ArrayList<>();
         list.add(5.0);
         list.add(6.0);
-        List<Double> out = agent.computeOutput(list);
+        List<Double> out = null;
+        try {
+            out = agent.computeOutput(list);
+            assertNotNull(out);
+            assertFalse(list.equals(out));
+            assertTrue(out.size() == 1);
+            assertTrue((out.get(0) >= -1.0)  && (out.get(0) <= 1.0) );
+        }catch (Error e){
+            assertEquals("Generator input is not normalised correctly", e.getMessage());
+        }
+        list = new ArrayList<>();
+        list.add(1.0);
+        list.add(-1.0);
+        out = agent.computeOutput(list);
         assertNotNull(out);
         assertFalse(list.equals(out));
         assertTrue(out.size() == 1);
+        assertTrue((out.get(0) >= -1.0)  && (out.get(0) <= 1.0) );
 
     }
 

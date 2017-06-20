@@ -98,7 +98,8 @@ public class Agents extends Algorithm {
                 individual.setOutput(outputsNetworks);
 
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
+                logger.log(Level.SEVERE, "Errors with the neural network " + e.getMessage());
+                e.printStackTrace();
             }
 
         });
@@ -133,10 +134,12 @@ public class Agents extends Algorithm {
     public void evaluateIndividuals(Algorithm opponent, Transformation transformation){
         //I need to evaluate the agent using the classifiers
         super.getPopulation().parallelStream().forEach(individual -> {
+//            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
             //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
             opponent.getPopulation().forEach(classifier -> {
                 try {
+//                    System.out.println(LocalDateTime.now().toString()  + "  Evaluation classifier<--------------------------------------------------------");
                     tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(individual.getOutput()));
                     //if the classifier is saying true -> it is wrongly judging the agent
                     if(result.getReal()){

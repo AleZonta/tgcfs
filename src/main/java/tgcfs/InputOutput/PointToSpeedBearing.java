@@ -25,7 +25,7 @@ public class PointToSpeedBearing {
         //speed = distance / time
         Distance dis = new Distance();
         Double distance = dis.compute(firstPoint, secondPoint);
-        Double time = 0.2; //TODO check this element
+        Double time = 0.2; //fixed value for IDSA (checked on IDSA)
         try {
             time = new Double(secondPoint.differenceInTime(firstPoint));
         } catch (Exception e) {

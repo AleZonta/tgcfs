@@ -6,6 +6,8 @@ import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.Models;
 import tgcfs.NN.OutputsNetwork;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -77,9 +79,17 @@ public class Agent extends Models {
 
     /**
      * Return last point of the real trajectory
+     * Checks if the data is null -> it creates it with the actual time
      * @return point object
      */
     public Point getLastPoint(){
-        return this.realOutput.get(this.realOutput.size() - 1);
+        Point p = this.realOutput.get(this.realOutput.size() - 1);
+        Point ret;
+        if(p.getTime() == null){
+            ret = new Point(p.getLatitude(), p.getLongitude(), 0.0, 0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        }else{
+            ret = new Point(p.getLatitude(), p.getLongitude(), p.getAltitude(), p.getDated(), p.getTime(), p.getDates());
+        }
+        return ret;
     }
 }

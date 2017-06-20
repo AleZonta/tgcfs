@@ -99,19 +99,31 @@ public class Classifiers extends Algorithm {
     }
 
     /**
-     * Evaluate the classifier with the real agent
+     * Evaluate the classifier on the real agent
+     * Each classifier is evaluated on the real agent oer "agent_population" times
      * @param agent the real agent
      */
     public void evaluateRealAgent(Models agent, Transformation transformation){
         super.getPopulation().parallelStream().forEach(individual -> {
             try {
-                OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(((Agent)agent).realOutput()));
-                //if the classifier is saying true -> it is correctly judging the agent
-                if(result.getReal()){
-                    individual.increaseFitness();
-                }
+                //now I am evaluating every classifier on the real agent only one time
+                //I should evaluate it the same number of time that I am evaluating the normal individual or even more.
+                //Paper read sometime they test this more than the pop number
+                //TODO check and decide how many times evaluate the classifier o the real data.
+                IntStream.range(0, super.getConfigFile().getAgentPopulationSize()).forEach(element ->{
+                    try {
+                        OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(((Agent)agent).realOutput()));
+                        //if the classifier is saying true -> it is correctly judging the agent
+                        if(result.getReal()){
+                            individual.increaseFitness();
+                        }
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
+                    }
+                });
+
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
+                logger.log(Level.SEVERE, "Error with the file" + e.getMessage());
             }
         });
     }

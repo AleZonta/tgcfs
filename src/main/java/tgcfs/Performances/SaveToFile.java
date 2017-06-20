@@ -127,7 +127,7 @@ public class SaveToFile {
      */
     private void saveFitness(String name, List<Integer> listFitness){
         try {
-            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + ".csv", true));
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-fitness.csv", true));
             listFitness.forEach(fitness -> {
                 try {
                     outputWriter.write(Integer.toString(fitness) + ", ");
@@ -168,7 +168,7 @@ public class SaveToFile {
      */
     private void saveGenome(String name, List<Double> genome){
         try {
-            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + ".csv", true));
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + ".-genome.csv", true));
             genome.forEach(gene -> {
                 try {
                     outputWriter.write(Double.toString(gene) + ", ");

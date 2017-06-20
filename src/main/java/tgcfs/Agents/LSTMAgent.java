@@ -153,6 +153,10 @@ public class LSTMAgent extends Models implements EvolvableNN {
      */
     @Override
     public List<Double> computeOutput(List<Double> input) {
+        //check if the input is in the correct range
+        if (input.stream().anyMatch(value -> value < -1.0 || value > 1.0)){
+            throw new Error("Generator input is not normalised correctly");
+        }
         //If this MultiLayerNetwork contains one or more RNN layers: conduct forward pass (prediction) but using previous stored state for any RNN layers.
         INDArray result = this.net.rnnTimeStep(Nd4j.create(input.stream().mapToDouble(d -> d).toArray()));
         double[] res = result.data().asDouble();

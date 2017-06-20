@@ -112,6 +112,8 @@ public abstract class Algorithm {
             Recombination obj = new DiscreteRecombination(firstParents.getObjectiveParameters(), secondParents.getObjectiveParameters());
             Recombination mut = new IntermediateRecombination(firstParents.getMutationStrengths(), secondParents.getMutationStrengths(), 0.5);
             Individual son = new Individual(obj.recombination(), mut.recombination());
+            //set model to the son
+            son.setModel(firstParents.getModel().deepCopy());
 
             //mutate the individual
             son.mutate(this.population.size());

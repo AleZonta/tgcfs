@@ -116,8 +116,10 @@ public class App {
         List<InputsNetwork> inputList = this.feeder.feeder(this.idsaLoader);
         this.realAgent.setRealOutput(this.feeder.obtainRealAgentSectionTrajectory());
         //execution agents
+        logger.log(Level.INFO,"Run Agents...");
         this.agents.runIndividuals(inputList);
         //classifier are executed and evaluated during agents evaluations
+        logger.log(Level.INFO,"Run Classifiers...");
         this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
         this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
         //save the fitness of all the population and the best genome
@@ -137,6 +139,7 @@ public class App {
             /* { SELECT parent }
                { RECOMBINE parents }
                { MUTATE offspring } */
+            logger.log(Level.INFO,"Generating Offspring...");
             this.agents.generateOffspring();
             this.classifiers.generateOffspring();
 
@@ -145,12 +148,15 @@ public class App {
                 inputList = this.feeder.feeder(this.idsaLoader);
                 this.realAgent.setRealOutput(this.feeder.obtainRealAgentSectionTrajectory());
                 //execution agents
+                logger.log(Level.INFO,"Run Agents...");
                 this.agents.runIndividuals(inputList);
+                logger.log(Level.INFO,"Run Classifiers...");
                 //classifier are executed and evaluated during agents evaluations
                 this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
                 this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
 
             /* { SELECT individuals next generation } */
+                logger.log(Level.INFO,"Parent Selection...");
                 this.agents.selectParents();
                 this.classifiers.selectParents();
 
@@ -165,6 +171,7 @@ public class App {
                 reachedEndTrajectory = Boolean.TRUE;
             } catch (Exception e){
                 logger.log(Level.WARNING, "Error concluded the main loop -> " + e.getMessage());
+                e.printStackTrace();
                 randomError = Boolean.TRUE;
             }
         }
@@ -172,12 +179,16 @@ public class App {
     }
 
 
-
-
-
-
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        App app = null;
+        try {
+            app = new App();
+            app.load();
+            app.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

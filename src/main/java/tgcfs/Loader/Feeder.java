@@ -70,6 +70,9 @@ public class Feeder {
         logger.log(Level.INFO, "Loading system...");
         this.routes.readTrajectories();
         this.graph.loadGraph();
+        if(this.maximumNumberOfTrajectories == 99999){
+            this.maximumNumberOfTrajectories = this.routes.getTra().getTrajectories().size();
+        }
         logger.log(Level.INFO, "System Online!!!");
     }
 
@@ -253,7 +256,7 @@ public class Feeder {
      * Feeder method
      * If I have to use a new trajectory it load it
      * It obtains the section of the trajectory that I need right now
-     * It translate the trajectory' points into the imput format for the framework
+     * It translate the trajectory' points into the input format for the framework
      * @param idsaLoader reference IDSA system
      * @return list of input formats
      * @throws Exception if there are problems with the config file or we reached the maximum number of trajectories usable
@@ -344,13 +347,10 @@ public class Feeder {
             //find time from previous point
             //distance / speed
             Double plusTime = distance / speed;
-            //TODO add time
-            
-
-            return new Point(position.getLat(), position.getLon()); //TODO add here the time
+            return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
         }else{
             //the new point is not here
-            return this.getNextLocation(new Point(closestNode.getLat(), closestNode.getLon()), speed, distance - dis, direction);
+            return this.getNextLocation(new Point(closestNode.getLat(), closestNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getDates()), speed, distance - dis, direction);
         }
 
     }

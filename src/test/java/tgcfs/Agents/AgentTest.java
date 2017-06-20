@@ -22,7 +22,14 @@ import static org.junit.Assert.assertNotNull;
 public class AgentTest {
     @Test
     public void getLastPoint() throws Exception {
-        throw new Exception("Not implemented");
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(5d,5d));
+
+        Agent agent = new Agent();
+        agent.setRealOutput(points);
+
+        Point p = agent.getLastPoint();
+        assertNotNull(p);
     }
 
     @Test

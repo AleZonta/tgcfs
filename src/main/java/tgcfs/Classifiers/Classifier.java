@@ -90,6 +90,10 @@ public class Classifier extends Models implements EvolvableNN {
      */
     @Override
     public List<Double> computeOutput(List<Double> input){
+        //check if the input is in the correct range
+        if (input.stream().anyMatch(value -> value < -1.0 || value > 1.0)){
+            throw new Error("Classifier input is not normalised correctly");
+        }
         //transform list to vector
         double[] inputVector = input.stream().mapToDouble(d -> d).toArray();
         double[] outputVector = new double[this.output];
