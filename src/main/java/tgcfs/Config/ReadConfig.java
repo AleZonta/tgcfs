@@ -47,6 +47,8 @@ public class ReadConfig {
     private String name;
     private String experiment;
     private String path;
+    private Boolean dumpPop;
+    private Boolean loadDumpPop;
 
     /**
      * Constructor with zero parameter
@@ -307,7 +309,19 @@ public class ReadConfig {
             // MaxGenerations
             this.path = (String) jsonObject.get("Path");
         }catch (ClassCastException | NullPointerException e) {
-            throw new Exception("Path is wrong or missing.");
+            throw new Exception("MaxGenerations is wrong or missing.");
+        }
+        try {
+            // dumpPop
+            this.dumpPop = (Boolean) jsonObject.get("DumpPopulation");
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("dumpPop is wrong or missing.");
+        }
+        try {
+            // loadDumpPop
+            this.loadDumpPop = (Boolean) jsonObject.get("LoadDumpedPop");
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("loadDumpPop is wrong or missing.");
         }
     }
 
@@ -418,5 +432,25 @@ public class ReadConfig {
                 "experiment='" + experiment + '\'' + ",\n" +
                 "path='" + path + '\'' + "\n" +
                 '}';
+    }
+
+    /**
+     * Am I saving all the population on a file?
+     * @return Boolean Value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Boolean getDumpPop() throws Exception {
+        if(this.dumpPop == null) throw new Exception("Try to access config file before reading it.");
+        return this.dumpPop;
+    }
+
+    /**
+     * Am i loading the population from a file?
+     * @return Boolean Value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Boolean getLoadDumpPop() throws Exception {
+        if(this.loadDumpPop == null) throw new Exception("Try to access config file before reading it.");
+        return this.loadDumpPop;
     }
 }

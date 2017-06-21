@@ -165,6 +165,11 @@ public class App {
                 SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(), this.classifiers.retAllFitness());
                 SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
                 SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
+                if(this.configFile.getDumpPop()) {
+                    logger.log(Level.INFO,"Dump Population...");
+                    SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
+                    SaveToFile.Saver.dumpPopulation(this.classifiers.getClass().getName(), this.classifiers.getPopulation());
+                }
 
             } catch (ReachedMaximumNumberException e) {
                 logger.log(Level.INFO, e.getMessage());

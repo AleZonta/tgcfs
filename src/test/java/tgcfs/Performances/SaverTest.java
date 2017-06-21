@@ -3,6 +3,7 @@ package tgcfs.Performances;
 import nl.tno.idsa.framework.config.ConfigFile;
 import org.junit.Test;
 import tgcfs.Config.ReadConfig;
+import tgcfs.EA.Individual;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,30 @@ import static junit.framework.TestCase.assertEquals;
  * a.zonta@vu.nl
  */
 public class SaverTest {
+    @Test
+    public void dumpPopulation() throws Exception {
+        List<Individual> list = new ArrayList<>();
+        list.add(new Individual(5));
+        list.add(new Individual(3));
+        list.add(new Individual(7));
+        list.add(new Individual(1));
+        try {
+            SaveToFile.Saver.dumpPopulation("a", list);
+        }catch (Exception e){
+            assertEquals("Cannot save, the class is not instantiate",e.getMessage());
+        }
+        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1");
+        SaveToFile.Saver.dumpPopulation("a", list);
+        SaveToFile.Saver.dumpPopulation("a", list);
+        List<Individual> list3 = new ArrayList<>();
+        list3.add(new Individual(50));
+        list3.add(new Individual(30));
+        list3.add(new Individual(70));
+        list3.add(new Individual(10));
+        SaveToFile.Saver.dumpPopulation("a", list3);
+
+    }
+
     @Test
     public void saveFitness() throws Exception {
 
@@ -93,5 +118,8 @@ public class SaverTest {
         SaveToFile.Saver.saveBestGenoma("a",list);
 
     }
+
+
+
 
 }

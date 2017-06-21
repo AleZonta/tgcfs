@@ -37,6 +37,10 @@
   "_____________________________Sixth section": "Settings for where to save the performances",
   "Name": "Test",
   "Experiment": "1",
-  "Path": "/Users/alessandrozonta/Desktop"
+  "Path": "/Users/alessandrozonta/Desktop",
+  "DumpPopulationExplanation": "Save the entire population on file.",
+  "DumpPopulation" : false,
+  "LoadDumpedPopExplanation": "Load the population from file. Not Implemented now",
+  "LoadDumpedPop": false
 
 }

@@ -88,7 +88,7 @@ public class Feeder {
         //decide how many time to analise the trajectory
         Integer split = this.conf.getHowManySplitting() + 1;
         //need to check if the trajectory is shorter than the split number
-        if(tra.getSize()<=split){
+        if(tra.getSize() <= split){
             split = 2; //I only split in half
         }
         return (int) Math.floor(tra.getSize() / split);

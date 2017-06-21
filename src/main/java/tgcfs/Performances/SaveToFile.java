@@ -1,10 +1,15 @@
 package tgcfs.Performances;
 
+import tgcfs.EA.Individual;
+
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Created by Alessandro Zonta on 01/06/2017.
@@ -82,6 +87,17 @@ public class SaveToFile {
         public static void saveBestGenoma(String name, List<Double> genoma) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveGenome(name, genoma);
+        }
+
+        /**
+         * Save the entire population in a csv file inside a zip file to save space
+         * @param name name of the population
+         * @param population individual of the population
+         * @throws Exception  if the class is not instantiate
+         */
+        public static void dumpPopulation(String name, List<Individual> population) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.dumpEverything(name, population);
         }
     }
 
@@ -168,7 +184,7 @@ public class SaveToFile {
      */
     private void saveGenome(String name, List<Double> genome){
         try {
-            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + ".-genome.csv", true));
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-genome.csv", true));
             genome.forEach(gene -> {
                 try {
                     outputWriter.write(Double.toString(gene) + ", ");
@@ -187,4 +203,48 @@ public class SaveToFile {
         }
     }
 
+
+    /**
+     * Save the entire population in a csv file inside a zip file to save space
+     * If the file already exists, it is going to be erased
+     * @param name name of the population
+     * @param population individual of the population
+     */
+    private void dumpEverything(String name, List<Individual> population){
+        String path = this.currentPath + name + "-population" + ".zip";
+        File f = new File(path);
+        if(f.exists() && !f.isDirectory()) {
+            try {
+                Files.delete(Paths.get(path));
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Error deleting file " + name + " CSV File " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        //check if file exist
+        try (FileOutputStream zipFile = new FileOutputStream(new File(path));
+             ZipOutputStream zos = new ZipOutputStream(zipFile);
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
+        ){
+            ZipEntry csvFile = new ZipEntry( name + "-population.csv");
+            zos.putNextEntry(csvFile);
+            population.forEach(individual -> {
+                individual.getObjectiveParameters().forEach(gene -> {
+                    try {
+                        writer.write(Double.toString(gene) + ", ");
+                    } catch (IOException e) {
+                        logger.log(Level.WARNING, "Error appending line to " + name + " CSV File " + e.getMessage());
+                        e.printStackTrace();
+                    }});
+                try {
+                    writer.newLine();
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Error appending line to " + name + " CSV File " + e.getMessage());
+                    e.printStackTrace();
+                }
+            });
+        }catch (Exception e){
+            logger.log(Level.WARNING, "Error with " + name + " Zip File " + e.getMessage());
+        }
+    }
 }

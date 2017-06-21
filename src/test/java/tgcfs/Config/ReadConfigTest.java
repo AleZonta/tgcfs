@@ -17,6 +17,40 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getDumpPop() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getDumpPop();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getDumpPop());
+    }
+
+    @Test
+    public void getLoadDumpPop() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getLoadDumpPop();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getLoadDumpPop());
+    }
+
+    @Test
     public void toStringTest() throws Exception {
         ReadConfig conf = new ReadConfig();
         assertNotNull(conf.toString());
