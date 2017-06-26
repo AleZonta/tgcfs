@@ -82,4 +82,17 @@ public class OutputNetwork implements OutputsNetwork {
         this.bearing = Normalisation.decodeDirectionData(out.get(1));
         this.distance = Normalisation.decodeDistance(out.get(2));
     }
+
+    /**
+     * Override to string method
+     * @return the string version of the data
+     */
+    @Override
+    public String toString() {
+        return "OutputNetwork{" + " " +
+                "speed=" + this.speed + ", " +
+                "bearing=" + this.bearing + ", " +
+                "distance=" + this.distance + " " +
+                '}';
+    }
 }

@@ -27,16 +27,13 @@ import java.util.logging.Logger;
 public class Routes {
     private Traces storage; //class that loads the track from file
     private Trajectories tra; //keep track of all the trajectories
-    private final ReadConfig conf; //configuration object containing location where to read the graph
     private static final Logger logger = Logger.getLogger(Routes.class.getName()); //logger for this class
     private static Integer number; //number of trajectories analysed
 
     /**
      * Constructor with one parameter
-     * @param conf the object conf containing the configuration
      */
-    public Routes(ReadConfig conf){
-        this.conf = conf;
+    public Routes(){
         number = 0;
     }
 
@@ -49,7 +46,7 @@ public class Routes {
      */
     public void readTrajectories() throws Exception{
         logger.log(Level.INFO, "Loading Trajectories...");
-        if (this.conf.getTrajectoriesType() == 0){
+        if (ReadConfig.Configurations.getTrajectoriesType() == 0){
             this.storage = new LoadIDSATrack();
         }else{
             this.storage = new LoadTrack();

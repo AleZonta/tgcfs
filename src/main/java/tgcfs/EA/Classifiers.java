@@ -2,6 +2,7 @@ package tgcfs.EA;
 
 import tgcfs.Agents.Agent;
 import tgcfs.Classifiers.OutputNetwork;
+import tgcfs.Config.ReadConfig;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
@@ -33,22 +34,6 @@ public class Classifiers extends Algorithm {
      */
     public Classifiers() throws Exception {
         super();
-    }
-
-    /**
-     * @implNote Implementation from Abstract class Algorithm
-     * @param model the model of the population
-     * @throws Exception if the reading of the config file goes wrong
-     */
-    @Override
-    public void generatePopulation(EvolvableNN model) throws Exception {
-        logger.log(Level.INFO, "Generating Classifiers Population...");
-        IntStream.range(0, super.getConfigFile().getClassifierPopulationSize()).forEach(i ->{
-            Individual newBorn = new Individual(model.getArrayLength());
-            //assign the model to the classifier
-            newBorn.setModel(model.deepCopy());
-            super.addIndividual(newBorn);
-        });
     }
 
     /**
@@ -109,8 +94,8 @@ public class Classifiers extends Algorithm {
                 //now I am evaluating every classifier on the real agent only one time
                 //I should evaluate it the same number of time that I am evaluating the normal individual or even more.
                 //Paper read sometime they test this more than the pop number
-                //TODO check and decide how many times evaluate the classifier o the real data.
-                IntStream.range(0, super.getConfigFile().getAgentPopulationSize()).forEach(element ->{
+                //evaluating the real agent for pop times
+                IntStream.range(0, ReadConfig.Configurations.getAgentPopulationSize()).forEach(element ->{
                     try {
                         OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(((Agent)agent).realOutput()));
                         //if the classifier is saying true -> it is correctly judging the agent

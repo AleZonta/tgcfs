@@ -1,6 +1,8 @@
 package tgcfs.EA;
 
 import tgcfs.Config.ReadConfig;
+import tgcfs.EA.Mutation.RandomResetting;
+import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.EA.Recombination.DiscreteRecombination;
 import tgcfs.EA.Recombination.IntermediateRecombination;
 import tgcfs.EA.Recombination.Recombination;
@@ -13,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -31,7 +35,6 @@ import java.util.logging.Logger;
  */
 public abstract class Algorithm {
     private List<Individual> population; //representation of the population
-    private ReadConfig configFile; //file containing configuration
     protected static final Logger logger = Logger.getLogger(Algorithm.class.getName()); //logger for this class
 
 
@@ -42,9 +45,6 @@ public abstract class Algorithm {
      */
     public Algorithm() throws Exception{
         this.population = new ArrayList<>();
-        //Loading config for this algorithm
-        this.configFile = new ReadConfig();
-        this.configFile.readFile();
     }
 
     /**
@@ -52,14 +52,33 @@ public abstract class Algorithm {
      * @param model the model of the population
      * @throws Exception exception
      */
-    public abstract void generatePopulation(EvolvableNN model) throws Exception;
+    public void generatePopulation(EvolvableNN model) throws Exception {
+        //check which class is calling this method
+        Integer size = 0;
+        if(this.getClass() == Agents.class){
+            size = ReadConfig.Configurations.getAgentPopulationSize();
+            logger.log(Level.INFO, "Generating Agents Population...");
+        }else{
+            size = ReadConfig.Configurations.getClassifierPopulationSize();
+            logger.log(Level.INFO, "Generating Classifiers Population...");
+        }
+        IntStream.range(0, size).forEach(i ->{
+            Individual newBorn;
+            try {
+                if(ReadConfig.Configurations.getMutation() == 0){
+                    newBorn = new UncorrelatedMutation(model.getArrayLength());
+                }else{
+                    newBorn = new RandomResetting(model.getArrayLength());
+                }
+                //assign the model to the classifier
+                newBorn.setModel(model.deepCopy());
+                this.addIndividual(newBorn);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error with generating population");
+                e.printStackTrace();
+            }
 
-    /**
-     * Getter for the config file
-     * @return reference to config file
-     */
-    public ReadConfig getConfigFile() {
-        return this.configFile;
+        });
     }
 
     /**
@@ -95,9 +114,9 @@ public abstract class Algorithm {
         //check which class is calling this method
         Integer size = 0;
         if(this.getClass() == Agents.class){
-            size = this.configFile.getAgentOffspringSize();
+            size = ReadConfig.Configurations.getAgentOffspringSize();
         }else{
-            size = this.configFile.getClassifierOffspringSize();
+            size = ReadConfig.Configurations.getClassifierOffspringSize();
         }
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
@@ -110,13 +129,24 @@ public abstract class Algorithm {
             //Discrete and intermediary recombination are then used to generate the objective parameters and
             //themutation strengths of the recombined individual, respectively
             Recombination obj = new DiscreteRecombination(firstParents.getObjectiveParameters(), secondParents.getObjectiveParameters());
-            Recombination mut = new IntermediateRecombination(firstParents.getMutationStrengths(), secondParents.getMutationStrengths(), 0.5);
-            Individual son = new Individual(obj.recombination(), mut.recombination());
+
+            Individual son = null;
+            if(ReadConfig.Configurations.getMutation() == 0){
+                Recombination mut = new IntermediateRecombination(((UncorrelatedMutation)firstParents).getMutationStrengths(), ((UncorrelatedMutation)secondParents).getMutationStrengths(), 0.5);
+                son = new UncorrelatedMutation(obj.recombination(), mut.recombination());
+            }else{
+                son = new RandomResetting(obj.recombination());
+            }
             //set model to the son
             son.setModel(firstParents.getModel().deepCopy());
 
             //mutate the individual
-            son.mutate(this.population.size());
+            if(ReadConfig.Configurations.getMutation() == 0){
+                son.mutate(this.population.size());
+            }else{
+                son.mutate(son.getObjectiveParameters().size());
+            }
+
             //add the son to the population
             this.population.add(son);
         }
@@ -138,9 +168,9 @@ public abstract class Algorithm {
         //check which class is calling this method
         Integer size = 0;
         if(this.getClass() == Agents.class){
-            size = this.configFile.getAgentPopulationSize();
+            size = ReadConfig.Configurations.getAgentPopulationSize();
         }else{
-            size = this.configFile.getClassifierPopulationSize();
+            size = ReadConfig.Configurations.getClassifierPopulationSize();
         }
         //sort the list
         this.population.sort(Comparator.comparing(Individual::getFitness));

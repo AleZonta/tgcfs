@@ -4,6 +4,7 @@ import org.junit.Test;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
+import tgcfs.Config.ReadConfig;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 
@@ -26,6 +27,7 @@ import static junit.framework.TestCase.assertNotNull;
 public class AgentsTest {
     @Test
     public void generatePopulation() throws Exception {
+        new ReadConfig.Configurations();
         //Random LSTM
         EvolvableNN model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
         Agents agentsCompeting = new Agents();
@@ -35,6 +37,7 @@ public class AgentsTest {
 
     @Test
     public void runIndividuals() throws Exception {
+        new ReadConfig.Configurations();
         List<InputsNetwork> input = new ArrayList<>();
         input.add(new InputNetwork(15.0, 30.8, 15.0));
         input.add(new InputNetwork(16.0, 31.8, 15.0));
@@ -51,6 +54,7 @@ public class AgentsTest {
 
     @Test
     public void runIndividual() throws Exception {
+        new ReadConfig.Configurations();
         Agents agentsCompeting = new Agents();
         try {
             agentsCompeting.runIndividual(null, null);

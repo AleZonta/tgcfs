@@ -26,12 +26,33 @@ import static junit.framework.TestCase.*;
  */
 public class FeederTest {
     @Test
+    public void obtainRealAgentSectionTrajectory() throws Exception {
+    }
+
+    @Test
+    public void getNextLocation() throws Exception {
+        Point myLocation = new Point(52.038615372493936, 4.29910204641889, 0d,12345.6, "123456", "14:20:10");
+        Double speed = 23d;
+        Double direction = 170d;
+        Double distance = 500d;
+
+        new ReadConfig.Configurations();
+
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+
+        Feeder system = new Feeder();
+        system.loadSystem();
+        Point result = system.getNextLocation(myLocation,speed,distance,direction);
+        System.out.println(result);
+        System.out.println(result.getTime());
+    }
+
+    @Test
     public void getMaximumNumberOfTrajectories() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         assertNotNull(system.getMaximumNumberOfTrajectories());
@@ -40,10 +61,9 @@ public class FeederTest {
     @Test
     public void feeder() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         system.loadSystem();
@@ -65,10 +85,9 @@ public class FeederTest {
     @Test
     public void getFinished() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         system.loadSystem();
@@ -90,10 +109,9 @@ public class FeederTest {
     @Test
     public void getNextPoint() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         system.loadSystem();
@@ -104,10 +122,9 @@ public class FeederTest {
     @Test
     public void obtainSectionTrajectory() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         system.loadSystem();
@@ -131,10 +148,9 @@ public class FeederTest {
 
     @Test
     public void getTrajectories() throws Exception {//initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         system.loadSystem();
@@ -144,10 +160,9 @@ public class FeederTest {
     @Test
     public void getTrajectory() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         system.loadSystem();
@@ -157,10 +172,9 @@ public class FeederTest {
     @Test
     public void obtainInput() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         system.loadSystem();
@@ -195,10 +209,9 @@ public class FeederTest {
     @Test
     public void loadSystem() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         Feeder system = new Feeder();
         system.loadSystem();

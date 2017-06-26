@@ -2,6 +2,7 @@ package tgcfs.EA;
 
 import org.junit.Test;
 import tgcfs.Agents.LSTMAgent;
+import tgcfs.Config.ReadConfig;
 import tgcfs.NN.EvolvableNN;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import static junit.framework.TestCase.assertNotNull;
 public class AlgorithmTest {
     @Test
     public void retAllFitness() throws Exception {
+        new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();
         EvolvableNN evolvableNN = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableNN);
@@ -37,6 +39,7 @@ public class AlgorithmTest {
 
     @Test
     public void retBestGenome() throws Exception {
+        new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();
         EvolvableNN evolvableNN = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableNN);
@@ -45,6 +48,7 @@ public class AlgorithmTest {
 
     @Test
     public void selectParents() throws Exception {
+        new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();
         EvolvableNN evolvableNN = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableNN);
@@ -57,6 +61,7 @@ public class AlgorithmTest {
 
     @Test
     public void generateOffspring() throws Exception {
+        new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();
         EvolvableNN evolvableNN = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableNN);

@@ -81,4 +81,15 @@ public class InputNetwork implements InputsNetwork{
         return res;
     }
 
+    /**
+     * Override to string method
+     * @return the string version of the data
+     */
+    @Override
+    public String toString() {
+        return "InputNetwork{" + " " +
+                "speed=" + this.speed + ", " +
+                "bearing=" + this.direction + " " +
+                '}';
+    }
 }

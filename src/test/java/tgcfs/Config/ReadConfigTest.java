@@ -17,6 +17,47 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getMutation() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getMutation();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getMutation());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getMutation(), ReadConfig.Configurations.getMutation());
+    }
+
+    @Test
+    public void getSeed() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getSeed();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getSeed());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getSeed(), ReadConfig.Configurations.getSeed());
+    }
+
+
+    @Test
     public void getDumpPop() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();
@@ -31,6 +72,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getDumpPop());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getDumpPop(), ReadConfig.Configurations.getDumpPop());
     }
 
     @Test
@@ -48,6 +92,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getLoadDumpPop());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getLoadDumpPop(), ReadConfig.Configurations.getLoadDumpPop());
     }
 
     @Test
@@ -71,6 +118,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getName());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getName(), ReadConfig.Configurations.getName());
     }
 
     @Test
@@ -88,6 +138,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getExperiment());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getExperiment(), ReadConfig.Configurations.getExperiment());
     }
 
     @Test
@@ -105,6 +158,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getPath());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getPath(), ReadConfig.Configurations.getPath());
     }
 
     @Test
@@ -122,6 +178,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getMaxGenerations());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getMaxGenerations(), ReadConfig.Configurations.getMaxGenerations());
     }
 
     @Test
@@ -139,6 +198,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getHowManyTrajectories());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHowManyTrajectories(), ReadConfig.Configurations.getHowManyTrajectories());
     }
 
     @Test
@@ -156,6 +218,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getAgentTimeSteps());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getAgentTimeSteps(), ReadConfig.Configurations.getAgentTimeSteps());
     }
 
     @Test
@@ -173,6 +238,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getClassifierTimeSteps());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getClassifierTimeSteps(), ReadConfig.Configurations.getClassifierTimeSteps());
     }
 
     @Test
@@ -190,6 +258,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getHiddenLayersAgent());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenLayersAgent());
     }
 
     @Test
@@ -207,6 +278,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getHiddenNeuronsAgent());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHiddenNeuronsAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent());
     }
 
     @Test
@@ -224,6 +298,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getHiddenNeuronsClassifier());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHiddenNeuronsClassifier(), ReadConfig.Configurations.getHiddenNeuronsClassifier());
     }
 
     @Test
@@ -241,6 +318,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getAgentOffspringSize());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getAgentOffspringSize(), ReadConfig.Configurations.getAgentOffspringSize());
     }
 
     @Test
@@ -258,6 +338,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getAgentPopulationSize());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getAgentPopulationSize(), ReadConfig.Configurations.getAgentPopulationSize());
     }
 
     @Test
@@ -275,6 +358,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getAgentAlpha());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getAgentAlpha(), ReadConfig.Configurations.getAgentAlpha());
     }
 
     @Test
@@ -292,6 +378,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getClassifierOffspringSize());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getClassifierOffspringSize(), ReadConfig.Configurations.getClassifierOffspringSize());
     }
 
     @Test
@@ -309,6 +398,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getClassifierPopulationSize());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getClassifierPopulationSize(), ReadConfig.Configurations.getClassifierPopulationSize());
     }
 
     @Test
@@ -326,6 +418,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getClassifierAlpha());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getClassifierAlpha(), ReadConfig.Configurations.getClassifierAlpha());
     }
 
     @Test
@@ -343,6 +438,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getHowManySplitting());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHowManySplitting(), ReadConfig.Configurations.getHowManySplitting());
     }
 
     @Test
@@ -360,6 +458,9 @@ public class ReadConfigTest {
             e.printStackTrace();
         }
         assertNotNull(conf.getTrajectoriesType());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getTrajectoriesType(), ReadConfig.Configurations.getTrajectoriesType());
     }
 
 

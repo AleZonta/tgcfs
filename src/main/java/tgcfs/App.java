@@ -36,7 +36,6 @@ import java.util.logging.Logger;
  *
  */
 public class App {
-    private ReadConfig configFile; //file containing configuration
     private Agents agents;
     private Classifiers classifiers;
     private Feeder feeder;
@@ -51,10 +50,10 @@ public class App {
      * @throws Exception if there are problems with the reading procedure
      */
     public App() throws Exception {
-        //Creating the agents
-        this.configFile = new ReadConfig();
-        this.configFile.readFile();
+        //initialising the config file class
+        new ReadConfig.Configurations();
 
+        //Creating the agents
         this.agents = new Agents();
         this.classifiers = new Classifiers();
 
@@ -63,8 +62,8 @@ public class App {
         this.idsaLoader = null;
 
         //initialise the saving class
-        new SaveToFile.Saver(this.configFile.getName(), this.configFile.getExperiment(), this.configFile.getPath());
-        SaveToFile.Saver.dumpSetting(this.configFile);
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        SaveToFile.Saver.dumpSetting(ReadConfig.Configurations.getConfig());
     }
 
 
@@ -76,8 +75,8 @@ public class App {
     public void load() throws Exception {
         logger.log(Level.INFO, "Starting App...");
         //loading models
-        EvolvableNN agentModel = new LSTMAgent(InputNetwork.inputSize, this.configFile.getHiddenLayersAgent(), this.configFile.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
-        EvolvableNN classifierModel = new Classifier(tgcfs.Classifiers.InputNetwork.inputSize, this.configFile.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+        EvolvableNN agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
+        EvolvableNN classifierModel = new Classifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
         //generate population
         //INITIALISE population EA with random candidate solution
         this.agents.generatePopulation(agentModel);
@@ -132,8 +131,8 @@ public class App {
         /* { REPEAT until TERMINAL CONDITION } */
         Boolean reachedEndTrajectory = Boolean.FALSE;
         Boolean randomError = Boolean.FALSE;
-        Integer maxGeneration = this.configFile.getMaxGenerations();
-        while(!reachedEndTrajectory || !randomError || generation <= maxGeneration) {
+        Integer maxGeneration = ReadConfig.Configurations.getMaxGenerations();
+        while(!reachedEndTrajectory && !randomError && generation <= maxGeneration) {
             generation++;
             logger.log(Level.INFO, "Evaluation generation " + generation.toString());
             /* { SELECT parent }
@@ -165,7 +164,7 @@ public class App {
                 SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(), this.classifiers.retAllFitness());
                 SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
                 SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
-                if(this.configFile.getDumpPop()) {
+                if(ReadConfig.Configurations.getDumpPop()) {
                     logger.log(Level.INFO,"Dump Population...");
                     SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
                     SaveToFile.Saver.dumpPopulation(this.classifiers.getClass().getName(), this.classifiers.getPopulation());

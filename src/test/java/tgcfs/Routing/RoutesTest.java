@@ -21,9 +21,9 @@ import static junit.framework.TestCase.assertNotNull;
 public class RoutesTest {
     @Test
     public void getNextTrajectory() throws Exception {
-        ReadConfig conf = new ReadConfig();
-        conf.readFile();
-        Routes routes = new Routes(conf);
+        new ReadConfig.Configurations();
+
+        Routes routes = new Routes();
         routes.readTrajectories();
         Trajectory tra = routes.getNextTrajectory();
         Trajectory tra1 = routes.getNextTrajectory();
@@ -34,9 +34,10 @@ public class RoutesTest {
 
     @Test
     public void getNextPosition() throws Exception {
-        ReadConfig conf = new ReadConfig();
-        conf.readFile();
-        Routes routes = new Routes(conf);
+
+        new ReadConfig.Configurations();
+
+        Routes routes = new Routes();
         routes.readTrajectories();
         Trajectory tra = routes.getNextTrajectory();
         Point p1 = routes.getNextPosition(tra);
@@ -58,9 +59,9 @@ public class RoutesTest {
 
     @Test
     public void readTrajectories() throws Exception {
-        ReadConfig conf = new ReadConfig();
-        conf.readFile();
-        Routes routes = new Routes(conf);
+        new ReadConfig.Configurations();
+
+        Routes routes = new Routes();
         routes.readTrajectories();
     }
 

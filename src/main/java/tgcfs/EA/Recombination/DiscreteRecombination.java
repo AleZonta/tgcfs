@@ -3,7 +3,7 @@ package tgcfs.EA.Recombination;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
+import java.util.stream.DoubleStream;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -38,7 +38,7 @@ public class DiscreteRecombination extends AbstractRecombination implements Reco
         List<Double> son = new ArrayList<>();
 
         final int[] index = {0};
-        IntStream randomNumber = new Random().ints(super.getSize(),0,1);
+        DoubleStream randomNumber = new Random().doubles(super.getSize(),0,1);
         randomNumber.forEach(number -> {
             if(number >= 0.5){
                 son.add(super.getMother().get(index[0]));

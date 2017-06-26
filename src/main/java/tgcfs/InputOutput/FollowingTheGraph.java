@@ -75,7 +75,11 @@ public class FollowingTheGraph implements Transformation {
             OutputNetwork output = (OutputNetwork) outputsNetwork;
             Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
             InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
+//            System.out.println(inputNetwork.toString());
             convertedInput.add(inputNetwork);
+
+            //upgrade position
+            this.lastPoint = position;
         });
 
         return convertedInput;

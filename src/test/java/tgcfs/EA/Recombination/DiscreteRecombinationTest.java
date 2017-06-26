@@ -23,8 +23,8 @@ import static junit.framework.TestCase.assertTrue;
 public class DiscreteRecombinationTest {
     @Test
     public void recombination() throws Exception {
-        List<Double> mother = new Random().doubles(20, -8.0, 8.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
-        List<Double> father = new Random().doubles(20, -8.0, 8.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
+        List<Double> mother = new Random().doubles(20, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
+        List<Double> father = new Random().doubles(20, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         Recombination rec = new DiscreteRecombination(mother, father);
         List<Double> son = rec.recombination();
         assertNotNull(son);
@@ -32,7 +32,16 @@ public class DiscreteRecombinationTest {
         for (int i = 0; i < son.size(); i++){
             assertTrue(son.get(i).equals(mother.get(i)) || son.get(i).equals(father.get(i)));
         }
-
+        Integer count = 0;
+        for (int i = 0; i < son.size(); i++){
+            if(son.get(i).equals(mother.get(i))) count+=1;
+        }
+        Integer count1 = 0;
+        for (int i = 0; i < son.size(); i++){
+            if(son.get(i).equals(father.get(i))) count1+=1;
+        }
+        assertTrue(count < mother.size());
+        assertTrue(count1 < father.size());
     }
 
 }

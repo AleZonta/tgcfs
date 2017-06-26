@@ -12,7 +12,6 @@ import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
-import tgcfs.Performances.SaveToFile;
 import tgcfs.Routing.Routes;
 
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import java.util.stream.IntStream;
 public class Feeder {
     private final Loader graph; //loader of the graph
     private final Routes routes; //loader of the trajectories
-    private final ReadConfig conf; //configuration object containing location where to read the graph
     private Integer position; //I need to remember the position where I am now
     private Boolean finished; //If the current trajectory is ended
     private Trajectory currentTrajectory; //current trajectory under investigation
@@ -51,15 +49,12 @@ public class Feeder {
      */
     public Feeder() throws Exception{
         logger.log(Level.INFO, "Initialising system...");
-        this.conf = new ReadConfig();
-        this.conf.readFile();
-        SaveToFile.Saver.dumpSetting(this.conf);
         this.graph = new Loader();
-        this.routes = new Routes(this.conf);
+        this.routes = new Routes();
         this.position = 0;
         this.finished = Boolean.FALSE;
         this.actualNumberOfTrajectory = 0;
-        this.maximumNumberOfTrajectories = this.conf.getHowManyTrajectories();
+        this.maximumNumberOfTrajectories = ReadConfig.Configurations.getHowManyTrajectories();
     }
 
     /**
@@ -86,7 +81,7 @@ public class Feeder {
      */
     private Integer selectPositionInTrajectory(Trajectory tra) throws Exception{
         //decide how many time to analise the trajectory
-        Integer split = this.conf.getHowManySplitting() + 1;
+        Integer split = ReadConfig.Configurations.getHowManySplitting() + 1;
         //need to check if the trajectory is shorter than the split number
         if(tra.getSize() <= split){
             split = 2; //I only split in half
@@ -296,7 +291,7 @@ public class Feeder {
         //I have trajectory and I have current position.
         //I just need to retrieve next n position
         List<Point> realPoint = new ArrayList<>();
-        IntStream.range(this.position, this.position + this.conf.getAgentTimeSteps()).forEach(i -> {
+        IntStream.range(this.position, this.position + ReadConfig.Configurations.getAgentTimeSteps()).forEach(i -> {
             Point nextPoint = this.getNextPoint(this.currentTrajectory);
             if (nextPoint != null){
                 realPoint.add(nextPoint);
@@ -319,14 +314,70 @@ public class Feeder {
         Coord coordA = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
         InfoNode initialNode = this.graph.findNodes(coordA);
 
+        InfoNode closestNode = this.getClosestNode(initialNode, whereIam, direction);
+
+        if(!closestNode.equals(initialNode)) {
+            //need to find edge and its distance
+            Double dis = this.graph.findDistanceBetweenNodesConnected(initialNode, closestNode);
+            if (distance < dis) {
+                //the new point is in the middle somewhere in this edge
+                Coord position = this.graph.findPointInEdge(initialNode, closestNode, distance);
+                //find time from previous point
+                //distance / speed
+                Double plusTime = distance / speed;
+                return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+            } else {
+                //loop until I am close enough -> better than recursive, Lisa has problems
+                Point nextPosition = new Point(closestNode.getLat(), closestNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getTime());
+
+                InfoNode secondInitialNode = null;
+                InfoNode closestSecondNode = null;
+                Double dist = 0d;
+                Double updatedDistance = distance - dis;
+                while (updatedDistance > dis) {
+                    Coord coordB = new Coord(nextPosition.getLatitude(), nextPosition.getLongitude());
+                    secondInitialNode = this.graph.findNodes(coordB);
+                    closestSecondNode = this.getClosestNode(secondInitialNode, nextPosition, direction);
+
+                    if(secondInitialNode.equals(closestSecondNode)) {
+                        return nextPosition;
+                    }
+
+
+                    //need to find edge and its distance
+                    dist = this.graph.findDistanceBetweenNodesConnected(secondInitialNode, closestSecondNode);
+                    updatedDistance -= dist;
+                    nextPosition = new Point(closestSecondNode.getLat(), closestSecondNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getTime());
+                }
+
+                //the new point is in the middle somewhere in this edge
+                Coord position = this.graph.findPointInEdge(secondInitialNode, closestSecondNode, dist);
+                //find time from previous point
+                //distance / speed
+                Double plusTime = distance / speed;
+                return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+            }
+        }else{
+            //If I am returning the same point I have to return the initial coordinates. We did not move anywhere
+            return whereIam;
+        }
+    }
+
+
+    /**
+     * Get initialNode closest node
+     * @param initialNode node where I am
+     * @param whereIam exactly point where I am
+     * @param direction direction I am moving
+     * @return closest point
+     */
+    private InfoNode getClosestNode(InfoNode initialNode, Point whereIam, Double direction){
         //find all the edge connected to this node
         List<InfoNode> endNodes = this.graph.retAllEndEdges(initialNode);
         List<Double> angles = new ArrayList<>();
         Coord IamHere = new Coord(whereIam.getLatitude(),whereIam.getLongitude());
         //compute all the angles
-        endNodes.forEach(node -> {
-            angles.add(IamHere.angleWith(node.getCoord()));
-        });
+        endNodes.forEach(node -> angles.add(IamHere.angleWith(node.getCoord())));
         //find id closest ending node
         final Integer[] index = {0};
         final Double[] minDifference = {Double.MAX_VALUE};
@@ -337,21 +388,12 @@ public class Feeder {
                 index[0] = i;
             }
         });
-        //now I now index closest nodes, find if the point is inside this edge
-        InfoNode closestNode = endNodes.get(index[0]);
-        //need to find edge and its distance
-        Double dis = this.graph.findDistanceBetweenNodesConnected(initialNode, closestNode);
-        if(distance < dis){
-            //the new point is in the middle somewhere in this edge
-            Coord position = this.graph.findPointInEdge(initialNode, closestNode, distance);
-            //find time from previous point
-            //distance / speed
-            Double plusTime = distance / speed;
-            return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
-        }else{
-            //the new point is not here
-            return this.getNextLocation(new Point(closestNode.getLat(), closestNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getDates()), speed, distance - dis, direction);
-        }
-
+        //now I now index closest nodes
+//        if (Math.abs(Normalisation.fromHalfPItoTotalPI(direction) - Normalisation.fromHalfPItoTotalPI(angles.get(index[0]))) < 10){
+//            //if im am going in the direction suggested by the nn I will move there
+//            return endNodes.get(index[0]);
+//        }
+        //not correct direction? I am staying here
+        return endNodes.get(index[0]);
     }
 }

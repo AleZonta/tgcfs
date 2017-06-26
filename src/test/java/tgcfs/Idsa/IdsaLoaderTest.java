@@ -23,19 +23,15 @@ public class IdsaLoaderTest {
     @Test
     public void returnAttraction() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         IdsaLoader loader = new IdsaLoader();
 
         loader = new IdsaLoader(20);
 
-
-        ReadConfig conf = new ReadConfig();
-        conf.readFile();
-        Routes routes = new Routes(conf);
+        Routes routes = new Routes();
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());
@@ -55,16 +51,15 @@ public class IdsaLoaderTest {
     @Test
     public void resetAPF() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         IdsaLoader loader = new IdsaLoader();
         loader = new IdsaLoader(20);
-        ReadConfig conf = new ReadConfig();
-        conf.readFile();
-        Routes routes = new Routes(conf);
+
+
+        Routes routes = new Routes();
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());
@@ -74,19 +69,16 @@ public class IdsaLoaderTest {
     @Test
     public void compute() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         IdsaLoader loader = new IdsaLoader();
 
         loader = new IdsaLoader(20);
 
 
-        ReadConfig conf = new ReadConfig();
-        conf.readFile();
-        Routes routes = new Routes(conf);
+        Routes routes = new Routes();
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());
@@ -104,19 +96,16 @@ public class IdsaLoaderTest {
     @Test
     public void initPotentialField() throws Exception {
         //initialise the saving class
-        ReadConfig configFile = new ReadConfig();
-        configFile.readFile();
+        new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(configFile.getName(), configFile.getExperiment(), configFile.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
         IdsaLoader loader = new IdsaLoader();
 
         loader = new IdsaLoader(20);
 
 
-        ReadConfig conf = new ReadConfig();
-        conf.readFile();
-        Routes routes = new Routes(conf);
+        Routes routes = new Routes();
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());

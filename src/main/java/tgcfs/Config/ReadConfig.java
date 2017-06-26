@@ -37,6 +37,8 @@ public class ReadConfig {
     private Integer classifierTimeSteps;
 
     private Integer maxGenerations;
+    private Integer seed;
+    private Integer mutation;
 
     //model config
     private Integer hiddenLayersAgent;
@@ -54,7 +56,7 @@ public class ReadConfig {
      * Constructor with zero parameter
      * Everything is set to null.
      */
-    public ReadConfig(){
+    protected ReadConfig(){
         this.trajectoriesType = null;
         this.howManySplitting = null;
         this.howManyTrajectories = null;
@@ -70,6 +72,8 @@ public class ReadConfig {
         this.classifierTimeSteps = null;
 
         this.maxGenerations = null;
+        this.seed = null;
+        this.mutation = null;
 
         this.hiddenLayersAgent = null;
         this.hiddenNeuronsAgent = null;
@@ -103,7 +107,7 @@ public class ReadConfig {
      */
     public Integer getAgentOffspringSize() throws Exception {
         if(this.agentOffspringSize == null) throw new Exception("Try to access config file before reading it.");
-        return agentOffspringSize;
+        return this.agentOffspringSize;
     }
 
     /**
@@ -113,7 +117,7 @@ public class ReadConfig {
      */
     public Integer getAgentPopulationSize() throws Exception {
         if(this.agentPopulationSize == null) throw new Exception("Try to access config file before reading it.");
-        return agentPopulationSize;
+        return this.agentPopulationSize;
     }
 
     /**
@@ -123,7 +127,7 @@ public class ReadConfig {
      */
     public Double getAgentAlpha() throws Exception {
         if(this.agentAlpha == null) throw new Exception("Try to access config file before reading it.");
-        return agentAlpha;
+        return this.agentAlpha;
     }
 
     /**
@@ -133,7 +137,7 @@ public class ReadConfig {
      */
     public Integer getAgentTimeSteps() throws Exception {
         if(this.agentTimeSteps == null) throw new Exception("Try to access config file before reading it.");
-        return agentTimeSteps;
+        return this.agentTimeSteps;
     }
 
     /**
@@ -143,7 +147,7 @@ public class ReadConfig {
      */
     public Integer getClassifierOffspringSize() throws Exception {
         if(this.classifierOffspringSize == null) throw new Exception("Try to access config file before reading it.");
-        return classifierOffspringSize;
+        return this.classifierOffspringSize;
     }
 
     /**
@@ -153,7 +157,7 @@ public class ReadConfig {
      */
     public Integer getClassifierPopulationSize() throws Exception {
         if(this.classifierPopulationSize == null) throw new Exception("Try to access config file before reading it.");
-        return classifierPopulationSize;
+        return this.classifierPopulationSize;
     }
 
     /**
@@ -163,7 +167,7 @@ public class ReadConfig {
      */
     public Double getClassifierAlpha() throws Exception {
         if(this.classifierAlpha == null) throw new Exception("Try to access config file before reading it.");
-        return classifierAlpha;
+        return this.classifierAlpha;
     }
 
     /**
@@ -173,7 +177,7 @@ public class ReadConfig {
      */
     public Integer getClassifierTimeSteps() throws Exception {
         if(this.classifierTimeSteps == null) throw new Exception("Try to access config file before reading it.");
-        return classifierTimeSteps;
+        return this.classifierTimeSteps;
     }
 
     /**
@@ -182,7 +186,7 @@ public class ReadConfig {
      * @throws Exception If the file is not available, not well formatted or the settings are not all coded an exception
      * is raised
      */
-    public void readFile() throws Exception {
+    protected void readFile() throws Exception {
         //config file has to be located in the same directory as the program is
         String currentPath = Paths.get(".").toAbsolutePath().normalize().toString() + "/settings.json";
         //file is a json file, need to parse it and than I can read it
@@ -323,6 +327,18 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("loadDumpPop is wrong or missing.");
         }
+        try {
+            // seed
+            this.seed = ((Long) jsonObject.get("Seed")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Seed is wrong or missing.");
+        }
+        try {
+            // seed
+            this.mutation = ((Long) jsonObject.get("Mutation")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Mutation is wrong or missing.");
+        }
     }
 
 
@@ -406,33 +422,6 @@ public class ReadConfig {
         return this.path;
     }
 
-    /**
-     * Override toString Method in order to print all the setting here
-     * @return String containing all the setting
-     */
-    @Override
-    public String toString() {
-        return "ReadConfig{" + "\n" +
-                "trajectoriesType=" + trajectoriesType + ",\n" +
-                "howManySplitting=" + howManySplitting + ",\n" +
-                "howManyTrajectories=" + howManyTrajectories + ",\n" +
-                "agentPopulationSize=" + agentPopulationSize + ",\n" +
-                "agentOffspringSize=" + agentOffspringSize + ",\n" +
-                "agentAlpha=" + agentAlpha + ",\n" +
-                "agentTimeSteps=" + agentTimeSteps + ",\n" +
-                "classifierPopulationSize=" + classifierPopulationSize + ",\n" +
-                "classifierOffspringSize=" + classifierOffspringSize + ",\n" +
-                "classifierAlpha=" + classifierAlpha + ",n" +
-                "classifierTimeSteps=" + classifierTimeSteps + ",\n" +
-                "maxGenerations=" + maxGenerations + ",\n" +
-                "hiddenLayersAgent=" + hiddenLayersAgent + ",\n" +
-                "hiddenNeuronsAgent=" + hiddenNeuronsAgent + ",\n" +
-                "hiddenNeuronsClassifier=" + hiddenNeuronsClassifier + ",\n" +
-                "name='" + name + '\'' + ",\n" +
-                "experiment='" + experiment + '\'' + ",\n" +
-                "path='" + path + '\'' + "\n" +
-                '}';
-    }
 
     /**
      * Am I saving all the population on a file?
@@ -453,4 +442,280 @@ public class ReadConfig {
         if(this.loadDumpPop == null) throw new Exception("Try to access config file before reading it.");
         return this.loadDumpPop;
     }
+
+    /**
+     * Loading the seed for the random initialisation of the population
+     * @return Integer Value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getSeed() throws Exception {
+        if(this.seed == null) throw new Exception("Try to access config file before reading it.");
+        return this.seed;
+    }
+
+    /**
+     * Return which version of mutation I want to use
+     * @return Integer number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getMutation() throws Exception {
+        if(this.mutation == null) throw new Exception("Try to access config file before reading it.");
+        return this.mutation;
+    }
+
+    /**
+     * Override toString Method in order to print all the setting here
+     * @return String containing all the setting
+     */
+    @Override
+    public String toString() {
+        return "ReadConfig{" + ",\n" +
+                "trajectoriesType=" + trajectoriesType + ",\n" +
+                "howManySplitting=" + howManySplitting + ",\n" +
+                "howManyTrajectories=" + howManyTrajectories + ",\n" +
+                "agentPopulationSize=" + agentPopulationSize + ",\n" +
+                "agentOffspringSize=" + agentOffspringSize + ",\n" +
+                "agentAlpha=" + agentAlpha + ",\n" +
+                "agentTimeSteps=" + agentTimeSteps + ",\n" +
+                "classifierPopulationSize=" + classifierPopulationSize + ",\n" +
+                "classifierOffspringSize=" + classifierOffspringSize + ",\n" +
+                "classifierAlpha=" + classifierAlpha + ",\n" +
+                "classifierTimeSteps=" + classifierTimeSteps + ",\n" +
+                "maxGenerations=" + maxGenerations + ",\n" +
+                "seed=" + seed + ",\n" +
+                "mutation=" + mutation + ",\n" +
+                "hiddenLayersAgent=" + hiddenLayersAgent + ",\n" +
+                "hiddenNeuronsAgent=" + hiddenNeuronsAgent + ",\n" +
+                "hiddenNeuronsClassifier=" + hiddenNeuronsClassifier + ",\n" +
+                "name='" + name + '\'' + ",\n" +
+                "experiment='" + experiment + '\'' + ",\n" +
+                "path='" + path + '\'' + ",\n" +
+                "dumpPop=" + dumpPop + ",\n" +
+                "loadDumpPop=" + loadDumpPop + ",\n" +
+                '}';
+    }
+
+
+    /**
+     * Static class offering all the info read from file
+     */
+    public static class Configurations{
+        private static ReadConfig config;
+
+        /**
+         * Initialise and read the settings from file
+         * @throws Exception if something goes wrong during the reading procedure
+         */
+        public Configurations() throws Exception {
+            config = new ReadConfig();
+            config.readFile();
+        }
+
+        /**
+         * Return seed setting
+         * @return integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getSeed() throws Exception {
+            return config.getSeed();
+        }
+
+        /**
+         * Return if I want to save the population on file
+         * @return Boolean Value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Boolean getDumpPop() throws Exception {
+            return config.getDumpPop();
+        }
+
+        /**
+         * Return the path of the experiment
+         * @return String value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static String getPath() throws Exception {
+            return config.getPath();
+        }
+
+        /**
+         * Return the number of the experiment
+         * @return String value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static String getExperiment() throws Exception {
+            return config.getExperiment();
+        }
+
+        /**
+         *  Return the name of the experiment
+         * @return String value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static String getName() throws Exception {
+            return config.getName();
+        }
+
+        /**
+         * Return the number of trajectories to test
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getHowManyTrajectories() throws Exception {
+            return config.getHowManyTrajectories();
+        }
+
+        /**
+         * Return number of the classifier's hidden neurons
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getHiddenNeuronsClassifier() throws Exception {
+            return config.getHiddenNeuronsClassifier();
+        }
+
+        /**
+         * Return number of the agent's hidden neurons
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getHiddenNeuronsAgent() throws Exception {
+            return config.getHiddenNeuronsAgent();
+        }
+
+        /**
+         * Return number of the agent's hidden layers number
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getHiddenLayersAgent() throws Exception {
+            return config.getHiddenLayersAgent();
+        }
+
+        /**
+         * Return number of the classifier's timesteps
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getClassifierTimeSteps() throws Exception {
+            return config.getClassifierTimeSteps();
+        }
+
+        /**
+         * Return number of the classifier's alpha value
+         * @return Double value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Double getClassifierAlpha() throws Exception {
+            return config.getClassifierAlpha();
+        }
+
+        /**
+         * Return number of the classifier's population size
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getClassifierPopulationSize() throws Exception {
+            return config.getClassifierPopulationSize();
+        }
+
+        /**
+         * Return number of the agent's time steps
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getAgentTimeSteps() throws Exception {
+            return config.getAgentTimeSteps();
+        }
+
+        /**
+         * Return number of the agent's alpha value
+         * @return Double value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Double getAgentAlpha() throws Exception {
+            return config.getAgentAlpha();
+        }
+
+        /**
+         * Return number of the agent's population size
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getAgentPopulationSize() throws Exception {
+            return config.getAgentPopulationSize();
+        }
+
+        /**
+         * Return number of the agent's offspring size
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getAgentOffspringSize() throws Exception {
+            return config.getAgentOffspringSize();
+        }
+
+        /**
+         * Return how many time split the trajectory
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getHowManySplitting() throws Exception {
+            return config.getHowManySplitting();
+        }
+
+        /**
+         * Return the trajectory's type
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getTrajectoriesType() throws Exception {
+            return config.getTrajectoriesType();
+        }
+
+        /**
+         * Return number of the classifier's offspring size
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getClassifierOffspringSize() throws Exception {
+            return config.getClassifierOffspringSize();
+        }
+
+        /**
+         * Return max number of generation
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getMaxGenerations() throws Exception {
+            return config.getMaxGenerations();
+        }
+
+        /**
+         * Return if I want to load the saved population
+         * @return Boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Boolean getLoadDumpPop() throws Exception {
+            return config.getLoadDumpPop();
+        }
+
+        /**
+         * Return the class
+         * @return Class reference
+         */
+        public static ReadConfig getConfig(){
+            return config;
+        }
+
+        /**
+         * Return which kind of mutation I want to use now
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getMutation() throws Exception {
+            return config.getMutation();
+        }
+    }
+
 }

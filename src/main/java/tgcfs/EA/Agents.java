@@ -2,6 +2,7 @@ package tgcfs.EA;
 
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.OutputNetwork;
+import tgcfs.Config.ReadConfig;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
@@ -10,7 +11,6 @@ import tgcfs.NN.OutputsNetwork;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -33,23 +33,6 @@ public class Agents extends Algorithm {
      */
     public Agents() throws Exception {
         super();
-    }
-
-    /**
-     * @implNote Implementation from Abstract class Algorithm
-     * @param model the model of the population
-     * @throws Exception if the reading of the config file goes wrong
-     */
-    @Override
-    public void generatePopulation(EvolvableNN model) throws Exception {
-        logger.log(Level.INFO, "Generating Agents Population...");
-        IntStream.range(0, super.getConfigFile().getAgentPopulationSize()).forEach( i -> {
-                //create an individual that has the size of the object parameter as the size of the network
-                Individual newBorn = new Individual(model.getArrayLength());
-                //assign the model to the classifier
-                newBorn.setModel(model.deepCopy());
-                super.addIndividual(newBorn);
-        });
     }
 
     /**
@@ -83,7 +66,7 @@ public class Agents extends Algorithm {
                 //output has only two fields, input needs three
                 //I am using the last direction present into input I am adding that one to the last output
                 Double directionAPF = ((InputNetwork)input.get(input.size() - 1)).getDirectionAPF(); //TODO is it correct this step?
-                for (int i = 0; i < super.getConfigFile().getAgentTimeSteps(); i++) {
+                for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
                     //transform output into input and add the direction
                     OutputNetwork outLocal = new OutputNetwork();
                     outLocal.deserialise(lastOutput);

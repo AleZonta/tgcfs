@@ -4,6 +4,7 @@ import nl.tno.idsa.framework.config.ConfigFile;
 import org.junit.Test;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
+import tgcfs.EA.Mutation.UncorrelatedMutation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +25,10 @@ public class SaverTest {
     @Test
     public void dumpPopulation() throws Exception {
         List<Individual> list = new ArrayList<>();
-        list.add(new Individual(5));
-        list.add(new Individual(3));
-        list.add(new Individual(7));
-        list.add(new Individual(1));
+        list.add(new UncorrelatedMutation(5));
+        list.add(new UncorrelatedMutation(3));
+        list.add(new UncorrelatedMutation(7));
+        list.add(new UncorrelatedMutation(1));
         try {
             SaveToFile.Saver.dumpPopulation("a", list);
         }catch (Exception e){
@@ -37,10 +38,10 @@ public class SaverTest {
         SaveToFile.Saver.dumpPopulation("a", list);
         SaveToFile.Saver.dumpPopulation("a", list);
         List<Individual> list3 = new ArrayList<>();
-        list3.add(new Individual(50));
-        list3.add(new Individual(30));
-        list3.add(new Individual(70));
-        list3.add(new Individual(10));
+        list3.add(new UncorrelatedMutation(50));
+        list3.add(new UncorrelatedMutation(30));
+        list3.add(new UncorrelatedMutation(70));
+        list3.add(new UncorrelatedMutation(10));
         SaveToFile.Saver.dumpPopulation("a", list3);
 
     }
@@ -79,9 +80,9 @@ public class SaverTest {
         new SaveToFile.Saver("test", "1", "/Users/alessandrozonta/Desktop");
 
 
-        ReadConfig config = new ReadConfig();
-        config.readFile();
-        SaveToFile.Saver.dumpSetting(config);
+        new ReadConfig.Configurations();
+
+        SaveToFile.Saver.dumpSetting(ReadConfig.Configurations.getConfig());
 
         gms.Config.ReadConfig config1= new gms.Config.ReadConfig();
         config1.readFile();
