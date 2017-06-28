@@ -45,6 +45,17 @@ public class FeederTest {
         Point result = system.getNextLocation(myLocation,speed,distance,direction);
         System.out.println(result);
         System.out.println(result.getTime());
+
+        myLocation = new Point(52.01912786045312, 4.307028977339069, 0d,12345.6, "123456", "14:20:10");
+        speed = 32d;
+        direction = 171d;
+        distance = 520d;
+
+
+        result = system.getNextLocation(myLocation,speed,distance,direction);
+        System.out.println(result);
+        System.out.println(result.getTime());
+
     }
 
     @Test

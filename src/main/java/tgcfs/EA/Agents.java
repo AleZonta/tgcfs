@@ -135,6 +135,7 @@ public class Agents extends Algorithm {
 
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Error " + e.getMessage());
+                    e.printStackTrace();
                 }
             });
         });

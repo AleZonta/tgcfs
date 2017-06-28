@@ -314,53 +314,122 @@ public class Feeder {
         Coord coordA = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
         InfoNode initialNode = this.graph.findNodes(coordA);
 
-        InfoNode closestNode = this.getClosestNode(initialNode, whereIam, direction);
+        InfoNode closestNode = null;
+        try {
+            closestNode = this.getClosestNode(initialNode, whereIam, direction);
+        }catch (Exception e){
+            //some problems in finding the closest node?
+            //If there is no closest node just return where I am
+            return whereIam;
+        }
+        //distance in kilometers
+        distance = distance / 1000;
 
-        if(!closestNode.equals(initialNode)) {
-            //need to find edge and its distance
-            Double dis = this.graph.findDistanceBetweenNodesConnected(initialNode, closestNode);
-            if (distance < dis) {
-                //the new point is in the middle somewhere in this edge
-                Coord position = this.graph.findPointInEdge(initialNode, closestNode, distance);
-                //find time from previous point
-                //distance / speed
-                Double plusTime = distance / speed;
-                return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
-            } else {
-                //loop until I am close enough -> better than recursive, Lisa has problems
-                Point nextPosition = new Point(closestNode.getLat(), closestNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getTime());
+        Double earthRadious = 6378.14;
+        Double latRad = Math.toRadians(whereIam.getLatitude());
+        Double lonRad = Math.toRadians(whereIam.getLongitude());
+        Double bearRad = Math.toRadians(direction);
 
-                InfoNode secondInitialNode = null;
-                InfoNode closestSecondNode = null;
-                Double dist = 0d;
-                Double updatedDistance = distance - dis;
-                while (updatedDistance > dis) {
-                    Coord coordB = new Coord(nextPosition.getLatitude(), nextPosition.getLongitude());
-                    secondInitialNode = this.graph.findNodes(coordB);
-                    closestSecondNode = this.getClosestNode(secondInitialNode, nextPosition, direction);
+        Double lat2 = Math.asin(Math.sin(latRad) * Math.cos(distance/earthRadious) + Math.cos(latRad)*Math.sin(distance/earthRadious) * Math.cos(bearRad));
+        Double long2 = lonRad + Math.atan2(Math.sin(bearRad)*Math.sin(distance/earthRadious)*Math.cos(latRad), Math.cos(distance/earthRadious)-Math.sin(latRad)*Math.sin(lat2));
 
-                    if(secondInitialNode.equals(closestSecondNode)) {
-                        return nextPosition;
-                    }
+        Double latDeg = Math.toDegrees(lat2);
+        Double longDeg = Math.toDegrees(long2);
+
+        Coord coordTest = new Coord(latDeg, longDeg);
+
+        //Is the new Point inside the border of the area in interest?
+        //need some test on loading the graph and see what is happening if I chose an external Point
+        //in that case I should return the starting point.
+        //Checked, In that case the closest node in the graph is returned and used. I think I can use this system in any case
+        //or load a bigger map
+        InfoNode testNode = this.graph.findNodes(coordTest);
 
 
-                    //need to find edge and its distance
-                    dist = this.graph.findDistanceBetweenNodesConnected(secondInitialNode, closestSecondNode);
-                    updatedDistance -= dist;
-                    nextPosition = new Point(closestSecondNode.getLat(), closestSecondNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getTime());
+        distance = distance * 1000;
+        final Double[] dis = {0.0};
+        List<InfoNode> list = null;
+        try {
+            list = this.graph.findPathBetweenNodes(closestNode, testNode);
+
+
+            List<InfoNode> finalList = list;
+            IntStream.range(1, list.size()).forEach(i -> dis[0] += this.graph.findDistanceBetweenNodesConnected(finalList.get(i-1), finalList.get(i)));
+
+            Double dist = dis[0];
+
+            //is possible that the ditanc eis already shorter than distance
+            if(dist > distance){
+                Integer val = 1;
+                //check the distance
+                while (dist > distance){
+                    final Double[] dis2 = {0.0};
+                    IntStream.range(1, list.size() - val).forEach(i -> dis2[0] += this.graph.findDistanceBetweenNodesConnected(finalList.get(i-1), finalList.get(i)));
+                    dist = dis2[0];
+                    val++;
                 }
 
-                //the new point is in the middle somewhere in this edge
-                Coord position = this.graph.findPointInEdge(secondInitialNode, closestSecondNode, dist);
-                //find time from previous point
-                //distance / speed
+
+                //now I am in the middle of two nodes and I need to find the right point at the right distance
+                Double realDistance = distance - dist;
+                Coord position = this.graph.findPointInEdge(finalList.get(list.size() - val), finalList.get(list.size() - val + 1), realDistance);
                 Double plusTime = distance / speed;
                 return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
             }
-        }else{
-            //If I am returning the same point I have to return the initial coordinates. We did not move anywhere
-            return whereIam;
+            Double plusTime = distance / speed;
+            return new Point(finalList.get(list.size() - 1).getLat(), finalList.get(list.size() - 1).getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+        } catch (Exception e) {
+            //If there is no path I am returning the first point, if there are other errors I am returning something different
+            if(!Objects.equals(e.getMessage(), "No path is found in the graph")) {
+                logger.log(Level.WARNING, "Error with " + e.getMessage());
+                e.printStackTrace();
+            }
         }
+
+//        if(!closestNode.equals(initialNode)) {
+//            //need to find edge and its distance
+//            Double dis = this.graph.findDistanceBetweenNodesConnected(initialNode, closestNode);
+//            if (distance < dis) {
+//                //the new point is in the middle somewhere in this edge
+//                Coord position = this.graph.findPointInEdge(initialNode, closestNode, distance);
+//                //find time from previous point
+//                //distance / speed
+//                Double plusTime = distance / speed;
+//                return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+//            } else {
+//                //loop until I am close enough -> better than recursive, Lisa has problems
+//                Point nextPosition = new Point(closestNode.getLat(), closestNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getTime());
+//
+//                InfoNode secondInitialNode = null;
+//                Double dist = 0d;
+//                Double updatedDistance = distance - dis;
+//                while (updatedDistance > dis) {
+//                    secondInitialNode = closestNode.deepCopy();
+//                    closestNode = this.getClosestNode(secondInitialNode, whereIam, direction);
+//
+//                    if(secondInitialNode.equals(closestNode)) {
+//                        return nextPosition;
+//                    }
+//
+//                    //need to find edge and its distance
+//                    dist = this.graph.findDistanceBetweenNodesConnected(secondInitialNode, closestNode);
+//                    updatedDistance -= dist;
+//                    nextPosition = new Point(closestNode.getLat(), closestNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getTime());
+//                }
+//
+//                //the new point is in the middle somewhere in this edge
+//                Coord position = this.graph.findPointInEdge(secondInitialNode, closestNode, dist);
+//                //find time from previous point
+//                //distance / speed
+//                Double plusTime = distance / speed;
+//                return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+//            }
+//        }else{
+//            //If I am returning the same point I have to return the initial coordinates. We did not move anywhere
+//            return whereIam;
+//        }
+        //No path between the two points, returning the first point
+        return whereIam;
     }
 
 
