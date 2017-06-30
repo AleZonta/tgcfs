@@ -51,4 +51,10 @@ public interface EvolvableNN {
      * @return deep copy of the model used
      */
     EvolvableNN deepCopy();
+
+    /**
+     * Train the Network
+     * @param input input of the network
+     */
+    void fit(List<InputsNetwork> input);
 }

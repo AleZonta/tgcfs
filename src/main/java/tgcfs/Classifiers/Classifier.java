@@ -4,6 +4,7 @@ import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.pattern.ElmanPattern;
 import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.Models;
 
 import java.util.ArrayList;
@@ -115,5 +116,14 @@ public class Classifier extends Models implements EvolvableNN {
     @Override
     public EvolvableNN deepCopy() {
         return new Classifier(this.input, this.hiddenNeurons, this.output);
+    }
+
+    /**
+     * Train the neural network
+     * @param input input of the network
+     */
+    @Override
+    public void fit(List<InputsNetwork> input) {
+        throw new Error("Not Implemented - Not Necessary for the Classifier");
     }
 }

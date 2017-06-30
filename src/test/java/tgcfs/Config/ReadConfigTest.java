@@ -17,6 +17,46 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void isRecombination() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.isRecombination();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.isRecombination());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.isRecombination(), ReadConfig.Configurations.isRecombination());
+    }
+
+    @Test
+    public void getTrajectoriesTrained() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getTrajectoriesTrained();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getTrajectoriesTrained());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getTrajectoriesTrained(), ReadConfig.Configurations.getTrajectoriesTrained());
+    }
+
+    @Test
     public void getMutation() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();
@@ -197,7 +237,15 @@ public class ReadConfigTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        try {
+            conf.getHowManyTrajectories();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("HowManySplitting must be even!") );
+        }
+
         assertNotNull(conf.getHowManyTrajectories());
+
+
 
         new ReadConfig.Configurations();
         assertEquals(conf.getHowManyTrajectories(), ReadConfig.Configurations.getHowManyTrajectories());

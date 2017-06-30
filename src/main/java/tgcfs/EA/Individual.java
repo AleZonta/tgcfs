@@ -1,8 +1,9 @@
 package tgcfs.EA;
 
 import tgcfs.Config.ReadConfig;
+import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
-import tgcfs.NN.OutputsNetwork;
+import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +23,8 @@ import java.util.Random;
  */
 public abstract class Individual {
     private List<Double> objectiveParameters;
-
+    private List<TrainReal> myInputandOutput;
     private Integer fitness;
-    private List<OutputsNetwork> output;
     private EvolvableNN model;
 
     /**
@@ -60,6 +60,7 @@ public abstract class Individual {
         this.objectiveParameters = null;
         this.fitness = null;
         this.model = null;
+        this.myInputandOutput = new ArrayList<>();
     }
 
     /**
@@ -70,6 +71,7 @@ public abstract class Individual {
         this.objectiveParameters = objPar;
         this.fitness = 0;
         this.model = null;
+        this.myInputandOutput = new ArrayList<>();
     }
 
     /**
@@ -83,6 +85,7 @@ public abstract class Individual {
         this.objectiveParameters = new Random(ReadConfig.Configurations.getSeed()).doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.fitness = 0;
         this.model = null;
+        this.myInputandOutput = new ArrayList<>();
     }
 
     /**
@@ -97,24 +100,8 @@ public abstract class Individual {
         this.objectiveParameters = new Random(ReadConfig.Configurations.getSeed()).doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.fitness = 0;
         this.model = model;
+        this.myInputandOutput = new ArrayList<>();
     }
-
-    /**
-     * Getter for the list of Output
-     * @return list of output
-     */
-    public List<OutputsNetwork> getOutput() {
-        return this.output;
-    }
-
-    /**
-     * Setter for the list of outputs
-     * @param output the outputs
-     */
-    public void setOutput(List<OutputsNetwork> output) {
-        this.output = output;
-    }
-
 
     /**
      * Method to mutate the individual.
@@ -154,4 +141,31 @@ public abstract class Individual {
         this.fitness = 0;
     }
 
+    /**
+     * Train the model
+     * @param input input needed to train the model
+     * @exception Exception error in setting the weights
+     */
+    public void fitModel(List<InputsNetwork> input) throws Exception {
+        this.model.setWeights(this.objectiveParameters);
+        this.model.fit(input);
+        //return the weights
+        this.objectiveParameters = this.model.getWeights();
+    }
+
+    /**
+     * Getter for my input and output
+     * @return  return the list of {@link TrainReal} objects
+     */
+    public List<TrainReal> getMyInputandOutput() {
+        return this.myInputandOutput;
+    }
+
+    /**
+     * Add one input output to the individual
+     * @param myInputandOutput {@link TrainReal} object
+     */
+    public void addMyInputandOutput(TrainReal myInputandOutput) {
+        this.myInputandOutput.add(myInputandOutput);
+    }
 }

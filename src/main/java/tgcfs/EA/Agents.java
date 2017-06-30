@@ -3,7 +3,9 @@ package tgcfs.EA;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
+import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.InputOutput.Transformation;
+import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -41,45 +43,49 @@ public class Agents extends Algorithm {
      * @throws Exception if there are problems in reading the info
      */
     @Override
-    public void runIndividuals(List<InputsNetwork> input) throws Exception {
+    public void runIndividuals(List<TrainReal> input) throws Exception {
         logger.log(Level.INFO, "Running Agents...");
 
         super.getPopulation().parallelStream().forEach(individual -> {
             try {
-                //retrive model from the individual
+                //retrieve model from the individual
                 EvolvableNN model = individual.getModel();
                 //set the weights
                 model.setWeights(individual.getObjectiveParameters());
 
                 //compute Output of the network
                 List<Double> lastOutput = null;
-                for (InputsNetwork inputsNetwork : input) {
-                    lastOutput = model.computeOutput(inputsNetwork.serialise());
-                }
-                //now for the number of time step that I want to check save the output
-                List<OutputsNetwork> outputsNetworks = new ArrayList<>();
+                for (TrainReal inputsNetwork : input) {
+                    for(InputsNetwork in : inputsNetwork.getTrainingPoint()){
+                        lastOutput = model.computeOutput(in.serialise());
+                    }
 
-                OutputNetwork out = new OutputNetwork();
-                out.deserialise(lastOutput);
-                outputsNetworks.add(out);
+                    //now for the number of time step that I want to check save the output
+                    List<OutputsNetwork> outputsNetworks = new ArrayList<>();
 
-                //output has only two fields, input needs three
-                //I am using the last direction present into input I am adding that one to the last output
-                Double directionAPF = ((InputNetwork)input.get(input.size() - 1)).getDirectionAPF(); //TODO is it correct this step?
-                for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
-                    //transform output into input and add the direction
-                    OutputNetwork outLocal = new OutputNetwork();
-                    outLocal.deserialise(lastOutput);
-                    InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
-                    lastOutput = model.computeOutput(inputLocal.serialise());
-
-                    out = new OutputNetwork();
+                    OutputNetwork out = new OutputNetwork();
                     out.deserialise(lastOutput);
                     outputsNetworks.add(out);
-                }
-                //assign the output to this individual
-                individual.setOutput(outputsNetworks);
 
+                    //output has only two fields, input needs three
+                    //I am using the last direction present into input I am adding that one to the last output
+
+                    Double directionAPF = ((InputNetwork)inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
+                    for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
+                        //transform output into input and add the direction
+                        OutputNetwork outLocal = new OutputNetwork();
+                        outLocal.deserialise(lastOutput);
+                        InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
+                        lastOutput = model.computeOutput(inputLocal.serialise());
+
+                        out = new OutputNetwork();
+                        out.deserialise(lastOutput);
+                        outputsNetworks.add(out);
+                    }
+                    //assign the output to this individual
+                    inputsNetwork.setOutputComputed(outputsNetworks);
+                    individual.addMyInputandOutput(inputsNetwork);
+                }
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Errors with the neural network " + e.getMessage());
                 e.printStackTrace();
@@ -121,25 +127,51 @@ public class Agents extends Algorithm {
             //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
             opponent.getPopulation().forEach(classifier -> {
-                try {
-//                    System.out.println(LocalDateTime.now().toString()  + "  Evaluation classifier<--------------------------------------------------------");
-                    tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(individual.getOutput()));
-                    //if the classifier is saying true -> it is wrongly judging the agent
-                    if(result.getReal()){
-                        individual.increaseFitness();
-                    }else{
-                        //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
-                        //For each correct judgement, the classifier’s fitness increases by one
-                        classifier.increaseFitness();
+                //I need to check for every output for every individual
+                individual.getMyInputandOutput().forEach(trainReal -> {
+                    ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
+                    try {
+                        tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(trainReal.getOutputComputed()));
+                        //if the classifier is saying true -> it is wrongly judging the agent
+                        if(result.getReal()){
+                            individual.increaseFitness();
+                        }else{
+                            //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
+                            //For each correct judgement, the classifier’s fitness increases by one
+                            classifier.increaseFitness();
+                        }
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Error " + e.getMessage());
+                        e.printStackTrace();
                     }
+                });
+            });
+        });
+    }
 
+    /**
+     * Method to train the network with the input selected
+     * @param combineInputList where to find the input to train
+     */
+    @Override
+    public void trainNetwork(List<TrainReal> combineInputList) {
+        //obtain list of inputs
+        combineInputList.forEach(trainReal -> {
+            List<InputsNetwork> inputsNetworks = trainReal.getTrainingPoint();
+            //I have to train all the population with the same inputs
+            super.getPopulation().parallelStream().forEach(individual -> {
+                //train the model
+                try {
+                    individual.fitModel(inputsNetworks);
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Error " + e.getMessage());
-                    e.printStackTrace();
+                    throw new Error("Error in training the model" + e.getMessage());
                 }
             });
         });
     }
+
+
+
 
 }
 

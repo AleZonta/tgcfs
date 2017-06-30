@@ -39,11 +39,13 @@ public class ReadConfig {
     private Integer maxGenerations;
     private Integer seed;
     private Integer mutation;
+    private Boolean recombination;
 
     //model config
     private Integer hiddenLayersAgent;
     private Integer hiddenNeuronsAgent;
     private Integer hiddenNeuronsClassifier;
+    private Integer trajectoriesTrained;
 
     //experiment config
     private String name;
@@ -74,10 +76,18 @@ public class ReadConfig {
         this.maxGenerations = null;
         this.seed = null;
         this.mutation = null;
+        this.recombination = null;
 
         this.hiddenLayersAgent = null;
         this.hiddenNeuronsAgent = null;
         this.hiddenNeuronsClassifier = null;
+        this.trajectoriesTrained = null;
+
+        this.name = null;
+        this.experiment = null;
+        this.path = null;
+        this.dumpPop = null;
+        this.loadDumpPop = null;
     }
 
     /**
@@ -213,6 +223,9 @@ public class ReadConfig {
         try {
             // time I split the trajectory
             this.howManySplitting = ((Long) jsonObject.get("HowManySplitting")).intValue();
+            if(this.howManySplitting % 2 != 0){
+                throw new Exception("HowManySplitting must be even!");
+            }
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("HowManySplitting is wrong or missing.");
         }
@@ -338,6 +351,18 @@ public class ReadConfig {
             this.mutation = ((Long) jsonObject.get("Mutation")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("Mutation is wrong or missing.");
+        }
+        try {
+            // trajectoriesTrained
+            this.trajectoriesTrained = ((Long) jsonObject.get("TrajectoriesTrained")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("TrajectoriesTrained is wrong or missing.");
+        }
+        try {
+            // recombination
+            this.recombination = (Boolean) jsonObject.get("Recombination");
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("recombination is wrong or missing.");
         }
     }
 
@@ -484,15 +509,37 @@ public class ReadConfig {
                 "maxGenerations=" + maxGenerations + ",\n" +
                 "seed=" + seed + ",\n" +
                 "mutation=" + mutation + ",\n" +
+                "recombination=" + recombination + ",\n" +
                 "hiddenLayersAgent=" + hiddenLayersAgent + ",\n" +
                 "hiddenNeuronsAgent=" + hiddenNeuronsAgent + ",\n" +
                 "hiddenNeuronsClassifier=" + hiddenNeuronsClassifier + ",\n" +
+                "trajectoriesTrained=" + trajectoriesTrained + ",\n" +
                 "name='" + name + '\'' + ",\n" +
                 "experiment='" + experiment + '\'' + ",\n" +
                 "path='" + path + '\'' + ",\n" +
                 "dumpPop=" + dumpPop + ",\n" +
                 "loadDumpPop=" + loadDumpPop + ",\n" +
                 '}';
+    }
+
+    /**
+     * Return number of trajectories that are going to be used by the LSTM for its training
+     * @return Integer number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getTrajectoriesTrained() throws Exception {
+        if(this.trajectoriesTrained == null) throw new Exception("Try to access config file before reading it.");
+        return this.trajectoriesTrained;
+    }
+
+    /**
+     * Am I using recombination?
+     * @return Boolean value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Boolean isRecombination() throws Exception {
+        if(this.recombination == null) throw new Exception("Try to access config file before reading it.");
+        return this.recombination;
     }
 
 
@@ -715,6 +762,23 @@ public class ReadConfig {
          */
         public static Integer getMutation() throws Exception {
             return config.getMutation();
+        }
+        /**
+         * Return number of trajectories that are going to be used by the LSTM for its training
+         * @return Integer number
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getTrajectoriesTrained() throws Exception {
+            return config.getTrajectoriesTrained();
+        }
+
+        /**
+         * Am I using recombination?
+         * @return Boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Boolean isRecombination() throws Exception {
+            return config.isRecombination();
         }
     }
 

@@ -2,11 +2,9 @@ package tgcfs.EA;
 
 import org.junit.Test;
 import tgcfs.Agents.LSTMAgent;
-import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
-import tgcfs.NN.OutputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,35 +77,6 @@ public class IndividualTest {
         individual = new RandomResetting(5);
         assertNotNull(individual);
         individual.setFitness(10);
-    }
-
-    @Test
-    public void getOutput() throws Exception {
-        new ReadConfig.Configurations();
-        Individual individual = new UncorrelatedMutation(5);
-        List<OutputsNetwork> output = new ArrayList<>();
-        output.add(new OutputNetwork(10.0,30.0, 40.0));
-        output.add(new OutputNetwork(20.0,40.0, 50.0));
-        individual.setOutput(output);
-        assertNotNull(individual.getOutput());
-
-        individual = new RandomResetting(5);
-        individual.setOutput(output);
-        assertNotNull(individual.getOutput());
-
-    }
-
-    @Test
-    public void setOutput() throws Exception {
-        new ReadConfig.Configurations();
-        Individual individual = new UncorrelatedMutation(5);
-        List<OutputsNetwork> output = new ArrayList<>();
-        output.add(new OutputNetwork(10.0,30.0,40.0));
-        output.add(new OutputNetwork(20.0,40.0,50.0));
-        individual.setOutput(output);
-
-        individual = new RandomResetting(5);
-        individual.setOutput(output);
     }
 
     @Test

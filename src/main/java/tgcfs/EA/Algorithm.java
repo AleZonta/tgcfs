@@ -7,6 +7,7 @@ import tgcfs.EA.Recombination.DiscreteRecombination;
 import tgcfs.EA.Recombination.IntermediateRecombination;
 import tgcfs.EA.Recombination.Recombination;
 import tgcfs.InputOutput.Transformation;
+import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -14,7 +15,7 @@ import tgcfs.NN.OutputsNetwork;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -121,8 +122,8 @@ public abstract class Algorithm {
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
             //two individuals are chosen randomly, with replacement, from the parent population
-            Integer firstParentsIndex = new Random().nextInt(this.population.size());
-            Integer secondParentsIndex = new Random().nextInt(this.population.size());
+            Integer firstParentsIndex = ThreadLocalRandom.current().nextInt(this.population.size());
+            Integer secondParentsIndex = ThreadLocalRandom.current().nextInt(this.population.size());
             Individual firstParents = this.population.get(firstParentsIndex);
             Individual secondParents = this.population.get(secondParentsIndex);
 
@@ -130,7 +131,7 @@ public abstract class Algorithm {
             //themutation strengths of the recombined individual, respectively
             Recombination obj = new DiscreteRecombination(firstParents.getObjectiveParameters(), secondParents.getObjectiveParameters());
 
-            Individual son = null;
+            Individual son;
             if(ReadConfig.Configurations.getMutation() == 0){
                 Recombination mut = new IntermediateRecombination(((UncorrelatedMutation)firstParents).getMutationStrengths(), ((UncorrelatedMutation)secondParents).getMutationStrengths(), 0.5);
                 son = new UncorrelatedMutation(obj.recombination(), mut.recombination());
@@ -146,6 +147,39 @@ public abstract class Algorithm {
             }else{
                 son.mutate(son.getObjectiveParameters().size());
             }
+
+            //add the son to the population
+            this.population.add(son);
+        }
+    }
+
+
+    /**
+     * With neural networks I could suffer from COMPETING CONVENTION problem if I am using the crossover
+     * If I only use the mutation I am not suffering from it
+     * Every parents is randomly selected and an offspring is generated exactly as the father.
+     * Mutation is then applied to it
+     *
+     * @throws Exception if the parents have not the same length
+     */
+    public void generateOffspringOnlyWithMutation() throws Exception {
+        //check which class is calling this method
+        Integer size = 0;
+        if(this.getClass() == Agents.class){
+            size = ReadConfig.Configurations.getAgentOffspringSize();
+        }else{
+            size = ReadConfig.Configurations.getClassifierOffspringSize();
+        }
+        //create offspring_size offspring
+        for(int i = 0; i < size; i ++) {
+            Integer idParent = ThreadLocalRandom.current().nextInt(this.population.size());
+            Individual parent = this.population.get(idParent);
+            //son has the same genome of the father
+            Individual son = new RandomResetting(parent.getObjectiveParameters());
+            //now the son is mutated 10 times (hardcoded value)
+            IntStream.range(0, 10).forEach(it -> {
+                son.mutate(son.getObjectiveParameters().size());
+            });
 
             //add the son to the population
             this.population.add(son);
@@ -186,7 +220,7 @@ public abstract class Algorithm {
      * @param input the input of the model
      * @throws Exception if there are problems in reading the info
      */
-    public abstract void runIndividuals(List<InputsNetwork> input) throws Exception;
+    public abstract void runIndividuals(List<TrainReal> input) throws Exception;
 
     /**
      * Run the classifier with the current input and obtain the result from the network
@@ -225,6 +259,12 @@ public abstract class Algorithm {
         this.population.sort(Comparator.comparing(Individual::getFitness));
         return this.population.get(0).getObjectiveParameters();
     }
+
+    /**
+     * Method to train the network with the input selected
+     * @param combineInputList where to find the input to train
+     */
+    public abstract void trainNetwork(List<TrainReal> combineInputList);
 
 
 }

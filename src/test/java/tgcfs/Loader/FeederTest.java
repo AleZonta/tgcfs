@@ -26,6 +26,22 @@ import static junit.framework.TestCase.*;
  */
 public class FeederTest {
     @Test
+    public void multiFeeder() throws Exception {
+        new ReadConfig.Configurations();
+
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+
+        Feeder system = new Feeder();
+        system.loadSystem();
+
+        IdsaLoader idsaLoader = new IdsaLoader();
+        idsaLoader.InitPotentialField(system.getTrajectories());
+
+        List<TrainReal> res = system.multiFeeder(idsaLoader);
+        assertNotNull(res);
+    }
+
+    @Test
     public void obtainRealAgentSectionTrajectory() throws Exception {
     }
 

@@ -5,7 +5,7 @@ import tgcfs.NN.EvolvableNN;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 /**
@@ -99,12 +99,12 @@ public class UncorrelatedMutation extends Individual {
         Double p2 = 1 / (2 * Math.sqrt( 2 * Math.sqrt(n)));
 
         //random Double general per each individual
-        Double rand1 = new Random().nextDouble();
+        Double rand1 = ThreadLocalRandom.current().nextDouble();
 
         //first mutate the list of mutation strengths
         IntStream.range(0, this.mutationStrengths.size()).forEach(i -> {
             //random Double generated separately for each element within each individual
-            Double randw = new Random().nextDouble();
+            Double randw = ThreadLocalRandom.current().nextDouble();
             //obtain the new mutation value
             Double newMutation = this.mutationStrengths.get(i) * Math.exp(p1 * rand1 + p2 * randw);
             //substitute the old one with the new one
@@ -114,7 +114,7 @@ public class UncorrelatedMutation extends Individual {
         //after having mutate all the mutation strengths it is time to mutate the actual objective parameters
         IntStream.range(0, super.getObjectiveParameters().size()).forEach(i -> {
             //random Double generated separately for each element within each individual
-            Double randw = new Random().nextDouble();
+            Double randw = ThreadLocalRandom.current().nextDouble();
             Double newObj = super.getObjectiveParameters().get(i) + this.mutationStrengths.get(i) * randw;
             super.getObjectiveParameters().set(i, newObj);
         });

@@ -1,17 +1,16 @@
 package tgcfs.EA;
 
 import tgcfs.Agents.Agent;
+import tgcfs.Agents.RealAgents;
 import tgcfs.Classifiers.OutputNetwork;
-import tgcfs.Config.ReadConfig;
 import tgcfs.InputOutput.Transformation;
+import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
-import tgcfs.NN.Models;
 import tgcfs.NN.OutputsNetwork;
 
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -42,7 +41,7 @@ public class Classifiers extends Algorithm {
      * @throws Exception if there are problems in reading the info
      */
     @Override
-    public void runIndividuals(List<InputsNetwork> input) throws Exception {
+    public void runIndividuals(List<TrainReal> input) throws Exception {
         throw new Exception("Method not usable for a Classifier");
     }
 
@@ -84,18 +83,24 @@ public class Classifiers extends Algorithm {
     }
 
     /**
+     * Train the network
+     * @param combineInputList where to find the input to train
+     */
+    @Override
+    public void trainNetwork(List<TrainReal> combineInputList) {
+        throw new Error("Method not usable for a Classifier");
+    }
+
+    /**
      * Evaluate the classifier on the real agent
      * Each classifier is evaluated on the real agent oer "agent_population" times
-     * @param agent the real agent
+     * @param agents the real agent
      */
-    public void evaluateRealAgent(Models agent, Transformation transformation){
+    public void evaluateRealAgent(RealAgents agents, Transformation transformation){
         super.getPopulation().parallelStream().forEach(individual -> {
             try {
-                //now I am evaluating every classifier on the real agent only one time
-                //I should evaluate it the same number of time that I am evaluating the normal individual or even more.
-                //Paper read sometime they test this more than the pop number
-                //evaluating the real agent for pop times
-                IntStream.range(0, ReadConfig.Configurations.getAgentPopulationSize()).forEach(element ->{
+                //evaluate classifier with real agents
+                agents.getRealAgents().forEach(agent -> {
                     try {
                         OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(((Agent)agent).realOutput()));
                         //if the classifier is saying true -> it is correctly judging the agent
@@ -106,7 +111,6 @@ public class Classifiers extends Algorithm {
                         logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
                     }
                 });
-
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error with the file" + e.getMessage());
             }

@@ -1,6 +1,5 @@
 package tgcfs;
 
-import tgcfs.Agents.Agent;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
@@ -8,12 +7,13 @@ import tgcfs.Classifiers.Classifier;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Classifiers;
+import tgcfs.Agents.RealAgents;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.Loader.Feeder;
 import tgcfs.Loader.ReachedMaximumNumberException;
+import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
-import tgcfs.NN.InputsNetwork;
 import tgcfs.Performances.SaveToFile;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class App {
     private Classifiers classifiers;
     private Feeder feeder;
     private IdsaLoader idsaLoader;
-    private Agent realAgent;
+    private RealAgents realAgent;
     private static final Logger logger = Logger.getLogger(App.class.getName()); //logger for this class
 
 
@@ -81,12 +81,12 @@ public class App {
         //INITIALISE population EA with random candidate solution
         this.agents.generatePopulation(agentModel);
         this.classifiers.generatePopulation(classifierModel);
-        this.realAgent = new Agent();
+        this.realAgent = new RealAgents();
         //loading graph and trajectories
         this.feeder = new Feeder();
         this.feeder.loadSystem();
         //loading potential field
-        //idsa loader I can also add the toatl number of tracks
+        //idsa loader I can also add the total number of tracks
         //now all the trajectories are loading
         this.idsaLoader = new IdsaLoader();
         this.idsaLoader.InitPotentialField(this.feeder.getTrajectories());
@@ -111,16 +111,21 @@ public class App {
         Integer generation = 0;
         /* { EVALUATE each candidate } */
         logger.log(Level.INFO, "Evaluation generation " + generation.toString());
-        //load new trajectory, transform the trajectory into the input wanted
-        List<InputsNetwork> inputList = this.feeder.feeder(this.idsaLoader);
-        this.realAgent.setRealOutput(this.feeder.obtainRealAgentSectionTrajectory());
+
+        //load several pieces of trajectory
+        List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader);
+        //create the real agents for this session
+        this.realAgent.createAgent(combineInputList);
         //execution agents
         logger.log(Level.INFO,"Run Agents...");
-        this.agents.runIndividuals(inputList);
+        //train the agents
+        this.agents.trainNetwork(combineInputList);
+        //run the agents
+        this.agents.runIndividuals(combineInputList);
         //classifier are executed and evaluated during agents evaluations
         logger.log(Level.INFO,"Run Classifiers...");
-        this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
-        this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
+        this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
+        this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder));
         //save the fitness of all the population and the best genome
         SaveToFile.Saver.saveFitness(this.agents.getClass().getName(),this.agents.retAllFitness());
         SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(),this.classifiers.retAllFitness());
@@ -139,20 +144,28 @@ public class App {
                { RECOMBINE parents }
                { MUTATE offspring } */
             logger.log(Level.INFO,"Generating Offspring...");
-            this.agents.generateOffspring();
-            this.classifiers.generateOffspring();
+
+            if(ReadConfig.Configurations.isRecombination()) {
+                this.agents.generateOffspring();
+                this.classifiers.generateOffspring();
+            }else{
+                this.agents.generateOffspringOnlyWithMutation();
+                this.classifiers.generateOffspringOnlyWithMutation();
+            }
 
             /* { EVALUATE new candidate } */
             try {
-                inputList = this.feeder.feeder(this.idsaLoader);
-                this.realAgent.setRealOutput(this.feeder.obtainRealAgentSectionTrajectory());
+                combineInputList = this.feeder.multiFeeder(this.idsaLoader);
+                this.realAgent.createAgent(combineInputList);
+                //train the agents
+                this.agents.trainNetwork(combineInputList);
                 //execution agents
                 logger.log(Level.INFO,"Run Agents...");
-                this.agents.runIndividuals(inputList);
+                this.agents.runIndividuals(combineInputList);
                 logger.log(Level.INFO,"Run Classifiers...");
                 //classifier are executed and evaluated during agents evaluations
-                this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
-                this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder, this.realAgent.getLastPoint()));
+                this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
+                this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder));
 
             /* { SELECT individuals next generation } */
                 logger.log(Level.INFO,"Parent Selection...");

@@ -2,7 +2,8 @@ package tgcfs.Loader;
 
 import gms.GraphML.InfoEdge;
 import gms.GraphML.InfoNode;
-import gms.Loader;
+import gms.LoadingSystem.Loader;
+import gms.LoadingSystem.System;
 import gms.Point.Coord;
 import lgds.trajectories.Point;
 import lgds.trajectories.Trajectories;
@@ -32,13 +33,14 @@ import java.util.stream.IntStream;
  * a.zonta@vu.nl
  */
 public class Feeder {
-    private final Loader graph; //loader of the graph
+    private final System graph; //loader of the graph
     private final Routes routes; //loader of the trajectories
     private Integer position; //I need to remember the position where I am now
     private Boolean finished; //If the current trajectory is ended
     private Trajectory currentTrajectory; //current trajectory under investigation
     private Integer maximumNumberOfTrajectories;
     private Integer actualNumberOfTrajectory;
+    private Point lastPoint;
     private static final Logger logger = Logger.getLogger(Feeder.class.getName()); //logger for this class
 
     /**
@@ -55,6 +57,7 @@ public class Feeder {
         this.finished = Boolean.FALSE;
         this.actualNumberOfTrajectory = 0;
         this.maximumNumberOfTrajectories = ReadConfig.Configurations.getHowManyTrajectories();
+        this.lastPoint = null;
     }
 
     /**
@@ -76,7 +79,7 @@ public class Feeder {
      * Method that returns every how many timestep I am providing the trajectory
      * Is reading from setting how many time split a trajectory
      * @param tra trajectory under analysis
-     * @return number of timestep to wait before providing the new part of trajectory
+     * @return number of time step to wait before providing the new part of trajectory
      * @throws Exception raising an exception if the setting file is not available or not correct
      */
     private Integer selectPositionInTrajectory(Trajectory tra) throws Exception{
@@ -274,12 +277,13 @@ public class Feeder {
             actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
         }
 
+        //save last point
+        this.lastPoint = actualPoint.get(actualPoint.size() - 1);
         //compute the potential field for the actualPoint
         actualPoint.forEach(idsaLoader::compute);
 
         //return the list of input network
-        return  this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)));
-
+        return this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)));
     }
 
     /**
@@ -385,49 +389,6 @@ public class Feeder {
                 e.printStackTrace();
             }
         }
-
-//        if(!closestNode.equals(initialNode)) {
-//            //need to find edge and its distance
-//            Double dis = this.graph.findDistanceBetweenNodesConnected(initialNode, closestNode);
-//            if (distance < dis) {
-//                //the new point is in the middle somewhere in this edge
-//                Coord position = this.graph.findPointInEdge(initialNode, closestNode, distance);
-//                //find time from previous point
-//                //distance / speed
-//                Double plusTime = distance / speed;
-//                return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
-//            } else {
-//                //loop until I am close enough -> better than recursive, Lisa has problems
-//                Point nextPosition = new Point(closestNode.getLat(), closestNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getTime());
-//
-//                InfoNode secondInitialNode = null;
-//                Double dist = 0d;
-//                Double updatedDistance = distance - dis;
-//                while (updatedDistance > dis) {
-//                    secondInitialNode = closestNode.deepCopy();
-//                    closestNode = this.getClosestNode(secondInitialNode, whereIam, direction);
-//
-//                    if(secondInitialNode.equals(closestNode)) {
-//                        return nextPosition;
-//                    }
-//
-//                    //need to find edge and its distance
-//                    dist = this.graph.findDistanceBetweenNodesConnected(secondInitialNode, closestNode);
-//                    updatedDistance -= dist;
-//                    nextPosition = new Point(closestNode.getLat(), closestNode.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.getTime());
-//                }
-//
-//                //the new point is in the middle somewhere in this edge
-//                Coord position = this.graph.findPointInEdge(secondInitialNode, closestNode, dist);
-//                //find time from previous point
-//                //distance / speed
-//                Double plusTime = distance / speed;
-//                return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
-//            }
-//        }else{
-//            //If I am returning the same point I have to return the initial coordinates. We did not move anywhere
-//            return whereIam;
-//        }
         //No path between the two points, returning the first point
         return whereIam;
     }
@@ -464,5 +425,30 @@ public class Feeder {
 //        }
         //not correct direction? I am staying here
         return endNodes.get(index[0]);
+    }
+
+
+    /**
+     * Return a list of (train-control) trajectories
+     * It calls {@link Feeder#feeder(IdsaLoader)} to obtain the single train trajectory and {@link Feeder#obtainRealAgentSectionTrajectory()}
+     * to find the ral part of the trajectory
+     *
+     * @param idsaLoader reference IDSA system
+     * @return list of {@link TrainReal} object
+     * @throws Exception if there are problems with the config file or we reached the maximum number of trajectories usable
+     */
+    public List<TrainReal> multiFeeder(IdsaLoader idsaLoader) throws Exception {
+        //need to load the number of trajectories given by settings
+        List<TrainReal> totalList = new ArrayList<>();
+        IntStream.range(0, ReadConfig.Configurations.getTrajectoriesTrained()).forEach(i -> {
+            try {
+                TrainReal tr = new TrainReal(this.feeder(idsaLoader),this.obtainRealAgentSectionTrajectory());
+                tr.setLastPoint(this.lastPoint);
+                totalList.add(tr);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error in loading the trajectories" + e.getMessage());
+            }
+        });
+        return totalList;
     }
 }

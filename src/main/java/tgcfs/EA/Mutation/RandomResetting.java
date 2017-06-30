@@ -64,13 +64,13 @@ public class RandomResetting extends Individual {
      * Random Resetting is an extension of the bit flip for the integer representation.
      * In this, a random value from the set of permissible values is assigned to a randomly chosen gene.
      *
-     * @param n is the population size
+     * @param n is the length of the genome
      */
     @Override
     public void mutate(Integer n) {
         //generate random number of gene that I will mutate
         Integer top = n / 4;
-        Integer rand = ThreadLocalRandom.current().nextInt(0, top + 1);
+        Integer rand = ThreadLocalRandom.current().nextInt(1, top + 1);
 
         IntStream.range(0,rand).forEach(el -> {
             //generate random position to mutate

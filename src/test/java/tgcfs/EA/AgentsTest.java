@@ -6,10 +6,6 @@ import tgcfs.Agents.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.NN.EvolvableNN;
-import tgcfs.NN.InputsNetwork;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -37,18 +33,25 @@ public class AgentsTest {
 
     @Test
     public void runIndividuals() throws Exception {
-        new ReadConfig.Configurations();
-        List<InputsNetwork> input = new ArrayList<>();
-        input.add(new InputNetwork(15.0, 30.8, 15.0));
-        input.add(new InputNetwork(16.0, 31.8, 15.0));
-        input.add(new InputNetwork(17.0, 32.8, 15.0));
-        input.add(new InputNetwork(18.0, 33.8, 15.0));
-        input.add(new InputNetwork(19.0, 34.8, 15.0));
-
-        EvolvableNN model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
-        Agents agentsCompeting = new Agents();
-        agentsCompeting.generatePopulation(model);
-        agentsCompeting.runIndividuals(input);
+//        new ReadConfig.Configurations();
+//        List<InputsNetwork> input = new ArrayList<>();
+//        input.add(new InputNetwork(15.0, 30.8, 15.0));
+//        input.add(new InputNetwork(16.0, 31.8, 15.0));
+//        input.add(new InputNetwork(17.0, 32.8, 15.0));
+//        input.add(new InputNetwork(18.0, 33.8, 15.0));
+//        input.add(new InputNetwork(19.0, 34.8, 15.0));
+//
+//        EvolvableNN model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
+//        Agents agentsCompeting = new Agents();
+//        agentsCompeting.generatePopulation(model);
+//
+//
+//        List<TrainReal> i = new ArrayList<>();
+//
+//        TrainReal t = new TrainReal()
+//
+//        agentsCompeting.runIndividuals(input);
+        throw new Exception("To Implement");
 
     }
 

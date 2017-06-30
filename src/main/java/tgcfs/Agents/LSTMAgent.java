@@ -1,6 +1,7 @@
 package tgcfs.Agents;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.GravesLSTM;
@@ -9,9 +10,11 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.Models;
 
 import java.util.Arrays;
@@ -77,6 +80,9 @@ public class LSTMAgent extends Models implements EvolvableNN {
         // some common parameters
         NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
         builder.biasInit(0);
+        builder.learningRate(0.001);
+        builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+        builder.miniBatch(false);
         builder.weightInit(WeightInit.XAVIER);
 
         NeuralNetConfiguration.ListBuilder listBuilder = builder.list();
@@ -102,6 +108,7 @@ public class LSTMAgent extends Models implements EvolvableNN {
         outputLayerBuilder.nIn(hiddenNeurons);
         outputLayerBuilder.nOut(outputSize);
         listBuilder.layer(hiddenLayers + 1, outputLayerBuilder.build());
+
 
         // create network
         MultiLayerConfiguration conf = listBuilder.build();
@@ -177,5 +184,19 @@ public class LSTMAgent extends Models implements EvolvableNN {
     @Override
     public EvolvableNN deepCopy() {
         return new LSTMAgent(this.inputSize, this.hiddenLayers, this.hiddenNeurons, this.outputSize);
+    }
+
+
+    /**
+     * @implNote Implementation from Interface
+     * @param input input of the network
+     */
+    public void fit(List<InputsNetwork> input){
+        //creation of a data set of data -> use to train the network
+        DataSet dataSet = new DataSet();
+        input.forEach(i -> dataSet.addFeatureVector(Nd4j.create(i.serialise().stream().mapToDouble(d -> d).toArray())));
+
+        this.net.fit(dataSet);
+
     }
 }

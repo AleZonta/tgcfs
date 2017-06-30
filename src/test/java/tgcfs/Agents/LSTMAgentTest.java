@@ -80,9 +80,10 @@ public class LSTMAgentTest {
 
     @Test
     public void getWeights() throws Exception {
-        LSTMAgent agent = new LSTMAgent(2,1,1,1);
+        LSTMAgent agent = new LSTMAgent(3,1,5,3);
         List<Double> lsit = agent.getWeights();
         assertNotNull(lsit);
+        System.out.println(lsit.size());
     }
 
     @Test
