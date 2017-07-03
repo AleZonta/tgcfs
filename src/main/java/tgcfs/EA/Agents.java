@@ -1,5 +1,6 @@
 package tgcfs.EA;
 
+import lgds.trajectories.Point;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
@@ -158,11 +159,12 @@ public class Agents extends Algorithm {
         //obtain list of inputs
         combineInputList.forEach(trainReal -> {
             List<InputsNetwork> inputsNetworks = trainReal.getTrainingPoint();
+            List<Point> points = trainReal.getPoints();
             //I have to train all the population with the same inputs
             super.getPopulation().parallelStream().forEach(individual -> {
                 //train the model
                 try {
-                    individual.fitModel(inputsNetworks);
+                    individual.fitModel(inputsNetworks, points);
                 } catch (Exception e) {
                     throw new Error("Error in training the model" + e.getMessage());
                 }

@@ -1,5 +1,7 @@
 package tgcfs.NN;
 
+import lgds.trajectories.Point;
+
 import java.util.List;
 
 /**
@@ -55,6 +57,7 @@ public interface EvolvableNN {
     /**
      * Train the Network
      * @param input input of the network
+     * @param points real point of the input
      */
-    void fit(List<InputsNetwork> input);
+    void fit(List<InputsNetwork> input, List<Point> points);
 }

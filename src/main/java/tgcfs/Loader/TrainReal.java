@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class TrainReal {
     private List<InputsNetwork> trainingPoint;
-    private Point lastPoint;
+    private List<Point> firstPart;
     private List<Point>  followingPart;
     private List<OutputsNetwork> outputComputed;
 
@@ -71,14 +71,22 @@ public class TrainReal {
      * @return Position
      */
     public Point getLastPoint() {
-        return this.lastPoint;
+        return this.firstPart.get(this.firstPart.size() - 1);
     }
 
     /**
-     * Setter for last point of the source
-     * @param lastPoint point
+     * Getter for the points on the first part of trajectories
+     * @return Position
      */
-    public void setLastPoint(Point lastPoint) {
-        this.lastPoint = lastPoint;
+    public List<Point> getPoints() {
+        return this.firstPart;
+    }
+
+    /**
+     * Setter for first part of the source
+     * @param firstPart point
+     */
+    public void setPoints(List<Point> firstPart) {
+        this.firstPart = firstPart;
     }
 }

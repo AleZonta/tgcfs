@@ -31,7 +31,7 @@ public class AlgorithmTest {
         algorithm.generateOffspring();
         List<Integer> fitness = algorithm.retAllFitness();
         assertNotNull(fitness);
-        assertEquals(new Integer(100).intValue(), fitness.size());
+        assertEquals(pop + pop, fitness.size());
         fitness.forEach(f -> {
             assertEquals(0, f.intValue());
         });

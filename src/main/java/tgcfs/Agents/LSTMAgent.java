@@ -1,5 +1,7 @@
 package tgcfs.Agents;
 
+import lgds.Distance.Distance;
+import lgds.trajectories.Point;
 import org.apache.commons.lang3.ArrayUtils;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -17,6 +19,7 @@ import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.Models;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -191,10 +194,25 @@ public class LSTMAgent extends Models implements EvolvableNN {
      * @implNote Implementation from Interface
      * @param input input of the network
      */
-    public void fit(List<InputsNetwork> input){
+    public void fit(List<InputsNetwork> input, List<Point> points){
         //creation of a data set of data -> use to train the network
-        DataSet dataSet = new DataSet();
-        input.forEach(i -> dataSet.addFeatureVector(Nd4j.create(i.serialise().stream().mapToDouble(d -> d).toArray())));
+        DataSet dataSet;
+
+        Distance d = new Distance();
+
+        INDArray array = Nd4j.create(input.get(0).serialise().size());
+        INDArray outputs = Nd4j.create(input.get(0).serialise().size());
+        for(int i = 0; i < input.size() - 1; i++) {
+            List<Double> l = input.get(i).serialise();
+            array.putRow(i, Nd4j.create(l.stream().mapToDouble(f -> f).toArray()));
+            List<Double> appo = new ArrayList<>();
+            appo.add(l.get(0));
+            appo.add(l.get(1));
+            appo.add(d.compute(points.get(i+1), points.get(i+2)));
+            outputs.putRow(i, Nd4j.create(appo.stream().mapToDouble(f -> f).toArray()));
+        }
+        dataSet = new DataSet(array,outputs);
+        //input.forEach(i -> dataSet.addFeatureVector(Nd4j.create(i.serialise().stream().mapToDouble(d -> d).toArray())));
 
         this.net.fit(dataSet);
 

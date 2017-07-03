@@ -1,5 +1,6 @@
 package tgcfs.EA;
 
+import lgds.trajectories.Point;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
@@ -144,11 +145,12 @@ public abstract class Individual {
     /**
      * Train the model
      * @param input input needed to train the model
+     * @param points the real points of the first part of the model
      * @exception Exception error in setting the weights
      */
-    public void fitModel(List<InputsNetwork> input) throws Exception {
+    public void fitModel(List<InputsNetwork> input, List<Point> points) throws Exception {
         this.model.setWeights(this.objectiveParameters);
-        this.model.fit(input);
+        this.model.fit(input, points);
         //return the weights
         this.objectiveParameters = this.model.getWeights();
     }

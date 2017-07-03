@@ -40,7 +40,7 @@ public class Feeder {
     private Trajectory currentTrajectory; //current trajectory under investigation
     private Integer maximumNumberOfTrajectories;
     private Integer actualNumberOfTrajectory;
-    private Point lastPoint;
+    private List<Point> points;
     private static final Logger logger = Logger.getLogger(Feeder.class.getName()); //logger for this class
 
     /**
@@ -57,7 +57,7 @@ public class Feeder {
         this.finished = Boolean.FALSE;
         this.actualNumberOfTrajectory = 0;
         this.maximumNumberOfTrajectories = ReadConfig.Configurations.getHowManyTrajectories();
-        this.lastPoint = null;
+        this.points = null;
     }
 
     /**
@@ -277,8 +277,9 @@ public class Feeder {
             actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
         }
 
-        //save last point
-        this.lastPoint = actualPoint.get(actualPoint.size() - 1);
+        //save points
+        this.points = new ArrayList<>();
+        actualPoint.forEach(point -> this.points.add(point.deepCopy()));
         //compute the potential field for the actualPoint
         actualPoint.forEach(idsaLoader::compute);
 
@@ -443,7 +444,7 @@ public class Feeder {
         IntStream.range(0, ReadConfig.Configurations.getTrajectoriesTrained()).forEach(i -> {
             try {
                 TrainReal tr = new TrainReal(this.feeder(idsaLoader),this.obtainRealAgentSectionTrajectory());
-                tr.setLastPoint(this.lastPoint);
+                tr.setPoints(this.points);
                 totalList.add(tr);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Error in loading the trajectories" + e.getMessage());

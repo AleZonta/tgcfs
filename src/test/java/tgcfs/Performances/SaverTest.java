@@ -24,6 +24,8 @@ import static junit.framework.TestCase.assertEquals;
 public class SaverTest {
     @Test
     public void dumpPopulation() throws Exception {
+        new ReadConfig.Configurations();
+
         List<Individual> list = new ArrayList<>();
         list.add(new UncorrelatedMutation(5));
         list.add(new UncorrelatedMutation(3));

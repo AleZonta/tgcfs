@@ -1,6 +1,8 @@
 package tgcfs.Agents;
 
+import lgds.trajectories.Point;
 import org.junit.Test;
+import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,31 @@ import static org.junit.Assert.*;
  * a.zonta@vu.nl
  */
 public class LSTMAgentTest {
+    @Test
+    public void fit() throws Exception {
+        LSTMAgent agent = new LSTMAgent(3,1,1,3);
+        List<InputsNetwork> input = new ArrayList<>();
+        input.add(new InputNetwork(10d,10d,80d));
+        input.add(new InputNetwork(20d,30d,90d));
+        input.add(new InputNetwork(30d,40d,10d));
+        input.add(new InputNetwork(40d,50d,120d));
+        input.add(new InputNetwork(50d,60d,130d));
+        input.add(new InputNetwork(60d,70d,140d));
+
+        List<Point> output = new ArrayList<>();
+        output.add(new Point(1d,6d));
+        output.add(new Point(2d,7d));
+        output.add(new Point(3d,8d));
+        output.add(new Point(4d,9d));
+        output.add(new Point(5d,10d));
+        output.add(new Point(3d,8d));
+        output.add(new Point(4d,9d));
+        output.add(new Point(5d,10d));
+
+        agent.fit(input,output);
+
+    }
+
     @Test
     public void computeOutput() throws Exception {
         LSTMAgent agent = new LSTMAgent(2,1,1,1);

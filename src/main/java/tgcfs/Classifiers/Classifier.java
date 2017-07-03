@@ -1,5 +1,6 @@
 package tgcfs.Classifiers;
 
+import lgds.trajectories.Point;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.pattern.ElmanPattern;
@@ -123,7 +124,7 @@ public class Classifier extends Models implements EvolvableNN {
      * @param input input of the network
      */
     @Override
-    public void fit(List<InputsNetwork> input) {
+    public void fit(List<InputsNetwork> input, List<Point> points) {
         throw new Error("Not Implemented - Not Necessary for the Classifier");
     }
 }
