@@ -3,6 +3,7 @@ package tgcfs.EA;
 import tgcfs.Agents.Agent;
 import tgcfs.Agents.RealAgents;
 import tgcfs.Classifiers.OutputNetwork;
+import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
@@ -102,6 +103,7 @@ public class Classifiers extends Algorithm {
                 //evaluate classifier with real agents
                 agents.getRealAgents().forEach(agent -> {
                     try {
+                        ((FollowingTheGraph)transformation).setLastPoint(agent.getLastPoint());
                         OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(((Agent)agent).realOutput()));
                         //if the classifier is saying true -> it is correctly judging the agent
                         if(result.getReal()){

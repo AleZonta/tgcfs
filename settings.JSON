@@ -29,7 +29,7 @@
   "ClassifierAlphaIntermediateRecombination": 0.5,
   "ClassifierTimeStepsExplanation": "Not implemented now",
   "ClassifierTimeSteps": 20,
-  "MaxGenerations": 2,
+  "MaxGenerations": 1,
   "Seed": 1,
   "MutationExplanation": "0 is Uncorrelated mutation, 1 is RandomResetting",
   "Mutation": 1,

@@ -177,9 +177,9 @@ public abstract class Algorithm {
             //son has the same genome of the father
             Individual son = new RandomResetting(parent.getObjectiveParameters());
             //now the son is mutated 10 times (hardcoded value)
-            IntStream.range(0, 10).forEach(it -> {
-                son.mutate(son.getObjectiveParameters().size());
-            });
+            IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().size()));
+            //set model to the son
+            son.setModel(parent.getModel().deepCopy());
 
             //add the son to the population
             this.population.add(son);

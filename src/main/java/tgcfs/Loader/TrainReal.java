@@ -4,6 +4,8 @@ import lgds.trajectories.Point;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -71,7 +73,14 @@ public class TrainReal {
      * @return Position
      */
     public Point getLastPoint() {
-        return this.firstPart.get(this.firstPart.size() - 1);
+        Point p = this.firstPart.get(this.firstPart.size() - 1);
+        Point ret;
+        if(p.getTime() == null){
+            ret = new Point(p.getLatitude(), p.getLongitude(), 0.0, 0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        }else{
+            ret = new Point(p.getLatitude(), p.getLongitude(), p.getAltitude(), p.getDated(), p.getTime(), p.getDates());
+        }
+        return ret;
     }
 
     /**
@@ -88,5 +97,6 @@ public class TrainReal {
      */
     public void setPoints(List<Point> firstPart) {
         this.firstPart = firstPart;
+
     }
 }
