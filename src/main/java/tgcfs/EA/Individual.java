@@ -1,14 +1,13 @@
 package tgcfs.EA;
 
 import lgds.trajectories.Point;
-import tgcfs.Config.ReadConfig;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -49,7 +48,7 @@ public abstract class Individual {
      * @param fitness the value to assign to fitness
      */
     public void setFitness(Integer fitness) {
-        this.fitness = fitness;
+        this.fitness = new Integer(fitness);
     }
 
 
@@ -83,7 +82,7 @@ public abstract class Individual {
      * @exception Exception if there are problems with the reading of the seed information
      */
     public Individual(Integer size) throws Exception {
-        this.objectiveParameters = new Random(ReadConfig.Configurations.getSeed()).doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
+        this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.fitness = 0;
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
@@ -98,10 +97,24 @@ public abstract class Individual {
      * @exception Exception if there are problems with the reading of the seed information
      */
     public Individual(Integer size, EvolvableNN model) throws Exception {
-        this.objectiveParameters = new Random(ReadConfig.Configurations.getSeed()).doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
+        this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.fitness = 0;
         this.model = model;
         this.myInputandOutput = new ArrayList<>();
+    }
+
+    /**
+     * four parameters constructor
+     * @param objPar objectiveParameters list
+     * @param fitness fitness
+     * @param model model to assign to the individual
+     * @param myInputandOutput input output last
+     */
+    public Individual(List<Double> objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
+        this.objectiveParameters = objPar;
+        this.fitness = fitness;
+        this.model = model.deepCopy();
+        this.myInputandOutput = myInputandOutput;
     }
 
     /**
@@ -170,4 +183,18 @@ public abstract class Individual {
     public void addMyInputandOutput(TrainReal myInputandOutput) {
         this.myInputandOutput.add(myInputandOutput);
     }
+
+    /**
+     * Reset the list of Input Output of the individual
+     */
+    public void resetInputOutput(){
+        this.myInputandOutput = new ArrayList<>();
+    }
+
+    /**
+     * Deep copy function
+     * @return Individual object
+     */
+    public abstract Individual deepCopy();
+
 }

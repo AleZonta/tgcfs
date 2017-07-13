@@ -47,6 +47,9 @@ public class Agents extends Algorithm {
     public void runIndividuals(List<TrainReal> input) throws Exception {
         logger.log(Level.INFO, "Running Agents...");
 
+        //reset input
+        super.getPopulation().forEach(Individual::resetInputOutput);
+
         super.getPopulation().parallelStream().forEach(individual -> {
             try {
                 //retrieve model from the individual

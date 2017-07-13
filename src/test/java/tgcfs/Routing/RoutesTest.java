@@ -6,6 +6,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import tgcfs.Config.ReadConfig;
 
+import java.util.stream.IntStream;
+
 import static junit.framework.TestCase.assertNotNull;
 
 /**
@@ -30,6 +32,12 @@ public class RoutesTest {
         assertNotNull(tra);
         assertNotNull(tra1);
         Assert.assertNotEquals(tra, tra1);
+
+
+        IntStream.range(0,1000).forEach(i -> {
+            Trajectory t = routes.getNextTrajectory();
+            assertNotNull(t);
+        });
     }
 
     @Test

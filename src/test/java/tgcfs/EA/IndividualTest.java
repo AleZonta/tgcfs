@@ -36,6 +36,17 @@ public class IndividualTest {
         assertNull(individual.getObjectiveParameters());
         individual = new RandomResetting(5);
         assertNotNull(individual.getObjectiveParameters());
+
+        Individual secInd = new RandomResetting(5);
+        assertNotNull(secInd.getObjectiveParameters());
+
+        List<Double> a = individual.getObjectiveParameters();
+        List<Double> b = secInd.getObjectiveParameters();
+        for (int i = 0; i< a.size(); i++){
+            System.out.println(a.get(i) + " " + b.get(i));
+            assertFalse(a.get(i).equals(b.get(i)));
+        }
+
     }
 
     @Test

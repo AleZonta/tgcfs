@@ -43,6 +43,8 @@ public class RealAgents {
      * @param combineInputList combined list with input and output
      */
     public void createAgent(List<TrainReal> combineInputList){
+        //empty every time I create them
+        this.realAgents = new ArrayList<>();
         combineInputList.forEach(comb -> this.newAgent(comb.getFollowingPart()));
     }
 

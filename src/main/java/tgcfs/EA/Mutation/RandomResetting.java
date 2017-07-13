@@ -1,6 +1,7 @@
 package tgcfs.EA.Mutation;
 
 import tgcfs.EA.Individual;
+import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
 
 import java.util.List;
@@ -58,6 +59,19 @@ public class RandomResetting extends Individual {
     public RandomResetting(Integer size, EvolvableNN model) throws Exception {
         super(size, model);
     }
+
+    /**
+     * four parameters constructor
+     * @param objPar objectiveParameters list
+     * @param fitness fitness
+     * @param model model to assign to the individual
+     * @param myInputandOutput input output last
+     */
+    public RandomResetting(List<Double> objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
+        super(objPar, fitness, model, myInputandOutput);
+    }
+
+
     /**
      * Implementation abstract method mutate from individual
      *
@@ -78,6 +92,14 @@ public class RandomResetting extends Individual {
             Double newValue = ThreadLocalRandom.current().nextDouble(-4,4);
             super.getObjectiveParameters().set(pos,newValue);
         });
+    }
 
+
+    /**
+     * Deep copy function
+     * @return RandomResetting object
+     */
+    public RandomResetting deepCopy(){
+        return new RandomResetting(this.getObjectiveParameters(), new Integer(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput());
     }
 }

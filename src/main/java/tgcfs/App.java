@@ -3,11 +3,11 @@ package tgcfs;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
+import tgcfs.Agents.RealAgents;
 import tgcfs.Classifiers.Classifier;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Classifiers;
-import tgcfs.Agents.RealAgents;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.Loader.Feeder;
@@ -152,6 +152,40 @@ public class App {
                 this.agents.generateOffspringOnlyWithMutation();
                 this.classifiers.generateOffspringOnlyWithMutation();
             }
+
+
+            Integer number = ReadConfig.Configurations.getTimestepEvolveAgentOverClassifier();
+            if(number > 0){
+                for(int i = 0; i < number - 1; i++) {
+                    //I have to evolve for this number of time-step -1 only the  agents and not the classifiers
+                    //The last timestep I am evolving both
+                    logger.log(Level.INFO, "Evaluation only agents' generation " + i);
+                /* { EVALUATE new candidate } */
+                    combineInputList = this.feeder.multiFeeder(this.idsaLoader);
+                    this.realAgent.createAgent(combineInputList);
+                    //train the agents
+                    this.agents.trainNetwork(combineInputList);
+                    //execution agents
+                    logger.log(Level.INFO, "Run Agents...");
+                    this.agents.runIndividuals(combineInputList);
+                    logger.log(Level.INFO, "Evaluate Agents...");
+                    //classifier are executed and evaluated during agents evaluations
+                    this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
+                    //reset classifier, I am not evolving them now
+                    this.classifiers.resetFitness();
+                /* { SELECT individuals next generation } */
+                    logger.log(Level.INFO, "Parent Selection...");
+                    this.agents.selectParents();
+                    //save the fitness of all the population and best genome
+                    SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
+                    SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(), this.agents.retBestGenome());
+                    if (ReadConfig.Configurations.getDumpPop()) {
+                        logger.log(Level.INFO, "Dump Population...");
+                        SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
+                    }
+                }
+            }
+
 
             /* { EVALUATE new candidate } */
             try {

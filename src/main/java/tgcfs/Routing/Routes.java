@@ -8,6 +8,7 @@ import lgds.trajectories.Trajectories;
 import lgds.trajectories.Trajectory;
 import tgcfs.Config.ReadConfig;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,10 +75,20 @@ public class Routes {
      * @return trajectory
      */
     public Trajectory getNextTrajectory(){
-        //get Trajectory
-        Trajectory trajectory = this.tra.getTrajectories().get(number);
+        Trajectory trajectory = null;
+        //check if the number is greater than the size of trajectories
+        if (number >= this.tra.getTrajectories().size()){
+            Integer rand = ThreadLocalRandom.current().nextInt(0, this.tra.getTrajectories().size());
+            //get Trajectory
+            trajectory = this.tra.getTrajectories().get(rand);
+        }else{
+            //get Trajectory
+            trajectory = this.tra.getTrajectories().get(number);
+        }
         //increase the number
         number++;
+
+
         return trajectory;
     }
 

@@ -151,6 +151,9 @@ public abstract class Algorithm {
             //add the son to the population
             this.population.add(son);
         }
+
+        //resetting the fitness of everyone
+        this.resetFitness();
     }
 
 
@@ -184,6 +187,9 @@ public abstract class Algorithm {
             //add the son to the population
             this.population.add(son);
         }
+
+        //resetting the fitness of everyone
+        this.resetFitness();
     }
 
 
@@ -206,11 +212,41 @@ public abstract class Algorithm {
         }else{
             size = ReadConfig.Configurations.getClassifierPopulationSize();
         }
+        //lets do binary selection
+
+//        List<Individual> newList = new ArrayList<>();
+//
+//        IntStream.range(0, size).forEach(i -> {
+//            Integer firstNumber = ThreadLocalRandom.current().nextInt(0,this.population.size());
+//            Integer secondNumber = ThreadLocalRandom.current().nextInt(0,this.population.size());
+//
+//            Individual one = this.population.get(firstNumber);
+//            Individual two = this.population.get(secondNumber);
+//            if(one.getFitness() > two.getFitness()){
+//                newList.add(one.deepCopy());
+//            }else{
+//                if(one.getFitness() < two.getFitness()){
+//                    newList.add(two.deepCopy());
+//                }else{
+//                    //rando select one of the two
+//                    Double rand = ThreadLocalRandom.current().nextDouble(0,1);
+//                    if(rand >= 0.5){
+//                        newList.add(one.deepCopy());
+//                    }else {
+//                        newList.add(two.deepCopy());
+//                    }
+//                }
+//            }
+//        });
         //sort the list
         this.population.sort(Comparator.comparing(Individual::getFitness));
+
         while(this.population.size() != size){
-            this.population.remove(this.population.size() - 1);
+            this.population.remove(0);
         }
+
+//        this.population = new ArrayList<>();
+//        this.population = newList;
         //now the population is again under the maximum size allowed and containing only the element with highest fitness.
     }
 
@@ -267,4 +303,10 @@ public abstract class Algorithm {
     public abstract void trainNetwork(List<TrainReal> combineInputList);
 
 
+    /**
+     * Reset the fitness of all the individual
+     */
+    public void resetFitness(){
+        this.population.forEach(Individual::resetFitness);
+    }
 }

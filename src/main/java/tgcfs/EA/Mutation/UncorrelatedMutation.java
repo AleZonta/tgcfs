@@ -1,6 +1,7 @@
 package tgcfs.EA.Mutation;
 
 import tgcfs.EA.Individual;
+import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
 
 import java.util.ArrayList;
@@ -77,6 +78,16 @@ public class UncorrelatedMutation extends Individual {
         IntStream.range(0, size).forEach(i -> this.mutationStrengths.add(1.0));
     }
 
+    /**
+     * four parameters constructor
+     * @param objPar objectiveParameters list
+     * @param fitness fitness
+     * @param model model to assign to the individual
+     * @param myInputandOutput input output last
+     */
+    public UncorrelatedMutation(List<Double> objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
+        super(objPar, fitness, model, myInputandOutput);
+    }
 
     /**
      * Implementation abstract method mutate from individual
@@ -118,6 +129,14 @@ public class UncorrelatedMutation extends Individual {
             Double newObj = super.getObjectiveParameters().get(i) + this.mutationStrengths.get(i) * randw;
             super.getObjectiveParameters().set(i, newObj);
         });
+    }
+
+    /**
+     * Deep copy function
+     * @return UncorrelatedMutation object
+     */
+    public UncorrelatedMutation deepCopy(){
+        return new UncorrelatedMutation(this.getObjectiveParameters(), new Integer(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput());
     }
 
 }

@@ -264,9 +264,9 @@ public class Feeder {
         //if the trajectory is yet not ended I do not need to load the next one
         if (!this.finished) {
             //If I have reached the maximum number of trajectory usable raise an exception
-            if(Objects.equals(this.actualNumberOfTrajectory, this.maximumNumberOfTrajectories)){
-                throw new ReachedMaximumNumberException("Reached Maximum Number Of trajectories");
-            }
+//            if(Objects.equals(this.actualNumberOfTrajectory, this.maximumNumberOfTrajectories)){
+//                throw new ReachedMaximumNumberException("Reached Maximum Number Of trajectories");
+//            }
             this.currentTrajectory = this.getTrajectory();
             //new trajectory new apf
             idsaLoader.resetAPF();

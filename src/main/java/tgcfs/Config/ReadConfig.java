@@ -40,6 +40,7 @@ public class ReadConfig {
     private Integer seed;
     private Integer mutation;
     private Boolean recombination;
+    private Integer timestepEvolveAgentOverClassifier;
 
     //model config
     private Integer hiddenLayersAgent;
@@ -77,6 +78,7 @@ public class ReadConfig {
         this.seed = null;
         this.mutation = null;
         this.recombination = null;
+        this.timestepEvolveAgentOverClassifier = null;
 
         this.hiddenLayersAgent = null;
         this.hiddenNeuronsAgent = null;
@@ -364,6 +366,12 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("recombination is wrong or missing.");
         }
+        try {
+            // recombination
+            this.timestepEvolveAgentOverClassifier = ((Long) jsonObject.get("EvolveAgentMoreThanClassifierTimesteps")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("EvolveAgentMoreThanClassifierTimesteps is wrong or missing.");
+        }
     }
 
 
@@ -510,6 +518,7 @@ public class ReadConfig {
                 "seed=" + seed + ",\n" +
                 "mutation=" + mutation + ",\n" +
                 "recombination=" + recombination + ",\n" +
+                "EvolveAgentMoreThanClassifierTimesteps=" + timestepEvolveAgentOverClassifier + ",\n" +
                 "hiddenLayersAgent=" + hiddenLayersAgent + ",\n" +
                 "hiddenNeuronsAgent=" + hiddenNeuronsAgent + ",\n" +
                 "hiddenNeuronsClassifier=" + hiddenNeuronsClassifier + ",\n" +
@@ -540,6 +549,16 @@ public class ReadConfig {
     public Boolean isRecombination() throws Exception {
         if(this.recombination == null) throw new Exception("Try to access config file before reading it.");
         return this.recombination;
+    }
+
+    /**
+     * Evolve the Agents more than the classifier for the number of timesteps returned from this method
+     * @return Integer number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getTimestepEvolveAgentOverClassifier() throws Exception {
+        if(this.timestepEvolveAgentOverClassifier == null) throw new Exception("Try to access config file before reading it.");
+        return this.timestepEvolveAgentOverClassifier;
     }
 
 
@@ -779,6 +798,15 @@ public class ReadConfig {
          */
         public static Boolean isRecombination() throws Exception {
             return config.isRecombination();
+        }
+
+        /**
+         * Evolve the Agents more than the classifier for the number of timesteps returned from this method
+         * @return Integer value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getTimestepEvolveAgentOverClassifier() throws Exception {
+            return config.getTimestepEvolveAgentOverClassifier();
         }
     }
 
