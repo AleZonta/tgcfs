@@ -241,6 +241,9 @@ public abstract class Algorithm {
         //sort the list
         this.population.sort(Comparator.comparing(Individual::getFitness));
 
+        this.population.forEach(individual -> System.out.print(individual.getFitness() + " "));
+        System.out.print(System.lineSeparator());
+
         while(this.population.size() != size){
             this.population.remove(0);
         }

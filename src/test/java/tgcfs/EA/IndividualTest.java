@@ -1,10 +1,14 @@
 package tgcfs.EA;
 
+import lgds.trajectories.Point;
 import org.junit.Test;
+import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.LSTMAgent;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
+import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,67 @@ import static junit.framework.TestCase.*;
  * a.zonta@vu.nl
  */
 public class IndividualTest {
+    @Test
+    public void fitModel() throws Exception {
+        List<InputsNetwork> input = new ArrayList<>();
+        input.add(new InputNetwork(10d,10d,80d));
+        input.add(new InputNetwork(20d,30d,90d));
+        input.add(new InputNetwork(30d,40d,10d));
+        input.add(new InputNetwork(40d,50d,120d));
+        input.add(new InputNetwork(50d,60d,130d));
+        input.add(new InputNetwork(60d,70d,140d));
+        List<Point> p = new ArrayList<>();
+        p.add(new Point(1d,1d));
+        p.add(new Point(2d,2d));
+        p.add(new Point(3d,3d));
+        p.add(new Point(4d,4d));
+        p.add(new Point(5d,4d));
+        p.add(new Point(6d,5d));
+        p.add(new Point(7d,6d));
+        p.add(new Point(8d,7d));
+        p.add(new Point(9d,8d));
+        p.add(new Point(10d,9d));
+
+        new ReadConfig.Configurations();
+        EvolvableNN model = new LSTMAgent(3,1,5,3);
+        Individual individual = new RandomResetting(model.getArrayLength(),model);
+        IntStream.range(0, 1000).forEach(j -> {
+            List<Double> weights = individual.getObjectiveParameters();
+            try {
+                individual.fitModel(input,p);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            List<Double> newweights= individual.getObjectiveParameters();
+
+            final Integer[] equal = {0};
+            IntStream.range(0,weights.size()).forEach(i -> {
+                if(weights.get(i).equals(newweights.get(i))){
+                    equal[0]++;
+                }
+            });
+            assertFalse(equal[0].equals(weights.size()));
+
+        });
+
+    }
+
+    @Test
+    public void getMyInputandOutput() throws Exception {
+    }
+
+    @Test
+    public void addMyInputandOutput() throws Exception {
+    }
+
+    @Test
+    public void resetInputOutput() throws Exception {
+    }
+
+    @Test
+    public void deepCopy() throws Exception {
+    }
+
     @Test
     public void getObjectiveParameters() throws Exception {
         new ReadConfig.Configurations();

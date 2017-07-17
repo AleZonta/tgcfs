@@ -5,6 +5,8 @@ import tgcfs.EA.Individual;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -183,11 +185,13 @@ public class SaveToFile {
      * @param genome list with the double value of the genome
      */
     private void saveGenome(String name, List<Double> genome){
+
         try {
             BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-genome.csv", true));
             genome.forEach(gene -> {
                 try {
-                    outputWriter.write(Double.toString(gene) + ", ");
+                    NumberFormat formatter = new DecimalFormat("0.#######E0");
+                    outputWriter.write(formatter.format(gene) + ", ");
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Error appending line to" + name + " CSV File " + e.getMessage());
                 }
@@ -231,7 +235,8 @@ public class SaveToFile {
             population.forEach(individual -> {
                 individual.getObjectiveParameters().forEach(gene -> {
                     try {
-                        writer.write(Double.toString(gene) + ", ");
+                        NumberFormat formatter = new DecimalFormat("0.#######E0");
+                        writer.write(formatter.format(gene) + ", ");
                     } catch (IOException e) {
                         logger.log(Level.WARNING, "Error appending line to " + name + " CSV File " + e.getMessage());
                         e.printStackTrace();
