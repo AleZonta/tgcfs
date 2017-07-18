@@ -248,6 +248,9 @@ public abstract class Algorithm {
             this.population.remove(0);
         }
 
+        this.population.forEach(individual -> System.out.print(individual.getFitness() + " "));
+        System.out.print(System.lineSeparator());
+
 //        this.population = new ArrayList<>();
 //        this.population = newList;
         //now the population is again under the maximum size allowed and containing only the element with highest fitness.

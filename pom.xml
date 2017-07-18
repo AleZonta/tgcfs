@@ -15,7 +15,7 @@
           <source>1.8</source>
           <target>1.8</target>
           <meminitial>2024m</meminitial>
-          <maxmem>10240m</maxmem>
+          <maxmem>20480m</maxmem>
         </configuration>
       </plugin>
       <plugin>
@@ -23,7 +23,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.19</version>
         <configuration>
-          <argLine>-Xmx10240m -Xss4086k</argLine>
+          <argLine>-Xmx20480m -Xss4086k</argLine>
         </configuration>
       </plugin>
       <plugin>
