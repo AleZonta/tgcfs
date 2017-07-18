@@ -16,7 +16,6 @@ import tgcfs.NN.InputsNetwork;
 import tgcfs.Routing.Routes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -42,7 +41,6 @@ public class Feeder {
     private Integer maximumNumberOfTrajectories;
     private Integer actualNumberOfTrajectory;
     private List<Point> points;
-    private HashMap<Coord, InfoNode> coordinatesAndNodeAlreadyFound;
     private static final Logger logger = Logger.getLogger(Feeder.class.getName()); //logger for this class
 
     /**
@@ -60,7 +58,6 @@ public class Feeder {
         this.actualNumberOfTrajectory = 0;
         this.maximumNumberOfTrajectories = ReadConfig.Configurations.getHowManyTrajectories();
         this.points = null;
-        this.coordinatesAndNodeAlreadyFound = new HashMap<>();
     }
 
     /**
@@ -320,8 +317,7 @@ public class Feeder {
     public Point getNextLocation(Point whereIam, Double speed, Double distance, Double direction){
         //find position where I am
         Coord coordA = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
-        //check If I have already found the node
-        InfoNode initialNode = this.coordinatesAndNodeAlreadyFound.computeIfAbsent(coordA, this.graph::findNodes);
+        InfoNode initialNode = this.graph.findNodes(coordA);
 
         InfoNode closestNode = null;
         try {
