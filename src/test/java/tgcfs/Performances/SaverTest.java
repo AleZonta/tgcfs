@@ -2,6 +2,8 @@ package tgcfs.Performances;
 
 import nl.tno.idsa.framework.config.ConfigFile;
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
@@ -99,17 +101,7 @@ public class SaverTest {
     @Test
     public void saveBestGenoma() throws Exception {
 
-        List<Double> list = new ArrayList<>();
-        list.add(1.0);
-        list.add(2.0);
-        list.add(3.0);
-        list.add(4.0);
-        list.add(4.0);
-        list.add(4.0);
-        list.add(4.0);
-        list.add(4.0);
-        list.add(4.0);
-        list.add(4.0);
+        INDArray list = Nd4j.rand(1,10);
 
         try {
             SaveToFile.Saver.saveBestGenoma("a", list);

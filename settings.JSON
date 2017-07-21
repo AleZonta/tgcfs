@@ -40,6 +40,7 @@
   "HiddenNeuronsAgent": 5,
   "HiddenNeuronsClassifier": 3,
   "TrajectoriesTrained": 10,
+  "Train": false,
   "_____________________________Sixth section": "Settings for where to save the performances",
   "Name": "Test",
   "Experiment": "1",
@@ -47,6 +48,9 @@
   "DumpPopulationExplanation": "Save the entire population on file.",
   "DumpPopulation" : false,
   "LoadDumpedPopExplanation": "Load the population from file. Not Implemented now",
-  "LoadDumpedPop": false
-
+  "LoadDumpedPop": false,
+  "_____________________________Seventh section": "Settings for databases",
+  "usingDB": false,
+  "dbNameCoordNode": "dbcn",
+  "dbNameDistance": " dbd"
 }

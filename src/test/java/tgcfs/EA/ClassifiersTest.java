@@ -10,6 +10,8 @@ import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -30,7 +32,7 @@ public class ClassifiersTest {
         Classifiers classifiers = new Classifiers();
         try {
             classifiers.trainNetwork(null);
-        }catch (Exception e){
+        }catch (Error e){
             assertEquals("Method not usable for a Classifier", e.getMessage());
         }
     }
@@ -69,7 +71,28 @@ public class ClassifiersTest {
         input.add(new InputNetwork(18.0, 33.8));
         input.add(new InputNetwork(19.0, 34.8));
 
-        assertNotNull(classifiers.runIndividual(classifiers.getPopulation().get(0),input));
+        OutputNetwork res = (OutputNetwork) classifiers.runIndividual(classifiers.getPopulation().get(0),input);
+        assertNotNull(res);
+
+
+        IntStream.range(0,5000).forEach(i -> {
+            List<InputsNetwork> inputHere = new ArrayList<>();
+            inputHere.add(new InputNetwork(ThreadLocalRandom.current().nextDouble(-5,55), ThreadLocalRandom.current().nextDouble(-180,180)));
+            inputHere.add(new InputNetwork(ThreadLocalRandom.current().nextDouble(-5,55), ThreadLocalRandom.current().nextDouble(-180,180)));
+            inputHere.add(new InputNetwork(ThreadLocalRandom.current().nextDouble(-5,55), ThreadLocalRandom.current().nextDouble(-180,180)));
+            inputHere.add(new InputNetwork(ThreadLocalRandom.current().nextDouble(-5,55), ThreadLocalRandom.current().nextDouble(-180,180)));
+            inputHere.add(new InputNetwork(ThreadLocalRandom.current().nextDouble(-5,55), ThreadLocalRandom.current().nextDouble(-180,180)));
+            try {
+                OutputNetwork ress = (OutputNetwork) classifiers.runIndividual(classifiers.getPopulation().get(0),inputHere);
+                System.out.println(ress.getReal().toString() );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+
+
+
     }
 
     @Test

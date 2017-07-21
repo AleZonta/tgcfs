@@ -1,5 +1,6 @@
 package tgcfs.EA;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
@@ -145,7 +146,7 @@ public abstract class Algorithm {
             if(ReadConfig.Configurations.getMutation() == 0){
                 son.mutate(this.population.size());
             }else{
-                son.mutate(son.getObjectiveParameters().size());
+                son.mutate(son.getObjectiveParameters().columns());
             }
 
             //add the son to the population
@@ -180,7 +181,7 @@ public abstract class Algorithm {
             //son has the same genome of the father
             Individual son = new RandomResetting(parent.getObjectiveParameters());
             //now the son is mutated 10 times (hardcoded value)
-            IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().size()));
+            IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
             //set model to the son
             son.setModel(parent.getModel().deepCopy());
 
@@ -296,7 +297,7 @@ public abstract class Algorithm {
      * Method that returns the best genome in the population
      * @return list of doubles
      */
-    public List<Double> retBestGenome(){
+    public INDArray retBestGenome(){
         //sort the list
         this.population.sort(Comparator.comparing(Individual::getFitness));
         return this.population.get(0).getObjectiveParameters();

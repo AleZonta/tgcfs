@@ -1,9 +1,8 @@
 package tgcfs.Classifiers;
 
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.InputOutput.Normalisation;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,9 +32,9 @@ public class InputNetworkTest {
     @Test
     public void serialise() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
-        List<Double> list = inputNetwork.serialise();
-        assertEquals(Normalisation.convertSpeed(10.0),list.get(0));
-        assertEquals(Normalisation.convertDirectionData(30.0),list.get(1));
+        INDArray list = inputNetwork.serialise();
+        assertEquals(Normalisation.convertSpeed(10.0).doubleValue(),list.getDouble(0));
+        assertEquals(Normalisation.convertDirectionData(30.0).doubleValue(),list.getDouble(1));
 
     }
 

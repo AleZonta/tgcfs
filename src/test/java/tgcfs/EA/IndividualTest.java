@@ -2,6 +2,7 @@ package tgcfs.EA;
 
 import lgds.trajectories.Point;
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.LSTMAgent;
 import tgcfs.Config.ReadConfig;
@@ -53,21 +54,21 @@ public class IndividualTest {
         EvolvableNN model = new LSTMAgent(3,1,5,3);
         Individual individual = new RandomResetting(model.getArrayLength(),model);
         IntStream.range(0, 1000).forEach(j -> {
-            List<Double> weights = individual.getObjectiveParameters();
+            INDArray weights = individual.getObjectiveParameters();
             try {
                 individual.fitModel(input,p);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            List<Double> newweights= individual.getObjectiveParameters();
+            INDArray newweights= individual.getObjectiveParameters();
 
             final Integer[] equal = {0};
-            IntStream.range(0,weights.size()).forEach(i -> {
-                if(weights.get(i).equals(newweights.get(i))){
+            IntStream.range(0,weights.columns()).forEach(i -> {
+                if(weights.getDouble(i) == newweights.getDouble(i)){
                     equal[0]++;
                 }
             });
-            assertFalse(equal[0].equals(weights.size()));
+            assertFalse(equal[0].equals(weights.columns()));
 
         });
 
@@ -105,11 +106,11 @@ public class IndividualTest {
         Individual secInd = new RandomResetting(5);
         assertNotNull(secInd.getObjectiveParameters());
 
-        List<Double> a = individual.getObjectiveParameters();
-        List<Double> b = secInd.getObjectiveParameters();
-        for (int i = 0; i< a.size(); i++){
-            System.out.println(a.get(i) + " " + b.get(i));
-            assertFalse(a.get(i).equals(b.get(i)));
+        INDArray a = individual.getObjectiveParameters();
+        INDArray b = secInd.getObjectiveParameters();
+        for (int i = 0; i< a.columns(); i++){
+            System.out.println(a.getDouble(i) + " " + b.getDouble(i));
+            assertFalse(a.getDouble(i) == b.getDouble(i));
         }
 
     }
@@ -281,26 +282,29 @@ public class IndividualTest {
         System.out.println(individual.getObjectiveParameters());
 
         Individual individual3 = new RandomResetting(100);
-        List<Double> t = new ArrayList<>();
-        individual3.getObjectiveParameters().forEach(el -> t.add(new Double(el)));
+
+        INDArray t = individual3.getObjectiveParameters().dup();
+
+
         IntStream.range(0,1000).forEach(i -> {
             individual3.mutate(100);
         });
 
 
-        individual3.getObjectiveParameters().forEach(val -> {
-            System.out.println(val);
-            assertTrue(val >= -4.0 && val <= 4.0);
-        });
+        for(int i = 0; i < individual3.getObjectiveParameters().columns(); i++){
+            System.out.println(individual3.getObjectiveParameters().getDouble(i));
+            assertTrue(individual3.getObjectiveParameters().getDouble(i) >= -4.0 && individual3.getObjectiveParameters().getDouble(i) <= 4.0);
+        }
+
 
         final Integer[] count = {0};
-        IntStream.range(0, t.size()).forEach(i ->{
-            if(Objects.equals(t.get(i), individual3.getObjectiveParameters().get(i))){
+        IntStream.range(0, t.columns()).forEach(i ->{
+            if(Objects.equals(t.getDouble(i), individual3.getObjectiveParameters().getDouble(i))){
                 count[0]++;
             }
         });
         System.out.println(count[0]);
-        assertTrue(count[0]!=individual3.getObjectiveParameters().size());
+        assertTrue(count[0]!=individual3.getObjectiveParameters().columns());
 
     }
 }

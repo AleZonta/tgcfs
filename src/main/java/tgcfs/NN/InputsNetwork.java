@@ -1,6 +1,6 @@
 package tgcfs.NN;
 
-import java.util.List;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -20,5 +20,5 @@ public interface InputsNetwork {
      * Serialising the field into a list
      * @return list containing all the fields
      */
-    List<Double> serialise();
+    INDArray serialise();
 }

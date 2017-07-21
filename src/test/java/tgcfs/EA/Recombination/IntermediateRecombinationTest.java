@@ -1,6 +1,9 @@
 package tgcfs.EA.Recombination;
 
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +30,13 @@ public class IntermediateRecombinationTest {
         List<Double> father = new Random().doubles(20, -8.0, 8.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         System.out.println(father.toString());
 
-        Recombination rec = new IntermediateRecombination(mother, father, 0.5);
-        List<Double> son = rec.recombination();
+        INDArray realMother = Nd4j.create(ArrayUtil.flattenDoubleArray(mother));
+        INDArray realFather = Nd4j.create(ArrayUtil.flattenDoubleArray(father));
+
+        Recombination rec = new IntermediateRecombination(realMother, realFather, 0.5);
+        INDArray son = rec.recombination();
         assertNotNull(son);
-        assertEquals(mother.size(), son.size());
+        assertEquals(realMother.columns(), son.columns());
         System.out.println(son.toString());
 
     }

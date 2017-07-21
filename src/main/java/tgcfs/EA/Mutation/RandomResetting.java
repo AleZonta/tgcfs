@@ -1,5 +1,6 @@
 package tgcfs.EA.Mutation;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
@@ -33,7 +34,7 @@ public class RandomResetting extends Individual {
      * Two parameter constructor and set to 0 the fitness
      * @param objPar objectiveParameters list
      */
-    public RandomResetting(List<Double> objPar){
+    public RandomResetting(INDArray objPar){
         super(objPar);
     }
 
@@ -67,7 +68,7 @@ public class RandomResetting extends Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      */
-    public RandomResetting(List<Double> objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
+    public RandomResetting(INDArray objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
         super(objPar, fitness, model, myInputandOutput);
     }
 
@@ -88,9 +89,9 @@ public class RandomResetting extends Individual {
 
         IntStream.range(0,rand).forEach(el -> {
             //generate random position to mutate
-            Integer pos = ThreadLocalRandom.current().nextInt(super.getObjectiveParameters().size());
+            Integer pos = ThreadLocalRandom.current().nextInt(super.getObjectiveParameters().columns());
             Double newValue = ThreadLocalRandom.current().nextDouble(-4,4);
-            super.getObjectiveParameters().set(pos,newValue);
+            super.getObjectiveParameters().putScalar(pos,newValue);
         });
     }
 

@@ -1,11 +1,11 @@
 package tgcfs.Classifiers;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.InputsNetwork;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Alessandro Zonta on 24/05/2017.
@@ -74,11 +74,11 @@ public class InputNetwork implements InputsNetwork{
      * @return list containing all the fields
      */
     @Override
-    public List<Double> serialise(){
-        List<Double> res = new ArrayList<>();
-        res.add(this.speed);
-        res.add(this.direction);
-        return res;
+    public INDArray serialise(){
+        INDArray array = Nd4j.zeros(2);
+        array.putScalar(0, this.speed);
+        array.putScalar(1, this.direction);
+        return array;
     }
 
     /**

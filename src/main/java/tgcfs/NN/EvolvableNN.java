@@ -1,6 +1,7 @@
 package tgcfs.NN;
 
 import lgds.trajectories.Point;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface EvolvableNN {
      * Method that returns the weights of the network
      * @return list of weights
      */
-    List<Double> getWeights();
+    INDArray getWeights();
 
 
     /**
@@ -38,7 +39,7 @@ public interface EvolvableNN {
      * @param weights list containing all the weights
      * @throws Exception if the length of the list passed as parameter is not correct
      */
-    void setWeights(List<Double> weights) throws Exception;
+    void setWeights(INDArray weights) throws Exception;
 
 
     /**
@@ -46,7 +47,7 @@ public interface EvolvableNN {
      * @param input list value that are the input of the network
      * @return list of output of the network
      */
-    List<Double> computeOutput(List<Double> input);
+    INDArray computeOutput(INDArray input);
 
     /**
      * Deep copy of the model

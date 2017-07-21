@@ -1,9 +1,9 @@
 package tgcfs.Classifiers;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.NN.OutputsNetwork;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -45,9 +45,9 @@ public class OutputNetwork implements OutputsNetwork{
      * @param out list containing all the fields
      */
     @Override
-    public void deserialise(List<Double> out) {
-        if (out.size() != outputSize) throw new Error("List size is not correct");
-        if(out.get(0) >= 0.0){
+    public void deserialise(INDArray out) {
+        if (out.columns() != outputSize) throw new Error("List size is not correct");
+        if(out.getDouble(0) >= 0.0){
             this.real = Boolean.TRUE;
         }else{
             this.real = Boolean.FALSE;

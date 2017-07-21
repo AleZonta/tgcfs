@@ -1,14 +1,15 @@
 package tgcfs.EA.Recombination;
 
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -25,23 +26,27 @@ public class DiscreteRecombinationTest {
     public void recombination() throws Exception {
         List<Double> mother = new Random().doubles(20, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         List<Double> father = new Random().doubles(20, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
-        Recombination rec = new DiscreteRecombination(mother, father);
-        List<Double> son = rec.recombination();
+
+        INDArray realMother = Nd4j.create(ArrayUtil.flattenDoubleArray(mother));
+        INDArray realFather = Nd4j.create(ArrayUtil.flattenDoubleArray(father));
+
+        Recombination rec = new DiscreteRecombination(realMother, realFather);
+        INDArray son = rec.recombination();
         assertNotNull(son);
-        assertEquals(mother.size(), son.size());
-        for (int i = 0; i < son.size(); i++){
-            assertTrue(son.get(i).equals(mother.get(i)) || son.get(i).equals(father.get(i)));
+        assertEquals(mother.size(), son.columns());
+        for (int i = 0; i < son.columns(); i++){
+            assertTrue(son.getDouble(i) == realMother.getDouble(i) || son.getDouble(i) == realFather.getDouble(i));
         }
         Integer count = 0;
-        for (int i = 0; i < son.size(); i++){
-            if(son.get(i).equals(mother.get(i))) count+=1;
+        for (int i = 0; i < son.columns(); i++){
+            if(son.getDouble(i) == realMother.getDouble(i)) count+=1;
         }
         Integer count1 = 0;
-        for (int i = 0; i < son.size(); i++){
-            if(son.get(i).equals(father.get(i))) count1+=1;
+        for (int i = 0; i < son.columns(); i++){
+            if(son.getDouble(i) == realFather.getDouble(i)) count1+=1;
         }
-        assertTrue(count < mother.size());
-        assertTrue(count1 < father.size());
+        assertTrue(count < realMother.columns());
+        assertTrue(count1 < realFather.columns());
     }
 
 }

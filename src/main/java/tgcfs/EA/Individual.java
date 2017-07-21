@@ -1,13 +1,14 @@
 package tgcfs.EA;
 
 import lgds.trajectories.Point;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -22,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * This class implements an individual
  */
 public abstract class Individual {
-    private List<Double> objectiveParameters;
+    private INDArray objectiveParameters;
     private List<TrainReal> myInputandOutput;
     private Integer fitness;
     private EvolvableNN model;
@@ -31,7 +32,7 @@ public abstract class Individual {
      * Getter fot the objective parameter
      * @return list of double
      */
-    public List<Double> getObjectiveParameters() {
+    public INDArray getObjectiveParameters() {
         return this.objectiveParameters;
     }
 
@@ -67,7 +68,7 @@ public abstract class Individual {
      * Two parameter constructor and set to 0 the fitness
      * @param objPar objectiveParameters list
      */
-    public Individual(List<Double> objPar){
+    public Individual(INDArray objPar){
         this.objectiveParameters = objPar;
         this.fitness = 0;
         this.model = null;
@@ -82,7 +83,8 @@ public abstract class Individual {
      * @exception Exception if there are problems with the reading of the seed information
      */
     public Individual(Integer size) throws Exception {
-        this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
+        //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
+        this.objectiveParameters = Nd4j.rand(1, size);
         this.fitness = 0;
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
@@ -97,7 +99,7 @@ public abstract class Individual {
      * @exception Exception if there are problems with the reading of the seed information
      */
     public Individual(Integer size, EvolvableNN model) throws Exception {
-        this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
+        this.objectiveParameters = Nd4j.rand(1, size);
         this.fitness = 0;
         this.model = model;
         this.myInputandOutput = new ArrayList<>();
@@ -110,7 +112,7 @@ public abstract class Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      */
-    public Individual(List<Double> objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
+    public Individual(INDArray objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
         this.objectiveParameters = objPar;
         this.fitness = fitness;
         this.model = model.deepCopy();

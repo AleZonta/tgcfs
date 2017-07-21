@@ -1,7 +1,8 @@
 package tgcfs.EA.Recombination;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
 import java.util.Random;
 import java.util.stream.DoubleStream;
 
@@ -24,7 +25,7 @@ public class DiscreteRecombination extends AbstractRecombination implements Reco
      * @param father individual father
      * @throws Exception raise an exception if the two individual has different length
      */
-    public DiscreteRecombination(List<Double> mother, List<Double> father) throws Exception {
+    public DiscreteRecombination(INDArray mother, INDArray father) throws Exception {
         super(mother,father);
     }
 
@@ -34,17 +35,19 @@ public class DiscreteRecombination extends AbstractRecombination implements Reco
      * For each position the parent who contributes its variable to the offspring is chosen randomly with equal probability.
      * @return new individual variables
      */
-    public List<Double> recombination(){
-        List<Double> son = new ArrayList<>();
+    public INDArray recombination(){
+        INDArray son = Nd4j.zeros(super.getSize());
 
         final int[] index = {0};
+        final int[] pos = {0};
         DoubleStream randomNumber = new Random().doubles(super.getSize(),0,1);
         randomNumber.forEach(number -> {
             if(number >= 0.5){
-                son.add(super.getMother().get(index[0]));
+                son.putScalar(pos[0], super.getMother().getDouble(index[0]));
             }else{
-                son.add(super.getFather().get(index[0]));
+                son.putScalar(pos[0], super.getFather().getDouble(index[0]));
             }
+            pos[0]++;
             index[0]++;
         });
         return son;

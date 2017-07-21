@@ -1,10 +1,10 @@
 package tgcfs.Agents;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.OutputsNetwork;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -76,11 +76,11 @@ public class OutputNetwork implements OutputsNetwork {
      * @param out list containing all the fields
      */
     @Override
-    public void deserialise(List<Double> out) {
-        if (out.size() != outputSize) throw new Error("List size is not correct");
-        this.speed = Normalisation.decodeSpeed(out.get(0));
-        this.bearing = Normalisation.decodeDirectionData(out.get(1));
-        this.distance = Normalisation.decodeDistance(out.get(2));
+    public void deserialise(INDArray out) {
+        if (out.columns() != outputSize) throw new Error("List size is not correct");
+        this.speed = Normalisation.decodeSpeed(out.getDouble(0));
+        this.bearing = Normalisation.decodeDirectionData(out.getDouble(1));
+        this.distance = Normalisation.decodeDistance(out.getDouble(2));
     }
 
     /**

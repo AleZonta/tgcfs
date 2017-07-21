@@ -47,6 +47,8 @@ public class ReadConfig {
     private Integer hiddenNeuronsAgent;
     private Integer hiddenNeuronsClassifier;
     private Integer trajectoriesTrained;
+    private Boolean train;
+
 
     //experiment config
     private String name;
@@ -84,6 +86,7 @@ public class ReadConfig {
         this.hiddenNeuronsAgent = null;
         this.hiddenNeuronsClassifier = null;
         this.trajectoriesTrained = null;
+        this.train = null;
 
         this.name = null;
         this.experiment = null;
@@ -367,10 +370,16 @@ public class ReadConfig {
             throw new Exception("recombination is wrong or missing.");
         }
         try {
-            // recombination
+            // timestepEvolveAgentOverClassifier
             this.timestepEvolveAgentOverClassifier = ((Long) jsonObject.get("EvolveAgentMoreThanClassifierTimesteps")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("EvolveAgentMoreThanClassifierTimesteps is wrong or missing.");
+        }
+        try {
+            // train
+            this.train = ((Boolean) jsonObject.get("Train"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Train is wrong or missing.");
         }
     }
 
@@ -523,6 +532,7 @@ public class ReadConfig {
                 "hiddenNeuronsAgent=" + hiddenNeuronsAgent + ",\n" +
                 "hiddenNeuronsClassifier=" + hiddenNeuronsClassifier + ",\n" +
                 "trajectoriesTrained=" + trajectoriesTrained + ",\n" +
+                "train=" + train + ",\n" +
                 "name='" + name + '\'' + ",\n" +
                 "experiment='" + experiment + '\'' + ",\n" +
                 "path='" + path + '\'' + ",\n" +
@@ -559,6 +569,16 @@ public class ReadConfig {
     public Integer getTimestepEvolveAgentOverClassifier() throws Exception {
         if(this.timestepEvolveAgentOverClassifier == null) throw new Exception("Try to access config file before reading it.");
         return this.timestepEvolveAgentOverClassifier;
+    }
+
+    /**
+     * Am I training the network before evolving?
+     * @return Boolean number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Boolean getTrain() throws Exception {
+        if(this.train == null) throw new Exception("Try to access config file before reading it.");
+        return train;
     }
 
 
@@ -808,6 +828,16 @@ public class ReadConfig {
         public static Integer getTimestepEvolveAgentOverClassifier() throws Exception {
             return config.getTimestepEvolveAgentOverClassifier();
         }
+
+        /**
+         * Am I training the network before evolving?
+         * @return Boolean number
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Boolean getTrain() throws Exception {
+            return config.getTrain();
+        }
+
     }
 
 }

@@ -183,6 +183,12 @@ public class App {
                         logger.log(Level.INFO, "Dump Population...");
                         SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
                     }
+                    //generate new offspring for new evolution
+                    if(ReadConfig.Configurations.isRecombination()) {
+                        this.agents.generateOffspring();
+                    }else{
+                        this.agents.generateOffspringOnlyWithMutation();
+                    }
                 }
             }
 

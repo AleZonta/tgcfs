@@ -1,6 +1,6 @@
 package tgcfs.EA.Recombination;
 
-import java.util.List;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -20,6 +20,6 @@ public interface Recombination {
      * Method that performs the recombination
      * @return the list of value forming the new individual
      */
-    List<Double> recombination();
+    INDArray recombination();
 
 }

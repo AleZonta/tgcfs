@@ -2,13 +2,12 @@ package tgcfs.Agents;
 
 import lgds.trajectories.Point;
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 import static org.junit.Assert.*;
 
@@ -51,27 +50,21 @@ public class LSTMAgentTest {
     @Test
     public void computeOutput() throws Exception {
         LSTMAgent agent = new LSTMAgent(2,1,1,1);
-        List<Double> list = new ArrayList<>();
-        list.add(5.0);
-        list.add(6.0);
-        List<Double> out = null;
+
+        INDArray array = Nd4j.rand(1, 2);
+        array.putScalar(0,5.0);
+        INDArray out = null;
         try {
-            out = agent.computeOutput(list);
-            assertNotNull(out);
-            assertFalse(list.equals(out));
-            assertTrue(out.size() == 1);
-            assertTrue((out.get(0) >= -1.0)  && (out.get(0) <= 1.0) );
+            out = agent.computeOutput(array);
         }catch (Error e){
             assertEquals("Generator input is not normalised correctly", e.getMessage());
         }
-        list = new ArrayList<>();
-        list.add(1.0);
-        list.add(-1.0);
-        out = agent.computeOutput(list);
+        INDArray real = Nd4j.rand(1, 2);
+        out = agent.computeOutput(real);
         assertNotNull(out);
-        assertFalse(list.equals(out));
-        assertTrue(out.size() == 1);
-        assertTrue((out.get(0) >= -1.0)  && (out.get(0) <= 1.0) );
+        assertFalse(real.equals(out));
+        assertTrue(out.columns() == 1);
+        assertTrue((out.getDouble(0) >= -1.0)  && (out.getDouble(0) <= 1.0) );
 
     }
 
@@ -90,27 +83,19 @@ public class LSTMAgentTest {
 
     @Test
     public void setWeights() throws Exception {
-        Random random = new Random();
-        DoubleStream doubleStream = random.doubles(-1, 1);
-        List<Double> numbers = doubleStream.limit(36L).boxed().collect(Collectors.toList());
-        List<Double> brandNewNumbers = new ArrayList<>();
-        numbers.forEach(num -> brandNewNumbers.add(Math.round(num * 1000.0) / 1000.0));
-
+        INDArray array = Nd4j.rand(1, 21);
         LSTMAgent agent = new LSTMAgent(2,1,1,1);
-        agent.setWeights(brandNewNumbers);
-        List<Double> lsit = agent.getWeights();
-        List<Double> brandNewlsit = new ArrayList<>();
-        lsit.forEach(num -> brandNewlsit.add(Math.round(num * 1000.0) / 1000.0));
-        assertEquals(brandNewNumbers,brandNewlsit);
-
+        agent.setWeights(array);
+        INDArray lsit = agent.getWeights();
+        assertEquals(array,lsit);
     }
 
     @Test
     public void getWeights() throws Exception {
-        LSTMAgent agent = new LSTMAgent(3,1,10,3);
-        List<Double> lsit = agent.getWeights();
+        LSTMAgent agent = new LSTMAgent(2,1,1,1);
+        INDArray lsit = agent.getWeights();
         assertNotNull(lsit);
-        System.out.println(lsit.size());
+        System.out.println(lsit.columns());
     }
 
     @Test
@@ -124,7 +109,7 @@ public class LSTMAgentTest {
                 + nL * (4 * nL + 3) //recurrent weights
                 + 4 * nL; //bias
         */
-        assertEquals(36L, agent.getArrayLength().longValue());
+        assertEquals(21L, agent.getArrayLength().longValue());
     }
 
 }

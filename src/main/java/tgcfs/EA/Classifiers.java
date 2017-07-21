@@ -1,5 +1,6 @@
 package tgcfs.EA;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Agents.Agent;
 import tgcfs.Agents.RealAgents;
 import tgcfs.Classifiers.OutputNetwork;
@@ -60,9 +61,13 @@ public class Classifiers extends Algorithm {
         //set the weights
         model.setWeights(individual.getObjectiveParameters());
         //compute Output of the network
-        List<Double> lastOutput = null;
+        INDArray lastOutput = null;
         for (InputsNetwork inputsNetwork : input) {
+            //System.out.println("------- input ------");
+            //System.out.println(inputsNetwork.serialise());
             lastOutput = model.computeOutput(inputsNetwork.serialise());
+            //System.out.println("------- output ------");
+            //System.out.println(lastOutput);
         }
         //I am interested only in the last output of this network
         OutputNetwork out = new OutputNetwork();

@@ -1,13 +1,10 @@
 package tgcfs.Classifiers;
 
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by Alessandro Zonta on 30/05/2017.
@@ -23,21 +20,21 @@ public class OutputNetworkTest {
     @Test
     public void getReal() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
-        List<Double> list = new ArrayList<>();
-        list.add(0.5);
-        outputNetwork.deserialise(list);
+        INDArray array = Nd4j.create(1);
+        array.putScalar(0,0.5);
+
+
+        outputNetwork.deserialise(array);
         assertNotNull(outputNetwork.getReal());
         assertTrue(outputNetwork.getReal());
 
-        list = new ArrayList<>();
-        list.add(0.6);
-        outputNetwork.deserialise(list);
+        array.putScalar(0,0.6);
+        outputNetwork.deserialise(array);
         assertNotNull(outputNetwork.getReal());
         assertTrue(outputNetwork.getReal());
 
-        list = new ArrayList<>();
-        list.add(-0.5);
-        outputNetwork.deserialise(list);
+        array.putScalar(0,-0.5);
+        outputNetwork.deserialise(array);
         assertNotNull(outputNetwork.getReal());
         assertFalse(outputNetwork.getReal());
     }
@@ -45,9 +42,11 @@ public class OutputNetworkTest {
     @Test
     public void deserialise() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
-        List<Double> list = new ArrayList<>();
-        list.add(0.5);
-        outputNetwork.deserialise(list);
+
+
+        INDArray array = Nd4j.create(1);
+        array.putScalar(0,0.5);
+        outputNetwork.deserialise(array);
     }
 
 }

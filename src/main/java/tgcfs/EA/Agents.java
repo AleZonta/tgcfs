@@ -1,6 +1,7 @@
 package tgcfs.EA;
 
 import lgds.trajectories.Point;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
@@ -58,7 +59,7 @@ public class Agents extends Algorithm {
                 model.setWeights(individual.getObjectiveParameters());
 
                 //compute Output of the network
-                List<Double> lastOutput = null;
+                INDArray lastOutput = null;
                 for (TrainReal inputsNetwork : input) {
                     for(InputsNetwork in : inputsNetwork.getTrainingPoint()){
                         lastOutput = model.computeOutput(in.serialise());
@@ -160,19 +161,25 @@ public class Agents extends Algorithm {
     @Override
     public void trainNetwork(List<TrainReal> combineInputList) {
         //obtain list of inputs
-        combineInputList.forEach(trainReal -> {
-            List<InputsNetwork> inputsNetworks = trainReal.getTrainingPoint();
-            List<Point> points = trainReal.getPoints();
-            //I have to train all the population with the same inputs
-            super.getPopulation().parallelStream().forEach(individual -> {
-                //train the model
-                try {
-                    individual.fitModel(inputsNetworks, points);
-                } catch (Exception e) {
-                    throw new Error("Error in training the model" + e.getMessage());
-                }
-            });
-        });
+        try {
+            if(ReadConfig.Configurations.getTrain()) {
+                combineInputList.forEach(trainReal -> {
+                    List<InputsNetwork> inputsNetworks = trainReal.getTrainingPoint();
+                    List<Point> points = trainReal.getPoints();
+                    //I have to train all the population with the same inputs
+                    super.getPopulation().parallelStream().forEach(individual -> {
+                        //train the model
+                        try {
+                            individual.fitModel(inputsNetworks, points);
+                        } catch (Exception e) {
+                            throw new Error("Error in training the model" + e.getMessage());
+                        }
+                    });
+                });
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error " + e.getMessage());
+        }
     }
 
 

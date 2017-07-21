@@ -1,5 +1,6 @@
 package tgcfs.Loader;
 
+import Connections.DatabaseCoordNode;
 import gms.GraphML.InfoEdge;
 import gms.GraphML.InfoNode;
 import gms.LoadingSystem.Loader;
@@ -41,6 +42,7 @@ public class Feeder {
     private Integer maximumNumberOfTrajectories;
     private Integer actualNumberOfTrajectory;
     private List<Point> points;
+    private final DatabaseCoordNode db; //database saving all the already visited nodes
     private static final Logger logger = Logger.getLogger(Feeder.class.getName()); //logger for this class
 
     /**
@@ -58,6 +60,7 @@ public class Feeder {
         this.actualNumberOfTrajectory = 0;
         this.maximumNumberOfTrajectories = ReadConfig.Configurations.getHowManyTrajectories();
         this.points = null;
+        this.db = new DatabaseCoordNode();
     }
 
     /**
@@ -317,7 +320,26 @@ public class Feeder {
     public Point getNextLocation(Point whereIam, Double speed, Double distance, Double direction){
         //find position where I am
         Coord coordA = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
-        InfoNode initialNode = this.graph.findNodes(coordA);
+
+        InfoNode initialNode = null;
+        //If I am using the db system
+        if(this.db.getEnable()){
+            //Check if I have already visited the node
+            String id = this.db.readData(coordA.getLat(),coordA.getLon());
+            //if it is null I have not visited it
+
+            if(id == null){
+                //i find the node
+                initialNode = this.graph.findNodes(coordA);
+                //add the node to the list
+                this.db.insertData(coordA.getLat(),coordA.getLon(), initialNode.getId());
+            }else{
+                //I've already visited it, I can retrieve it from the db
+                initialNode = this.graph.getNodeFromId(id);
+            }
+        }else{
+            initialNode = this.graph.findNodes(coordA);
+        }
 
         InfoNode closestNode = null;
         try {

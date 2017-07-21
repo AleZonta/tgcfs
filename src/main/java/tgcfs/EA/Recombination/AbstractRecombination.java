@@ -1,6 +1,6 @@
 package tgcfs.EA.Recombination;
 
-import java.util.List;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -15,8 +15,8 @@ import java.util.List;
  * abstract class recombination
  */
 public class AbstractRecombination{
-    private List<Double> mother;
-    private List<Double> father;
+    private INDArray mother;
+    private INDArray father;
     private Integer size;
 
     /**
@@ -25,20 +25,20 @@ public class AbstractRecombination{
      * @param father individual father
      * @throws Exception raise an exception if the two individual has different length
      */
-    public AbstractRecombination(List<Double> mother, List<Double> father) throws Exception {
+    public AbstractRecombination(INDArray mother, INDArray father) throws Exception {
         this.father = father;
         this.mother = mother;
-        if(this.mother.size() != this.father.size()){
+        if(this.mother.columns() != this.father.columns()){
             throw new Exception("Mother and Father have different lengths");
         }
-        this.size = this.mother.size();
+        this.size = this.mother.columns();
     }
 
     /**
      * Getter for the mother
      * @return mother elements
      */
-    public List<Double> getMother() {
+    public INDArray getMother() {
         return this.mother;
     }
 
@@ -46,7 +46,7 @@ public class AbstractRecombination{
      * Getter for the father
      * @return father elements
      */
-    public List<Double> getFather() {
+    public INDArray getFather() {
         return this.father;
     }
 

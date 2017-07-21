@@ -17,6 +17,26 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getTrain() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getTrain();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getTrain());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getTrain(), ReadConfig.Configurations.getTrain());
+    }
+
+    @Test
     public void getTimestepEvolveAgentOverClassifier() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();

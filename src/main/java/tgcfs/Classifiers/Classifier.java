@@ -1,17 +1,21 @@
 package tgcfs.Classifiers;
 
 import lgds.trajectories.Point;
-import org.encog.engine.network.activation.ActivationSigmoid;
-import org.encog.neural.networks.BasicNetwork;
-import org.encog.neural.pattern.ElmanPattern;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.Models;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 18/05/2017.
@@ -32,7 +36,8 @@ import java.util.stream.DoubleStream;
  * The Classier is offering the methods to evolve the NN using an evolutionary algorithm
  */
 public class Classifier extends Models implements EvolvableNN {
-    private BasicNetwork elmanNetwork; //the neural network used for the classifier
+    //private BasicNetwork elmanNetwork; //the neural network used for the classifier
+    private MultiLayerNetwork net; //neural network, brain of the agent
     private Integer arrayLength; //length of the weight array
     private Integer input;
     private Integer hiddenNeurons;
@@ -46,13 +51,35 @@ public class Classifier extends Models implements EvolvableNN {
      */
     public Classifier(Integer input, Integer HiddenNeurons, Integer output){
         super();
-        ElmanPattern pattern = new ElmanPattern();
-        pattern.setActivationFunction(new ActivationSigmoid());
-        pattern.setInputNeurons(input);
-        pattern.addHiddenLayer(HiddenNeurons);
-        pattern.setOutputNeurons(output);
-        this.elmanNetwork = (BasicNetwork) pattern.generate();
-        this.arrayLength = this.elmanNetwork.encodedArrayLength(); //get the length of the array
+
+        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+                .weightInit(WeightInit.XAVIER)
+                .activation(Activation.HARDTANH)
+                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+                .learningRate(0.05)
+                .list()
+                .layer(0, new DenseLayer.Builder().nIn(input + HiddenNeurons).nOut(HiddenNeurons)
+                        .build())
+                .layer(1, new DenseLayer.Builder().nIn(HiddenNeurons).nOut(output)
+                        .build())
+                .build();
+
+        this.net = new MultiLayerNetwork(conf);
+        this.net.init();
+
+
+
+
+
+
+//        ElmanPattern pattern = new ElmanPattern();
+//        pattern.setActivationFunction(new ActivationTANH());
+//        pattern.setInputNeurons(input);
+//        pattern.addHiddenLayer(HiddenNeurons);
+//        pattern.setOutputNeurons(output);
+//        this.elmanNetwork = (BasicNetwork) pattern.generate();
+//        this.arrayLength = this.elmanNetwork.encodedArrayLength(); //get the length of the array
+        this.arrayLength = this.net.numParams();
         this.input = input;
         this.hiddenNeurons = HiddenNeurons;
         this.output = output;
@@ -64,14 +91,16 @@ public class Classifier extends Models implements EvolvableNN {
      * @throws Exception if the length of the list passed as parameter is not correct
      */
     @Override
-    public void setWeights(List<Double> weights) throws Exception {
-        if (weights.size() != this.arrayLength){
+    public void setWeights(INDArray weights) throws Exception {
+        if (weights.columns() != this.arrayLength){
             throw new Exception("Length list weights is not correct.");
         }
         //transform list to vector
-        double[] weightsVector = weights.stream().mapToDouble(d -> d).toArray();
+        //ouble[] weightsVector = weights.stream().mapToDouble(d -> d).toArray();
         //set the weights
-        this.elmanNetwork.decodeFromArray(weightsVector);
+        //this.elmanNetwork.decodeFromArray(weightsVector);
+
+        this.net.setParameters(weights);
     }
 
 
@@ -79,11 +108,8 @@ public class Classifier extends Models implements EvolvableNN {
      * @implNote Implementation from Interface
      */
     @Override
-    public List<Double> getWeights(){
-        double[] weightsVector = new double[this.arrayLength];
-        //get the weights
-        this.elmanNetwork.encodeToArray(weightsVector);
-        return DoubleStream.of(weightsVector).boxed().collect(Collectors.toCollection(ArrayList::new));
+    public INDArray getWeights(){
+        return this.net.params();
     }
 
 
@@ -91,17 +117,32 @@ public class Classifier extends Models implements EvolvableNN {
      * @implNote Implementation from Interface
      */
     @Override
-    public List<Double> computeOutput(List<Double> input){
+    public INDArray computeOutput(INDArray input){
         //check if the input is in the correct range
-        if (input.stream().anyMatch(value -> value < -1.0 || value > 1.0)){
-            throw new Error("Classifier input is not normalised correctly");
+        for(int i = 0; i < input.columns(); i++){
+            if(input.getDouble(i) < -1.0 || input.getDouble(i) > 1.0){
+                throw new Error("Generator input is not normalised correctly");
+            }
         }
-        //transform list to vector
-        double[] inputVector = input.stream().mapToDouble(d -> d).toArray();
-        double[] outputVector = new double[this.output];
-        //compute the output
-        this.elmanNetwork.compute(inputVector, outputVector);
-        return DoubleStream.of(outputVector).boxed().collect(Collectors.toCollection(ArrayList::new));
+
+        INDArray pastInput = this.net.getLayer(1).input();
+
+        //load the context value of the hidden layer
+        INDArray total = Nd4j.create(1,this.input + this.hiddenNeurons);
+        IntStream.range(0, this.input).forEach(i -> {
+            total.putScalar(i,input.getDouble(i));
+        });
+        if(pastInput == null) {
+            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> {
+                total.putScalar(i,0.0);
+            });
+        }else{
+            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> {
+                total.putScalar(i,pastInput.getDouble(i-this.input));
+            });
+        }
+
+        return this.net.rnnTimeStep(total);
     }
 
     /**

@@ -2,7 +2,6 @@ package tgcfs.Agents;
 
 import lgds.Distance.Distance;
 import lgds.trajectories.Point;
-import org.apache.commons.lang3.ArrayUtils;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -19,8 +18,6 @@ import tgcfs.NN.EvolvableNN;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.Models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -98,7 +95,7 @@ public class LSTMAgent extends Models implements EvolvableNN {
         listBuilder.layer(0, inputLayerBuilder.build());
 
         // hidden Layers
-        IntStream.range(1, hiddenLayers + 1).forEach(i -> {
+        IntStream.range(1, hiddenLayers).forEach(i -> {
             GravesLSTM.Builder hiddenLayerBuilder = new GravesLSTM.Builder();
             hiddenLayerBuilder.nIn(hiddenNeurons);
             hiddenLayerBuilder.nOut(hiddenNeurons);
@@ -110,7 +107,8 @@ public class LSTMAgent extends Models implements EvolvableNN {
         RnnOutputLayer.Builder outputLayerBuilder = new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT);
         outputLayerBuilder.nIn(hiddenNeurons);
         outputLayerBuilder.nOut(outputSize);
-        listBuilder.layer(hiddenLayers + 1, outputLayerBuilder.build());
+        outputLayerBuilder.activation(Activation.SOFTSIGN);
+        listBuilder.layer(hiddenLayers, outputLayerBuilder.build());
 
 
         // create network
@@ -134,10 +132,8 @@ public class LSTMAgent extends Models implements EvolvableNN {
      * @return list weights
      */
     @Override
-    public List<Double> getWeights(){
-        INDArray result = this.net.params();
-        double[] res = result.data().asDouble();
-        return Arrays.asList(ArrayUtils.toObject(res));
+    public INDArray getWeights(){
+        return  this.net.params();
     }
 
 
@@ -147,11 +143,11 @@ public class LSTMAgent extends Models implements EvolvableNN {
      * @throws Exception if the length of the list is not correct
      */
     @Override
-    public void setWeights(List<Double> weights) throws Exception {
-        if (weights.size() != this.net.numParams()){
+    public void setWeights(INDArray weights) throws Exception {
+        if (weights.columns() != this.net.numParams()){
             throw new Exception("Length list weights is not correct.");
         }
-        this.net.setParameters(Nd4j.create(weights.stream().mapToDouble(d -> d).toArray()));
+        this.net.setParameters(weights);
         //automatically clear the previous status
         this.clearPreviousState();
     }
@@ -162,15 +158,15 @@ public class LSTMAgent extends Models implements EvolvableNN {
      * @return list of output of the network
      */
     @Override
-    public List<Double> computeOutput(List<Double> input) {
+    public INDArray computeOutput(INDArray input) {
         //check if the input is in the correct range
-        if (input.stream().anyMatch(value -> value < -1.0 || value > 1.0)){
-            throw new Error("Generator input is not normalised correctly");
+        for(int i = 0; i < input.columns(); i++){
+            if(input.getDouble(i) < -1.0 || input.getDouble(i) > 1.0){
+                throw new Error("Generator input is not normalised correctly");
+            }
         }
         //If this MultiLayerNetwork contains one or more RNN layers: conduct forward pass (prediction) but using previous stored state for any RNN layers.
-        INDArray result = this.net.rnnTimeStep(Nd4j.create(input.stream().mapToDouble(d -> d).toArray()));
-        double[] res = result.data().asDouble();
-        return Arrays.asList(ArrayUtils.toObject(res));
+        return this.net.rnnTimeStep(input);
     }
 
     /**
@@ -200,16 +196,16 @@ public class LSTMAgent extends Models implements EvolvableNN {
 
         Distance d = new Distance();
 
-        INDArray array = Nd4j.create(input.get(0).serialise().size());
-        INDArray outputs = Nd4j.create(input.get(0).serialise().size());
+        INDArray array = Nd4j.create(input.get(0).serialise().columns());
+        INDArray outputs = Nd4j.create(input.get(0).serialise().columns());
         for(int i = 0; i < input.size() - 1; i++) {
-            List<Double> l = input.get(i).serialise();
-            array.putRow(i, Nd4j.create(l.stream().mapToDouble(f -> f).toArray()));
-            List<Double> appo = new ArrayList<>();
-            appo.add(l.get(0));
-            appo.add(l.get(1));
-            appo.add(d.compute(points.get(i+1), points.get(i+2)));
-            outputs.putRow(i, Nd4j.create(appo.stream().mapToDouble(f -> f).toArray()));
+            INDArray l = input.get(i).serialise();
+            array.putRow(i, l);
+            INDArray o = Nd4j.zeros(3);
+            o.putScalar(0, l.getDouble(0));
+            o.putScalar(1, l.getDouble(1));
+            o.putScalar(2, d.compute(points.get(i+1), points.get(i+2)));
+            outputs.putRow(i, o);
         }
         dataSet = new DataSet(array,outputs);
         //input.forEach(i -> dataSet.addFeatureVector(Nd4j.create(i.serialise().stream().mapToDouble(d -> d).toArray())));

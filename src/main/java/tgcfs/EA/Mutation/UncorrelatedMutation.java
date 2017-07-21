@@ -1,10 +1,11 @@
 package tgcfs.EA.Mutation;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableNN;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
@@ -22,13 +23,13 @@ import java.util.stream.IntStream;
  * Implementation of the uncorrelated mutation of an individual
  */
 public class UncorrelatedMutation extends Individual {
-    private List<Double> mutationStrengths;
+    private INDArray mutationStrengths;
 
     /**
      * Getter fot the mutation strengths
      * @return list of double
      */
-    public List<Double> getMutationStrengths() {
+    public INDArray getMutationStrengths() {
         return this.mutationStrengths;
     }
 
@@ -46,7 +47,7 @@ public class UncorrelatedMutation extends Individual {
      * @param objPar objectiveParameters list
      * @param mutStr mutationStrengths list
      */
-    public UncorrelatedMutation(List<Double> objPar, List<Double> mutStr){
+    public UncorrelatedMutation(INDArray objPar,INDArray mutStr){
         super(objPar);
         this.mutationStrengths = mutStr;
     }
@@ -60,8 +61,7 @@ public class UncorrelatedMutation extends Individual {
      */
     public UncorrelatedMutation(Integer size) throws Exception {
         super(size);
-        this.mutationStrengths = new ArrayList<>();
-        IntStream.range(0, size).forEach(i -> this.mutationStrengths.add(1.0));
+        this.mutationStrengths = Nd4j.ones(size);
     }
 
     /**
@@ -74,8 +74,7 @@ public class UncorrelatedMutation extends Individual {
      */
     public UncorrelatedMutation(Integer size, EvolvableNN model) throws Exception {
         super(size, model);
-        this.mutationStrengths = new ArrayList<>();
-        IntStream.range(0, size).forEach(i -> this.mutationStrengths.add(1.0));
+        this.mutationStrengths = Nd4j.ones(size);
     }
 
     /**
@@ -85,7 +84,7 @@ public class UncorrelatedMutation extends Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      */
-    public UncorrelatedMutation(List<Double> objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
+    public UncorrelatedMutation(INDArray objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
         super(objPar, fitness, model, myInputandOutput);
     }
 
@@ -113,21 +112,21 @@ public class UncorrelatedMutation extends Individual {
         Double rand1 = ThreadLocalRandom.current().nextDouble();
 
         //first mutate the list of mutation strengths
-        IntStream.range(0, this.mutationStrengths.size()).forEach(i -> {
+        IntStream.range(0, this.mutationStrengths.columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
             Double randw = ThreadLocalRandom.current().nextDouble();
             //obtain the new mutation value
-            Double newMutation = this.mutationStrengths.get(i) * Math.exp(p1 * rand1 + p2 * randw);
+            Double newMutation = this.mutationStrengths.getDouble(i) * Math.exp(p1 * rand1 + p2 * randw);
             //substitute the old one with the new one
-            this.mutationStrengths.set(i, newMutation);
+            this.mutationStrengths.putScalar(i, newMutation);
         });
 
         //after having mutate all the mutation strengths it is time to mutate the actual objective parameters
-        IntStream.range(0, super.getObjectiveParameters().size()).forEach(i -> {
+        IntStream.range(0, super.getObjectiveParameters().columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
             Double randw = ThreadLocalRandom.current().nextDouble();
-            Double newObj = super.getObjectiveParameters().get(i) + this.mutationStrengths.get(i) * randw;
-            super.getObjectiveParameters().set(i, newObj);
+            Double newObj = super.getObjectiveParameters().getDouble(i) + this.mutationStrengths.getDouble(i) * randw;
+            super.getObjectiveParameters().putScalar(i, newObj);
         });
     }
 

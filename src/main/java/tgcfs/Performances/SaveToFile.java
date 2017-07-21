@@ -1,12 +1,11 @@
 package tgcfs.Performances;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.EA.Individual;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,7 +85,7 @@ public class SaveToFile {
          * @param genoma list with the double value of the genoma
          * @throws Exception  if the class is not instantiate
          */
-        public static void saveBestGenoma(String name, List<Double> genoma) throws Exception {
+        public static void saveBestGenoma(String name, INDArray genoma) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveGenome(name, genoma);
         }
@@ -184,20 +183,12 @@ public class SaveToFile {
      * @param name name of the class/file I am saving
      * @param genome list with the double value of the genome
      */
-    private void saveGenome(String name, List<Double> genome){
+    private void saveGenome(String name, INDArray genome){
 
         try {
             BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-genome.csv", true));
-            genome.forEach(gene -> {
-                try {
-                    NumberFormat formatter = new DecimalFormat("0.#######E0");
-                    outputWriter.write(formatter.format(gene) + ", ");
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Error appending line to" + name + " CSV File " + e.getMessage());
-                }
-            });
+            outputWriter.write(genome.data().toString());
             outputWriter.newLine();
-
             logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
 
             outputWriter.flush();
@@ -233,15 +224,8 @@ public class SaveToFile {
             ZipEntry csvFile = new ZipEntry( name + "-population.csv");
             zos.putNextEntry(csvFile);
             population.forEach(individual -> {
-                individual.getObjectiveParameters().forEach(gene -> {
-                    try {
-                        NumberFormat formatter = new DecimalFormat("0.#######E0");
-                        writer.write(formatter.format(gene) + ", ");
-                    } catch (IOException e) {
-                        logger.log(Level.WARNING, "Error appending line to " + name + " CSV File " + e.getMessage());
-                        e.printStackTrace();
-                    }});
                 try {
+                    writer.write(individual.getObjectiveParameters().data().toString());
                     writer.newLine();
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Error appending line to " + name + " CSV File " + e.getMessage());

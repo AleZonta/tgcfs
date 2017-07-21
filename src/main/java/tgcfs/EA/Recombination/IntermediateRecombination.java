@@ -1,7 +1,7 @@
 package tgcfs.EA.Recombination;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -28,7 +28,7 @@ public class IntermediateRecombination extends AbstractRecombination implements 
      *              picked at random every time
      * @throws Exception raise an exception if the two individual has different length or the alpha value is not correct
      */
-    public IntermediateRecombination(List<Double> mother, List<Double> father, Double alpha) throws Exception {
+    public IntermediateRecombination(INDArray mother, INDArray father, Double alpha) throws Exception {
         super(mother,father);
         this.alpha = alpha;
         if(this.alpha < 0 || this.alpha > 1){
@@ -43,11 +43,11 @@ public class IntermediateRecombination extends AbstractRecombination implements 
      * zi =αxi +(1-α)yi whereα:0≤α ≤1
      * @return new individual variables
      */
-    public List<Double> recombination(){
-        List<Double> son = new ArrayList<>();
+    public INDArray recombination(){
+        INDArray son = Nd4j.zeros(super.getSize());
 
         for (int i = 0; i < super.getSize(); i++){
-            son.add(this.alpha * super.getMother().get(i) + (1 - this.alpha) * super.getFather().get(i));
+            son.add(this.alpha * super.getMother().getDouble(i) + (1 - this.alpha) * super.getFather().getDouble(i));
         }
 
         return son;

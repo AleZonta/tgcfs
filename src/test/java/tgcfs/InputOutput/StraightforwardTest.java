@@ -1,12 +1,13 @@
 package tgcfs.InputOutput;
 
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,8 +25,13 @@ public class StraightforwardTest {
     public void transform() throws Exception {
         List<OutputsNetwork> outputNetworks = new ArrayList<>();
         OutputNetwork out = new OutputNetwork();
-        List<Double> list = new ArrayList<>(Arrays.asList(1.0,0.5,0.2));
-        out.deserialise(list);
+
+        INDArray array = Nd4j.create(3);
+        array.putScalar(0, 1.0);
+        array.putScalar(1, 0.5);
+        array.putScalar(2, 0.7);
+
+        out.deserialise(array);
         outputNetworks.add(out);
 
         Transformation transformation = new Straightforward();

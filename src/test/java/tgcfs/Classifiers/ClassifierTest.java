@@ -1,11 +1,9 @@
 package tgcfs.Classifiers;
 
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
@@ -23,7 +21,7 @@ import static org.junit.Assert.*;
 public class ClassifierTest {
     @Test
     public void deepCopy() throws Exception {
-        Classifier test = new Classifier(2,1,1);
+        Classifier test = new Classifier(2,5,1);
         Classifier secondAgent = (Classifier) test.deepCopy();
         assertFalse(test.equals(secondAgent));
     }
@@ -39,11 +37,10 @@ public class ClassifierTest {
     public void setWeights() throws Exception {
         Classifier test = new Classifier(2,1,1);
 
-        Random random = new Random();
-        DoubleStream doubleStream = random.doubles(-1, 1);
-        List<Double> numbers = doubleStream.limit(test.getArrayLength()).boxed().collect(Collectors.toList());
-        test.setWeights(numbers);
-        assertEquals(numbers, test.getWeights());
+        INDArray array = Nd4j.rand(1, test.getArrayLength());
+
+        test.setWeights(array);
+        assertEquals(array, test.getWeights());
     }
 
     @Test
@@ -55,20 +52,18 @@ public class ClassifierTest {
     public void computeOutput() throws Exception {
         Classifier test = new Classifier(2,1,1);
 
-        Random random = new Random();
-        DoubleStream doubleStream = random.doubles(-1, 1);
-        List<Double> numbers = doubleStream.limit(test.getArrayLength()).boxed().collect(Collectors.toList());
-        test.setWeights(numbers);
+        INDArray array = Nd4j.rand(1, test.getArrayLength());
+        test.setWeights(array);
 
         IntStream.range(0,100).forEach(i ->{
-            Random randomm = new Random();
-            DoubleStream doubleStreamHere = randomm.doubles(-1, 1);
-            List<Double> numberss = doubleStreamHere.limit(2).boxed().collect(Collectors.toList());
-            List<Double> out = test.computeOutput(numberss);
+            INDArray arrayy = Nd4j.rand(1, 2);
+
+
+            INDArray out = test.computeOutput(arrayy);
             assertNotNull(out);
 
-            assertEquals(1, out.size());
-            assertTrue((out.get(0) >= -1.0)  && (out.get(0) <= 1.0) );
+            assertEquals(1, out.columns());
+            assertTrue((out.getDouble(0) >= -1.0)  && (out.getDouble(0) <= 1.0) );
         });
 
     }

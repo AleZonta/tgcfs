@@ -1,15 +1,13 @@
 package tgcfs.EA.Mutation;
 
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotSame;
 import static junit.framework.TestCase.assertTrue;
 
@@ -28,21 +26,27 @@ public class RandomResettingTest {
     public void mutate() throws Exception {
         new ReadConfig.Configurations();
         Individual ind = new RandomResetting(2000);
-        List<Double> original = ind.getObjectiveParameters();
-        List<Double> realOriginal = new ArrayList<>();
-        original.forEach(el -> realOriginal.add(new Double(el)));
+        INDArray original = ind.getObjectiveParameters();
+
+        INDArray realOriginal = original.dup();
+
         IntStream.range(0, 100000).forEach(i -> {
             ind.mutate(2000);
-            List<Double> mutw = ind.getObjectiveParameters();
+            INDArray mutw = ind.getObjectiveParameters();
             Integer d = 0;
-            for(int z = 0; z < original.size(); z++){
-                if(!Objects.equals(realOriginal.get(z), mutw.get(z))){
+            for(int z = 0; z < original.columns(); z++){
+                if(!Objects.equals(realOriginal.getDouble(z), mutw.getDouble(z))){
                     d++;
                 }
             }
             assertNotSame(0,d);
-            mutw.forEach(el -> assertTrue(el>=-4 && el<=4));
-            mutw.forEach(el -> assertFalse(el.isNaN()));
+            for(int j = 0; j < mutw.columns(); j++){
+                assertTrue(mutw.getDouble(j)>=-4 && mutw.getDouble(j)<=4);
+            }
+            for(int j = 0; j < mutw.columns(); j++){
+                assertTrue(mutw.getDouble(j)>=-4 && mutw.getDouble(j)<=4);
+            }
+
         });
 
     }
