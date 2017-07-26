@@ -8,6 +8,7 @@ import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
 
@@ -43,7 +44,9 @@ public class LSTMAgentTest {
         output.add(new Point(4d,9d));
         output.add(new Point(5d,10d));
 
-        agent.fit(input,output);
+        IntStream.range(0, 1000000).forEach(i -> agent.fit(input,output));
+
+
 
     }
 

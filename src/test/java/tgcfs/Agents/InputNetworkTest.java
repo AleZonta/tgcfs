@@ -39,9 +39,9 @@ public class InputNetworkTest {
     public void serialise() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(5.0,10.0,30.0);
         INDArray result = inputNetwork.serialise();
-        assertEquals(Normalisation.convertSpeed(10.0).doubleValue(), result.getDouble(0));
-        assertEquals(Normalisation.convertDirectionData(30.0).doubleValue(), result.getDouble(1));
-        assertEquals(Normalisation.convertDirectionData(5.0).doubleValue(), result.getDouble(2));
+        assertEquals(Normalisation.convertSpeed(10.0), result.getDouble(0), 0.000001);
+        assertEquals(Normalisation.convertDirectionData(30.0), result.getDouble(1), 0.000001);
+        assertEquals(Normalisation.convertDirectionData(5.0), result.getDouble(2), 0.000001);
     }
 
 }

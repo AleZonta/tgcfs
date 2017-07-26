@@ -34,7 +34,7 @@ public class OutputNetworkTest {
         array2.putScalar(1, 0.5);
         array2.putScalar(2, 0.7);
         outputNetwork.deserialise(array2);
-        assertEquals(Normalisation.decodeDistance(0.7),outputNetwork.getDistance());
+        assertEquals(Normalisation.decodeDistance(0.7),outputNetwork.getDistance(), 0.01);
     }
 
     @Test

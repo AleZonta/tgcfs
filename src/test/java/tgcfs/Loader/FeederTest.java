@@ -98,14 +98,16 @@ public class FeederTest {
         IdsaLoader idsaLoader = new IdsaLoader();
         idsaLoader.InitPotentialField(system.getTrajectories());
 
-        try {
-            while (true) {
+
+        IntStream.range(0,10).forEach(i -> {
+            try {
                 List<InputsNetwork> res = system.feeder(idsaLoader);
                 assertNotNull(res);
+            }catch (Exception e){
+                assertEquals("Reached Maximum Number Of trajectories", e.getMessage());
             }
-        }catch (ReachedMaximumNumberException e){
-            assertEquals("Reached Maximum Number Of trajectories", e.getMessage());
-        }
+        });
+
 
     }
 

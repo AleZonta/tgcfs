@@ -68,8 +68,17 @@ public class Classifier extends Models implements EvolvableNN {
         this.net.init();
 
 
-
-
+        //elman neural network requires the weight of the recurrent connection fixed to 1
+        INDArray weights = this.net.getLayer(0).paramTable().get("W");
+        for(int i = input; i < input + HiddenNeurons; i++){
+            if(HiddenNeurons == 1) {
+                weights.putScalar(i, 1.0);
+            }else{
+                for(int j = 0; j < HiddenNeurons; j++){
+                    weights.getColumn(j).putScalar(i, 1.0);
+                }
+            }
+        }
 
 
 //        ElmanPattern pattern = new ElmanPattern();
@@ -99,8 +108,20 @@ public class Classifier extends Models implements EvolvableNN {
         //ouble[] weightsVector = weights.stream().mapToDouble(d -> d).toArray();
         //set the weights
         //this.elmanNetwork.decodeFromArray(weightsVector);
-
         this.net.setParameters(weights);
+
+
+        //be sure elman neural network is respected
+        INDArray weightsLayer = this.net.getLayer(0).paramTable().get("W");
+        for(int i = this.input; i < this.input + this.hiddenNeurons; i++){
+            if(this.hiddenNeurons == 1) {
+                weightsLayer.putScalar(i, 1.0);
+            }else{
+                for(int j = 0; j < this.hiddenNeurons; j++){
+                    weightsLayer.getColumn(j).putScalar(i, 1.0);
+                }
+            }
+        }
     }
 
 

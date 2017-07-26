@@ -50,7 +50,7 @@ public class ClassifierTest {
 
     @Test
     public void computeOutput() throws Exception {
-        Classifier test = new Classifier(2,1,1);
+        Classifier test = new Classifier(3,4,1);
 
         INDArray array = Nd4j.rand(1, test.getArrayLength());
         test.setWeights(array);

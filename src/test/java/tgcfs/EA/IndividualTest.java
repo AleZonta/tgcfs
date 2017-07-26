@@ -53,8 +53,8 @@ public class IndividualTest {
         new ReadConfig.Configurations();
         EvolvableNN model = new LSTMAgent(3,1,5,3);
         Individual individual = new RandomResetting(model.getArrayLength(),model);
-        IntStream.range(0, 1000).forEach(j -> {
-            INDArray weights = individual.getObjectiveParameters();
+        IntStream.range(0, 10).forEach(j -> {
+            INDArray weights = individual.getObjectiveParameters().dup();
             try {
                 individual.fitModel(input,p);
             } catch (Exception e) {

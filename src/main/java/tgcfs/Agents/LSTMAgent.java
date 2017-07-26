@@ -77,6 +77,15 @@ public class LSTMAgent extends Models implements EvolvableNN {
      * @param outputSize integer value containing how many output neurons the network will have
      */
     private void loadLSTM(Integer inputSize, Integer hiddenLayers, Integer hiddenNeurons, Integer outputSize){
+
+//        //Initialize the user interface backend
+//        UIServer uiServer = UIServer.getInstance();
+//        //Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in memory.
+//        StatsStorage statsStorage = new InMemoryStatsStorage();
+//        //Attach the StatsStorage instance to the UI: this allows the contents of the StatsStorage to be visualized
+//        uiServer.attach(statsStorage);
+
+
         // some common parameters
         NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
         builder.biasInit(0);
@@ -116,6 +125,8 @@ public class LSTMAgent extends Models implements EvolvableNN {
         this.net = new MultiLayerNetwork(conf);
         this.net.init();
 
+
+//        this.net.setListeners(new StatsListener(statsStorage));
     }
 
     /**

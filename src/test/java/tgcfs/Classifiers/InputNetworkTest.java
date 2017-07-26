@@ -33,8 +33,8 @@ public class InputNetworkTest {
     public void serialise() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
         INDArray list = inputNetwork.serialise();
-        assertEquals(Normalisation.convertSpeed(10.0).doubleValue(),list.getDouble(0));
-        assertEquals(Normalisation.convertDirectionData(30.0).doubleValue(),list.getDouble(1));
+        assertEquals(Normalisation.convertSpeed(10.0),list.getDouble(0), 0.000001);
+        assertEquals(Normalisation.convertDirectionData(30.0),list.getDouble(1), 0.000001);
 
     }
 
