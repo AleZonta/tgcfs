@@ -41,14 +41,6 @@ public interface EvolvableNN {
      */
     void setWeights(INDArray weights) throws Exception;
 
-
-    /**
-     * Compute the output of the network
-     * @param input list value that are the input of the network
-     * @return list of output of the network
-     */
-    INDArray computeOutput(INDArray input);
-
     /**
      * Deep copy of the model
      * @return deep copy of the model used
@@ -61,4 +53,11 @@ public interface EvolvableNN {
      * @param points real point of the input
      */
     void fit(List<InputsNetwork> input, List<Point> points);
+
+    /**
+     * Compute the output of the network given the input
+     * @param input list value that are the input of the network
+     * @return list of output of the network
+     */
+    INDArray computeOutput(INDArray input);
 }

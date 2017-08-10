@@ -273,6 +273,8 @@ public class Feeder {
             this.currentTrajectory = this.getTrajectory();
             //new trajectory new apf
             idsaLoader.resetAPF();
+            //init potential field with new elements from the current trajectory
+            idsaLoader.InitPotentialField(this.getTrajectories());
         }
         //retrieve section form the trajectory
         List<Point> actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);

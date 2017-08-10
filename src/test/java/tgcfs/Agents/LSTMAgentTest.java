@@ -95,7 +95,7 @@ public class LSTMAgentTest {
 
     @Test
     public void getWeights() throws Exception {
-        LSTMAgent agent = new LSTMAgent(2,1,1,1);
+        LSTMAgent agent = new LSTMAgent(3,1,5,3);
         INDArray lsit = agent.getWeights();
         assertNotNull(lsit);
         System.out.println(lsit.columns());

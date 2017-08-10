@@ -20,7 +20,7 @@
     0,
     0
   ],
-  "MaxNumberOfTrackedPeople": 10,
+  "MaxNumberOfTrackedPeople": 1,
   "Path_Explanation" : "O is yes, 1 is no",
   "Path": 1,
   "Performance_explanation" : "zero is only single performance, one is only total performance, two is both, three is no performance saved",
@@ -43,5 +43,5 @@
   "POIsAreClustered": true,
   "Lag": 8,
   "Smoother": false,
-  "MorePOIs": 10
+  "MorePOIs": 49
 }

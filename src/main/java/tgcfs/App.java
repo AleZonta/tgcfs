@@ -232,7 +232,7 @@ public class App {
                 randomError = Boolean.TRUE;
             }
         }
-
+        logger.log(Level.INFO, "Co-evolution ended");
     }
 
 

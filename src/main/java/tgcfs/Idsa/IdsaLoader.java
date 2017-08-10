@@ -144,6 +144,22 @@ public class IdsaLoader {
     }
 
     /**
+     * Function that loads the potential field.
+     * It creates a fake World with the dimension from the trajectories loaded.
+     * Then it computes the POI from the subset of trajectory considered
+     * it checks if the trajectory loaded has the end point in the subset of POIS
+     * @param trajectory used to check if the endPoint is there
+     */
+    public void InitPotentialField(Trajectory trajectory){
+        nl.tno.idsa.framework.world.Point endPoint = new nl.tno.idsa.framework.world.Point(trajectory.getLastPoint().getLatitude(),trajectory.getLastPoint().getLongitude());
+        Boolean isPResent = this.pot.getPointsOfInterest().stream().anyMatch(poi -> poi.contains(endPoint));
+        if(isPResent){
+            this.pot.getPointsOfInterest().add(new POI(endPoint));
+        }
+    }
+
+
+    /**
      * Method that updates the potential field
      * @param point current position
      */

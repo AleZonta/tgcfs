@@ -75,7 +75,9 @@ public class SaveToFile {
          * @param setting config files
          */
         public static void dumpSetting(Object setting){
-            instance.dumpConfig(setting);
+            if(instance!=null) {
+                instance.dumpConfig(setting);
+            }
         }
 
         /**
