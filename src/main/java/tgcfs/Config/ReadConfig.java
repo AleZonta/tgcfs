@@ -57,6 +57,13 @@ public class ReadConfig {
     private Boolean dumpPop;
     private Boolean loadDumpPop;
 
+    //section type of model
+    private Integer valueModel;
+    private Boolean LSTM;
+    private Boolean convolution;
+    private Boolean clax;
+
+
     /**
      * Constructor with zero parameter
      * Everything is set to null.
@@ -93,6 +100,12 @@ public class ReadConfig {
         this.path = null;
         this.dumpPop = null;
         this.loadDumpPop = null;
+
+
+        this.LSTM = null;
+        this.convolution = null;
+        this.clax = null;
+        this.valueModel = null;
     }
 
     /**
@@ -381,6 +394,39 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("Train is wrong or missing.");
         }
+
+        try {
+            // LSTM
+            this.LSTM = ((Boolean) jsonObject.get("LSTM"));
+
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("LSTM is wrong or missing.");
+        }
+        try {
+            // convolution
+            this.convolution = ((Boolean) jsonObject.get("Convolution"));
+
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Convolution is wrong or missing.");
+        }
+        try {
+            // clax
+            this.clax = ((Boolean) jsonObject.get("Clax"));
+
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Clax is wrong or missing.");
+        }
+
+        //check that only one between LSTM / Convolution / Clax can be true
+        int countTrue = this.LSTM ? 1 : 0;
+        countTrue += this.convolution ? 1 : 0;
+        countTrue += this.clax ? 1 : 0;
+
+        if(this.LSTM) this.valueModel = 0;
+        if(this.convolution) this.valueModel = 1;
+        if(this.clax) this.valueModel = 2;
+        if(countTrue > 1) throw new Exception("More models are set as true, only one is allowed");
+        if (this.clax && this.train) throw new Exception("Training is not allowed with clax system");
     }
 
 
@@ -505,6 +551,45 @@ public class ReadConfig {
         return this.mutation;
     }
 
+
+    /**
+     * Am i using the LSTM?
+     * @return Boolean Value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Boolean getLSTM() throws Exception {
+        if(this.LSTM == null) throw new Exception("Try to access config file before reading it.");
+        return this.LSTM;
+    }
+    /**
+     * Am i using the convolution system?
+     * @return Boolean Value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Boolean getConvolution() throws Exception {
+        if(this.convolution == null) throw new Exception("Try to access config file before reading it.");
+        return this.convolution;
+    }
+    /**
+     * Am i using the classification way?
+     * @return Boolean Value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Boolean getClax() throws Exception {
+        if(this.clax == null) throw new Exception("Try to access config file before reading it.");
+        return this.clax;
+    }
+
+    /**
+     * Get the model used as a number
+     * @return Integer Value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Integer getValueModel() throws Exception {
+        if(this.valueModel == null) throw new Exception("Try to access config file before reading it.");
+        return this.valueModel;
+    }
+
     /**
      * Override toString Method in order to print all the setting here
      * @return String containing all the setting
@@ -538,6 +623,9 @@ public class ReadConfig {
                 "path='" + path + '\'' + ",\n" +
                 "dumpPop=" + dumpPop + ",\n" +
                 "loadDumpPop=" + loadDumpPop + ",\n" +
+                "LSTM=" + LSTM + ",\n" +
+                "Convolution=" + convolution + ",\n" +
+                "Clax=" + clax + ",\n" +
                 '}';
     }
 
@@ -836,6 +924,40 @@ public class ReadConfig {
          */
         public static Boolean getTrain() throws Exception {
             return config.getTrain();
+        }
+
+        /**
+         * Am I using the LSTM?
+         * @return Boolean number
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Boolean getLSTM() throws Exception {
+            return config.getLSTM();
+        }
+        /**
+         * Am I sing the convolutionary network?
+         * @return Boolean number
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Boolean getConvolution() throws Exception {
+            return config.getConvolution();
+        }
+        /**
+         * Am I using the classificator way?
+         * @return Boolean number
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Boolean getClax() throws Exception {
+            return config.getClax();
+        }
+
+        /**
+         * Get the model used as a number
+         * @return Integer Value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Integer getValueModel() throws Exception {
+            return config.getValueModel();
         }
 
     }

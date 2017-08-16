@@ -2,7 +2,7 @@ package tgcfs.Classifiers;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.ENN;
 
@@ -26,7 +26,7 @@ import java.util.List;
  *
  * The Classier is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class Classifier extends ENN implements EvolvableNN{
+public class Classifier extends ENN implements EvolvableModel {
     /**
      * Constructor of the classifier. It generates the ElmanNetwork.
      *
@@ -88,7 +88,7 @@ public class Classifier extends ENN implements EvolvableNN{
      * @return deep copy of the model
      */
     @Override
-    public EvolvableNN deepCopy() {
+    public EvolvableModel deepCopy() {
         return new Classifier(this.input, this.hiddenNeurons, this.output);
     }
 

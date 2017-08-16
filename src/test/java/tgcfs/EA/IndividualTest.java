@@ -4,11 +4,11 @@ import lgds.trajectories.Point;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.LSTMAgent;
+import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class IndividualTest {
         p.add(new Point(10d,9d));
 
         new ReadConfig.Configurations();
-        EvolvableNN model = new LSTMAgent(3,1,5,3);
+        EvolvableModel model = new LSTMAgent(3,1,5,3);
         Individual individual = new RandomResetting(model.getArrayLength(),model);
         IntStream.range(0, 10).forEach(j -> {
             INDArray weights = individual.getObjectiveParameters().dup();

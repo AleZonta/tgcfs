@@ -34,7 +34,7 @@ public class Convolutionary extends Models implements Network {
 
 
     /**
-     * Contructor with zero parameter
+     * Constructor with zero parameter
      * It loads the convolutionary network
      * It has two inputs -> conditional cnn
      * Different layers of convolutionary nodes

@@ -2,12 +2,12 @@ package tgcfs.EA;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Agents.Agent;
-import tgcfs.Agents.RealAgents;
+import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
@@ -57,7 +57,7 @@ public class Classifiers extends Algorithm {
      */
     public OutputsNetwork runIndividual(Individual individual, List<InputsNetwork> input) throws Exception {
         //retrive model from the individual
-        EvolvableNN model = individual.getModel();
+        EvolvableModel model = individual.getModel();
         //set the weights
         model.setWeights(individual.getObjectiveParameters());
         //compute Output of the network

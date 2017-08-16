@@ -4,7 +4,7 @@ import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public abstract class Individual {
     private INDArray objectiveParameters;
     private List<TrainReal> myInputandOutput;
     private Integer fitness;
-    private EvolvableNN model;
+    private EvolvableModel model;
 
     /**
      * Getter fot the objective parameter
@@ -98,7 +98,7 @@ public abstract class Individual {
      * @param model model to assign to the individual
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public Individual(Integer size, EvolvableNN model) throws Exception {
+    public Individual(Integer size, EvolvableModel model) throws Exception {
         this.objectiveParameters = Nd4j.rand(1, size);
         this.fitness = 0;
         this.model = model;
@@ -112,7 +112,7 @@ public abstract class Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      */
-    public Individual(INDArray objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
+    public Individual(INDArray objPar, Integer fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
         this.objectiveParameters = objPar;
         this.fitness = fitness;
         this.model = model.deepCopy();
@@ -129,7 +129,7 @@ public abstract class Individual {
      * Getter for the model of the individual
      * @return model
      */
-    public EvolvableNN getModel() {
+    public EvolvableModel getModel() {
         return this.model;
     }
 
@@ -137,7 +137,7 @@ public abstract class Individual {
      * Setter for the model of the individual
      * @param model model to assign
      */
-    public void setModel(EvolvableNN model) {
+    public void setModel(EvolvableModel model) {
         this.model = model;
     }
 

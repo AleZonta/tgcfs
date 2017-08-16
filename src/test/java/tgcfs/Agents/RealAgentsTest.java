@@ -2,6 +2,7 @@ package tgcfs.Agents;
 
 import lgds.trajectories.Point;
 import org.junit.Test;
+import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.InputsNetwork;
 

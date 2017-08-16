@@ -17,6 +17,86 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getValueModel() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getValueModel();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getValueModel());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getValueModel(), ReadConfig.Configurations.getValueModel());
+    }
+
+    @Test
+    public void getLSTM() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getLSTM();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getLSTM());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getLSTM(), ReadConfig.Configurations.getLSTM());
+    }
+
+    @Test
+    public void getConvolution() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getConvolution();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getConvolution());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getConvolution(), ReadConfig.Configurations.getConvolution());
+    }
+
+    @Test
+    public void getClax() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getClax();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getClax());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getClax(), ReadConfig.Configurations.getClax());
+    }
+
+    @Test
     public void getTrain() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();

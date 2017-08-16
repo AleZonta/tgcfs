@@ -99,13 +99,13 @@ public class IdsaLoader {
         World world = new World();
 
         world.applyGeoRoot(trajectories.getUtmRoot().getLatitude(),trajectories.getUtmRoot().getLongitude(),trajectories.getWhWorld().getLatitude(),trajectories.getWhWorld().getLongitude());
-        logger.log(Level.INFO, "Loading Potential Field...");
+        logger.log(Level.FINE, "Loading Potential Field...");
         this.pot = new PotentialField(world, this.configFile, this.par.getH(), this.par.getZ1(), this.par.getZ2(), this.par.getS2(), this.par.getW2(), this.par.getName(), this.par.getExperiment());
 
         logger.log(Level.INFO, "Potential Field Online.");
         //what About the POI for the potential Field?
         //I should generate all the one I have it and then pick it up
-        logger.log(Level.INFO, "Computing POIs...");
+        logger.log(Level.FINE, "Computing POIs...");
         Boolean morePOIsInTotal = Boolean.FALSE;
         if(this.configFile.getMorePOIs() != 0){
             //also negative numbers are okay, not too negative though
@@ -140,7 +140,7 @@ public class IdsaLoader {
         }
         this.pot.setPointsOfInterest(pois);
         this.pot.setPreviousPoint(new nl.tno.idsa.framework.world.Point(0.0,0.0));
-        logger.log(Level.INFO, "POIs are loaded.");
+        logger.log(Level.FINE, "POIs are loaded.");
     }
 
     /**
@@ -192,5 +192,15 @@ public class IdsaLoader {
         this.pot.setPreviousPoint(new nl.tno.idsa.framework.world.Point(0.0,0.0));
     }
 
+
+    /**
+     * Return the possible target computed with the IDSA framework
+     * @return center point of the target
+     * @throws Exception if the potential field is not loaded
+     */
+    public Point retPossibleTarget() throws Exception {
+        nl.tno.idsa.framework.world.Point p = this.pot.retPossibleTarget();
+        return new Point(p.getX(), p.getY());
+    }
 
 }

@@ -1,9 +1,9 @@
 package tgcfs;
 
-import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.LSTMAgent;
-import tgcfs.Agents.OutputNetwork;
-import tgcfs.Agents.RealAgents;
+import tgcfs.Agents.*;
+import tgcfs.Agents.Models.Clax;
+import tgcfs.Agents.Models.LSTMAgent;
+import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Classifiers.Classifier;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
@@ -13,7 +13,7 @@ import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.Loader.Feeder;
 import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
 
 import java.util.List;
@@ -74,14 +74,6 @@ public class App {
      */
     public void load() throws Exception {
         logger.log(Level.INFO, "Starting App...");
-        //loading models
-        EvolvableNN agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
-        EvolvableNN classifierModel = new Classifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
-        //generate population
-        //INITIALISE population EA with random candidate solution
-        this.agents.generatePopulation(agentModel);
-        this.classifiers.generatePopulation(classifierModel);
-        this.realAgent = new RealAgents();
         //loading graph and trajectories
         this.feeder = new Feeder();
         this.feeder.loadSystem();
@@ -90,6 +82,25 @@ public class App {
         //now all the trajectories are loading
         this.idsaLoader = new IdsaLoader();
         this.idsaLoader.InitPotentialField(this.feeder.getTrajectories());
+        //loading models
+        EvolvableModel agentModel;
+        //decide which model to implement here
+        switch (ReadConfig.Configurations.getValueModel()){
+            case 0:
+                agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
+                break;
+            case 2:
+                agentModel = new Clax(this.feeder, this.idsaLoader);
+                break;
+            default:
+                throw new NoSuchMethodError("Model not yet implemented");
+        }
+        EvolvableModel classifierModel = new Classifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+        //generate population
+        //INITIALISE population EA with random candidate solution
+        this.agents.generatePopulation(agentModel);
+        this.classifiers.generatePopulation(classifierModel);
+        this.realAgent = new RealAgents();
         logger.log(Level.INFO, "Framework online!");
     }
 

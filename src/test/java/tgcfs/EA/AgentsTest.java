@@ -3,11 +3,11 @@ package tgcfs.EA;
 import lgds.trajectories.Point;
 import org.junit.Test;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.LSTMAgent;
+import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class AgentsTest {
     public void generatePopulation() throws Exception {
         new ReadConfig.Configurations();
         //Random LSTM
-        EvolvableNN model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
+        EvolvableModel model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
         Agents agentsCompeting = new Agents();
         agentsCompeting.generatePopulation(model);
         assertNotNull(agentsCompeting.getPopulation());
@@ -47,7 +47,7 @@ public class AgentsTest {
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
 
-        EvolvableNN model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
+        EvolvableModel model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
         Agents agentsCompeting = new Agents();
         agentsCompeting.generatePopulation(model);
 

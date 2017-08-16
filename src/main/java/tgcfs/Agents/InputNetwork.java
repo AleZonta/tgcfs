@@ -1,5 +1,6 @@
 package tgcfs.Agents;
 
+import lgds.trajectories.*;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.InputOutput.Normalisation;
@@ -23,6 +24,7 @@ public class InputNetwork implements InputsNetwork {
     private Double directionAPF;
     private Double speed;
     private Double bearing;
+    private Point targetPoint;
     public static final Integer inputSize = 3; //the size of the input corresponding to the three fields here
 
     /**
@@ -36,9 +38,10 @@ public class InputNetwork implements InputsNetwork {
         this.bearing = Normalisation.convertDirectionData(bearing);
         this.speed = Normalisation.convertSpeed(speed);
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
+        this.targetPoint = null;
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
-        if (allFields.length != inputSize + 1){
+        if (allFields.length != inputSize + 2){
             throw new Error("Number of fields and variable expressing that do not correspond.");
         }
 
@@ -82,5 +85,19 @@ public class InputNetwork implements InputsNetwork {
         return array;
     }
 
+    /**
+     * Setter for the target point
+     * @param targetPoint point
+     */
+    public void setTargetPoint(Point targetPoint) {
+        this.targetPoint = targetPoint;
+    }
 
+    /**
+     * Getter for the target point
+     * @return target point
+     */
+    public Point getTargetPoint() {
+        return targetPoint;
+    }
 }

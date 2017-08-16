@@ -9,7 +9,7 @@ import tgcfs.EA.Recombination.IntermediateRecombination;
 import tgcfs.EA.Recombination.Recombination;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
@@ -54,7 +54,7 @@ public abstract class Algorithm {
      * @param model the model of the population
      * @throws Exception exception
      */
-    public void generatePopulation(EvolvableNN model) throws Exception {
+    public void generatePopulation(EvolvableModel model) throws Exception {
         //check which class is calling this method
         Integer size = 0;
         if(this.getClass() == Agents.class){

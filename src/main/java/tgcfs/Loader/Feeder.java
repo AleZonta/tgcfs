@@ -9,6 +9,7 @@ import gms.Point.Coord;
 import lgds.trajectories.Point;
 import lgds.trajectories.Trajectories;
 import lgds.trajectories.Trajectory;
+import tgcfs.Agents.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.Normalisation;
@@ -19,6 +20,7 @@ import tgcfs.Routing.Routes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -194,9 +196,11 @@ public class Feeder {
      * The bearing is computed checking the future direction where the agent is moving
      * The bearing is how the crow flies, no consideration about real routing
      * @param points points to transform
+     * @param attraction attraction of the potential field
+     * @param possibleTarget possible target of this trajectory -> highest point charged
      * @return list of speeddirection objects
      */
-    public List<InputsNetwork> obtainInput(List<Point> points, Double attraction){
+    public List<InputsNetwork> obtainInput(List<Point> points, Double attraction, Point possibleTarget){
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
         List<InputsNetwork> totalList = new ArrayList<>();
@@ -213,8 +217,11 @@ public class Feeder {
             }else{
                 speed = 0.0;
             }
-            totalList.add(new tgcfs.Agents.InputNetwork(attraction, speed, bearing));
+            InputNetwork inputNetwork = new InputNetwork(attraction, speed, bearing);
+            inputNetwork.setTargetPoint(possibleTarget);
+            totalList.add(inputNetwork);
         });
+
 
         return totalList;
     }
@@ -276,12 +283,13 @@ public class Feeder {
             //init potential field with new elements from the current trajectory
             idsaLoader.InitPotentialField(this.getTrajectories());
         }
+        logger.log(Level.INFO, "retrieve section of the trajectory");
         //retrieve section form the trajectory
         List<Point> actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
         while(actualPoint.size() == 0){
             actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
         }
-
+        logger.log(Level.INFO, "end of the while -> probably the problem is here");
         //save points
         this.points = new ArrayList<>();
         actualPoint.forEach(point -> this.points.add(point.deepCopy()));
@@ -289,7 +297,7 @@ public class Feeder {
         actualPoint.forEach(idsaLoader::compute);
 
         //return the list of input network
-        return this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)));
+        return this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)), idsaLoader.retPossibleTarget());
     }
 
     /**
@@ -476,4 +484,23 @@ public class Feeder {
         });
         return totalList;
     }
+
+
+    /**
+     * Return all the edges of the graph
+     * @return list of edges
+     */
+    public Set<InfoEdge> retAllEdges(){
+        return this.graph.getEdgeSet();
+    }
+
+    /**
+     * Return all the nodes of the graph
+     * @return list of nodes
+     */
+    public Set<InfoNode> retAllNodes(){
+        return this.graph.getNodesSet();
+    }
+
+
 }

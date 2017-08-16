@@ -47,6 +47,18 @@ public class PointToSpeedBearing {
 
 
     /**
+     * Compute distance between two points
+     * @param firstPoint first position
+     * @param secondPoint second position
+     * @return distance
+     */
+    public Double obtainDistance(Point firstPoint, Point secondPoint){
+        //speed = distance / time
+        Distance dis = new Distance();
+        return dis.compute(firstPoint, secondPoint);
+    }
+
+    /**
      * Compute the bearing between two points
      * @param lat1 latitude first point
      * @param lon1 longitude first point

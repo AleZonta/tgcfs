@@ -5,7 +5,7 @@ import tgcfs.Classifiers.Classifier;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class ClassifiersTest {
     public void generatePopulation() throws Exception {
         new ReadConfig.Configurations();
         //random classifier
-        EvolvableNN model = new Classifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
+        EvolvableModel model = new Classifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
         Classifiers classifiers = new Classifiers();
         classifiers.generatePopulation(model);
         assertNotNull(classifiers.getPopulation());
@@ -60,7 +60,7 @@ public class ClassifiersTest {
     @Test
     public void runIndividual() throws Exception {
         new ReadConfig.Configurations();
-        EvolvableNN model = new Classifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
+        EvolvableModel model = new Classifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
         Classifiers classifiers = new Classifiers();
         classifiers.generatePopulation(model);
 

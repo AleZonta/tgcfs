@@ -4,7 +4,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -72,7 +72,7 @@ public class UncorrelatedMutation extends Individual {
      * @param model model to assign to the individual
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public UncorrelatedMutation(Integer size, EvolvableNN model) throws Exception {
+    public UncorrelatedMutation(Integer size, EvolvableModel model) throws Exception {
         super(size, model);
         this.mutationStrengths = Nd4j.ones(size);
     }
@@ -84,7 +84,7 @@ public class UncorrelatedMutation extends Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      */
-    public UncorrelatedMutation(INDArray objPar, Integer fitness, EvolvableNN model, List<TrainReal> myInputandOutput){
+    public UncorrelatedMutation(INDArray objPar, Integer fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
         super(objPar, fitness, model, myInputandOutput);
     }
 

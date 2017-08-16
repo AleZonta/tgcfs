@@ -212,7 +212,7 @@ public class FeederTest {
         for(int i = 0; i < 10; i++){
             po.add(system.getNextPoint(a));
         }
-        List<InputsNetwork> res = system.obtainInput(po, 10.0);
+        List<InputsNetwork> res = system.obtainInput(po, 10.0, null);
         assertNotNull(res);
     }
 

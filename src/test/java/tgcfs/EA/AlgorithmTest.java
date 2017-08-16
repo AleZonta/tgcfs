@@ -1,9 +1,9 @@
 package tgcfs.EA;
 
 import org.junit.Test;
-import tgcfs.Agents.LSTMAgent;
+import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Config.ReadConfig;
-import tgcfs.NN.EvolvableNN;
+import tgcfs.NN.EvolvableModel;
 
 import java.util.List;
 
@@ -25,8 +25,8 @@ public class AlgorithmTest {
     public void retAllFitness() throws Exception {
         new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();
-        EvolvableNN evolvableNN = new LSTMAgent(1,1,1,1);
-        algorithm.generatePopulation(evolvableNN);
+        EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
+        algorithm.generatePopulation(evolvableModel);
         Integer pop = algorithm.getPopulation().size();
         algorithm.generateOffspring();
         List<Integer> fitness = algorithm.retAllFitness();
@@ -41,8 +41,8 @@ public class AlgorithmTest {
     public void retBestGenome() throws Exception {
         new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();
-        EvolvableNN evolvableNN = new LSTMAgent(1,1,1,1);
-        algorithm.generatePopulation(evolvableNN);
+        EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
+        algorithm.generatePopulation(evolvableModel);
         assertNotNull(algorithm.retBestGenome());
     }
 
@@ -50,8 +50,8 @@ public class AlgorithmTest {
     public void selectParents() throws Exception {
         new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();
-        EvolvableNN evolvableNN = new LSTMAgent(1,1,1,1);
-        algorithm.generatePopulation(evolvableNN);
+        EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
+        algorithm.generatePopulation(evolvableModel);
         Integer pop = algorithm.getPopulation().size();
         algorithm.generateOffspring();
         assertEquals(pop*2,algorithm.getPopulation().size());
@@ -63,8 +63,8 @@ public class AlgorithmTest {
     public void generateOffspring() throws Exception {
         new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();
-        EvolvableNN evolvableNN = new LSTMAgent(1,1,1,1);
-        algorithm.generatePopulation(evolvableNN);
+        EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
+        algorithm.generatePopulation(evolvableModel);
         Integer pop = algorithm.getPopulation().size();
         algorithm.generateOffspring();
         assertEquals(pop*2,algorithm.getPopulation().size());
