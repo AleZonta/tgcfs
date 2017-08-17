@@ -2,6 +2,7 @@ package tgcfs;
 
 import tgcfs.Agents.*;
 import tgcfs.Agents.Models.Clax;
+import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Classifiers.Classifier;
@@ -89,6 +90,9 @@ public class App {
             case 0:
                 agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
                 break;
+            case 1:
+                agentModel = new ConvAgent();
+                break;
             case 2:
                 agentModel = new Clax(this.feeder, this.idsaLoader);
                 break;
@@ -167,40 +171,7 @@ public class App {
 
             Integer number = ReadConfig.Configurations.getTimestepEvolveAgentOverClassifier();
             if(number > 0){
-                for(int i = 0; i < number - 1; i++) {
-                    //I have to evolve for this number of time-step -1 only the  agents and not the classifiers
-                    //The last timestep I am evolving both
-                    logger.log(Level.INFO, "Evaluation only agents' generation " + i);
-                /* { EVALUATE new candidate } */
-                    combineInputList = this.feeder.multiFeeder(this.idsaLoader);
-                    this.realAgent.createAgent(combineInputList);
-                    //train the agents
-                    this.agents.trainNetwork(combineInputList);
-                    //execution agents
-                    logger.log(Level.INFO, "Run Agents...");
-                    this.agents.runIndividuals(combineInputList);
-                    logger.log(Level.INFO, "Evaluate Agents...");
-                    //classifier are executed and evaluated during agents evaluations
-                    this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
-                    //reset classifier, I am not evolving them now
-                    this.classifiers.resetFitness();
-                /* { SELECT individuals next generation } */
-                    logger.log(Level.INFO, "Parent Selection...");
-                    this.agents.selectParents();
-                    //save the fitness of all the population and best genome
-                    SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
-                    SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(), this.agents.retBestGenome());
-                    if (ReadConfig.Configurations.getDumpPop()) {
-                        logger.log(Level.INFO, "Dump Population...");
-                        SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
-                    }
-                    //generate new offspring for new evolution
-                    if(ReadConfig.Configurations.isRecombination()) {
-                        this.agents.generateOffspring();
-                    }else{
-                        this.agents.generateOffspringOnlyWithMutation();
-                    }
-                }
+                this.generateMoreThanDiscriminate(number);
             }
 
 
@@ -246,6 +217,53 @@ public class App {
         logger.log(Level.INFO, "Co-evolution ended");
     }
 
+
+    /**
+     * run the generative part more time than the discriminative part
+     * @param number number of time to run
+     * @throws Exception something wrong happens
+     */
+    public void generateMoreThanDiscriminate(Integer number) throws Exception {
+        for(int i = 0; i < number - 1; i++) {
+            //I have to evolve for this number of time-step -1 only the  agents and not the classifiers
+            //The last timestep I am evolving both
+            logger.log(Level.INFO, "Evaluation only agents' generation " + i);
+                /* { EVALUATE new candidate } */
+            List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader);
+            this.realAgent.createAgent(combineInputList);
+            //train the agents
+            this.agents.trainNetwork(combineInputList);
+            //execution agents
+            logger.log(Level.INFO, "Run Agents...");
+            this.agents.runIndividuals(combineInputList);
+            logger.log(Level.INFO, "Evaluate Agents...");
+            //classifier are executed and evaluated during agents evaluations
+            this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
+            //reset classifier, I am not evolving them now
+            this.classifiers.resetFitness();
+                /* { SELECT individuals next generation } */
+            logger.log(Level.INFO, "Parent Selection...");
+            this.agents.selectParents();
+            //save the fitness of all the population and best genome
+            SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
+            SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(), this.agents.retBestGenome());
+            if (ReadConfig.Configurations.getDumpPop()) {
+                logger.log(Level.INFO, "Dump Population...");
+                SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
+            }
+            //generate new offspring for new evolution
+            if(ReadConfig.Configurations.isRecombination()) {
+                this.agents.generateOffspring();
+            }else{
+                this.agents.generateOffspringOnlyWithMutation();
+            }
+        }
+    }
+
+
+    public Agents getagents(){
+        return this.agents;
+    }
 
     public static void main( String[] args )
     {

@@ -17,6 +17,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import tgcfs.NN.Models;
 
+import java.util.Map;
+
 /**
  * Created by Alessandro Zonta on 08/08/2017.
  * PhD Situational Analytics
@@ -193,5 +195,37 @@ public class Convolutionary extends Models implements Network {
         return this.net.summary();
     }
 
+
+    /**
+     * Return the parameter of the net
+     * @return INDarray
+     */
+    public INDArray getWeights(){
+        return this.net.params();
+    }
+
+
+    /**
+     * @implNote Implementation from Interface
+     * @param weights list containing all the weights
+     * @throws Exception if the length of the list is not correct
+     */
+    public void setWeights(INDArray weights) throws Exception {
+        if (weights.columns() != this.net.numParams()){
+            throw new Exception("Length list weights is not correct.");
+        }
+        this.net.setParams(weights);
+    }
+
+
+    /**
+     * Compute the output of the network given the input
+     * @param input list value that are the input of the network
+     * @return list of output of the network
+     */
+    public INDArray computeOutput(INDArray[] input) {
+        Map<String, INDArray> res = this.net.feedForward(input, Boolean.FALSE);
+        return res.get("out");
+    }
 
 }

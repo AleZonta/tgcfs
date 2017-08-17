@@ -2,8 +2,10 @@ package tgcfs.EA;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.InputNetwork;
+import tgcfs.Agents.Models.Clax;
+import tgcfs.Agents.Models.ConvAgent;
+import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.InputOutput.FollowingTheGraph;
@@ -59,70 +61,115 @@ public class Agents extends Algorithm {
                 //set the weights
                 model.setWeights(individual.getObjectiveParameters());
 
-                //check which model I am using. If not clax I can do the normal procedure
-                if(!model.getClass().equals(Clax.class)) {
-                    //compute Output of the network
-                    INDArray lastOutput = null;
-                    for (TrainReal inputsNetwork : input) {
-                        for (InputsNetwork in : inputsNetwork.getTrainingPoint()) {
-                            lastOutput = model.computeOutput(in.serialise());
-                        }
-
-                        //now for the number of time step that I want to check save the output
-                        List<OutputsNetwork> outputsNetworks = new ArrayList<>();
-
-                        OutputNetwork out = new OutputNetwork();
-                        out.deserialise(lastOutput);
-                        outputsNetworks.add(out);
-
-                        //output has only two fields, input needs three
-                        //I am using the last direction present into input I am adding that one to the last output
-
-                        Double directionAPF = ((InputNetwork) inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
-                        for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
-                            //transform output into input and add the direction
-                            OutputNetwork outLocal = new OutputNetwork();
-                            outLocal.deserialise(lastOutput);
-                            InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
-                            lastOutput = model.computeOutput(inputLocal.serialise());
-
-                            out = new OutputNetwork();
-                            out.deserialise(lastOutput);
-                            outputsNetworks.add(out);
-                        }
-                        //assign the output to this individual
-                        inputsNetwork.setOutputComputed(outputsNetworks);
-                        individual.addMyInputandOutput(inputsNetwork);
-                    }
-                }else{
-                    //with clax is slightly different
-                    Clax m = (Clax) model; //cast to clax for the proprietary method
-
-                    //I have more training input in the list
-                    for (TrainReal inputsNetwork : input) {
-                        m.setStart(inputsNetwork.getLastPoint());
-                        m.setTarget(((InputNetwork)inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size())).getTargetPoint());
-
-                        //need to compute the trajectory
-                        List<INDArray> out = m.computeTrajectory();
-                        //now for the number of time step that I want to check save the output
-                        List<OutputsNetwork> outputsNetworks = new ArrayList<>();
-                        out.forEach(o -> {
-                            OutputNetwork outClax = new OutputNetwork();
-                            outClax.deserialise(o);
-                            outputsNetworks.add(outClax);
-                        });
-                        //assign the output to this individual
-                        inputsNetwork.setOutputComputed(outputsNetworks);
-                        individual.addMyInputandOutput(inputsNetwork);
-                    }
+                //select which model I am using
+                if(model.getClass().equals(LSTMAgent.class)){
+                    this.runLSTM(input, model, individual);
+                }else if(model.getClass().equals(Clax.class)){
+                    this.runClax(input, model, individual);
+                }else if(model.getClass().equals(ConvAgent.class)){
+                    this.runConvol(input, model, individual);
                 }
+
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Errors with the neural network " + e.getMessage());
                 e.printStackTrace();
             }
 
         });
+    }
+
+    /**
+     * run the convolutional model
+     * @param input the input of the model
+     * @param model the model Convolutional used
+     * @param individual the individual under evaluation
+     * @throws Exception if something bad happened
+     */
+    private void runConvol(List<TrainReal> input, EvolvableModel model, Individual individual) throws NoSuchMethodException {
+//        NativeImageLoader imageLoader = new NativeImageLoader();
+//        INDArray lastOutput = null;
+//        for (TrainReal inputsNetwork : input) {
+//            for (String path : inputsNetwork.getTrainingImage()){
+//
+//            }
+//
+//        }
+        //TODO do i have to generate the image in real time? -> seems like yep, so I need to find a way to do it
+        throw new NoSuchMethodException("Still not implemented");
+    }
+
+    /**
+     * run the Clax model
+     * @param input the input of the model
+     * @param model the model Clax used
+     * @param individual the individual under evaluation
+     * @throws Exception if something bad happened
+     */
+    private void runClax(List<TrainReal> input, EvolvableModel model, Individual individual) throws Exception {
+        //with clax is slightly different
+        Clax m = (Clax) model; //cast to clax for the proprietary method
+
+        //I have more training input in the list
+        for (TrainReal inputsNetwork : input) {
+            m.setStart(inputsNetwork.getLastPoint());
+            m.setTarget(((InputNetwork)inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size())).getTargetPoint());
+
+            //need to compute the trajectory
+            List<INDArray> out = m.computeTrajectory();
+            //now for the number of time step that I want to check save the output
+            List<OutputsNetwork> outputsNetworks = new ArrayList<>();
+            out.forEach(o -> {
+                OutputNetwork outClax = new OutputNetwork();
+                outClax.deserialise(o);
+                outputsNetworks.add(outClax);
+            });
+            //assign the output to this individual
+            inputsNetwork.setOutputComputed(outputsNetworks);
+            individual.addMyInputandOutput(inputsNetwork);
+        }
+    }
+
+    /**
+     * Run the LSTM agent
+     * @param input the input of the model
+     * @param model the model LSTM used
+     * @param individual the individual under evaluation
+     * @throws Exception if something bad happened
+     */
+    private void runLSTM(List<TrainReal> input, EvolvableModel model, Individual individual) throws Exception {
+        //compute Output of the network
+        INDArray lastOutput = null;
+        for (TrainReal inputsNetwork : input) {
+            for (InputsNetwork in : inputsNetwork.getTrainingPoint()) {
+                lastOutput = model.computeOutput(in.serialise());
+            }
+
+            //now for the number of time step that I want to check save the output
+            List<OutputsNetwork> outputsNetworks = new ArrayList<>();
+
+            OutputNetwork out = new OutputNetwork();
+            out.deserialise(lastOutput);
+            outputsNetworks.add(out);
+
+            //output has only two fields, input needs three
+            //I am using the last direction present into input I am adding that one to the last output
+
+            Double directionAPF = ((InputNetwork) inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
+            for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
+                //transform output into input and add the direction
+                OutputNetwork outLocal = new OutputNetwork();
+                outLocal.deserialise(lastOutput);
+                InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
+                lastOutput = model.computeOutput(inputLocal.serialise());
+
+                out = new OutputNetwork();
+                out.deserialise(lastOutput);
+                outputsNetworks.add(out);
+            }
+            //assign the output to this individual
+            inputsNetwork.setOutputComputed(outputsNetworks);
+            individual.addMyInputandOutput(inputsNetwork);
+        }
     }
 
 

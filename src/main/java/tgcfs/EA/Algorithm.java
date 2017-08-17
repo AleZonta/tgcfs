@@ -130,7 +130,7 @@ public abstract class Algorithm {
 
             //Discrete and intermediary recombination are then used to generate the objective parameters and
             //themutation strengths of the recombined individual, respectively
-            Recombination obj = new DiscreteRecombination(firstParents.getObjectiveParameters(), secondParents.getObjectiveParameters());
+            Recombination obj = new DiscreteRecombination(firstParents.getObjectiveParameters().dup(), secondParents.getObjectiveParameters().dup());
 
             Individual son;
             if(ReadConfig.Configurations.getMutation() == 0){
@@ -179,7 +179,7 @@ public abstract class Algorithm {
             Integer idParent = ThreadLocalRandom.current().nextInt(this.population.size());
             Individual parent = this.population.get(idParent);
             //son has the same genome of the father
-            Individual son = new RandomResetting(parent.getObjectiveParameters());
+            Individual son = new RandomResetting(parent.getObjectiveParameters().dup());
             //now the son is mutated 10 times (hardcoded value)
             IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
             //set model to the son
@@ -246,8 +246,11 @@ public abstract class Algorithm {
             this.population.remove(0);
         }
 
-//        this.population = new ArrayList<>();
-//        this.population = newList;
+        List<Individual> newList = new ArrayList<>();
+        this.population.forEach(p -> newList.add(p.deepCopy()));
+
+        this.population = new ArrayList<>();
+        this.population = newList;
         //now the population is again under the maximum size allowed and containing only the element with highest fitness.
     }
 

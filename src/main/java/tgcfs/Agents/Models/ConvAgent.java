@@ -1,7 +1,6 @@
 package tgcfs.Agents.Models;
 
 import lgds.trajectories.Point;
-import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.Convolutionary;
@@ -21,7 +20,10 @@ import java.util.List;
 public class ConvAgent extends Convolutionary implements EvolvableModel {
 
 
-
+    /**
+     * Constructor with zero parameter
+     * It builds the network
+     */
     public ConvAgent(){
         super();
     }
@@ -33,27 +35,10 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
      */
     @Override
     public Integer getArrayLength() {
-        return null;
+        return super.getNumPar();
     }
 
-    /**
-     * @implNote Implementation from Interface
-     * @return list weights
-     */
-    @Override
-    public INDArray getWeights() {
-        return null;
-    }
 
-    /**
-     * @implNote Implementation from Interface
-     * @param weights list containing all the weights
-     * @throws Exception if the length of the list is not correct
-     */
-    @Override
-    public void setWeights(INDArray weights) throws Exception {
-
-    }
 
     /**
      * @implNote Implementation from Interface
@@ -61,7 +46,7 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
      */
     @Override
     public EvolvableModel deepCopy() {
-        return null;
+        return new ConvAgent();
     }
 
     /**
@@ -70,6 +55,6 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
      */
     @Override
     public void fit(List<InputsNetwork> input, List<Point> points) {
-
+        throw new NoSuchMethodError("Method not implemented");
     }
 }

@@ -68,6 +68,8 @@ public class AlgorithmTest {
         Integer pop = algorithm.getPopulation().size();
         algorithm.generateOffspring();
         assertEquals(pop*2,algorithm.getPopulation().size());
+
+
     }
 
 }

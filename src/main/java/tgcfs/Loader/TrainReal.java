@@ -21,9 +21,11 @@ import java.util.List;
  * This class will represent the match between part of the trajectory used as a train and the part of the trajectory used as a real part
  */
 public class TrainReal {
-    private List<InputsNetwork> trainingPoint;
+    private final List<InputsNetwork> trainingPoint;
+    private final List<String> trainingImage;
     private List<Point> firstPart;
-    private List<Point>  followingPart;
+    private final List<Point>  followingPart;
+    private final String conditionalImage;
     private List<OutputsNetwork> outputComputed;
 
     /**
@@ -34,6 +36,23 @@ public class TrainReal {
     public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart){
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
+        this.trainingImage = null;
+        this.firstPart = null;
+        this.conditionalImage = null;
+    }
+
+    /**
+     * Constructor with two parameters
+     * @param trainingPoint list of inputNetwork
+     * @param followingPart list of points
+     * @param trainingImage path of the training images
+     */
+    public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart, List<String> trainingImage, String conditionalImage){
+        this.trainingPoint = trainingPoint;
+        this.followingPart = followingPart;
+        this.trainingImage = trainingImage;
+        this.firstPart = null;
+        this.conditionalImage = conditionalImage;
     }
 
     /**
@@ -98,5 +117,21 @@ public class TrainReal {
     public void setPoints(List<Point> firstPart) {
         this.firstPart = firstPart;
 
+    }
+
+    /**
+     * Getter for the list of the training images
+     * @return list of string containing the path
+     */
+    public List<String> getTrainingImage() {
+        return trainingImage;
+    }
+
+    /**
+     * Getter fot the conditional image
+     * @return
+     */
+    public String getConditionalImage() {
+        return this.conditionalImage;
     }
 }

@@ -112,6 +112,9 @@ public class IndividualTest {
             System.out.println(a.getDouble(i) + " " + b.getDouble(i));
             assertFalse(a.getDouble(i) == b.getDouble(i));
         }
+        System.out.println(a.toString());
+        System.out.println(b.toString());
+
 
     }
 

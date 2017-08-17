@@ -286,8 +286,14 @@ public class Feeder {
         logger.log(Level.INFO, "retrieve section of the trajectory");
         //retrieve section form the trajectory
         List<Point> actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
+        Integer check = 0;
         while(actualPoint.size() == 0){
             actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
+            check++;
+            if(check == 100){
+                logger.log(Level.WARNING, "loop without end. Find a way to solve this problem now!!!!!");
+                logger.log(Level.WARNING, this.currentTrajectory.getSize().toString());
+            }
         }
         logger.log(Level.INFO, "end of the while -> probably the problem is here");
         //save points
