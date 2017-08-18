@@ -58,7 +58,7 @@ public class Feeder {
         this.graph = new Loader();
         this.routes = new Routes();
         this.position = 0;
-        this.finished = Boolean.FALSE;
+        this.finished = Boolean.TRUE;
         this.actualNumberOfTrajectory = 0;
         this.maximumNumberOfTrajectories = ReadConfig.Configurations.getHowManyTrajectories();
         this.points = null;
@@ -237,6 +237,10 @@ public class Feeder {
         List<Point> point = new ArrayList<>();
         //Every how many time step I return the trajectory
         Integer count = this.selectPositionInTrajectory(trajectory);
+//        if(this.position > trajectory.getSize()) {
+//            this.finished = Boolean.TRUE;
+//            this.position = 0;
+//        }
         IntStream.range(this.position, this.position + count).forEach(i -> {
             Point p = this.getNextPoint(trajectory);
             //If it not null I add the element to the list
@@ -247,7 +251,11 @@ public class Feeder {
                 this.finished = Boolean.TRUE;
             }
         });
-        this.position += count;
+        if(this.finished){
+            this.position = 0;
+        }else {
+            this.position += count;
+        }
         return point;
     }
 
@@ -258,7 +266,6 @@ public class Feeder {
     public Boolean getFinished() {
         return finished;
     }
-
 
     /**
      * Feeder method
@@ -272,30 +279,34 @@ public class Feeder {
     public List<InputsNetwork> feeder(IdsaLoader idsaLoader) throws Exception {
         //retrieve trajectory
         //if the trajectory is yet not ended I do not need to load the next one
-        if (!this.finished) {
+        if (this.finished) {
             //If I have reached the maximum number of trajectory usable raise an exception
 //            if(Objects.equals(this.actualNumberOfTrajectory, this.maximumNumberOfTrajectories)){
 //                throw new ReachedMaximumNumberException("Reached Maximum Number Of trajectories");
 //            }
+            if(this.currentTrajectory != null) {
+                //if I know the trajectory is ended I have to reset it for future usage
+                this.currentTrajectory.softResetTrajectory();
+            }
             this.currentTrajectory = this.getTrajectory();
             //new trajectory new apf
             idsaLoader.resetAPF();
             //init potential field with new elements from the current trajectory
             idsaLoader.InitPotentialField(this.getTrajectories());
+            //reset finished
+            this.finished = Boolean.FALSE;
         }
-        logger.log(Level.INFO, "retrieve section of the trajectory");
         //retrieve section form the trajectory
         List<Point> actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
-        Integer check = 0;
-        while(actualPoint.size() == 0){
-            actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
-            check++;
-            if(check == 100){
-                logger.log(Level.WARNING, "loop without end. Find a way to solve this problem now!!!!!");
-                logger.log(Level.WARNING, this.currentTrajectory.getSize().toString());
-            }
+        //hardcoded low bound for the size
+        if(actualPoint.size() < 10){
+
+            //need to find a new trajectory
+            //it can happen only if the current one is finished
+            this.finished = Boolean.TRUE;
+            return this.feeder(idsaLoader);
         }
-        logger.log(Level.INFO, "end of the while -> probably the problem is here");
+
         //save points
         this.points = new ArrayList<>();
         actualPoint.forEach(point -> this.points.add(point.deepCopy()));
