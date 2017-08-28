@@ -22,6 +22,15 @@ import static junit.framework.TestCase.assertNotNull;
  */
 public class RoutesTest {
     @Test
+    public void getTra() throws Exception {
+        new ReadConfig.Configurations();
+
+        Routes routes = new Routes();
+        routes.readTrajectories();
+        assertNotNull(routes.getTra());
+    }
+
+    @Test
     public void getNextTrajectory() throws Exception {
         new ReadConfig.Configurations();
 

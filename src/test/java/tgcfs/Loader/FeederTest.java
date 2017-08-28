@@ -26,6 +26,34 @@ import static junit.framework.TestCase.*;
  */
 public class FeederTest {
     @Test
+    public void retAllEdges() throws Exception {
+        new ReadConfig.Configurations();
+
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+
+        Feeder system = new Feeder();
+        system.loadSystem();
+
+        assertEquals(26047,system.retAllEdges().size());
+        System.out.println(system.retAllEdges().size());
+
+    }
+
+    @Test
+    public void retAllNodes() throws Exception {
+        new ReadConfig.Configurations();
+
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+
+        Feeder system = new Feeder();
+        system.loadSystem();
+
+        assertEquals(12714,system.retAllNodes().size());
+        System.out.println(system.retAllNodes().size());
+
+    }
+
+    @Test
     public void multiFeeder() throws Exception {
         new ReadConfig.Configurations();
 

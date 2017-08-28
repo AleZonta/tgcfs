@@ -65,8 +65,8 @@ public class FollowingTheGraph implements Transformation {
      */
     @Override
     public List<InputsNetwork> transform(List<OutputsNetwork> outputs) {
-        if (this.feeder == null) throw new Error("System with the graph not instantiate");
-        if (this.lastPoint == null) throw new Error("Last Point not instantiate");
+        if (this.feeder == null) throw new NullPointerException("System with the graph not instantiate");
+        if (this.lastPoint == null) throw new NullPointerException("Last Point not instantiate");
 
         List<InputsNetwork> convertedInput = new ArrayList<>();
         PointToSpeedBearing converterPointSB = new PointToSpeedBearing();
@@ -99,5 +99,18 @@ public class FollowingTheGraph implements Transformation {
      */
     public void setFeeder(Feeder feeder) {
         this.feeder = feeder;
+    }
+
+
+    /**
+     * Method that converts the output of the network to a real world point
+     * @param outputsNetwork output network to convert
+     * @return point in the real world corresponding to the displacement
+     */
+    public Point singlePointConversion(OutputsNetwork outputsNetwork){
+        if (this.feeder == null) throw new NullPointerException("System with the graph not instantiate");
+        if (this.lastPoint == null) throw new NullPointerException("Last Point not instantiate");
+        OutputNetwork output = (OutputNetwork) outputsNetwork;
+        return this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
     }
 }

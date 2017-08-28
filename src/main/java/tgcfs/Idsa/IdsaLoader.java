@@ -13,6 +13,7 @@ import org.json.simple.parser.ParseException;
 import tgcfs.Performances.SaveToFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -152,10 +153,11 @@ public class IdsaLoader {
      */
     public void InitPotentialField(Trajectory trajectory){
         nl.tno.idsa.framework.world.Point endPoint = new nl.tno.idsa.framework.world.Point(trajectory.getLastPoint().getLatitude(),trajectory.getLastPoint().getLongitude());
-        Boolean isPResent = this.pot.getPointsOfInterest().stream().anyMatch(poi -> poi.contains(endPoint));
-        if(isPResent){
+        Boolean isPresent = this.pot.getPointsOfInterest().stream().anyMatch(poi -> poi.contains(endPoint));
+        if(isPresent){
             this.pot.getPointsOfInterest().add(new POI(endPoint));
         }
+        this.pot.setPreviousPoint(new nl.tno.idsa.framework.world.Point(0.0,0.0));
     }
 
 
@@ -201,6 +203,17 @@ public class IdsaLoader {
     public Point retPossibleTarget() throws Exception {
         nl.tno.idsa.framework.world.Point p = this.pot.retPossibleTarget();
         return new Point(p.getX(), p.getY());
+    }
+
+    /**
+     * Generate the picture using the python connection in IDSA
+     * @param points current trajectory
+     * @return boolean value stating the success or not of the conversion
+     */
+    public Boolean generatePicture(List<Point> points) throws IOException {
+        List<nl.tno.idsa.framework.world.Point> tra = new ArrayList<>();
+        points.forEach(p -> tra.add(new nl.tno.idsa.framework.world.Point(p.getLatitude(), p.getLongitude())));
+        return this.pot.generatePictureWithPython(tra);
     }
 
 }

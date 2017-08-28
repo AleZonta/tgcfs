@@ -46,11 +46,10 @@ public class LSTM extends Models implements Network{
         // some common parameters
         NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
         builder.biasInit(0);
-        builder.learningRate(0.006);
+        builder.learningRate(0.01);
         builder.regularization(true);
         builder.l2(0.001);
         builder.updater(Updater.RMSPROP);
-        builder.rmsDecay(0.99);
         builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 
         builder.miniBatch(false);
@@ -62,7 +61,7 @@ public class LSTM extends Models implements Network{
         GravesLSTM.Builder inputLayerBuilder = new GravesLSTM.Builder();
         inputLayerBuilder.nIn(inputSize);
         inputLayerBuilder.nOut(hiddenNeurons);
-        inputLayerBuilder.activation(Activation.TANH);
+        inputLayerBuilder.activation(Activation.SOFTSIGN);
         listBuilder.layer(0, inputLayerBuilder.build());
 
         // hidden Layers
@@ -70,7 +69,7 @@ public class LSTM extends Models implements Network{
             GravesLSTM.Builder hiddenLayerBuilder = new GravesLSTM.Builder();
             hiddenLayerBuilder.nIn(hiddenNeurons);
             hiddenLayerBuilder.nOut(hiddenNeurons);
-            hiddenLayerBuilder.activation(Activation.TANH);
+            hiddenLayerBuilder.activation(Activation.SOFTSIGN);
             listBuilder.layer(i, hiddenLayerBuilder.build());
         });
 
@@ -78,7 +77,8 @@ public class LSTM extends Models implements Network{
         RnnOutputLayer.Builder outputLayerBuilder = new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT);
         outputLayerBuilder.nIn(hiddenNeurons);
         outputLayerBuilder.nOut(outputSize);
-        outputLayerBuilder.activation(Activation.TANH);
+        outputLayerBuilder.activation(Activation.SOFTMAX);
+        outputLayerBuilder.lossFunction(LossFunctions.LossFunction.MSE);
         listBuilder.layer(hiddenLayers, outputLayerBuilder.build());
 
 

@@ -6,6 +6,7 @@ import org.deeplearning4j.nn.conf.LearningRatePolicy;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
@@ -33,6 +34,7 @@ import java.util.Map;
  */
 public class Convolutionary extends Models implements Network {
     private ComputationGraph net; //neural network, brain of the agent
+    private INDArray conditionalPicture;
 
 
     /**
@@ -40,8 +42,11 @@ public class Convolutionary extends Models implements Network {
      * It loads the convolutionary network
      * It has two inputs -> conditional cnn
      * Different layers of convolutionary nodes
-     **/
-    public Convolutionary(){
+     *
+     * @param dimension height and with of the picture
+     *
+     * */
+    public Convolutionary(Integer dimension){
         ComputationGraphConfiguration.GraphBuilder graph = new NeuralNetConfiguration.Builder()
                 .seed(123)
                 .iterations(90)
@@ -52,7 +57,6 @@ public class Convolutionary extends Models implements Network {
                 .lrPolicyDecayRate(0.96)
                 .lrPolicySteps(320000)
                 .updater(Updater.NESTEROVS)
-                .momentum(0.9)
                 .weightInit(WeightInit.XAVIER)
                 .regularization(true)
                 .l2(2e-4)
@@ -76,7 +80,7 @@ public class Convolutionary extends Models implements Network {
 
 
         ConvolutionLayer.Builder thirdLayer = new ConvolutionLayer.Builder(3, 3);
-        thirdLayer.nIn(numberFilterOut * 2); //number filter as input
+        thirdLayer.nIn(numberFilterOut * 4); //number filter as input
         thirdLayer.stride(2,2); //stride = 1 -> move pixel by pixel
         thirdLayer.kernelSize(2,2);
         thirdLayer.nOut(numberFilterOut * 4); //number filter out
@@ -90,7 +94,7 @@ public class Convolutionary extends Models implements Network {
         fourthLayer.activation(Activation.RELU);
 
         DenseLayer.Builder fullFirstConnectedLayer = new DenseLayer.Builder();
-        fullFirstConnectedLayer.nIn(numberFilterOut * 4);
+        //fullFirstConnectedLayer.nIn(numberFilterOut * 4);
         fullFirstConnectedLayer.nOut(50);
         fullFirstConnectedLayer.biasInit(1.0);
         fullFirstConnectedLayer.activation(Activation.TANH);
@@ -121,12 +125,15 @@ public class Convolutionary extends Models implements Network {
                 .addLayer("full2", fullSecondConnectedLayer.build(), "full1")
                 .addLayer("out", outputlayer.build(), "full2")
                 .setOutputs("out")
+                .setInputTypes(InputType.convolutionalFlat(dimension,dimension,3),InputType.convolutionalFlat(dimension,dimension,3))
                 .backprop(Boolean.TRUE).pretrain(Boolean.FALSE);
 
         ComputationGraphConfiguration conf = graph.build();
 
         this.net = new ComputationGraph(conf);
         this.net.init();
+
+        this.conditionalPicture = null;
     }
 
     /**
@@ -163,7 +170,13 @@ public class Convolutionary extends Models implements Network {
      */
     @Override
     public INDArray computeOutput(INDArray input) {
-        throw new NoSuchMethodError("Method not implemented");
+        //now I have the two input, I need to concatenate them and pass them to the system
+        //fix the conditional picture in the second position
+        if(this.conditionalPicture == null) throw new NullPointerException("Conditional picture not setted");
+        INDArray[] inputs = new INDArray[2];
+        inputs[0] = input;
+        inputs[1] = this.conditionalPicture;
+        return this.computeOutput(inputs);
     }
 
     /**
@@ -228,4 +241,19 @@ public class Convolutionary extends Models implements Network {
         return res.get("out");
     }
 
+    /**
+     * Get the conditional picture
+     * @return INDarray flattened of the picture
+     */
+    public INDArray getConditionalPicture() {
+        return conditionalPicture;
+    }
+
+    /**
+     * Set conditional picture
+     * @param conditionalPicture INDarray picture
+     */
+    public void setConditionalPicture(INDArray conditionalPicture) {
+        this.conditionalPicture = conditionalPicture;
+    }
 }

@@ -91,7 +91,8 @@ public class App {
                 agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
                 break;
             case 1:
-                agentModel = new ConvAgent();
+                // fixed size for now
+                agentModel = new ConvAgent(32);
                 break;
             case 2:
                 agentModel = new Clax(this.feeder, this.idsaLoader);

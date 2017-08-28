@@ -491,17 +491,36 @@ public class Feeder {
         //need to load the number of trajectories given by settings
         List<TrainReal> totalList = new ArrayList<>();
         IntStream.range(0, ReadConfig.Configurations.getTrajectoriesTrained()).forEach(i -> {
-            try {
-                TrainReal tr = new TrainReal(this.feeder(idsaLoader),this.obtainRealAgentSectionTrajectory());
-                tr.setPoints(this.points);
-                totalList.add(tr);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error in loading the trajectories" + e.getMessage());
-            }
+            this.feedTheEater(idsaLoader,totalList);
         });
+
+        //it is possible total list is not the right size. Check it
+        while(totalList.size() < ReadConfig.Configurations.getTrajectoriesTrained()){
+            this.feedTheEater(idsaLoader,totalList);
+            logger.log(Level.INFO, "TrainReal sit size not correct, adding one more example");
+        }
         return totalList;
     }
 
+
+    /**
+     * Feed the list of data.
+     * It retrieves and translate the point into the correct input and it adds the real point to the
+     * object used to store them
+     * @param idsaLoader  reference IDSA system
+     * @param totalList total list of {@link TrainReal}
+     */
+    private void feedTheEater(IdsaLoader idsaLoader, List<TrainReal> totalList){
+        try {
+            TrainReal tr = new TrainReal(this.feeder(idsaLoader),this.obtainRealAgentSectionTrajectory());
+            tr.setPoints(this.points);
+            //last splitting does not have the realsection, I am not adding it to the total list
+            if(!tr.getFollowingPart().isEmpty()) totalList.add(tr);
+            if(ReadConfig.Configurations.getValueModel() == 2) tr.setIdsaLoader(idsaLoader);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error in loading the trajectories" + e.getMessage());
+        }
+    }
 
     /**
      * Return all the edges of the graph

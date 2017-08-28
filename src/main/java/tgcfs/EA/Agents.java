@@ -1,6 +1,7 @@
 package tgcfs.EA;
 
 import lgds.trajectories.Point;
+import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.Clax;
@@ -14,7 +15,9 @@ import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Networks.Convolutionary;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -85,17 +88,66 @@ public class Agents extends Algorithm {
      * @param individual the individual under evaluation
      * @throws Exception if something bad happened
      */
-    private void runConvol(List<TrainReal> input, EvolvableModel model, Individual individual) throws NoSuchMethodException {
-//        NativeImageLoader imageLoader = new NativeImageLoader();
-//        INDArray lastOutput = null;
-//        for (TrainReal inputsNetwork : input) {
-//            for (String path : inputsNetwork.getTrainingImage()){
-//
-//            }
-//
-//        }
-        //TODO do i have to generate the image in real time? -> seems like yep, so I need to find a way to do it
-        throw new NoSuchMethodException("Still not implemented");
+    private void runConvol(List<TrainReal> input, EvolvableModel model, Individual individual) throws Exception {
+        NativeImageLoader imageLoader = new NativeImageLoader();
+        INDArray lastOutput = null;
+        INDArray conditionalInputConverted = null;
+        for (TrainReal inputsNetwork : input) {
+            //need to genereta a picture for every timestep of the trajectory
+            List<Point> growingTrajectory = new ArrayList<>();
+            for(Point p : inputsNetwork.getPoints()){
+                growingTrajectory.add(p);
+                Boolean res = inputsNetwork.getIdsaLoader().generatePicture(growingTrajectory);
+                if(!res) throw new Exception("Creation of the pictures did not work out");
+                //if the conversion worked correctly I know where the actual picture is stored
+                File realInput = new File(inputsNetwork.getNormalImage());
+                INDArray realInputConverted = imageLoader.asMatrix(realInput);
+
+                //since it is always the same lets compute it only the first time
+                if(conditionalInputConverted == null) {
+                    File conditionalInput = new File(inputsNetwork.getConditionalImage());
+                    conditionalInputConverted = imageLoader.asMatrix(conditionalInput);
+                    ((Convolutionary)model).setConditionalPicture(conditionalInputConverted);
+                }
+
+                //compute output
+                lastOutput = model.computeOutput(realInputConverted);
+
+
+                //now for the number of time step that I want to check save the output
+                List<OutputsNetwork> outputsNetworks = new ArrayList<>();
+
+                OutputNetwork out = new OutputNetwork();
+                out.deserialise(lastOutput);
+                outputsNetworks.add(out);
+
+
+                for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
+                    //transform output into input and add the direction
+                    OutputNetwork outLocal = new OutputNetwork();
+                    outLocal.deserialise(lastOutput);
+
+                    FollowingTheGraph transformation = new FollowingTheGraph();
+                    growingTrajectory.add(transformation.singlePointConversion(outLocal));
+
+                    res = inputsNetwork.getIdsaLoader().generatePicture(growingTrajectory);
+                    if(!res) throw new Exception("Creation of the pictures did not work out");
+
+                    realInput = new File(inputsNetwork.getNormalImage());
+                    realInputConverted = imageLoader.asMatrix(realInput);
+                    //compute output
+                    lastOutput = model.computeOutput(realInputConverted);
+
+                    out = new OutputNetwork();
+                    out.deserialise(lastOutput);
+                    outputsNetworks.add(out);
+                }
+                //assign the output to this individual
+                inputsNetwork.setOutputComputed(outputsNetworks);
+                individual.addMyInputandOutput(inputsNetwork);
+            }
+
+        }
     }
 
     /**

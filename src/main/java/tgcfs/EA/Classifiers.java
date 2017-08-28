@@ -108,6 +108,9 @@ public class Classifiers extends Algorithm {
                 //evaluate classifier with real agents
                 agents.getRealAgents().forEach(agent -> {
                     try {
+                        if(agent.realOutput().size() < 5){
+                            String testHere ="";
+                        }
                         ((FollowingTheGraph)transformation).setLastPoint(agent.getLastPoint());
                         OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(((Agent)agent).realOutput()));
                         //if the classifier is saying true -> it is correctly judging the agent
@@ -115,7 +118,7 @@ public class Classifiers extends Algorithm {
                             individual.increaseFitness();
                         }
                     } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage());
+                        logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage() + " " + e.toString());
                     }
                 });
             } catch (Exception e) {

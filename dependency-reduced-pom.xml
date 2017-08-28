@@ -81,24 +81,6 @@
       </plugin>
     </plugins>
   </build>
-  <dependencies>
-    <dependency>
-      <groupId>org.deeplearning4j</groupId>
-      <artifactId>deeplearning4j-ui-resources</artifactId>
-      <version>0.8.0</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>deeplearning4j-nlp</artifactId>
-          <groupId>org.deeplearning4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>nd4j-jackson</artifactId>
-          <groupId>org.nd4j</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

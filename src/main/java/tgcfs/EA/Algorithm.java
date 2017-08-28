@@ -242,12 +242,26 @@ public abstract class Algorithm {
         //sort the list
         this.population.sort(Comparator.comparing(Individual::getFitness));
 
+        //log the fitness of all the population
+        List<Integer> fitn = new ArrayList<>();
+        this.population.forEach(p -> fitn.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population before selection--");
+        logger.log(Level.INFO, fitn.toString());
+
+
         while(this.population.size() != size){
             this.population.remove(0);
         }
 
         List<Individual> newList = new ArrayList<>();
         this.population.forEach(p -> newList.add(p.deepCopy()));
+
+        List<Integer> fitnd = new ArrayList<>();
+        newList.forEach(p -> fitnd.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population after selection--");
+        logger.log(Level.INFO, fitnd.toString());
 
         this.population = new ArrayList<>();
         this.population = newList;

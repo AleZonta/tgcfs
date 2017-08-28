@@ -1,9 +1,11 @@
 package tgcfs.Loader;
 
 import lgds.trajectories.Point;
+import tgcfs.Idsa.IdsaLoader;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,11 +24,12 @@ import java.util.List;
  */
 public class TrainReal {
     private final List<InputsNetwork> trainingPoint;
-    private final List<String> trainingImage;
     private List<Point> firstPart;
     private final List<Point>  followingPart;
     private final String conditionalImage;
+    private final String normalImage;
     private List<OutputsNetwork> outputComputed;
+    private IdsaLoader idsaLoader;
 
     /**
      * Constructor with two parameters
@@ -36,24 +39,47 @@ public class TrainReal {
     public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart){
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
-        this.trainingImage = null;
         this.firstPart = null;
-        this.conditionalImage = null;
+        //the conditional image path is hardcoded -> has to be in the same directory of the program
+        this.conditionalImage = Paths.get(".").toAbsolutePath().normalize().toString() + "/cond.png";
+        this.normalImage = Paths.get(".").toAbsolutePath().normalize().toString() + "/image.png";
+        this.idsaLoader = null;
+        this.outputComputed = null;
     }
 
     /**
-     * Constructor with two parameters
+     * Constructor with four parameters
      * @param trainingPoint list of inputNetwork
      * @param followingPart list of points
-     * @param trainingImage path of the training images
+     * @param conditionalImage path of the conditional image
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart, List<String> trainingImage, String conditionalImage){
+    public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart, String conditionalImage, String normalImage){
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
-        this.trainingImage = trainingImage;
         this.firstPart = null;
         this.conditionalImage = conditionalImage;
+        this.normalImage = normalImage;
+        this.idsaLoader = null;
+        this.outputComputed = null;
     }
+
+
+    /**
+     * Constructor with three parameter
+     * @param trainingPoint the training point
+     * @param followingPart the following part
+     * @param idsaLoader idsa loader reference
+     */
+    public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart, IdsaLoader idsaLoader){
+        this.trainingPoint = trainingPoint;
+        this.followingPart = followingPart;
+        this.firstPart = null;
+        this.conditionalImage = Paths.get(".").toAbsolutePath().normalize().toString() + "/cond.png";
+        this.normalImage = Paths.get(".").toAbsolutePath().normalize().toString() + "/image.png";
+        this.idsaLoader = idsaLoader;
+        this.outputComputed = null;
+    }
+
 
     /**
      * Getter for the input part of the trajectory
@@ -120,18 +146,34 @@ public class TrainReal {
     }
 
     /**
-     * Getter for the list of the training images
-     * @return list of string containing the path
-     */
-    public List<String> getTrainingImage() {
-        return trainingImage;
-    }
-
-    /**
      * Getter fot the conditional image
      * @return
      */
     public String getConditionalImage() {
         return this.conditionalImage;
+    }
+
+    /**
+     * Getter for the idsa loader reference
+     * @return idsa loader reference {@link IdsaLoader}
+     */
+    public IdsaLoader getIdsaLoader() {
+        return idsaLoader;
+    }
+
+    /**
+     * setter for the idsaloader reference
+     * @param idsaLoader the idsa loader reference
+     */
+    public void setIdsaLoader(IdsaLoader idsaLoader) {
+        this.idsaLoader = idsaLoader;
+    }
+
+    /**
+     * Getter for the location of the normal image
+     * @return string value with the path
+     */
+    public String getNormalImage() {
+        return this.normalImage;
     }
 }
