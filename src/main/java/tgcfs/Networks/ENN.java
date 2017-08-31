@@ -40,15 +40,20 @@ public class ENN extends Models implements Network {
      */
     public ENN(Integer input, Integer HiddenNeurons, Integer output){
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+                .seed(12345)
                 .weightInit(WeightInit.XAVIER)
-                .activation(Activation.HARDTANH)
+                .regularization(true)
+                .l2(0.001)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .learningRate(0.05)
+                .learningRate(0.001)
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(input + HiddenNeurons).nOut(HiddenNeurons)
+                        .activation(Activation.TANH)
                         .build())
                 .layer(1, new DenseLayer.Builder().nIn(HiddenNeurons).nOut(output)
+                        .activation(Activation.TANH)
                         .build())
+                .pretrain(false).backprop(true)
                 .build();
 
         this.net = new MultiLayerNetwork(conf);
@@ -77,14 +82,14 @@ public class ENN extends Models implements Network {
 
     /**
      * Compute the output of the network given the input
-     * @param input list value that are the input of the network
+     * @param in list value that are the input of the network
      * @return list of output of the network
      */
     @Override
-    public INDArray computeOutput(INDArray input) {
+    public INDArray computeOutput(INDArray in) {
         //check if the input is in the correct range
-        for(int i = 0; i < input.columns(); i++){
-            if(input.getDouble(i) < -1.0 || input.getDouble(i) > 1.0){
+        for(int i = 0; i < in.columns(); i++){
+            if(in.getDouble(i) < -1.0 || in.getDouble(i) > 1.0){
                 throw new Error("Generator input is not normalised correctly");
             }
         }
@@ -93,17 +98,11 @@ public class ENN extends Models implements Network {
 
         //load the context value of the hidden layer
         INDArray total = Nd4j.create(1,this.input + this.hiddenNeurons);
-        IntStream.range(0, this.input).forEach(i -> {
-            total.putScalar(i,input.getDouble(i));
-        });
+        IntStream.range(0, this.input).forEach(i -> total.putScalar(i, in.getDouble(i)));
         if(pastInput == null) {
-            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> {
-                total.putScalar(i,0.0);
-            });
+            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,0.5));
         }else{
-            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> {
-                total.putScalar(i,pastInput.getDouble(i-this.input));
-            });
+            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,pastInput.getDouble(i-this.input)));
         }
 
         return this.net.rnnTimeStep(total);

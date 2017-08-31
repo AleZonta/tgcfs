@@ -9,6 +9,7 @@ import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -85,6 +86,9 @@ public abstract class Individual {
     public Individual(Integer size) throws Exception {
         //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.objectiveParameters = Nd4j.rand(1, size);
+        for(int j = 0; j< size; j++){
+            this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
+        }
         this.fitness = 0;
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
@@ -100,6 +104,9 @@ public abstract class Individual {
      */
     public Individual(Integer size, EvolvableModel model) throws Exception {
         this.objectiveParameters = Nd4j.rand(1, size);
+        for(int j = 0; j< size; j++){
+            this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
+        }
         this.fitness = 0;
         this.model = model;
         this.myInputandOutput = new ArrayList<>();

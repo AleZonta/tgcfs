@@ -9,6 +9,7 @@ import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
+import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
@@ -92,6 +93,9 @@ public class Agents extends Algorithm {
         NativeImageLoader imageLoader = new NativeImageLoader();
         INDArray lastOutput = null;
         INDArray conditionalInputConverted = null;
+
+        IdsaLoader refLoader = input.get(0).getIdsaLoader();
+
         for (TrainReal inputsNetwork : input) {
             //need to genereta a picture for every timestep of the trajectory
             List<Point> growingTrajectory = new ArrayList<>();
@@ -99,6 +103,8 @@ public class Agents extends Algorithm {
                 growingTrajectory.add(p);
                 Boolean res = inputsNetwork.getIdsaLoader().generatePicture(growingTrajectory);
                 if(!res) throw new Exception("Creation of the pictures did not work out");
+                //erase image
+                //((ConvAgent)model).erasePictureCreated(Paths.get(inputsNetwork.getNormalImage()));
                 //if the conversion worked correctly I know where the actual picture is stored
                 File realInput = new File(inputsNetwork.getNormalImage());
                 INDArray realInputConverted = imageLoader.asMatrix(realInput);
@@ -121,17 +127,26 @@ public class Agents extends Algorithm {
                 out.deserialise(lastOutput);
                 outputsNetworks.add(out);
 
+                //need this to transform the the value into point
+                FollowingTheGraph transformation = new FollowingTheGraph();
+                //I need to set the feeder
+                transformation.setFeeder(((ConvAgent)model).getFeeder());
+                //and the last point
+                transformation.setLastPoint(growingTrajectory.get(growingTrajectory.size() - 1));
 
                 for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
                     //transform output into input and add the direction
                     OutputNetwork outLocal = new OutputNetwork();
                     outLocal.deserialise(lastOutput);
 
-                    FollowingTheGraph transformation = new FollowingTheGraph();
-                    growingTrajectory.add(transformation.singlePointConversion(outLocal));
+                    Point toAdd = transformation.singlePointConversion(outLocal);
+                    transformation.setLastPoint(toAdd);
+                    growingTrajectory.add(toAdd);
 
                     res = inputsNetwork.getIdsaLoader().generatePicture(growingTrajectory);
                     if(!res) throw new Exception("Creation of the pictures did not work out");
+                    //erase image
+                    //((ConvAgent)model).erasePictureCreated(Paths.get(inputsNetwork.getNormalImage()));
 
                     realInput = new File(inputsNetwork.getNormalImage());
                     realInputConverted = imageLoader.asMatrix(realInput);

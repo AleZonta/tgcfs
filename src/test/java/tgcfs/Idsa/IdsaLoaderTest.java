@@ -23,6 +23,8 @@ import static junit.framework.TestCase.assertNotNull;
  * a.zonta@vu.nl
  */
 public class IdsaLoaderTest {
+
+
     @Test
     public void initPotentialField1() throws Exception {
     }
@@ -37,9 +39,7 @@ public class IdsaLoaderTest {
 
         new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
-        IdsaLoader loader = new IdsaLoader();
-
-        loader = new IdsaLoader(20);
+        IdsaLoader loader = new IdsaLoader(200);
 
         Routes routes = new Routes();
         routes.readTrajectories();
@@ -47,8 +47,9 @@ public class IdsaLoaderTest {
         loader.InitPotentialField(routes.getTra());
 
         Trajectory tra = routes.getNextTrajectory();
+        tra = routes.getNextTrajectory();
         List<Point> p = new ArrayList<>();
-        for(int t = 0; t < 20; t++){
+        for(int t = 0; t < 200; t++){
             p.add(routes.getNextPosition(tra));
         }
 

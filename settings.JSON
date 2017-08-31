@@ -15,7 +15,7 @@
   "trajectoriesTypeExplanation": "0 idsa, 1 geolife, 2 both",
   "trajectoriesType": 0,
   "HowManySplittingExplanation" : "How many times split the trajectory",
-  "HowManySplitting": 6,
+  "HowManySplitting": 4,
   "HowManyTrajectoriesExplanation" : "Number is the maximum number of trajectories that are going to be tested. 99999 means use all of them",
   "HowManyTrajectories": 99999,
   "_____________________________Fourth Section": "Setting for the EA algorithm",
@@ -41,6 +41,7 @@
   "HiddenNeuronsClassifier": 3,
   "TrajectoriesTrained": 10,
   "Train": false,
+  "PictureSize": 64,
   "_____________________________Sixth section": "Settings for where to save the performances",
   "Name": "Test",
   "Experiment": "1",
@@ -54,7 +55,7 @@
   "dbNameCoordNode": "dbcn",
   "dbNameDistance": " dbd",
   "_____________________________Eight section": "what model use in the system",
-  "LSTM": true,
-  "Convolution": false,
+  "LSTM": false,
+  "Convolution": true,
   "Clax": false
 }

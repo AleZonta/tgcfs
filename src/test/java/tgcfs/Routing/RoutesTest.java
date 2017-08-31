@@ -21,6 +21,7 @@ import static junit.framework.TestCase.assertNotNull;
  * a.zonta@vu.nl
  */
 public class RoutesTest {
+
     @Test
     public void getTra() throws Exception {
         new ReadConfig.Configurations();

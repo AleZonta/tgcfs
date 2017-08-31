@@ -39,6 +39,8 @@ public class IdsaLoader {
     private ConfigFile configFile; //file containing configuration for IDSA
     private LoadParameters par; //parameter for potential field
     private Boolean computed; //I can obtain direction only if I computed it before it
+    private Point baseWorld;
+    private Point widthWorld;
 
     /**
      * Constructor that loads all the configurations for the potential field
@@ -215,5 +217,4 @@ public class IdsaLoader {
         points.forEach(p -> tra.add(new nl.tno.idsa.framework.world.Point(p.getLatitude(), p.getLongitude())));
         return this.pot.generatePictureWithPython(tra);
     }
-
 }

@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
@@ -28,9 +29,9 @@ public class ClassifierTest {
 
     @Test
     public void getArrayLength() throws Exception {
-        Classifier test = new Classifier(2,1,1);
+        Classifier test = new Classifier(3,4,1);
 
-        assertEquals(6, test.getArrayLength().longValue());
+        assertEquals(37, test.getArrayLength().longValue());
     }
 
     @Test
@@ -50,22 +51,37 @@ public class ClassifierTest {
 
     @Test
     public void computeOutput() throws Exception {
-        Classifier test = new Classifier(3,4,1);
+        for(int w=0; w<15; w++) {
+            Classifier test = new Classifier(3, 4, 1);
 
-        INDArray array = Nd4j.rand(1, test.getArrayLength());
-        test.setWeights(array);
+            INDArray array = Nd4j.rand(1, test.getArrayLength());
+            for (int j = 0; j < test.getArrayLength(); j++) {
+                array.putScalar(j, ThreadLocalRandom.current().nextDouble(-1, 1));
 
-        IntStream.range(0,100).forEach(i ->{
-            INDArray arrayy = Nd4j.rand(1, 2);
+            }
 
 
-            INDArray out = test.computeOutput(arrayy);
-            assertNotNull(out);
+            test.setWeights(array);
+            final INDArray[] out = {null};
+            IntStream.range(0, 1000).forEach(i -> {
+                INDArray arrayy = Nd4j.rand(1, 3);
+                for (int j = 0; j < 3; j++) {
+                    arrayy.putScalar(j, ThreadLocalRandom.current().nextDouble(-1, 1));
+                }
 
-            assertEquals(1, out.columns());
-            assertTrue((out.getDouble(0) >= -1.0)  && (out.getDouble(0) <= 1.0) );
-        });
 
+                out[0] = test.computeOutput(arrayy);
+                assertNotNull(out[0]);
+
+
+
+                assertEquals(1, out[0].columns());
+                assertTrue((out[0].getDouble(0) >= -1.0) && (out[0].getDouble(0) <= 1.0));
+
+            });
+            System.out.println(out[0].getDouble(0));
+            System.out.println("----");
+        }
     }
 
 }

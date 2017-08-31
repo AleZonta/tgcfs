@@ -25,6 +25,7 @@ import static junit.framework.TestCase.*;
  * a.zonta@vu.nl
  */
 public class FeederTest {
+
     @Test
     public void retAllEdges() throws Exception {
         new ReadConfig.Configurations();

@@ -6,6 +6,11 @@ import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.Convolutionary;
 
+import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -24,7 +29,7 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
 
 
     /**
-     * Constructor with zero parameter
+     * Constructor with one parameter
      * It builds the network
      *
      * @param dimension dimension pictures
@@ -35,6 +40,17 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
         this.feeder = null;
     }
 
+
+    /**
+     * Constructor with two parameters
+     * @param dimension dimension of the picture
+     * @param feeder feeder system
+     */
+    public ConvAgent(Integer dimension, Feeder feeder){
+        super(dimension);
+        this.size = dimension;
+        this.feeder = feeder;
+    }
 
     /**
      * @implNote Implementation from Interface
@@ -53,7 +69,7 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
      */
     @Override
     public EvolvableModel deepCopy() {
-        return new ConvAgent(this.size);
+        return new ConvAgent(this.size, this.feeder);
     }
 
     /**
@@ -80,5 +96,23 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
      */
     public void setFeeder(Feeder feeder) {
         this.feeder = feeder;
+    }
+
+
+    /**
+     * Erase the picture created if available
+     * @param path path of the picture
+     */
+    public void erasePictureCreated(Path path){
+        try {
+            Files.delete(path);
+        } catch (NoSuchFileException x) {
+            System.err.format("%s: no such" + " file or directory%n", path);
+        } catch (DirectoryNotEmptyException x) {
+            System.err.format("%s not empty%n", path);
+        } catch (IOException x) {
+            // File permission problems are caught here.
+            System.err.println(x);
+        }
     }
 }

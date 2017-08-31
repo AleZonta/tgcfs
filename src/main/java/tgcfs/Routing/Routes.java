@@ -59,6 +59,7 @@ public class Routes {
         this.tra.shuffle();
         //analysing the trajectories
         //this.tra.analiseAndCheckTrajectory();
+
     }
 
     /**
@@ -100,8 +101,5 @@ public class Routes {
     public Point getNextPosition(Trajectory trajectory){
        return trajectory.getNextPoint(this.storage);
     }
-
-
-
 
 }

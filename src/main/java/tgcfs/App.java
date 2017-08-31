@@ -1,5 +1,6 @@
 package tgcfs;
 
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Agents.*;
 import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
@@ -18,6 +19,7 @@ import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,6 +67,9 @@ public class App {
         //initialise the saving class
         new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
         SaveToFile.Saver.dumpSetting(ReadConfig.Configurations.getConfig());
+
+        //back up for convolution, in java there are some problems
+        if(Objects.equals(ReadConfig.Configurations.getValueModel(), ReadConfig.Configurations.Convolution)) Nd4j.enableFallbackMode(Boolean.TRUE);
     }
 
 
@@ -92,7 +97,8 @@ public class App {
                 break;
             case 1:
                 // fixed size for now
-                agentModel = new ConvAgent(32);
+                agentModel = new ConvAgent(ReadConfig.Configurations.getPictureSize());
+                ((ConvAgent)agentModel).setFeeder(this.feeder);
                 break;
             case 2:
                 agentModel = new Clax(this.feeder, this.idsaLoader);

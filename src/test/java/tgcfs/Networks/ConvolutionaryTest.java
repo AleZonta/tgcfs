@@ -59,13 +59,15 @@ public class ConvolutionaryTest {
     @Test
     public void computeOutput() throws Exception {
         Nd4j.enableFallbackMode(Boolean.TRUE);
-        Convolutionary convolutionary = new Convolutionary(32);
+        Convolutionary convolutionary = new Convolutionary(64);
         //lets discover how big has to be the input picture
         //lets try 480X480
         NativeImageLoader imageLoader = new NativeImageLoader();
         //test with 32x32
-        INDArray one = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/480x480/a.jpg"));
-        INDArray two = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/480x480/b.jpg"));
+        INDArray cond = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/boh/480x480/c.jpg"));
+        INDArray one = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/boh/480x480/d.jpg"));
+//        INDArray one = imageLoader.asMatrix(new File("/Users/alessandrozonta/Documents/tgcfs/image.png"));
+//        INDArray two = imageLoader.asMatrix(new File("/Users/alessandrozonta/Documents/tgcfs/cond.png"));
 
         INDArray out = null;
         try {
@@ -73,7 +75,7 @@ public class ConvolutionaryTest {
         }catch (NullPointerException e){
             assertEquals("Conditional picture not setted", e.getMessage());
         }
-        convolutionary.setConditionalPicture(two);
+        convolutionary.setConditionalPicture(cond);
         out = convolutionary.computeOutput(one);
 
         assertNotNull(out);
@@ -100,10 +102,10 @@ public class ConvolutionaryTest {
         //lets try 480X480
         NativeImageLoader imageLoader = new NativeImageLoader();
         //test with 64x64
-        INDArray cond = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/480x480/c.jpg"));
-        INDArray one = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/480x480/d.jpg"));
-        INDArray two = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/480x480/e.jpg"));
-        INDArray three = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/480x480/g.jpg"));
+        INDArray cond = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/boh/480x480/c.jpg"));
+        INDArray one = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/boh/480x480/d.jpg"));
+        INDArray two = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/boh/480x480/e.jpg"));
+        INDArray three = imageLoader.asMatrix(new File("/Users/alessandrozonta/Desktop/boh/480x480/g.jpg"));
         INDArray[] vect = new INDArray[2];
         vect[1] = cond;
         vect[0] = one;

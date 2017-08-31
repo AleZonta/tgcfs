@@ -17,6 +17,8 @@ import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Routing.Routes;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,6 +47,8 @@ public class Feeder {
     private Integer actualNumberOfTrajectory;
     private List<Point> points;
     private final DatabaseCoordNode db; //database saving all the already visited nodes
+    private Boolean isNewTrajectory;
+    private Point lastTimeUsed;
     private static final Logger logger = Logger.getLogger(Feeder.class.getName()); //logger for this class
 
     /**
@@ -63,6 +67,8 @@ public class Feeder {
         this.maximumNumberOfTrajectories = ReadConfig.Configurations.getHowManyTrajectories();
         this.points = null;
         this.db = new DatabaseCoordNode();
+        this.isNewTrajectory = null;
+        this.lastTimeUsed = null;
     }
 
     /**
@@ -277,6 +283,8 @@ public class Feeder {
      * @throws Exception if there are problems with the config file or we reached the maximum number of trajectories usable
      */
     public List<InputsNetwork> feeder(IdsaLoader idsaLoader) throws Exception {
+        //set info for the time
+        this.isNewTrajectory = Boolean.FALSE;
         //retrieve trajectory
         //if the trajectory is yet not ended I do not need to load the next one
         if (this.finished) {
@@ -295,9 +303,26 @@ public class Feeder {
             idsaLoader.InitPotentialField(this.getTrajectories());
             //reset finished
             this.finished = Boolean.FALSE;
+            //set info for the time
+            this.isNewTrajectory = Boolean.TRUE;
+            this.lastTimeUsed = null;
         }
         //retrieve section form the trajectory
         List<Point> actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
+        List<Point> pointWithTime = new ArrayList<>();
+        for(int i = 0; i< actualPoint.size(); i++){
+            Point actualSinglePoint = actualPoint.get(i);
+            Point toAdd = null;
+            if(i == 0 && this.isNewTrajectory){
+                toAdd = new Point(actualSinglePoint.getLatitude(), actualSinglePoint.getLongitude(), actualSinglePoint.getAltitude(),0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                this.lastTimeUsed = toAdd;
+            }else{
+                toAdd = new Point(actualSinglePoint.getLatitude(), actualSinglePoint.getLongitude(), actualSinglePoint.getAltitude(),0d, this.lastTimeUsed.addTimeToPoint(0.2), this.lastTimeUsed.addTimeToPoint(0.2));
+                this.lastTimeUsed = toAdd;
+            }
+            pointWithTime.add(toAdd);
+        }
+
         //hardcoded low bound for the size
         if(actualPoint.size() < 10){
 
@@ -309,7 +334,7 @@ public class Feeder {
 
         //save points
         this.points = new ArrayList<>();
-        actualPoint.forEach(point -> this.points.add(point.deepCopy()));
+        pointWithTime.forEach(point -> this.points.add(point.deepCopy()));
         //compute the potential field for the actualPoint
         actualPoint.forEach(idsaLoader::compute);
 
@@ -412,7 +437,7 @@ public class Feeder {
 
             Double dist = dis[0];
 
-            //is possible that the ditanc eis already shorter than distance
+            //is possible that the distance is already shorter than distance
             if(dist > distance){
                 Integer val = 1;
                 //check the distance
@@ -516,7 +541,7 @@ public class Feeder {
             tr.setPoints(this.points);
             //last splitting does not have the realsection, I am not adding it to the total list
             if(!tr.getFollowingPart().isEmpty()) totalList.add(tr);
-            if(ReadConfig.Configurations.getValueModel() == 2) tr.setIdsaLoader(idsaLoader);
+            if(Objects.equals(ReadConfig.Configurations.getValueModel(), ReadConfig.Configurations.Convolution)) tr.setIdsaLoader(idsaLoader);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error in loading the trajectories" + e.getMessage());
         }

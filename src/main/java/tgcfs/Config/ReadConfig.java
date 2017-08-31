@@ -63,6 +63,8 @@ public class ReadConfig {
     private Boolean convolution;
     private Boolean clax;
 
+    private Integer pictureSize;
+
 
     /**
      * Constructor with zero parameter
@@ -106,6 +108,9 @@ public class ReadConfig {
         this.convolution = null;
         this.clax = null;
         this.valueModel = null;
+
+
+        this.pictureSize = null;
     }
 
     /**
@@ -398,21 +403,18 @@ public class ReadConfig {
         try {
             // LSTM
             this.LSTM = ((Boolean) jsonObject.get("LSTM"));
-
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("LSTM is wrong or missing.");
         }
         try {
             // convolution
             this.convolution = ((Boolean) jsonObject.get("Convolution"));
-
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("Convolution is wrong or missing.");
         }
         try {
             // clax
             this.clax = ((Boolean) jsonObject.get("Clax"));
-
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("Clax is wrong or missing.");
         }
@@ -427,6 +429,13 @@ public class ReadConfig {
         if(this.clax) this.valueModel = 2;
         if(countTrue > 1) throw new Exception("More models are set as true, only one is allowed");
         if (this.clax && this.train) throw new Exception("Training is not allowed with clax system");
+
+        try {
+            // picturesize
+            this.pictureSize = ((Long) jsonObject.get("PictureSize")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("PictureSize is wrong or missing.");
+        }
     }
 
 
@@ -618,6 +627,7 @@ public class ReadConfig {
                 "hiddenNeuronsClassifier=" + hiddenNeuronsClassifier + ",\n" +
                 "trajectoriesTrained=" + trajectoriesTrained + ",\n" +
                 "train=" + train + ",\n" +
+                "pictureSize=" + pictureSize  + ",\n" +
                 "name='" + name + '\'' + ",\n" +
                 "experiment='" + experiment + '\'' + ",\n" +
                 "path='" + path + '\'' + ",\n" +
@@ -669,12 +679,24 @@ public class ReadConfig {
         return train;
     }
 
+    /**
+     * Get picture size. Since is square only one measure is returned
+     * @return Integer value of the size
+     */
+    public Integer getPictureSize() throws Exception {
+        if(this.pictureSize == null) throw new Exception("Try to access config file before reading it.");
+        return pictureSize;
+    }
+
 
     /**
      * Static class offering all the info read from file
      */
     public static class Configurations{
         private static ReadConfig config;
+        public static Integer LSTM = 0;
+        public static Integer Convolution = 1;
+        public static Integer Clax = 2;
 
         /**
          * Initialise and read the settings from file
@@ -958,6 +980,14 @@ public class ReadConfig {
          */
         public static Integer getValueModel() throws Exception {
             return config.getValueModel();
+        }
+
+        /**
+         * Get picture size. Since is square only one measure is returned
+         * @return Integer value of the size
+         */
+        public static Integer getPictureSize() throws Exception {
+            return config.getPictureSize();
         }
 
     }
