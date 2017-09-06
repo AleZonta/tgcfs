@@ -17,6 +17,26 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getCheckAlsoPast() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getCheckAlsoPast();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertNotNull(conf.getCheckAlsoPast());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getCheckAlsoPast(), ReadConfig.Configurations.getCheckAlsoPast());
+    }
+
+    @Test
     public void getPictureSize() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();

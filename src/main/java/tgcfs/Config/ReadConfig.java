@@ -65,6 +65,7 @@ public class ReadConfig {
 
     private Integer pictureSize;
 
+    private Boolean checkAlsoPast;
 
     /**
      * Constructor with zero parameter
@@ -111,6 +112,7 @@ public class ReadConfig {
 
 
         this.pictureSize = null;
+        this.checkAlsoPast = null;
     }
 
     /**
@@ -436,6 +438,12 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("PictureSize is wrong or missing.");
         }
+        try {
+            // LSTM
+            this.checkAlsoPast = ((Boolean) jsonObject.get("CheckAlsoPast"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("CheckAlsoPast is wrong or missing.");
+        }
     }
 
 
@@ -628,6 +636,7 @@ public class ReadConfig {
                 "trajectoriesTrained=" + trajectoriesTrained + ",\n" +
                 "train=" + train + ",\n" +
                 "pictureSize=" + pictureSize  + ",\n" +
+                "CheckAlsoPast=" + checkAlsoPast + ",\n" +
                 "name='" + name + '\'' + ",\n" +
                 "experiment='" + experiment + '\'' + ",\n" +
                 "path='" + path + '\'' + ",\n" +
@@ -682,10 +691,21 @@ public class ReadConfig {
     /**
      * Get picture size. Since is square only one measure is returned
      * @return Integer value of the size
+     * @throws Exception if I am trying to access it before reading it
      */
     public Integer getPictureSize() throws Exception {
         if(this.pictureSize == null) throw new Exception("Try to access config file before reading it.");
         return pictureSize;
+    }
+
+    /**
+     * Get the flag if it is checking also the past of the trajectory
+     * @return Boolean value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public Boolean getCheckAlsoPast() throws Exception {
+        if(this.checkAlsoPast == null) throw new Exception("Try to access config file before reading it.");
+        return checkAlsoPast;
     }
 
 
@@ -985,11 +1005,20 @@ public class ReadConfig {
         /**
          * Get picture size. Since is square only one measure is returned
          * @return Integer value of the size
+         * @throws Exception if I am trying to access it before reading it
          */
         public static Integer getPictureSize() throws Exception {
             return config.getPictureSize();
         }
 
+        /**
+         * Get the flag if it is checking also the past of the trajectory
+         * @return Boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static Boolean getCheckAlsoPast() throws Exception {
+            return config.getCheckAlsoPast();
+        }
     }
 
 }

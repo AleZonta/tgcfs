@@ -40,13 +40,25 @@ public class RealAgents {
     }
 
     /**
+     * Add new real agent to the total list
+     * @param points real output for the agent
+     * @param realPoint real first part of the agent
+     */
+    public void newAgent(List<Point> points, List<Point> realPoint){
+        Agent agent = new Agent();
+        agent.setRealOutput(points);
+        agent.setRealFirstPart(realPoint);
+        this.realAgents.add(agent);
+    }
+
+    /**
      * Create the real agents directly from the multiple combined list
      * @param combineInputList combined list with input and output
      */
     public void createAgent(List<TrainReal> combineInputList){
         //empty every time I create them
         this.realAgents = new ArrayList<>();
-        combineInputList.forEach(comb -> this.newAgent(comb.getFollowingPart()));
+        combineInputList.forEach(comb -> this.newAgent(comb.getFollowingPart(), comb.getPoints()));
     }
 
     /**

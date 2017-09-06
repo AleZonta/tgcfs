@@ -220,13 +220,17 @@ public class Feeder {
             Double bearing = conversion.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
             Double speed;
+            Double space;
             if(i > 0){
                 Point previousPoint = points.get(i - 1);
                 speed = conversion.obtainSpeed(previousPoint, actualPoint);
+                space = conversion.obtainDistance(previousPoint, actualPoint);
             }else{
                 speed = 0.0;
+                space = 0.0;
             }
-            InputNetwork inputNetwork = new InputNetwork(attraction, speed, bearing);
+
+            InputNetwork inputNetwork = new InputNetwork(attraction, speed, bearing, space);
             inputNetwork.setTargetPoint(possibleTarget);
             totalList.add(inputNetwork);
         });

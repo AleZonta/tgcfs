@@ -1,5 +1,6 @@
 package tgcfs.InputOutput;
 
+import lgds.trajectories.Point;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
@@ -22,7 +23,8 @@ public interface Transformation {
     /**
      * Method that transform the output of one neural network to the input of a another network
      * @param outputs data that we want to transform into input data
+     * @param realFirstPartPoint if I am using also this part I have to add it to the output
      * @return the input of the new network
      */
-    List<InputsNetwork> transform(List<OutputsNetwork> outputs);
+    List<InputsNetwork> transform(List<OutputsNetwork> outputs, List<Point> realFirstPartPoint);
 }

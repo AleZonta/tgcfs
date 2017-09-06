@@ -2,6 +2,7 @@ package tgcfs.Agents;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.InputOutput.Normalisation;
+import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
 import java.lang.reflect.Field;
@@ -42,6 +43,22 @@ public class OutputNetwork implements OutputsNetwork {
         this.speed = speed;
         this.bearing = bearing;
         this.distance = distance;
+        Field[] allFields = OutputNetwork.class.getDeclaredFields();
+        if (allFields.length != outputSize + 1){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
+    }
+
+    /**
+     * Constructor two parameters
+     * @param out {@link InputsNetwork} network to transform
+     */
+    public OutputNetwork(InputsNetwork out){
+        if(!out.getClass().equals(InputNetwork.class)) throw new Error("Only InputNetwork Are accepted");
+        InputNetwork net = (InputNetwork)out;
+        this.speed = Normalisation.decodeSpeed(net.getSpeed());
+        this.bearing = Normalisation.decodeDirectionData(net.getBearing());
+        this.distance = Normalisation.decodeDistance(net.getSpace());
         Field[] allFields = OutputNetwork.class.getDeclaredFields();
         if (allFields.length != outputSize + 1){
             throw new Error("Number of fields and variable expressing that do not correspond.");

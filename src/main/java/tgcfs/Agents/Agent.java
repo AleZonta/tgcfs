@@ -26,12 +26,15 @@ import java.util.stream.IntStream;
  */
 public class Agent extends Models {
     private List<Point> realOutput;
+    private List<Point> realFirstPart;
 
     /**
      * Constructor that calls the father class constructor
      */
     public Agent(){
         super();
+        this.realOutput = null;
+        this.realFirstPart = null;
     }
 
 
@@ -91,5 +94,21 @@ public class Agent extends Models {
             ret = new Point(p.getLatitude(), p.getLongitude(), p.getAltitude(), p.getDated(), p.getTime(), p.getDates());
         }
         return ret;
+    }
+
+    /**
+     * Getter for the first part
+     * @return List of {@link Point}
+     */
+    public List<Point> getRealFirstPart() {
+        return this.realFirstPart;
+    }
+
+    /**
+     * Setter fot the realFirstPart
+     * @param realFirstPart List of {@link Point}
+     */
+    public void setRealFirstPart(List<Point> realFirstPart) {
+        this.realFirstPart = realFirstPart;
     }
 }

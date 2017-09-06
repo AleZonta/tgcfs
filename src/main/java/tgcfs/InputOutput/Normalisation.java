@@ -73,7 +73,7 @@ public class Normalisation {
     /**
      * Normalise value for the speed value.
      * Maximum speed available is ~200km/h
-     * If the speed is faster than the maximum allowed the agent get a fined.
+     * If the speed is faster than the maximum allowed the agent get a fine.
      * Kidding.
      * The value is set to the maximum allowed
      * If the speed is lower than zero, something is wrong or the physics has to be rewritten.
@@ -160,6 +160,23 @@ public class Normalisation {
         Double minSpeed = -1.0;
         Double b = 555.0;
         Double a = 0.0;
+        return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
+    }
+
+    /**
+     * Convert Distance
+     * Need to define a maximum distance
+     * Maximum speed is 55.5m/s
+     * Let's define a maximum transfer of 10 seconds
+     * This means 555 metres maximum
+     * @param toBeConverted distance that has to be de normalised
+     * @return double real value
+     */
+    public static Double convertDistance(Double toBeConverted){
+        Double maxSpeed = 555.0;
+        Double minSpeed = 0.0;
+        Double b = 1.0;
+        Double a = -1.0;
         return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
     }
 

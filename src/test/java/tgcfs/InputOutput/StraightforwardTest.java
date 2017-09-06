@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Agents.OutputNetwork;
-import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
 import java.util.ArrayList;
@@ -35,7 +34,8 @@ public class StraightforwardTest {
         outputNetworks.add(out);
 
         Transformation transformation = new Straightforward();
-        List<InputsNetwork> input = transformation.transform(outputNetworks);
+        //List<InputsNetwork> input = transformation.transform(outputNetworks);
+        throw new Error("Finish to implement");
     }
 
 }

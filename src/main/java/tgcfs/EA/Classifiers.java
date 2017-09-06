@@ -1,7 +1,6 @@
 package tgcfs.EA;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
-import tgcfs.Agents.Agent;
 import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.InputOutput.FollowingTheGraph;
@@ -108,11 +107,8 @@ public class Classifiers extends Algorithm {
                 //evaluate classifier with real agents
                 agents.getRealAgents().forEach(agent -> {
                     try {
-                        if(agent.realOutput().size() < 5){
-                            String testHere ="";
-                        }
                         ((FollowingTheGraph)transformation).setLastPoint(agent.getLastPoint());
-                        OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(((Agent)agent).realOutput()));
+                        OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(agent.realOutput(),agent.getRealFirstPart()));
                         //if the classifier is saying true -> it is correctly judging the agent
                         if(result.getReal()){
                             individual.increaseFitness();

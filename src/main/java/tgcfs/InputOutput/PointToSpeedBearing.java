@@ -2,6 +2,7 @@ package tgcfs.InputOutput;
 
 import lgds.Distance.Distance;
 import lgds.trajectories.Point;
+import tgcfs.Config.ReadConfig;
 
 /**
  * Created by Alessandro Zonta on 31/05/2017.
@@ -24,14 +25,22 @@ public class PointToSpeedBearing {
     public Double obtainSpeed(Point firstPoint, Point secondPoint){
         //speed = distance / time
         Distance dis = new Distance();
-        Double distance = dis.compute(firstPoint, secondPoint);
         Double time = 0.2; //fixed value for IDSA (checked on IDSA)
+        Double distance = dis.compute(firstPoint, secondPoint);
         try {
-            time = new Double(secondPoint.differenceInTime(firstPoint));
-        } catch (Exception e) {
-            //I do not have time, so time will be the one I set before. I do not print the stack trace
+            if (ReadConfig.Configurations.getTrajectoriesType() != 0) {
+                try {
+                    time = new Double(secondPoint.differenceInTime(firstPoint));
+                } catch (Exception e) {
+                    //I do not have time, so time will be the one I set before. I do not print the stack trace
+                    //e.printStackTrace();
+                }
+            }
+        }catch (Exception e) {
             //e.printStackTrace();
         }
+
+
         return distance / time;
     }
 

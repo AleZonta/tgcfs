@@ -25,6 +25,7 @@ public class InputNetwork implements InputsNetwork {
     private Double speed;
     private Double bearing;
     private Point targetPoint;
+    private Double space;
     public static final Integer inputSize = 3; //the size of the input corresponding to the three fields here
 
     /**
@@ -41,7 +42,29 @@ public class InputNetwork implements InputsNetwork {
         this.targetPoint = null;
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
-        if (allFields.length != inputSize + 2){
+        if (allFields.length != inputSize + 3){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
+
+    }
+
+    /**
+     * Constructor with three parameters. all the inputs
+     * It is also normalising the input in the range ±1 for the NN
+     * @param directionAPF Double number corresponding to the direction retrieved form the apf
+     * @param speed Double number corresponding to the speed
+     * @param bearing Double number corresponding to the bearing
+     * @param space distance between the two points
+     */
+    public InputNetwork(Double directionAPF, Double speed, Double bearing, Double space){
+        this.bearing = Normalisation.convertDirectionData(bearing);
+        this.speed = Normalisation.convertSpeed(speed);
+        this.directionAPF = Normalisation.convertDirectionData(directionAPF);
+        this.space = Normalisation.convertDistance(space);
+        this.targetPoint = null;
+
+        Field[] allFields = InputNetwork.class.getDeclaredFields();
+        if (allFields.length != inputSize + 3){
             throw new Error("Number of fields and variable expressing that do not correspond.");
         }
 
@@ -99,5 +122,13 @@ public class InputNetwork implements InputsNetwork {
      */
     public Point getTargetPoint() {
         return targetPoint;
+    }
+
+    /**
+     * Getter for the distance between points
+     * @return Double value
+     */
+    public Double getSpace() {
+        return space;
     }
 }

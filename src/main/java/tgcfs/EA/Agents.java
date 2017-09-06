@@ -207,12 +207,13 @@ public class Agents extends Algorithm {
         //compute Output of the network
         INDArray lastOutput = null;
         for (TrainReal inputsNetwork : input) {
+            //now for the number of time step that I want to check save the output
+            List<OutputsNetwork> outputsNetworks = new ArrayList<>();
             for (InputsNetwork in : inputsNetwork.getTrainingPoint()) {
+                //If I am also checking the first part in the evaluation I need to add it
                 lastOutput = model.computeOutput(in.serialise());
             }
 
-            //now for the number of time step that I want to check save the output
-            List<OutputsNetwork> outputsNetworks = new ArrayList<>();
 
             OutputNetwork out = new OutputNetwork();
             out.deserialise(lastOutput);
@@ -276,7 +277,7 @@ public class Agents extends Algorithm {
                 individual.getMyInputandOutput().forEach(trainReal -> {
                     ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
                     try {
-                        tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(trainReal.getOutputComputed()));
+                        tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(trainReal.getOutputComputed(), trainReal.getPoints()));
                         //if the classifier is saying true -> it is wrongly judging the agent
                         if(result.getReal()){
                             individual.increaseFitness();

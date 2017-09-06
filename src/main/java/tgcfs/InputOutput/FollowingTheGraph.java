@@ -3,6 +3,7 @@ package tgcfs.InputOutput;
 import lgds.trajectories.Point;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.InputNetwork;
+import tgcfs.Config.ReadConfig;
 import tgcfs.Loader.Feeder;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -61,15 +62,26 @@ public class FollowingTheGraph implements Transformation {
      * Using the graph I will find next position and with that position I will compute real bearing and speed
      * The method throws two errors. If the graph or the last point are not instantiate, the error is raised.
      * @param outputs data that we want to transform into input data.
+     * @param realFirstPartPoint if I am using also this part I have to add it to the output
      * @return the input of the new network (classifier)
      */
     @Override
-    public List<InputsNetwork> transform(List<OutputsNetwork> outputs) {
+    public List<InputsNetwork> transform(List<OutputsNetwork> outputs, List<Point> realFirstPartPoint) {
         if (this.feeder == null) throw new NullPointerException("System with the graph not instantiate");
         if (this.lastPoint == null) throw new NullPointerException("Last Point not instantiate");
 
         List<InputsNetwork> convertedInput = new ArrayList<>();
         PointToSpeedBearing converterPointSB = new PointToSpeedBearing();
+
+        //If I am also checking the first part I am adding that to the result to compute
+        try {
+            if(ReadConfig.Configurations.getCheckAlsoPast()){
+                List<InputsNetwork> inputNetworks = this.feeder.obtainInput(realFirstPartPoint, 0d,null);
+                //System.out.println(inputNetworks.size());
+                convertedInput.addAll(inputNetworks);
+            }
+        } catch (Exception ignored) {}
+
 
         outputs.forEach(outputsNetwork -> {
             OutputNetwork output = (OutputNetwork) outputsNetwork;
