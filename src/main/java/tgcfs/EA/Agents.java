@@ -222,7 +222,7 @@ public class Agents extends Algorithm {
             //I am using the last direction present into input I am adding that one to the last output
 
             Double directionAPF = ((InputNetwork) inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
-            for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
+            for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps() - 1; i++) {
                 //transform output into input and add the direction
                 OutputNetwork outLocal = new OutputNetwork();
                 outLocal.deserialise(lastOutput);

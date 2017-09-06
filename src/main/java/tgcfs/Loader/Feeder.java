@@ -69,6 +69,9 @@ public class Feeder {
         this.db = new DatabaseCoordNode();
         this.isNewTrajectory = null;
         this.lastTimeUsed = null;
+
+        //set KdTree search
+        this.graph.setOptimisedGraph(Boolean.TRUE);
     }
 
     /**
