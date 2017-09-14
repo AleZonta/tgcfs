@@ -2,6 +2,7 @@ package tgcfs.Classifiers;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.ENN;
@@ -27,6 +28,13 @@ import java.util.List;
  * The Classier is offering the methods to evolve the NN using an evolutionary algorithm
  */
 public class Classifier extends ENN implements EvolvableModel {
+
+    /**
+     * Default constructor
+     */
+    public Classifier(){}
+
+
     /**
      * Constructor of the classifier. It generates the ElmanNetwork.
      *
@@ -98,6 +106,51 @@ public class Classifier extends ENN implements EvolvableModel {
      */
     @Override
     public void fit(List<InputsNetwork> input, List<Point> points) {
-        throw new NoSuchMethodError("Method not implemented");
+        //creation of a data set of data -> use to train the network
+        INDArray array = Nd4j.create(input.get(0).serialise().columns(), input.size());
+        INDArray outputs = Nd4j.create(1, points.size());
+        this.createOutput(input,points,array,outputs);
+        for(int i = 0; i < input.size(); i++){
+            this.fit(Nd4j.toFlattened(array.getColumn(i)),Nd4j.toFlattened(outputs.getColumn(i)));
+        }
     }
+
+
+    /**
+     * Create the INDArray from normal vector
+     * @param input inputsnetwork containing the input
+     * @param points real points of the inputs
+     * @param array INDArray input
+     * @param outputs INDArray output
+     */
+    protected void createOutput(List<InputsNetwork> input, List<Point> points, INDArray array, INDArray outputs){
+        for(int i = 0; i < input.size(); i++) {
+            INDArray l = input.get(i).serialise();
+            array.putColumn(i, l);
+        }
+
+        for(int i = 0; i < points.size(); i++){
+            outputs.putScalar(i, points.get(i).getLatitude());
+        }
+    }
+
+
+    /**
+     * Compute output given the time series
+     * @param input list of {@link InputNetwork}
+     * @return {@link INDArray}
+     */
+    public INDArray computeOutput(List<InputsNetwork> input) {
+        INDArray array = Nd4j.create(input.get(0).serialise().columns(), input.size());
+        for(int i = 0; i < input.size(); i++) {
+            INDArray l = input.get(i).serialise();
+            array.putColumn(i, l);
+        }
+        INDArray result = Nd4j.create(1, super.output);
+        for(int i = 0; i < input.size(); i++){
+            result = this.computeOutput(Nd4j.toFlattened(array.getColumn(i)));
+        }
+        return result;
+    }
+
 }

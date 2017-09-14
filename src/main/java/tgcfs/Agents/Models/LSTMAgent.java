@@ -90,8 +90,6 @@ public class LSTMAgent extends LSTM implements EvolvableModel {
     @Override
     public void fit(List<InputsNetwork> input, List<Point> points) {
         //creation of a data set of data -> use to train the network
-        Distance d = new Distance();
-
         INDArray array = Nd4j.create(input.get(0).serialise().columns(), input.size());
         INDArray outputs = Nd4j.create(input.get(0).serialise().columns(), input.size());
         this.createOutput(input,points,array,outputs);

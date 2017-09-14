@@ -29,6 +29,7 @@ public class TrainReal {
     private final String conditionalImage;
     private final String normalImage;
     private List<OutputsNetwork> outputComputed;
+    private List<Point> realPointsOutputComputed;
     private IdsaLoader idsaLoader;
 
     /**
@@ -45,6 +46,7 @@ public class TrainReal {
         this.normalImage = Paths.get(".").toAbsolutePath().normalize().toString() + "/image.png";
         this.idsaLoader = null;
         this.outputComputed = null;
+        this.realPointsOutputComputed = null;
     }
 
     /**
@@ -61,6 +63,8 @@ public class TrainReal {
         this.normalImage = normalImage;
         this.idsaLoader = null;
         this.outputComputed = null;
+        this.realPointsOutputComputed = null;
+
     }
 
 
@@ -78,6 +82,8 @@ public class TrainReal {
         this.normalImage = Paths.get(".").toAbsolutePath().normalize().toString() + "/image.png";
         this.idsaLoader = idsaLoader;
         this.outputComputed = null;
+        this.realPointsOutputComputed = null;
+
     }
 
 
@@ -175,5 +181,21 @@ public class TrainReal {
      */
     public String getNormalImage() {
         return this.normalImage;
+    }
+
+    /**
+     * Getter fot the real point output computed
+     * @return List<Point>
+     */
+    public List<Point> getRealPointsOutputComputed() {
+        return this.realPointsOutputComputed;
+    }
+
+    /**
+     * Setter fot the list of the real output computed
+     * @param realPointsOutputComputed List<Point>
+     */
+    public void setRealPointsOutputComputed(List<Point> realPointsOutputComputed) {
+        this.realPointsOutputComputed = realPointsOutputComputed;
     }
 }

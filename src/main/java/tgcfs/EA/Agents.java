@@ -205,95 +205,48 @@ public class Agents extends Algorithm {
      */
     private void runLSTM(List<TrainReal> input, EvolvableModel model, Individual individual) throws Exception {
         //compute Output of the network
-        final INDArray[] lastOutput = {null};
+        INDArray lastOutput = null;
 
-
-        Integer number = 1;
+        Integer number;
         try{
             number = ReadConfig.Configurations.getAgentTimeSteps();
         }catch (Exception e){
-            //nothing
+            number = 1;
         }
-        Integer finalNumber = number;
-
-        //lets test if i can arrange some parallel execution here
-        input.parallelStream().forEach(inputsNetwork -> {
-
-            EvolvableModel hereModel = individual.getModel().deepCopy();
-            try {
-                hereModel.setWeights(individual.getObjectiveParameters());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
 
+        for (TrainReal inputsNetwork : input) {
             //now for the number of time step that I want to check save the output
             List<OutputsNetwork> outputsNetworks = new ArrayList<>();
             for (InputsNetwork in : inputsNetwork.getTrainingPoint()) {
                 //If I am also checking the first part in the evaluation I need to add it
-                lastOutput[0] = hereModel.computeOutput(in.serialise());
+                lastOutput = model.computeOutput(in.serialise());
             }
+
+
             OutputNetwork out = new OutputNetwork();
-            out.deserialise(lastOutput[0]);
+            out.deserialise(lastOutput);
             outputsNetworks.add(out);
 
             //output has only two fields, input needs three
             //I am using the last direction present into input I am adding that one to the last output
 
             Double directionAPF = ((InputNetwork) inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
-
-
-            for (int i = 0; i < finalNumber - 1; i++) {
+            for (int i = 0; i < number - 1; i++) {
                 //transform output into input and add the direction
                 OutputNetwork outLocal = new OutputNetwork();
-                outLocal.deserialise(lastOutput[0]);
+                outLocal.deserialise(lastOutput);
                 InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
-                lastOutput[0] = hereModel.computeOutput(inputLocal.serialise());
+                lastOutput = model.computeOutput(inputLocal.serialise());
 
                 out = new OutputNetwork();
-                out.deserialise(lastOutput[0]);
+                out.deserialise(lastOutput);
                 outputsNetworks.add(out);
             }
             //assign the output to this individual
             inputsNetwork.setOutputComputed(outputsNetworks);
             individual.addMyInputandOutput(inputsNetwork);
-        });
-
-
-
-
-//        for (TrainReal inputsNetwork : input) {
-//            //now for the number of time step that I want to check save the output
-//            List<OutputsNetwork> outputsNetworks = new ArrayList<>();
-//            for (InputsNetwork in : inputsNetwork.getTrainingPoint()) {
-//                //If I am also checking the first part in the evaluation I need to add it
-//                lastOutput = model.computeOutput(in.serialise());
-//            }
-//
-//
-//            OutputNetwork out = new OutputNetwork();
-//            out.deserialise(lastOutput);
-//            outputsNetworks.add(out);
-//
-//            //output has only two fields, input needs three
-//            //I am using the last direction present into input I am adding that one to the last output
-//
-//            Double directionAPF = ((InputNetwork) inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
-//            for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps() - 1; i++) {
-//                //transform output into input and add the direction
-//                OutputNetwork outLocal = new OutputNetwork();
-//                outLocal.deserialise(lastOutput);
-//                InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
-//                lastOutput = model.computeOutput(inputLocal.serialise());
-//
-//                out = new OutputNetwork();
-//                out.deserialise(lastOutput);
-//                outputsNetworks.add(out);
-//            }
-//            //assign the output to this individual
-//            inputsNetwork.setOutputComputed(outputsNetworks);
-//            individual.addMyInputandOutput(inputsNetwork);
-//        }
+        }
     }
 
 

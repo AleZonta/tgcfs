@@ -1,7 +1,10 @@
 package tgcfs.Performances;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.EA.Individual;
+import tgcfs.Loader.TrainReal;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -101,6 +105,17 @@ public class SaveToFile {
         public static void dumpPopulation(String name, List<Individual> population) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.dumpEverything(name, population);
+        }
+
+
+        /**
+         * Save in JSON format the trajectory and the generated part of it
+         * @param combineInputList List of {@link TrainReal}
+         * @throws Exception  if the class is not instantiate
+         */
+        public static void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.dumpTrajectoryAndGeneratedPart(combineInputList);
         }
     }
 
@@ -236,6 +251,58 @@ public class SaveToFile {
             });
         }catch (Exception e){
             logger.log(Level.WARNING, "Error with " + name + " Zip File " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Save in JSON format the trajectory and the generated part of it
+     * @param combineInputList List of {@link TrainReal}
+     */
+    private void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList){
+        String path = this.currentPath + "trajectory-generatedPoints" + ".zip";
+        try (FileOutputStream zipFile = new FileOutputStream(new File(path));
+             ZipOutputStream zos = new ZipOutputStream(zipFile);
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
+        ){
+            ZipEntry csvFile = new ZipEntry(  "trajectory-generatedPoints.json");
+            zos.putNextEntry(csvFile);
+
+            JSONObject totalObj = new JSONObject();
+
+            IntStream.range(0, combineInputList.size()).forEach(i -> {
+
+                TrainReal el = combineInputList.get(i);
+
+                JSONObject obj = new JSONObject();
+                JSONArray trajectory = new JSONArray();
+                //put the trajectory
+                trajectory.addAll(el.getPoints());
+                obj.put("trajectory", trajectory);
+
+                JSONArray generated = new JSONArray();
+                generated.addAll(el.getRealPointsOutputComputed());
+                obj.put("generated", generated);
+
+                JSONArray real = new JSONArray();
+                real.addAll(el.getFollowingPart());
+                obj.put("real", real);
+
+                String name = "trajectory-" + i;
+                totalObj.put(name, obj);
+            });
+
+            totalObj.put("size", combineInputList.size());
+            try {
+                writer.write(totalObj.toJSONString());
+                writer.newLine();
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Error appending line to trajectory-generatedPoints CSV File " + e.getMessage());
+                e.printStackTrace();
+            }
+
+        }catch (Exception e){
+            logger.log(Level.WARNING, "Error with trajectory-generatedPoints Zip File " + e.getMessage());
         }
     }
 }

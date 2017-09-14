@@ -4,12 +4,15 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 import tgcfs.NN.Models;
+import tgcfs.Networks.DeepLearning4j.MultiLayerNetworkBis;
 
 import java.util.stream.IntStream;
 
@@ -26,11 +29,16 @@ import java.util.stream.IntStream;
  * Class implementing the Elman Neural Network
  */
 public class ENN extends Models implements Network {
-    protected MultiLayerNetwork net; //neural network, brain of the agent
+    protected MultiLayerNetworkBis net; //neural network, brain of the agent
     protected Integer arrayLength; //length of the weight array
     protected Integer input;
     protected Integer hiddenNeurons;
     protected Integer output;
+
+    /**
+     * Default constructor
+     */
+    public ENN(){ }
 
     /**
      * Constructor of the classifier. It generates the ElmanNetwork.
@@ -42,22 +50,22 @@ public class ENN extends Models implements Network {
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(12345)
                 .weightInit(WeightInit.XAVIER)
-                .regularization(true)
-                .l2(0.001)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .learningRate(0.001)
+                .learningRate(0.01)
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(input + HiddenNeurons).nOut(HiddenNeurons)
                         .activation(Activation.TANH)
                         .build())
-                .layer(1, new DenseLayer.Builder().nIn(HiddenNeurons).nOut(output)
+                .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).nIn(HiddenNeurons).nOut(output)
                         .activation(Activation.TANH)
                         .build())
                 .pretrain(false).backprop(true)
                 .build();
 
-        this.net = new MultiLayerNetwork(conf);
+        this.net = new MultiLayerNetworkBis(conf);
         this.net.init();
+
+        this.net.setListeners(new ScoreIterationListener(20));
 
 
         //elman neural network requires the weight of the recurrent connection fixed to 1
@@ -105,17 +113,31 @@ public class ENN extends Models implements Network {
             IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,pastInput.getDouble(i-this.input)));
         }
 
-        return this.net.rnnTimeStep(total);
+//        return this.net.rnnTimeStep(total);
+        return this.net.output(total);
     }
 
     /**
      * fit the network
+     *
+     * Need to fix the elman recurrent nodes for the network
+     *
      * @param inputs input of the network
      * @param labels real point of the input
      */
     @Override
     public void fit(INDArray inputs, INDArray labels) {
-        throw new NoSuchMethodError("Method not implemented");
+        INDArray pastInput = this.net.getInputFirstLayer();
+        //load the context value of the hidden layer
+        INDArray total = Nd4j.create(1,this.input + this.hiddenNeurons);
+        IntStream.range(0, this.input).forEach(i -> total.putScalar(i, inputs.getDouble(i)));
+        if(pastInput == null) {
+            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,0.5));
+        }else{
+            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,pastInput.getDouble(i-this.input)));
+        }
+
+        this.net.fit(total, labels);
     }
 
     /**

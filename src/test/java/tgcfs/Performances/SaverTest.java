@@ -1,15 +1,20 @@
 package tgcfs.Performances;
 
+import lgds.trajectories.Point;
 import nl.tno.idsa.framework.config.ConfigFile;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import tgcfs.Agents.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
+import tgcfs.Loader.TrainReal;
+import tgcfs.NN.InputsNetwork;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -24,6 +29,43 @@ import static junit.framework.TestCase.assertEquals;
  * a.zonta@vu.nl
  */
 public class SaverTest {
+    @Test
+    public void dumpTrajectoryAndGeneratedPart() throws Exception {
+        new ReadConfig.Configurations();
+        List<InputsNetwork> input = new ArrayList<>();
+        input.add(new InputNetwork(15.0, 30.8, 15.0));
+        input.add(new InputNetwork(16.0, 31.8, 15.0));
+        input.add(new InputNetwork(17.0, 32.8, 15.0));
+        input.add(new InputNetwork(18.0, 33.8, 15.0));
+        input.add(new InputNetwork(19.0, 34.8, 15.0));
+        List<Point> p = new ArrayList<>();
+        p.add(new Point(3d,5d));
+        p.add(new Point(3d,5d));
+        p.add(new Point(3d,5d));
+        p.add(new Point(3d,5d));
+        TrainReal t = new TrainReal(input, p);
+        t.setRealPointsOutputComputed(p);
+        t.setPoints(p);
+
+        TrainReal tt = new TrainReal(input, p);
+        tt.setRealPointsOutputComputed(p);
+        tt.setPoints(p);
+
+        List<TrainReal> list = new ArrayList<>();
+        list.add(t);
+        list.add(tt);
+
+        IntStream.range(0, 1000).forEach(i -> {
+            TrainReal ttt = new TrainReal(input, p);
+            ttt.setRealPointsOutputComputed(p);
+            ttt.setPoints(p);
+            list.add(ttt);
+        });
+
+        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1");
+        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(list);
+    }
+
     @Test
     public void dumpPopulation() throws Exception {
         new ReadConfig.Configurations();
