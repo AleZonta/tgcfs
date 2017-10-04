@@ -1,7 +1,9 @@
 package tgcfs.EA;
 
 import org.junit.Test;
+import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.LSTMAgent;
+import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.NN.EvolvableModel;
 
@@ -21,6 +23,25 @@ import static junit.framework.TestCase.assertNotNull;
  * a.zonta@vu.nl
  */
 public class AlgorithmTest {
+    @Test
+    public void getMaxFitnessAchievable() throws Exception {
+        new ReadConfig.Configurations();
+        //Random LSTM
+        EvolvableModel model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
+        Agents agentsCompeting = new Agents();
+        agentsCompeting.generatePopulation(model);
+        System.out.println("agent max fitness achievable -> " + agentsCompeting.getMaxFitnessAchievable());
+
+        Classifiers classifiers = new Classifiers();
+        classifiers.generatePopulation(model);
+        System.out.println("classifier max fitness achievable -> " + classifiers.getMaxFitnessAchievable());
+
+    }
+    @Test
+    public void getFittestIndividual() throws Exception {
+        throw new Exception("Not tested");
+    }
+
     @Test
     public void generatePopulation() throws Exception {
         throw new Exception("Not tested");

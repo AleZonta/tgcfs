@@ -27,6 +27,8 @@ import static junit.framework.TestCase.assertNotNull;
  * a.zonta@vu.nl
  */
 public class AgentsTest {
+
+
     @Test
     public void trainNetwork() throws Exception {
         throw new Exception("Not tested");

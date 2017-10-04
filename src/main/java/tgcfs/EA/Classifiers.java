@@ -8,6 +8,7 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Classifiers.OutputNetwork;
+import tgcfs.Config.ReadConfig;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -39,6 +40,18 @@ public class Classifiers extends Algorithm {
      */
     public Classifiers() throws Exception {
         super();
+    }
+
+    /**
+     * Generate the population for the EA
+     * set the max fitness achievable by an agent
+     * @param model the model of the population
+     * @throws Exception exception
+     */
+    @Override
+    public void generatePopulation(EvolvableModel model) throws Exception {
+        super.generatePopulation(model);
+        this.maxFitnessAchievable = (ReadConfig.Configurations.getAgentPopulationSize() + ReadConfig.Configurations.getAgentOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained();
     }
 
     /**

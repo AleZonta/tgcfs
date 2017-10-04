@@ -40,6 +40,7 @@ import java.util.logging.Level;
  */
 public class Agents extends Algorithm {
 
+
     /**
      * Constructor zero parameter
      * Call the super constructor
@@ -47,6 +48,18 @@ public class Agents extends Algorithm {
      */
     public Agents() throws Exception {
         super();
+    }
+
+    /**
+     * Generate the population for the EA
+     * set the max fitness achievable by an agent
+     * @param model the model of the population
+     * @throws Exception exception
+     */
+    @Override
+    public void generatePopulation(EvolvableModel model) throws Exception {
+        super.generatePopulation(model);
+        this.maxFitnessAchievable = (ReadConfig.Configurations.getClassifierPopulationSize() + ReadConfig.Configurations.getClassifierOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained();
     }
 
     /**
@@ -386,7 +399,7 @@ public class Agents extends Algorithm {
         //obtain list of inputs
         try {
             if(ReadConfig.Configurations.getTrain()) {
-                throw new Exception("How to train a LSTM without bad examples");
+                throw new Exception("How should i train a LSTM without bad examples???");
 //                combineInputList.forEach(trainReal -> {
 //                    List<InputsNetwork> inputsNetworks = trainReal.getTrainingPoint();
 //                    List<Point> points = trainReal.getPoints();
@@ -405,8 +418,6 @@ public class Agents extends Algorithm {
             logger.log(Level.SEVERE, "Error " + e.getMessage());
         }
     }
-
-
 
 
 }

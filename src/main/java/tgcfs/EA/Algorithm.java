@@ -37,6 +37,7 @@ import java.util.stream.IntStream;
  */
 public abstract class Algorithm {
     private List<Individual> population; //representation of the population
+    protected int maxFitnessAchievable;
     protected static final Logger logger = Logger.getLogger(Algorithm.class.getName()); //logger for this class
 
 
@@ -47,6 +48,8 @@ public abstract class Algorithm {
      */
     public Algorithm() throws Exception{
         this.population = new ArrayList<>();
+        this.maxFitnessAchievable = 0;
+
     }
 
     /**
@@ -329,6 +332,23 @@ public abstract class Algorithm {
     }
 
 
+    /**
+     * Get the fittest individual of the population
+     * @return fittest {@link Individual}
+     */
+    public Individual getFittestIndividual(){
+        //sort the list
+        this.population.sort(Comparator.comparing(Individual::getFitness));
+        return this.population.get(this.population.size() - 1);
+    }
 
+
+    /**
+     * Getter for the max fitness achievable by an agent
+     * @return int value of fitness
+     */
+    public int getMaxFitnessAchievable() {
+        return maxFitnessAchievable;
+    }
 
 }

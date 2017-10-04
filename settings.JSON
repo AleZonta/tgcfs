@@ -37,6 +37,7 @@
   "EvolveAgentMoreThanClassifierTimesteps": 0,
   "CheckAlsoPastExplanation": "true -> it checks also the training trajectory to decide if the new part is okay or not. False -> it checks only the new part",
   "CheckAlsoPast": true,
+  "AutomaticCalibration": true,
   "_____________________________Fifth section": "Settings for the models",
   "HiddenLayersAgent": 1,
   "HiddenNeuronsAgent": 5,

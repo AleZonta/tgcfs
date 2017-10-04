@@ -67,6 +67,8 @@ public class ReadConfig {
     private Integer pictureSize;
 
     private Boolean checkAlsoPast;
+    private Boolean automaticCalibration;
+
 
     /**
      * Constructor with zero parameter
@@ -115,6 +117,8 @@ public class ReadConfig {
         this.pictureSize = null;
         this.checkAlsoPast = null;
         this.dumpTrajectoryPointAndMeaning = null;
+
+        this.automaticCalibration = null;
     }
 
     /**
@@ -122,7 +126,7 @@ public class ReadConfig {
      * @return String with the path
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getTrajectoriesType() throws Exception {
+    public int getTrajectoriesType() throws Exception {
         if(this.trajectoriesType == null) throw new Exception("Try to access config file before reading it.");
         return this.trajectoriesType;
     }
@@ -132,7 +136,7 @@ public class ReadConfig {
      * @return Integer numberh
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getHowManySplitting() throws Exception {
+    public int getHowManySplitting() throws Exception {
         if(this.howManySplitting == null) throw new Exception("Try to access config file before reading it.");
         return this.howManySplitting;
     }
@@ -142,7 +146,7 @@ public class ReadConfig {
      * @return Integer number with the size
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getAgentOffspringSize() throws Exception {
+    public int getAgentOffspringSize() throws Exception {
         if(this.agentOffspringSize == null) throw new Exception("Try to access config file before reading it.");
         return this.agentOffspringSize;
     }
@@ -152,7 +156,7 @@ public class ReadConfig {
      * @return Integer number with the size
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getAgentPopulationSize() throws Exception {
+    public int getAgentPopulationSize() throws Exception {
         if(this.agentPopulationSize == null) throw new Exception("Try to access config file before reading it.");
         return this.agentPopulationSize;
     }
@@ -162,7 +166,7 @@ public class ReadConfig {
      * @return Double number
      * @throws Exception if I am trying to access it before reading it
      */
-    public Double getAgentAlpha() throws Exception {
+    public double getAgentAlpha() throws Exception {
         if(this.agentAlpha == null) throw new Exception("Try to access config file before reading it.");
         return this.agentAlpha;
     }
@@ -172,7 +176,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getAgentTimeSteps() throws Exception {
+    public int getAgentTimeSteps() throws Exception {
         if(this.agentTimeSteps == null) throw new Exception("Try to access config file before reading it.");
         return this.agentTimeSteps;
     }
@@ -182,7 +186,7 @@ public class ReadConfig {
      * @return Integer number with the size
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getClassifierOffspringSize() throws Exception {
+    public int getClassifierOffspringSize() throws Exception {
         if(this.classifierOffspringSize == null) throw new Exception("Try to access config file before reading it.");
         return this.classifierOffspringSize;
     }
@@ -192,7 +196,7 @@ public class ReadConfig {
      * @return Integer number with the size
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getClassifierPopulationSize() throws Exception {
+    public int getClassifierPopulationSize() throws Exception {
         if(this.classifierPopulationSize == null) throw new Exception("Try to access config file before reading it.");
         return this.classifierPopulationSize;
     }
@@ -202,7 +206,7 @@ public class ReadConfig {
      * @return Double number
      * @throws Exception if I am trying to access it before reading it
      */
-    public Double getClassifierAlpha() throws Exception {
+    public double getClassifierAlpha() throws Exception {
         if(this.classifierAlpha == null) throw new Exception("Try to access config file before reading it.");
         return this.classifierAlpha;
     }
@@ -212,7 +216,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getClassifierTimeSteps() throws Exception {
+    public int getClassifierTimeSteps() throws Exception {
         if(this.classifierTimeSteps == null) throw new Exception("Try to access config file before reading it.");
         return this.classifierTimeSteps;
     }
@@ -451,6 +455,11 @@ public class ReadConfig {
             this.dumpTrajectoryPointAndMeaning = ((Boolean) jsonObject.get("DumpTrajectoryPointAndMeaning"));
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("DumpTrajectoryPointAndMeaning is wrong or missing.");
+        }try {
+            // AutomaticCalibration
+            this.automaticCalibration = ((Boolean) jsonObject.get("AutomaticCalibration"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("AutomaticCalibration is wrong or missing.");
         }
     }
 
@@ -460,7 +469,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception  if I am trying to access it before reading it
      */
-    public Integer getHiddenLayersAgent() throws Exception {
+    public int getHiddenLayersAgent() throws Exception {
         if(this.hiddenLayersAgent == null) throw new Exception("Try to access config file before reading it.");
         return this.hiddenLayersAgent;
     }
@@ -470,7 +479,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception  if I am trying to access it before reading it
      */
-    public Integer getHiddenNeuronsAgent() throws Exception {
+    public int getHiddenNeuronsAgent() throws Exception {
         if(this.hiddenNeuronsAgent == null) throw new Exception("Try to access config file before reading it.");
         return this.hiddenNeuronsAgent;
     }
@@ -480,7 +489,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception  if I am trying to access it before reading it
      */
-    public Integer getHiddenNeuronsClassifier() throws Exception {
+    public int getHiddenNeuronsClassifier() throws Exception {
         if(this.hiddenNeuronsClassifier == null) throw new Exception("Try to access config file before reading it.");
         return this.hiddenNeuronsClassifier;
     }
@@ -490,7 +499,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception  if I am trying to access it before reading it
      */
-    public Integer getHowManyTrajectories() throws Exception {
+    public int getHowManyTrajectories() throws Exception {
         if(this.howManyTrajectories == null) throw new Exception("Try to access config file before reading it.");
         return this.howManyTrajectories;
     }
@@ -500,7 +509,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception  if I am trying to access it before reading it
      */
-    public Integer getMaxGenerations() throws Exception {
+    public int getMaxGenerations() throws Exception {
         if(this.maxGenerations == null) throw new Exception("Try to access config file before reading it.");
         return this.maxGenerations;
     }
@@ -541,7 +550,7 @@ public class ReadConfig {
      * @return Boolean Value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean getDumpPop() throws Exception {
+    public boolean getDumpPop() throws Exception {
         if(this.dumpPop == null) throw new Exception("Try to access config file before reading it.");
         return this.dumpPop;
     }
@@ -551,7 +560,7 @@ public class ReadConfig {
      * @return Boolean Value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean getLoadDumpPop() throws Exception {
+    public boolean getLoadDumpPop() throws Exception {
         if(this.loadDumpPop == null) throw new Exception("Try to access config file before reading it.");
         return this.loadDumpPop;
     }
@@ -561,7 +570,7 @@ public class ReadConfig {
      * @return Integer Value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getSeed() throws Exception {
+    public int getSeed() throws Exception {
         if(this.seed == null) throw new Exception("Try to access config file before reading it.");
         return this.seed;
     }
@@ -571,7 +580,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getMutation() throws Exception {
+    public int getMutation() throws Exception {
         if(this.mutation == null) throw new Exception("Try to access config file before reading it.");
         return this.mutation;
     }
@@ -582,7 +591,7 @@ public class ReadConfig {
      * @return Boolean Value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean getLSTM() throws Exception {
+    public boolean getLSTM() throws Exception {
         if(this.LSTM == null) throw new Exception("Try to access config file before reading it.");
         return this.LSTM;
     }
@@ -591,7 +600,7 @@ public class ReadConfig {
      * @return Boolean Value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean getConvolution() throws Exception {
+    public boolean getConvolution() throws Exception {
         if(this.convolution == null) throw new Exception("Try to access config file before reading it.");
         return this.convolution;
     }
@@ -600,7 +609,7 @@ public class ReadConfig {
      * @return Boolean Value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean getClax() throws Exception {
+    public boolean getClax() throws Exception {
         if(this.clax == null) throw new Exception("Try to access config file before reading it.");
         return this.clax;
     }
@@ -610,7 +619,7 @@ public class ReadConfig {
      * @return Integer Value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getValueModel() throws Exception {
+    public int getValueModel() throws Exception {
         if(this.valueModel == null) throw new Exception("Try to access config file before reading it.");
         return this.valueModel;
     }
@@ -645,6 +654,7 @@ public class ReadConfig {
                 "train=" + train + ",\n" +
                 "pictureSize=" + pictureSize  + ",\n" +
                 "CheckAlsoPast=" + checkAlsoPast + ",\n" +
+                "AutomaticCalibration=" + automaticCalibration + ",\n" +
                 "name='" + name + '\'' + ",\n" +
                 "experiment='" + experiment + '\'' + ",\n" +
                 "path='" + path + '\'' + ",\n" +
@@ -662,7 +672,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getTrajectoriesTrained() throws Exception {
+    public int getTrajectoriesTrained() throws Exception {
         if(this.trajectoriesTrained == null) throw new Exception("Try to access config file before reading it.");
         return this.trajectoriesTrained;
     }
@@ -672,7 +682,7 @@ public class ReadConfig {
      * @return Boolean value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean isRecombination() throws Exception {
+    public boolean isRecombination() throws Exception {
         if(this.recombination == null) throw new Exception("Try to access config file before reading it.");
         return this.recombination;
     }
@@ -682,7 +692,7 @@ public class ReadConfig {
      * @return Integer number
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getTimestepEvolveAgentOverClassifier() throws Exception {
+    public int getTimestepEvolveAgentOverClassifier() throws Exception {
         if(this.timestepEvolveAgentOverClassifier == null) throw new Exception("Try to access config file before reading it.");
         return this.timestepEvolveAgentOverClassifier;
     }
@@ -692,7 +702,7 @@ public class ReadConfig {
      * @return Boolean number
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean getTrain() throws Exception {
+    public boolean getTrain() throws Exception {
         if(this.train == null) throw new Exception("Try to access config file before reading it.");
         return train;
     }
@@ -702,7 +712,7 @@ public class ReadConfig {
      * @return Integer value of the size
      * @throws Exception if I am trying to access it before reading it
      */
-    public Integer getPictureSize() throws Exception {
+    public int getPictureSize() throws Exception {
         if(this.pictureSize == null) throw new Exception("Try to access config file before reading it.");
         return pictureSize;
     }
@@ -712,7 +722,7 @@ public class ReadConfig {
      * @return Boolean value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean getCheckAlsoPast() throws Exception {
+    public boolean getCheckAlsoPast() throws Exception {
         if(this.checkAlsoPast == null) throw new Exception("Try to access config file before reading it.");
         return checkAlsoPast;
     }
@@ -722,9 +732,19 @@ public class ReadConfig {
      * @return Boolean value
      * @throws Exception if I am trying to access it before reading it
      */
-    public Boolean getDumpTrajectoryPointAndMeaning() throws Exception {
+    public boolean getDumpTrajectoryPointAndMeaning() throws Exception {
         if(this.dumpTrajectoryPointAndMeaning == null) throw new Exception("Try to access config file before reading it.");
         return this.dumpTrajectoryPointAndMeaning;
+    }
+
+    /**
+     * Getter for the automatic calibration of the two population
+     * @return Boolean value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public boolean getAutomaticCalibration() throws Exception {
+        if(this.automaticCalibration == null) throw new Exception("Try to access config file before reading it.");
+        return this.automaticCalibration;
     }
 
 
@@ -733,9 +753,9 @@ public class ReadConfig {
      */
     public static class Configurations{
         private static ReadConfig config;
-        public static Integer LSTM = 0;
-        public static Integer Convolution = 1;
-        public static Integer Clax = 2;
+        public static int LSTM = 0;
+        public static int Convolution = 1;
+        public static int Clax = 2;
 
         /**
          * Initialise and read the settings from file
@@ -751,7 +771,7 @@ public class ReadConfig {
          * @return integer value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getSeed() throws Exception {
+        public static int getSeed() throws Exception {
             return config.getSeed();
         }
 
@@ -760,7 +780,7 @@ public class ReadConfig {
          * @return Boolean Value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean getDumpPop() throws Exception {
+        public static boolean getDumpPop() throws Exception {
             return config.getDumpPop();
         }
 
@@ -793,145 +813,145 @@ public class ReadConfig {
 
         /**
          * Return the number of trajectories to test
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getHowManyTrajectories() throws Exception {
+        public static int getHowManyTrajectories() throws Exception {
             return config.getHowManyTrajectories();
         }
 
         /**
          * Return number of the classifier's hidden neurons
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getHiddenNeuronsClassifier() throws Exception {
+        public static int getHiddenNeuronsClassifier() throws Exception {
             return config.getHiddenNeuronsClassifier();
         }
 
         /**
          * Return number of the agent's hidden neurons
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getHiddenNeuronsAgent() throws Exception {
+        public static int getHiddenNeuronsAgent() throws Exception {
             return config.getHiddenNeuronsAgent();
         }
 
         /**
          * Return number of the agent's hidden layers number
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getHiddenLayersAgent() throws Exception {
+        public static int getHiddenLayersAgent() throws Exception {
             return config.getHiddenLayersAgent();
         }
 
         /**
          * Return number of the classifier's timesteps
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getClassifierTimeSteps() throws Exception {
+        public static int getClassifierTimeSteps() throws Exception {
             return config.getClassifierTimeSteps();
         }
 
         /**
          * Return number of the classifier's alpha value
-         * @return Double value
+         * @return double value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Double getClassifierAlpha() throws Exception {
+        public static double getClassifierAlpha() throws Exception {
             return config.getClassifierAlpha();
         }
 
         /**
          * Return number of the classifier's population size
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getClassifierPopulationSize() throws Exception {
+        public static int getClassifierPopulationSize() throws Exception {
             return config.getClassifierPopulationSize();
         }
 
         /**
          * Return number of the agent's time steps
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getAgentTimeSteps() throws Exception {
+        public static int getAgentTimeSteps() throws Exception {
             return config.getAgentTimeSteps();
         }
 
         /**
          * Return number of the agent's alpha value
-         * @return Double value
+         * @return double value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Double getAgentAlpha() throws Exception {
+        public static double getAgentAlpha() throws Exception {
             return config.getAgentAlpha();
         }
 
         /**
          * Return number of the agent's population size
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getAgentPopulationSize() throws Exception {
+        public static int getAgentPopulationSize() throws Exception {
             return config.getAgentPopulationSize();
         }
 
         /**
          * Return number of the agent's offspring size
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getAgentOffspringSize() throws Exception {
+        public static int getAgentOffspringSize() throws Exception {
             return config.getAgentOffspringSize();
         }
 
         /**
          * Return how many time split the trajectory
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getHowManySplitting() throws Exception {
+        public static int getHowManySplitting() throws Exception {
             return config.getHowManySplitting();
         }
 
         /**
          * Return the trajectory's type
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getTrajectoriesType() throws Exception {
+        public static int getTrajectoriesType() throws Exception {
             return config.getTrajectoriesType();
         }
 
         /**
          * Return number of the classifier's offspring size
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getClassifierOffspringSize() throws Exception {
+        public static int getClassifierOffspringSize() throws Exception {
             return config.getClassifierOffspringSize();
         }
 
         /**
          * Return max number of generation
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getMaxGenerations() throws Exception {
+        public static int getMaxGenerations() throws Exception {
             return config.getMaxGenerations();
         }
 
         /**
          * Return if I want to load the saved population
-         * @return Boolean value
+         * @return boolean value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean getLoadDumpPop() throws Exception {
+        public static boolean getLoadDumpPop() throws Exception {
             return config.getLoadDumpPop();
         }
 
@@ -945,107 +965,116 @@ public class ReadConfig {
 
         /**
          * Return which kind of mutation I want to use now
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getMutation() throws Exception {
+        public static int getMutation() throws Exception {
             return config.getMutation();
         }
         /**
          * Return number of trajectories that are going to be used by the LSTM for its training
-         * @return Integer number
+         * @return int number
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getTrajectoriesTrained() throws Exception {
+        public static int getTrajectoriesTrained() throws Exception {
             return config.getTrajectoriesTrained();
         }
 
         /**
          * Am I using recombination?
-         * @return Boolean value
+         * @return boolean value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean isRecombination() throws Exception {
+        public static boolean isRecombination() throws Exception {
             return config.isRecombination();
         }
 
         /**
          * Evolve the Agents more than the classifier for the number of timesteps returned from this method
-         * @return Integer value
+         * @return int value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getTimestepEvolveAgentOverClassifier() throws Exception {
+        public static int getTimestepEvolveAgentOverClassifier() throws Exception {
             return config.getTimestepEvolveAgentOverClassifier();
         }
 
         /**
          * Am I training the network before evolving?
-         * @return Boolean number
+         * @return boolean number
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean getTrain() throws Exception {
+        public static boolean getTrain() throws Exception {
             return config.getTrain();
         }
 
         /**
          * Am I using the LSTM?
-         * @return Boolean number
+         * @return boolean number
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean getLSTM() throws Exception {
+        public static boolean getLSTM() throws Exception {
             return config.getLSTM();
         }
         /**
          * Am I sing the convolutionary network?
-         * @return Boolean number
+         * @return boolean number
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean getConvolution() throws Exception {
+        public static boolean getConvolution() throws Exception {
             return config.getConvolution();
         }
         /**
          * Am I using the classificator way?
-         * @return Boolean number
+         * @return boolean number
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean getClax() throws Exception {
+        public static boolean getClax() throws Exception {
             return config.getClax();
         }
 
         /**
          * Get the model used as a number
-         * @return Integer Value
+         * @return int Value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getValueModel() throws Exception {
+        public static int getValueModel() throws Exception {
             return config.getValueModel();
         }
 
         /**
          * Get picture size. Since is square only one measure is returned
-         * @return Integer value of the size
+         * @return int value of the size
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Integer getPictureSize() throws Exception {
+        public static int getPictureSize() throws Exception {
             return config.getPictureSize();
         }
 
         /**
          * Get the flag if it is checking also the past of the trajectory
-         * @return Boolean value
+         * @return boolean value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean getCheckAlsoPast() throws Exception {
+        public static boolean getCheckAlsoPast() throws Exception {
             return config.getCheckAlsoPast();
         }
 
         /**
          * Getter for dumping the file with trajectory and the point generated by the network
+         * @return boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static boolean getDumpTrajectoryPointAndMeaning() throws Exception {
+            return config.getDumpTrajectoryPointAndMeaning();
+        }
+
+        /**
+         * Getter for the automatic calibration of the two population
          * @return Boolean value
          * @throws Exception if I am trying to access it before reading it
          */
-        public static Boolean getDumpTrajectoryPointAndMeaning() throws Exception {
-            return config.getDumpTrajectoryPointAndMeaning();
+        public static boolean getAutomaticCalibration() throws Exception {
+            return config.getAutomaticCalibration();
         }
     }
 

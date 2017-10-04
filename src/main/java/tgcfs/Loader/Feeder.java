@@ -527,7 +527,7 @@ public class Feeder {
         //it is possible total list is not the right size. Check it
         while(totalList.size() < ReadConfig.Configurations.getTrajectoriesTrained()){
             this.feedTheEater(idsaLoader,totalList);
-            logger.log(Level.INFO, "TrainReal sit size not correct, adding one more example");
+            //logger.log(Level.INFO, "TrainReal sit size not correct, adding one more example");
         }
         return totalList;
     }
