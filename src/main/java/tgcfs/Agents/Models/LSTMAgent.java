@@ -3,7 +3,9 @@ package tgcfs.Agents.Models;
 import lgds.Distance.Distance;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.LSTM;
@@ -37,7 +39,7 @@ public class LSTMAgent extends LSTM implements EvolvableModel {
      * @param hiddenNeurons integer value containing how many neurons the hidden layers will have
      * @param outputSize    integer value containing how many output neurons the network will have
      */
-    public LSTMAgent(Integer inputSize, Integer hiddenLayers, Integer hiddenNeurons, Integer outputSize) {
+    public LSTMAgent(int inputSize, int hiddenLayers, int hiddenNeurons, int outputSize) {
         super(inputSize, hiddenLayers, hiddenNeurons, outputSize);
     }
 
@@ -46,7 +48,7 @@ public class LSTMAgent extends LSTM implements EvolvableModel {
      * @return Integer value
      */
     @Override
-    public Integer getArrayLength() {
+    public int getArrayLength() {
         return this.net.numParams();
     }
 
@@ -98,6 +100,11 @@ public class LSTMAgent extends LSTM implements EvolvableModel {
         for(int i = 0; i < input.size() - 1; i++){
             this.fit(Nd4j.toFlattened(array.getColumn(i)),Nd4j.toFlattened(outputs.getColumn(i + 1)));
         }
+    }
+
+    @Override
+    public void fit(DataSet dataSet) {
+        throw new NotImplementedException();
     }
 
 

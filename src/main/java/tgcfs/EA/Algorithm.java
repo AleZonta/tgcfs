@@ -56,7 +56,7 @@ public abstract class Algorithm {
      */
     public void generatePopulation(EvolvableModel model) throws Exception {
         //check which class is calling this method
-        Integer size = 0;
+        int size = 0;
         if(this.getClass() == Agents.class){
             size = ReadConfig.Configurations.getAgentPopulationSize();
             logger.log(Level.INFO, "Generating Agents Population...");
@@ -114,7 +114,7 @@ public abstract class Algorithm {
      */
     public void generateOffspring() throws Exception {
         //check which class is calling this method
-        Integer size = 0;
+        int size = 0;
         if(this.getClass() == Agents.class){
             size = ReadConfig.Configurations.getAgentOffspringSize();
         }else{
@@ -123,8 +123,8 @@ public abstract class Algorithm {
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
             //two individuals are chosen randomly, with replacement, from the parent population
-            Integer firstParentsIndex = ThreadLocalRandom.current().nextInt(this.population.size());
-            Integer secondParentsIndex = ThreadLocalRandom.current().nextInt(this.population.size());
+            int firstParentsIndex = ThreadLocalRandom.current().nextInt(this.population.size());
+            int secondParentsIndex = ThreadLocalRandom.current().nextInt(this.population.size());
             Individual firstParents = this.population.get(firstParentsIndex);
             Individual secondParents = this.population.get(secondParentsIndex);
 
@@ -168,7 +168,7 @@ public abstract class Algorithm {
      */
     public void generateOffspringOnlyWithMutation() throws Exception {
         //check which class is calling this method
-        Integer size = 0;
+        int size = 0;
         if(this.getClass() == Agents.class){
             size = ReadConfig.Configurations.getAgentOffspringSize();
         }else{
@@ -176,7 +176,7 @@ public abstract class Algorithm {
         }
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
-            Integer idParent = ThreadLocalRandom.current().nextInt(this.population.size());
+            int idParent = ThreadLocalRandom.current().nextInt(this.population.size());
             Individual parent = this.population.get(idParent);
             //son has the same genome of the father
             Individual son = new RandomResetting(parent.getObjectiveParameters().dup());
@@ -207,7 +207,7 @@ public abstract class Algorithm {
      */
     public void selectParents() throws Exception {
         //check which class is calling this method
-        Integer size = 0;
+        int size = 0;
         if(this.getClass() == Agents.class){
             size = ReadConfig.Configurations.getAgentPopulationSize();
         }else{
@@ -327,4 +327,8 @@ public abstract class Algorithm {
     public void resetFitness(){
         this.population.forEach(Individual::resetFitness);
     }
+
+
+
+
 }

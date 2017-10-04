@@ -8,6 +8,7 @@ import tgcfs.NN.EvolvableModel;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 /**
@@ -84,7 +85,7 @@ public class UncorrelatedMutation extends Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      */
-    public UncorrelatedMutation(INDArray objPar, Integer fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
+    public UncorrelatedMutation(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
         super(objPar, fitness, model, myInputandOutput);
     }
 
@@ -135,7 +136,7 @@ public class UncorrelatedMutation extends Individual {
      * @return UncorrelatedMutation object
      */
     public UncorrelatedMutation deepCopy(){
-        return new UncorrelatedMutation(this.getObjectiveParameters(), new Integer(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput());
+        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness().intValue()), this.getModel().deepCopy(), this.getMyInputandOutput());
     }
 
 }

@@ -22,6 +22,51 @@ import static junit.framework.TestCase.assertNotNull;
  */
 public class AlgorithmTest {
     @Test
+    public void generatePopulation() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void getPopulation() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void addIndividual() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void generateOffspringOnlyWithMutation() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void runIndividuals() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void runIndividual() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void evaluateIndividuals() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void trainNetwork() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void resetFitness() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
     public void retAllFitness() throws Exception {
         new ReadConfig.Configurations();
         Algorithm algorithm = new Agents();

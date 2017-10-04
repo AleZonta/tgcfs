@@ -29,7 +29,7 @@ public class Routes {
     private Traces storage; //class that loads the track from file
     private Trajectories tra; //keep track of all the trajectories
     private static final Logger logger = Logger.getLogger(Routes.class.getName()); //logger for this class
-    private static Integer number; //number of trajectories analysed
+    private static int number; //number of trajectories analysed
 
     /**
      * Constructor with one parameter

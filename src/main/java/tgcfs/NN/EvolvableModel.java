@@ -2,6 +2,7 @@ package tgcfs.NN;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public interface EvolvableModel {
      * Getter for the number of weight in the network
      * @return Integer value
      */
-    Integer getArrayLength();
+    int getArrayLength();
 
     /**
      * Method that returns the weights of the network
@@ -53,6 +54,12 @@ public interface EvolvableModel {
      * @param points real point of the input
      */
     void fit(List<InputsNetwork> input, List<Point> points);
+
+    /**
+     * Train the Network
+     * @param dataSet Dataset to train
+     */
+    void fit(DataSet dataSet);
 
     /**
      * Compute the output of the network given the input

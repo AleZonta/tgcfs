@@ -5,6 +5,7 @@ import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Loader.Feeder;
+import tgcfs.Loader.TrainReal;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
@@ -61,38 +62,63 @@ public class FollowingTheGraph implements Transformation {
      * Every points in the output has to be located in the real word routing system
      * Using the graph I will find next position and with that position I will compute real bearing and speed
      * The method throws two errors. If the graph or the last point are not instantiate, the error is raised.
-     * @param outputs data that we want to transform into input data.
-     * @param realFirstPartPoint if I am using also this part I have to add it to the output
+     * @param trainReal all the data I need to transform and output the data
      * @return the input of the new network (classifier)
      */
     @Override
-    public List<InputsNetwork> transform(List<OutputsNetwork> outputs, List<Point> realFirstPartPoint) {
+    public List<InputsNetwork> transform(TrainReal trainReal) {
         if (this.feeder == null) throw new NullPointerException("System with the graph not instantiate");
         if (this.lastPoint == null) throw new NullPointerException("Last Point not instantiate");
 
+        List<OutputsNetwork> outputs = trainReal.getOutputComputed();
+
         List<InputsNetwork> convertedInput = new ArrayList<>();
+        List<InputsNetwork> convertedInputReal = new ArrayList<>();
+
         PointToSpeedBearing converterPointSB = new PointToSpeedBearing();
 
         //If I am also checking the first part I am adding that to the result to compute
         try {
             if(ReadConfig.Configurations.getCheckAlsoPast()){
-                List<InputsNetwork> inputNetworks = this.feeder.obtainInput(realFirstPartPoint, 0d,null);
-                //System.out.println(inputNetworks.size());
-                convertedInput.addAll(inputNetworks);
+                convertedInput.addAll(trainReal.getTrainingPoint());
+                convertedInputReal.addAll(trainReal.getTrainingPoint());
             }
         } catch (Exception ignored) {}
 
+        //remember the last point
+        Point lastp = this.lastPoint.deepCopy();
 
-        outputs.forEach(outputsNetwork -> {
+        int i = 0;
+        //this is for the fake part
+        for(OutputsNetwork outputsNetwork: outputs){
+
             OutputNetwork output = (OutputNetwork) outputsNetwork;
             Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
             InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
-//            System.out.println(inputNetwork.toString());
             convertedInput.add(inputNetwork);
 
             //upgrade position
             this.lastPoint = position;
-        });
+            i++;
+        }
+        //save the entire trajectory for future works
+        trainReal.setAllThePartTransformedFake(convertedInput);
+
+
+        //this is for the real part
+        this.lastPoint = lastp;
+        List<OutputsNetwork> out = trainReal.getRealOutput();
+
+        for(int j = 0; j<i; j++){
+            OutputNetwork output = (OutputNetwork) out.get(j);
+            Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
+            convertedInputReal.add(inputNetwork);
+
+            //upgrade position
+            this.lastPoint = position;
+        }
+        trainReal.setAllThePartTransformedReal(convertedInputReal);
 
         return convertedInput;
     }

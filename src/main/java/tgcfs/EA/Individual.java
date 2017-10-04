@@ -2,6 +2,7 @@ package tgcfs.EA;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -10,6 +11,7 @@ import tgcfs.NN.InputsNetwork;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -26,7 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class Individual {
     private INDArray objectiveParameters;
     private List<TrainReal> myInputandOutput;
-    private Integer fitness;
+    private AtomicInteger fitness;
     private EvolvableModel model;
 
     /**
@@ -42,7 +44,7 @@ public abstract class Individual {
      * @return Integer value
      */
     public Integer getFitness() {
-        return this.fitness;
+        return this.fitness.intValue();
     }
 
     /**
@@ -50,7 +52,7 @@ public abstract class Individual {
      * @param fitness the value to assign to fitness
      */
     public void setFitness(Integer fitness) {
-        this.fitness = new Integer(fitness);
+        this.fitness = new AtomicInteger(fitness);
     }
 
 
@@ -71,7 +73,7 @@ public abstract class Individual {
      */
     public Individual(INDArray objPar){
         this.objectiveParameters = objPar;
-        this.fitness = 0;
+        this.fitness = new AtomicInteger(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
     }
@@ -83,13 +85,13 @@ public abstract class Individual {
      * @param size size of the objectiveParameter
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public Individual(Integer size) throws Exception {
+    public Individual(int size) throws Exception {
         //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
             this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
         }
-        this.fitness = 0;
+        this.fitness = new AtomicInteger(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
     }
@@ -102,12 +104,12 @@ public abstract class Individual {
      * @param model model to assign to the individual
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public Individual(Integer size, EvolvableModel model) throws Exception {
+    public Individual(int size, EvolvableModel model) throws Exception {
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
             this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
         }
-        this.fitness = 0;
+        this.fitness = new AtomicInteger(0);
         this.model = model;
         this.myInputandOutput = new ArrayList<>();
     }
@@ -119,7 +121,7 @@ public abstract class Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      */
-    public Individual(INDArray objPar, Integer fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
+    public Individual(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
         this.objectiveParameters = objPar;
         this.fitness = fitness;
         this.model = model.deepCopy();
@@ -154,14 +156,14 @@ public abstract class Individual {
      */
     public void increaseFitness() throws Exception {
         if(this.fitness == null) throw new Exception("Individual not correctly initialised");
-        this.fitness++;
+        this.fitness.incrementAndGet();
     }
 
     /**
      * Reset the fitness to zero
      */
     public void resetFitness(){
-        this.fitness = 0;
+        this.fitness.set(0);
     }
 
     /**
@@ -174,6 +176,16 @@ public abstract class Individual {
         this.model.setWeights(this.objectiveParameters);
         this.model.fit(input, points);
         //return the weights
+        this.objectiveParameters = this.model.getWeights();
+    }
+
+    /**
+     * Train the model
+     * @param dataSet dataset as input
+     */
+    public void fitModel(DataSet dataSet) throws Exception {
+        this.model.setWeights(this.objectiveParameters);
+        this.model.fit(dataSet);//return the weights
         this.objectiveParameters = this.model.getWeights();
     }
 

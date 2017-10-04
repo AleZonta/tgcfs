@@ -1,6 +1,8 @@
 package tgcfs.Agents.Models;
 
 import lgds.trajectories.Point;
+import org.nd4j.linalg.dataset.DataSet;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Loader.Feeder;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
@@ -34,7 +36,7 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
      *
      * @param dimension dimension pictures
      */
-    public ConvAgent(Integer dimension){
+    public ConvAgent(int dimension){
         super(dimension);
         this.size = dimension;
         this.feeder = null;
@@ -46,7 +48,7 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
      * @param dimension dimension of the picture
      * @param feeder feeder system
      */
-    public ConvAgent(Integer dimension, Feeder feeder){
+    public ConvAgent(int dimension, Feeder feeder){
         super(dimension);
         this.size = dimension;
         this.feeder = feeder;
@@ -57,7 +59,7 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
      * @return Integer value
      */
     @Override
-    public Integer getArrayLength() {
+    public int getArrayLength() {
         return super.getNumPar();
     }
 
@@ -79,6 +81,11 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
     @Override
     public void fit(List<InputsNetwork> input, List<Point> points) {
         throw new NoSuchMethodError("Method not implemented");
+    }
+
+    @Override
+    public void fit(DataSet dataSet) {
+        throw new NotImplementedException();
     }
 
     /**

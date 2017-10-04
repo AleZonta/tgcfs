@@ -113,7 +113,7 @@ public class LSTMAgentTest {
                 + nL * (4 * nL + 3) //recurrent weights
                 + 4 * nL; //bias
         */
-        assertEquals(21L, agent.getArrayLength().longValue());
+        assertEquals(21L, agent.getArrayLength());
     }
 
 }

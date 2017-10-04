@@ -3,6 +3,9 @@ package tgcfs.EA;
 import lgds.trajectories.Point;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.INDArrayIndex;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
@@ -53,11 +56,10 @@ public class Agents extends Algorithm {
      */
     @Override
     public void runIndividuals(List<TrainReal> input) throws Exception {
-        logger.log(Level.INFO, "Running Agents...");
-
         //reset input
         super.getPopulation().forEach(Individual::resetInputOutput);
 
+        //every individual in parallel
         super.getPopulation().parallelStream().forEach(individual -> {
             try {
                 //retrieve model from the individual
@@ -207,7 +209,7 @@ public class Agents extends Algorithm {
         //compute Output of the network
         INDArray lastOutput = null;
 
-        Integer number;
+        int number;
         try{
             number = ReadConfig.Configurations.getAgentTimeSteps();
         }catch (Exception e){
@@ -218,14 +220,22 @@ public class Agents extends Algorithm {
         for (TrainReal inputsNetwork : input) {
             //now for the number of time step that I want to check save the output
             List<OutputsNetwork> outputsNetworks = new ArrayList<>();
-            for (InputsNetwork in : inputsNetwork.getTrainingPoint()) {
-                //If I am also checking the first part in the evaluation I need to add it
-                lastOutput = model.computeOutput(in.serialise());
-            }
 
+            List<InputsNetwork> in = inputsNetwork.getTrainingPoint();
+            int size = in.size();
+            INDArray features = Nd4j.create(new int[]{1, InputNetwork.inputSize, size}, 'f');
+            for (int j = 0; j < size; j++) {
+                INDArray vector = in.get(j).serialise();
+                features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
+            }
+            lastOutput = model.computeOutput(features);
+
+
+            int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
+            INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
 
             OutputNetwork out = new OutputNetwork();
-            out.deserialise(lastOutput);
+            out.deserialise(realLastOut);
             outputsNetworks.add(out);
 
             //output has only two fields, input needs three
@@ -245,6 +255,8 @@ public class Agents extends Algorithm {
             }
             //assign the output to this individual
             inputsNetwork.setOutputComputed(outputsNetworks);
+            //create the output already computed
+            inputsNetwork.createOutput();
             individual.addMyInputandOutput(inputsNetwork);
         }
     }
@@ -272,36 +284,97 @@ public class Agents extends Algorithm {
      * The fitness of each classifier is obtained by using it to evaluate each model in the competing population
      * For each correct judgement, the classifier’s fitness increases by one
      *
-     * @param opponent competing population
+     * It is evaluating the false trajectory and also the real one
+     *
+     * @param model competing population
      * @param transformation the class that will transform from one output to the new input
      */
-    public void evaluateIndividuals(Algorithm opponent, Transformation transformation){
+    public void evaluateIndividuals(Algorithm model, Transformation transformation){
         //I need to evaluate the agent using the classifiers
-        super.getPopulation().parallelStream().forEach(individual -> {
+        super.getPopulation().parallelStream().forEach(agent -> {
 //            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
             //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
-            opponent.getPopulation().forEach(classifier -> {
-                //I need to check for every output for every individual
-                individual.getMyInputandOutput().forEach(trainReal -> {
+
+            //this is one agent
+            //I need to check for every output for every individual
+            agent.getMyInputandOutput().parallelStream().forEach(trainReal -> {
+
+                //for every example I need to run the classifier and check the result
+                model.getPopulation().forEach(classifier -> {
+
                     ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
+                    List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
+                    if(inputFake == null) {
+                        inputFake = transformation.transform(trainReal);
+                    }
+
+                    //run the classifier for the Fake trajectory
                     try {
-                        tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(trainReal.getOutputComputed(), trainReal.getPoints()));
-                        //if the classifier is saying true -> it is wrongly judging the agent
-                        if(result.getReal()){
-                            individual.increaseFitness();
-                        }else{
-                            //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
-                            //For each correct judgement, the classifier’s fitness increases by one
-                            classifier.increaseFitness();
-                        }
+                        this.runClassifier(model ,agent, classifier, inputFake, Boolean.TRUE);
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "Error " + e.getMessage());
                         e.printStackTrace();
                     }
+
+                    //run the classifier for the Real trajectory
+                    List<InputsNetwork> inputReal = trainReal.getAllThePartTransformedReal();
+                    try {
+                        this.runClassifier(model ,agent, classifier, inputReal, Boolean.FALSE);
+                    } catch (Exception e) {
+                        logger.log(Level.SEVERE, "Error " + e.getMessage());
+                        e.printStackTrace();
+                    }
+
+
                 });
             });
+
+
+//
+//
+//            opponent.getPopulation().forEach(classifier -> {
+//                //I need to check for every output for every individual
+//                individual.getMyInputandOutput().forEach(trainReal -> {
+//                    ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
+//                    try {
+//                        tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(trainReal.getOutputComputed(), trainReal.getPoints()));
+//                        //if the classifier is saying true -> it is wrongly judging the agent
+//                        if(result.getReal()){
+//                            individual.increaseFitness();
+//                        }else{
+//                            //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
+//                            //For each correct judgement, the classifier’s fitness increases by one
+//                            classifier.increaseFitness();
+//                        }
+//                    } catch (Exception e) {
+//                        logger.log(Level.SEVERE, "Error " + e.getMessage());
+//                        e.printStackTrace();
+//                    }
+//                });
+//            });
         });
+    }
+
+
+    /**
+     * Run the classifier
+     * @param model model of the classifier
+     * @param agent agent individual
+     * @param classifier agent classifier
+     * @param input input for the classifier
+     * @param real Boolean value. If it is false I do not need to increment the agent fitness since I am checking the real trajectory
+     */
+    private void runClassifier(Algorithm model, Individual agent, Individual classifier, List<InputsNetwork> input, boolean real) throws Exception {
+        tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
+        //if the classifier is saying true -> it is wrongly judging the agent
+        if(result.getReal()){
+            if(real) agent.increaseFitness();
+        }else{
+            //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
+            //For each correct judgement, the classifier’s fitness increases by one
+            classifier.increaseFitness();
+        }
     }
 
     /**
@@ -313,19 +386,20 @@ public class Agents extends Algorithm {
         //obtain list of inputs
         try {
             if(ReadConfig.Configurations.getTrain()) {
-                combineInputList.forEach(trainReal -> {
-                    List<InputsNetwork> inputsNetworks = trainReal.getTrainingPoint();
-                    List<Point> points = trainReal.getPoints();
-                    //I have to train all the population with the same inputs
-                    super.getPopulation().parallelStream().forEach(individual -> {
-                        //train the model
-                        try {
-                            individual.fitModel(inputsNetworks, points);
-                        } catch (Exception e) {
-                            throw new Error("Error in training the model" + e.getMessage());
-                        }
-                    });
-                });
+                throw new Exception("How to train a LSTM without bad examples");
+//                combineInputList.forEach(trainReal -> {
+//                    List<InputsNetwork> inputsNetworks = trainReal.getTrainingPoint();
+//                    List<Point> points = trainReal.getPoints();
+//                    //I have to train all the population with the same inputs
+//                    super.getPopulation().parallelStream().forEach(individual -> {
+//                        //train the model
+//                        try {
+//                            individual.fitModel(inputsNetworks, points);
+//                        } catch (Exception e) {
+//                            throw new Error("Error in training the model" + e.getMessage());
+//                        }
+//                    });
+//                });
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error " + e.getMessage());

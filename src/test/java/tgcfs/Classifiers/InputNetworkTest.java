@@ -5,6 +5,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.InputOutput.Normalisation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Alessandro Zonta on 30/05/2017.
@@ -20,13 +21,13 @@ public class InputNetworkTest {
     @Test
     public void getSpeed() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
-        assertEquals(Normalisation.convertSpeed(10.0), inputNetwork.getSpeed());
+        assertTrue(Normalisation.convertSpeed(10.0) == inputNetwork.getSpeed());
     }
 
     @Test
     public void getDirection() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
-        assertEquals(Normalisation.convertDirectionData(30.0), inputNetwork.getDirection());
+        assertTrue(Normalisation.convertDirectionData(30.0) == inputNetwork.getDirection());
     }
 
     @Test

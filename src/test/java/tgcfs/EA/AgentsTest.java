@@ -28,6 +28,11 @@ import static junit.framework.TestCase.assertNotNull;
  */
 public class AgentsTest {
     @Test
+    public void trainNetwork() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
     public void generatePopulation() throws Exception {
         new ReadConfig.Configurations();
         //Random LSTM

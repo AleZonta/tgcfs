@@ -21,7 +21,8 @@ import static org.junit.Assert.*;
 public class LSTMTest {
     @Test
     public void computeOutput() throws Exception {
-        LSTM agent = new LSTM(2,1,1,1);
+        LSTM agent = new LSTM(2,2000,10,3);
+
 
         INDArray array = Nd4j.rand(1, 2);
         array.putScalar(0,5.0);
@@ -35,14 +36,14 @@ public class LSTMTest {
         out = agent.computeOutput(real);
         assertNotNull(out);
         assertFalse(real.equals(out));
-        assertTrue(out.columns() == 1);
+        assertTrue(out.columns() == 3);
         assertTrue((out.getDouble(0) >= -1.0)  && (out.getDouble(0) <= 1.0) );
     }
 
     @Test
     public void getNumPar() throws Exception {
         LSTM net = new LSTM(2,1,1,1);
-        assertEquals(21L, net.getNumPar().longValue());
+        assertEquals(21L, net.getNumPar());
     }
 
     @Test

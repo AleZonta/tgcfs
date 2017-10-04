@@ -8,6 +8,7 @@ import gms.LoadingSystem.WeightedGraph;
 import lgds.map.OsmosisLoader;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -104,7 +105,7 @@ public class Clax implements EvolvableModel {
      * @return Integer value
      */
     @Override
-    public Integer getArrayLength() {
+    public int getArrayLength() {
         return this.weights.columns();
     }
 
@@ -148,6 +149,11 @@ public class Clax implements EvolvableModel {
         throw new NotImplementedException();
     }
 
+    @Override
+    public void fit(DataSet dataSet) {
+        throw new NotImplementedException();
+    }
+
     /**
      * Compute the output for the network
      * first time that it is called it set the start position
@@ -176,7 +182,7 @@ public class Clax implements EvolvableModel {
      * Return double value of the distance importance
      * @return Double value
      */
-    private Double getDistanceValue(){
+    private double getDistanceValue(){
         return this.weights.getDouble(this.getArrayLength() - 2);
     }
 
@@ -184,7 +190,7 @@ public class Clax implements EvolvableModel {
      * Return double value of the attraction importance
      * @return Double value
      */
-    private Double getAttractionValue(){
+    private double getAttractionValue(){
         return this.weights.getDouble(this.getArrayLength() - 1);
     }
 
@@ -192,7 +198,7 @@ public class Clax implements EvolvableModel {
      * Return double value of the pacman width
      * @return Double value
      */
-    private Double getPacmanValue(){
+    private double getPacmanValue(){
         return this.weights.getDouble(this.getArrayLength());
     }
 
@@ -319,9 +325,9 @@ public class Clax implements EvolvableModel {
      * @return double potential position
      * @throws Exception problems obtain the potential
      */
-    private Double computeMidValuePoint(Double lati, Double loni, Double late, Double lone) throws Exception {
-        Double middleLat = (lati + late) / 2;
-        Double middleLong = (loni + lone) / 2;
+    private double computeMidValuePoint(double lati, double loni, double late, double lone) throws Exception {
+        double middleLat = (lati + late) / 2;
+        double middleLong = (loni + lone) / 2;
         return this.idsaLoader.returnAttraction(new Point(middleLat, middleLong));
     }
 

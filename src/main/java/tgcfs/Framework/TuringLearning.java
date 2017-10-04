@@ -6,7 +6,6 @@ import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
-import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.Classifier;
 import tgcfs.Config.ReadConfig;
@@ -47,7 +46,6 @@ public class TuringLearning implements Framework{
     private Classifiers classifiers;
     private Feeder feeder;
     private IdsaLoader idsaLoader;
-    private RealAgents realAgent;
     private static final Logger logger = Logger.getLogger(TuringLearning.class.getName()); //logger for this class
 
 
@@ -64,7 +62,6 @@ public class TuringLearning implements Framework{
         this.agents = new Agents();
         this.classifiers = new Classifiers();
 
-        this.realAgent = null;
         this.feeder = null;
         this.idsaLoader = null;
 
@@ -116,7 +113,6 @@ public class TuringLearning implements Framework{
         //INITIALISE population EA with random candidate solution
         this.agents.generatePopulation(agentModel);
         this.classifiers.generatePopulation(classifierModel);
-        this.realAgent = new RealAgents();
         logger.log(Level.INFO, "Framework online!");
     }
 
@@ -136,14 +132,12 @@ public class TuringLearning implements Framework{
     @Override
     public void run() throws Exception {
         logger.log(Level.INFO, "Starting Evolution...");
-        Integer generation = 0;
+        int generation = 0;
         /* { EVALUATE each candidate } */
-        logger.log(Level.INFO, "Evaluation generation " + generation.toString());
+        logger.log(Level.INFO, "Evaluation generation " + generation);
 
         //load several pieces of trajectory
         List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader);
-        //create the real agents for this session
-        this.realAgent.createAgent(combineInputList);
         //execution agents
         logger.log(Level.INFO,"Run Agents...");
         //train the agents
@@ -153,7 +147,6 @@ public class TuringLearning implements Framework{
         //classifier are executed and evaluated during agents evaluations
         logger.log(Level.INFO,"Run Classifiers...");
         this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
-        this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder));
         //save the fitness of all the population and the best genome
         SaveToFile.Saver.saveFitness(this.agents.getClass().getName(),this.agents.retAllFitness());
         SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(),this.classifiers.retAllFitness());
@@ -167,7 +160,6 @@ public class TuringLearning implements Framework{
         Integer maxGeneration = ReadConfig.Configurations.getMaxGenerations();
         while(!reachedEndTrajectory && !randomError && generation <= maxGeneration) {
             generation++;
-            logger.log(Level.INFO, "Evaluation generation " + generation.toString());
             /* { SELECT parent }
                { RECOMBINE parents }
                { MUTATE offspring } */
@@ -181,8 +173,8 @@ public class TuringLearning implements Framework{
                 this.classifiers.generateOffspringOnlyWithMutation();
             }
 
-
-            Integer number = ReadConfig.Configurations.getTimestepEvolveAgentOverClassifier();
+            logger.log(Level.INFO, "Evaluation generation " + generation);
+            int number = ReadConfig.Configurations.getTimestepEvolveAgentOverClassifier();
             if(number > 0){
                 this.generateMoreThanDiscriminate(number);
             }
@@ -190,7 +182,6 @@ public class TuringLearning implements Framework{
             /* { EVALUATE new candidate } */
             try {
                 combineInputList = this.feeder.multiFeeder(this.idsaLoader);
-                this.realAgent.createAgent(combineInputList);
                 //train the agents
                 this.agents.trainNetwork(combineInputList);
                 //execution agents
@@ -199,8 +190,6 @@ public class TuringLearning implements Framework{
                 logger.log(Level.INFO,"Run Classifiers...");
                 //classifier are executed and evaluated during agents evaluations
                 this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
-                this.classifiers.evaluateRealAgent(this.realAgent, new FollowingTheGraph(this.feeder));
-
 
                 //I need to generate this dataset for testing the classifiers and understand visually what is happening
                 //this is happening only in the last generation
@@ -251,7 +240,6 @@ public class TuringLearning implements Framework{
             logger.log(Level.INFO, "Evaluation only agents' generation " + i);
                 /* { EVALUATE new candidate } */
             List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader);
-            this.realAgent.createAgent(combineInputList);
             //train the agents
             this.agents.trainNetwork(combineInputList);
             //execution agents
@@ -290,10 +278,12 @@ public class TuringLearning implements Framework{
     private void saveTrajectoryAndGeneratedPoints(List<TrainReal> combineInputList, FollowingTheGraph transformation) throws Exception {
         //compute the real point. //TODO check it it is faster to do this for every points directly in computation and then use the converted one as imput
         combineInputList.forEach(trainReal -> {
-            List<Point> generatedPoint = new ArrayList<>();
-            transformation.setLastPoint(trainReal.getLastPoint());
-            trainReal.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(transformation.singlePointConversion(outputsNetwork)));
-            trainReal.setRealPointsOutputComputed(generatedPoint);
+            if(trainReal.getRealPointsOutputComputed() == null) {
+                List<Point> generatedPoint = new ArrayList<>();
+                transformation.setLastPoint(trainReal.getLastPoint());
+                trainReal.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(transformation.singlePointConversion(outputsNetwork)));
+                trainReal.setRealPointsOutputComputed(generatedPoint);
+            }
         });
         SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(combineInputList);
     }

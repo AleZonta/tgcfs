@@ -56,7 +56,7 @@ public class InputNetwork implements InputsNetwork{
      * Getter for the speed variable
      * @return Double number
      */
-    public Double getSpeed() {
+    public double getSpeed() {
         return this.speed;
     }
 
@@ -64,7 +64,7 @@ public class InputNetwork implements InputsNetwork{
      * Getter for the direction variable
      * @return Double variable
      */
-    public Double getDirection() {
+    public double getDirection() {
         return this.direction;
     }
 

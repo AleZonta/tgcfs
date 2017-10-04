@@ -41,19 +41,19 @@ public class ConvolutionaryTest {
     @Test
     public void getNumberInputArrays() throws Exception {
         Convolutionary convolutionary = new Convolutionary(32);
-        assertEquals(2, convolutionary.getNumberInputArrays().longValue());
+        assertEquals(2, convolutionary.getNumberInputArrays());
     }
 
     @Test
     public void getNumberOutputArrays() throws Exception {
         Convolutionary convolutionary = new Convolutionary(32);
-        assertEquals(1, convolutionary.getNumberOutputArrays().longValue());
+        assertEquals(1, convolutionary.getNumberOutputArrays());
     }
 
     @Test
     public void getNumPar() throws Exception {
         Convolutionary convolutionary = new Convolutionary(32);
-        assertEquals(476737, convolutionary.getNumPar().longValue());
+        assertEquals(476737, convolutionary.getNumPar());
     }
 
     @Test

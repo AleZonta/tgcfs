@@ -21,6 +21,17 @@ import static org.junit.Assert.*;
  */
 public class ClassifierTest {
     @Test
+    public void fit() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
+    public void createOutput() throws Exception {
+        throw new Exception("Not tested");
+
+    }
+
+    @Test
     public void deepCopy() throws Exception {
         Classifier test = new Classifier(2,5,1);
         Classifier secondAgent = (Classifier) test.deepCopy();
@@ -31,7 +42,7 @@ public class ClassifierTest {
     public void getArrayLength() throws Exception {
         Classifier test = new Classifier(3,4,1);
 
-        assertEquals(37, test.getArrayLength().longValue());
+        assertEquals(37, test.getArrayLength());
     }
 
     @Test

@@ -40,6 +40,6 @@ public interface Network {
      * Get number parameter of the network
      * @return integer number
      */
-    Integer getNumPar();
+    int getNumPar();
 
 }

@@ -21,12 +21,12 @@ import java.lang.reflect.Field;
  * This class Implements the input of the agents
  */
 public class InputNetwork implements InputsNetwork {
-    private Double directionAPF;
-    private Double speed;
-    private Double bearing;
+    private double directionAPF;
+    private double speed;
+    private double bearing;
     private Point targetPoint;
-    private Double space;
-    public static final Integer inputSize = 3; //the size of the input corresponding to the three fields here
+    private double space;
+    public static final int inputSize = 3; //the size of the input corresponding to the three fields here
 
     /**
      * Constructor with three parameters. all the inputs
@@ -35,7 +35,7 @@ public class InputNetwork implements InputsNetwork {
      * @param speed Double number corresponding to the speed
      * @param bearing Double number corresponding to the bearing
      */
-    public InputNetwork(Double directionAPF, Double speed, Double bearing){
+    public InputNetwork(double directionAPF, double speed, double bearing){
         this.bearing = Normalisation.convertDirectionData(bearing);
         this.speed = Normalisation.convertSpeed(speed);
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
@@ -56,7 +56,7 @@ public class InputNetwork implements InputsNetwork {
      * @param bearing Double number corresponding to the bearing
      * @param space distance between the two points
      */
-    public InputNetwork(Double directionAPF, Double speed, Double bearing, Double space){
+    public InputNetwork(double directionAPF, double speed, double bearing, double space){
         this.bearing = Normalisation.convertDirectionData(bearing);
         this.speed = Normalisation.convertSpeed(speed);
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
@@ -74,7 +74,7 @@ public class InputNetwork implements InputsNetwork {
      * Getter for the direction of the APF
      * @return Double value
      */
-    public Double getDirectionAPF() {
+    public double getDirectionAPF() {
         return this.directionAPF;
     }
 
@@ -82,7 +82,7 @@ public class InputNetwork implements InputsNetwork {
      * Getter for the speed
      * @return Double value
      */
-    public Double getSpeed() {
+    public double getSpeed() {
         return this.speed;
     }
 
@@ -90,7 +90,7 @@ public class InputNetwork implements InputsNetwork {
      * Getter for the bearing
      * @return Double value
      */
-    public Double getBearing() {
+    public double getBearing() {
         return this.bearing;
     }
 
@@ -128,7 +128,19 @@ public class InputNetwork implements InputsNetwork {
      * Getter for the distance between points
      * @return Double value
      */
-    public Double getSpace() {
+    public double getSpace() {
         return space;
+    }
+
+
+    /**
+     * Serialise object ready for the classifier
+     * @return {@link INDArray} vector
+     */
+    public INDArray serialiaseAsInputClassifier(){
+        INDArray array = Nd4j.zeros(2);
+        array.putScalar(0, this.speed);
+        array.putScalar(1, this.bearing);
+        return array;
     }
 }

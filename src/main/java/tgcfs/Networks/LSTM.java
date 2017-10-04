@@ -29,10 +29,10 @@ import java.util.stream.IntStream;
  */
 public class LSTM extends Models implements Network{
     protected MultiLayerNetwork net; //neural network, brain of the agent
-    protected Integer inputSize;
-    protected Integer hiddenLayers;
-    protected Integer hiddenNeurons;
-    protected Integer outputSize;
+    protected int inputSize;
+    protected int hiddenLayers;
+    protected int hiddenNeurons;
+    protected int outputSize;
 
     /**
      * Building of the Recurrent Neural NN.Network
@@ -41,7 +41,7 @@ public class LSTM extends Models implements Network{
      * @param hiddenNeurons integer value containing how many neurons the hidden layers will have
      * @param outputSize integer value containing how many output neurons the network will have
      */
-    public LSTM(Integer inputSize, Integer hiddenLayers, Integer hiddenNeurons, Integer outputSize){
+    public LSTM(int inputSize, int hiddenLayers, int hiddenNeurons, int outputSize){
         super();
         // some common parameters
         NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
@@ -103,12 +103,6 @@ public class LSTM extends Models implements Network{
      */
     @Override
     public INDArray computeOutput(INDArray input) {
-        //check if the input is in the correct range
-        for(int i = 0; i < input.columns(); i++){
-            if(input.getDouble(i) < -1.0 || input.getDouble(i) > 1.0){
-                throw new Error("Generator input is not normalised correctly");
-            }
-        }
         //If this MultiLayerNetwork contains one or more RNN layers: conduct forward pass (prediction) but using previous stored state for any RNN layers.
         return this.net.rnnTimeStep(input);
     }
@@ -119,7 +113,7 @@ public class LSTM extends Models implements Network{
      * @return integer number
      */
     @Override
-    public Integer getNumPar(){
+    public int getNumPar(){
         return this.net.numParams();
     }
 

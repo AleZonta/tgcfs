@@ -25,7 +25,7 @@ public class Normalisation {
      * @param data element to normalise
      * @return element normalised
      */
-    public static Double convertData(InputsNetwork network, Double data){
+    public static double convertData(InputsNetwork network, double data){
         if(network.getClass().equals(InputNetwork.class)){
             return convertAgents(data);
         }
@@ -38,9 +38,9 @@ public class Normalisation {
      * @param data element to normalise
      * @return element normalised
      */
-    private static Double convertAgents(Double data){
-        Double maxAgents = 100.0;
-        Double minAgents = -100.0;
+    private static double convertAgents(double data){
+        double maxAgents = 100.0;
+        double minAgents = -100.0;
         return 2 * ((data - minAgents) / (maxAgents - minAgents)) - 1;
     }
 
@@ -49,9 +49,9 @@ public class Normalisation {
      * @param data element to normalise
      * @return element normalised
      */
-    private static Double convertClassifier(Double data){
-        Double maxClassifier = 100.0;
-        Double minClassifier = -100.0;
+    private static double convertClassifier(double data){
+        double maxClassifier = 100.0;
+        double minClassifier = -100.0;
         return 2 * ((data - minClassifier) / (maxClassifier - minClassifier)) - 1;
     }
 
@@ -62,9 +62,9 @@ public class Normalisation {
      * @param toBeConverted angle that needs to be normalised
      * @return normalised angle between ±1
      */
-    public static Double convertDirectionData(Double toBeConverted) {
-        Double maxAngle = 180.0;
-        Double minAngle = -180.0;
+    public static Double convertDirectionData(double toBeConverted) {
+        double maxAngle = 180.0;
+        double minAngle = -180.0;
         if (toBeConverted > maxAngle || toBeConverted < minAngle) throw new Error("Wrong range in input");
         return 2 * ((toBeConverted - minAngle) / (maxAngle - minAngle)) - 1;
     }
@@ -81,9 +81,9 @@ public class Normalisation {
      * @param toBeConverted speed that needs to be normalised
      * @return normalised speed between ±1
      */
-    public static Double convertSpeed(Double toBeConverted) {
-        Double maxSpeed = 55.5; //55.5 metres/seconds means maximum speed of 200 km/h
-        Double minSpeed = 0.0;
+    public static double convertSpeed(double toBeConverted) {
+        double maxSpeed = 55.5; //55.5 metres/seconds means maximum speed of 200 km/h
+        double minSpeed = 0.0;
         if (toBeConverted > maxSpeed) {
             toBeConverted = maxSpeed;
         }
@@ -98,11 +98,11 @@ public class Normalisation {
      * @param toBeConverted speed that has to be de normalised
      * @return double real value
      */
-    public static Double decodeSpeed(Double toBeConverted){
-        Double maxSpeed = 1.0;
-        Double minSpeed = -1.0;
-        Double b = 55.5;
-        Double a = 0.0;
+    public static double decodeSpeed(double toBeConverted){
+        double maxSpeed = 1.0;
+        double minSpeed = -1.0;
+        double b = 55.5;
+        double a = 0.0;
         return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
     }
 
@@ -111,11 +111,11 @@ public class Normalisation {
      * @param toBeConverted direction data that has to be de - normalised
      * @return double real value
      */
-    public static Double decodeDirectionData(Double toBeConverted){
-        Double maxAngle = 1.0;
-        Double minAngle = -1.0;
-        Double b = 180.0;
-        Double a = -180.0;
+    public static double decodeDirectionData(double toBeConverted){
+        double maxAngle = 1.0;
+        double minAngle = -1.0;
+        double b = 180.0;
+        double a = -180.0;
         return (b - a) * ((toBeConverted - minAngle) / (maxAngle - minAngle)) + a;
     }
 
@@ -124,7 +124,7 @@ public class Normalisation {
      * @param toBeConverted angle that has to be converted
      * @return converted angle
      */
-    public static Double fromHalfPItoTotalPI(Double toBeConverted){
+    public static double fromHalfPItoTotalPI(double toBeConverted){
         if(toBeConverted >= 0 && toBeConverted<=180){
             return toBeConverted;
         }else{
@@ -137,7 +137,7 @@ public class Normalisation {
      * @param toBeConverted angle that has to be converted
      * @return converted angle
      */
-    public static Double fromTotalPItoHalfPI(Double toBeConverted){
+    public static double fromTotalPItoHalfPI(double toBeConverted){
         if(toBeConverted<=180){
             return toBeConverted;
         }else{
@@ -155,11 +155,11 @@ public class Normalisation {
      * @param toBeConverted distance that has to be de normalised
      * @return double real value
      */
-    public static Double decodeDistance(Double toBeConverted){
-        Double maxSpeed = 1.0;
-        Double minSpeed = -1.0;
-        Double b = 555.0;
-        Double a = 0.0;
+    public static double decodeDistance(double toBeConverted){
+        double maxSpeed = 1.0;
+        double minSpeed = -1.0;
+        double b = 555.0;
+        double a = 0.0;
         return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
     }
 
@@ -172,11 +172,11 @@ public class Normalisation {
      * @param toBeConverted distance that has to be de normalised
      * @return double real value
      */
-    public static Double convertDistance(Double toBeConverted){
-        Double maxSpeed = 555.0;
-        Double minSpeed = 0.0;
-        Double b = 1.0;
-        Double a = -1.0;
+    public static double convertDistance(double toBeConverted){
+        double maxSpeed = 555.0;
+        double minSpeed = 0.0;
+        double b = 1.0;
+        double a = -1.0;
         return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
     }
 

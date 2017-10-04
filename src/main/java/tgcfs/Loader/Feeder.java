@@ -40,11 +40,11 @@ import java.util.stream.IntStream;
 public class Feeder {
     private final System graph; //loader of the graph
     private final Routes routes; //loader of the trajectories
-    private Integer position; //I need to remember the position where I am now
+    private int position; //I need to remember the position where I am now
     private Boolean finished; //If the current trajectory is ended
     private Trajectory currentTrajectory; //current trajectory under investigation
-    private Integer maximumNumberOfTrajectories;
-    private Integer actualNumberOfTrajectory;
+    private int maximumNumberOfTrajectories;
+    private int actualNumberOfTrajectory;
     private List<Point> points;
     private final DatabaseCoordNode db; //database saving all the already visited nodes
     private Boolean isNewTrajectory;
@@ -98,7 +98,7 @@ public class Feeder {
      */
     private Integer selectPositionInTrajectory(Trajectory tra) throws Exception{
         //decide how many time to analise the trajectory
-        Integer split = ReadConfig.Configurations.getHowManySplitting() + 1;
+        int split = ReadConfig.Configurations.getHowManySplitting() + 1;
         //need to check if the trajectory is shorter than the split number
         if(tra.getSize() <= split){
             split = 2; //I only split in half
@@ -209,7 +209,7 @@ public class Feeder {
      * @param possibleTarget possible target of this trajectory -> highest point charged
      * @return list of speeddirection objects
      */
-    public List<InputsNetwork> obtainInput(List<Point> points, Double attraction, Point possibleTarget){
+    public List<InputsNetwork> obtainInput(List<Point> points, double attraction, Point possibleTarget){
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
         List<InputsNetwork> totalList = new ArrayList<>();
@@ -219,8 +219,8 @@ public class Feeder {
             Point nextPoint = points.get(i+1);
             Double bearing = conversion.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
-            Double speed;
-            Double space;
+            double speed;
+            double space;
             if(i > 0){
                 Point previousPoint = points.get(i - 1);
                 speed = conversion.obtainSpeed(previousPoint, actualPoint);
@@ -249,7 +249,7 @@ public class Feeder {
     public List<Point> obtainSectionTrajectory(Trajectory trajectory) throws Exception {
         List<Point> point = new ArrayList<>();
         //Every how many time step I return the trajectory
-        Integer count = this.selectPositionInTrajectory(trajectory);
+        int count = this.selectPositionInTrajectory(trajectory);
 //        if(this.position > trajectory.getSize()) {
 //            this.finished = Boolean.TRUE;
 //            this.position = 0;
@@ -411,16 +411,16 @@ public class Feeder {
         //distance in kilometers
         distance = distance / 1000;
 
-        Double earthRadious = 6378.14;
-        Double latRad = Math.toRadians(whereIam.getLatitude());
-        Double lonRad = Math.toRadians(whereIam.getLongitude());
-        Double bearRad = Math.toRadians(direction);
+        double earthRadious = 6378.14;
+        double latRad = Math.toRadians(whereIam.getLatitude());
+        double lonRad = Math.toRadians(whereIam.getLongitude());
+        double bearRad = Math.toRadians(direction);
 
-        Double lat2 = Math.asin(Math.sin(latRad) * Math.cos(distance/earthRadious) + Math.cos(latRad)*Math.sin(distance/earthRadious) * Math.cos(bearRad));
-        Double long2 = lonRad + Math.atan2(Math.sin(bearRad)*Math.sin(distance/earthRadious)*Math.cos(latRad), Math.cos(distance/earthRadious)-Math.sin(latRad)*Math.sin(lat2));
+        double lat2 = Math.asin(Math.sin(latRad) * Math.cos(distance/earthRadious) + Math.cos(latRad)*Math.sin(distance/earthRadious) * Math.cos(bearRad));
+        double long2 = lonRad + Math.atan2(Math.sin(bearRad)*Math.sin(distance/earthRadious)*Math.cos(latRad), Math.cos(distance/earthRadious)-Math.sin(latRad)*Math.sin(lat2));
 
-        Double latDeg = Math.toDegrees(lat2);
-        Double longDeg = Math.toDegrees(long2);
+        double latDeg = Math.toDegrees(lat2);
+        double longDeg = Math.toDegrees(long2);
 
         Coord coordTest = new Coord(latDeg, longDeg);
 
@@ -433,7 +433,7 @@ public class Feeder {
 
 
         distance = distance * 1000;
-        final Double[] dis = {0.0};
+        final double[] dis = {0.0};
         List<InfoNode> list = null;
         try {
             list = this.graph.findPathBetweenNodes(closestNode, testNode);
@@ -442,14 +442,14 @@ public class Feeder {
             List<InfoNode> finalList = list;
             IntStream.range(1, list.size()).forEach(i -> dis[0] += this.graph.findDistanceBetweenNodesConnected(finalList.get(i-1), finalList.get(i)));
 
-            Double dist = dis[0];
+            double dist = dis[0];
 
             //is possible that the distance is already shorter than distance
             if(dist > distance){
                 Integer val = 1;
                 //check the distance
                 while (dist > distance){
-                    final Double[] dis2 = {0.0};
+                    final double[] dis2 = {0.0};
                     IntStream.range(1, list.size() - val).forEach(i -> dis2[0] += this.graph.findDistanceBetweenNodesConnected(finalList.get(i-1), finalList.get(i)));
                     dist = dis2[0];
                     val++;
@@ -457,12 +457,12 @@ public class Feeder {
 
 
                 //now I am in the middle of two nodes and I need to find the right point at the right distance
-                Double realDistance = distance - dist;
+                double realDistance = distance - dist;
                 Coord position = this.graph.findPointInEdge(finalList.get(list.size() - val), finalList.get(list.size() - val + 1), realDistance);
-                Double plusTime = distance / speed;
+                double plusTime = distance / speed;
                 return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
             }
-            Double plusTime = distance / speed;
+            double plusTime = distance / speed;
             return new Point(finalList.get(list.size() - 1).getLat(), finalList.get(list.size() - 1).getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
         } catch (Exception e) {
             //If there is no path I am returning the first point, if there are other errors I am returning something different
@@ -491,8 +491,8 @@ public class Feeder {
         //compute all the angles
         endNodes.forEach(node -> angles.add(IamHere.angleWith(node.getCoord())));
         //find id closest ending node
-        final Integer[] index = {0};
-        final Double[] minDifference = {Double.MAX_VALUE};
+        final int[] index = {0};
+        final double[] minDifference = {Double.MAX_VALUE};
         IntStream.range(0, angles.size()).forEach(i -> {
             Double difference = Math.abs(Normalisation.fromHalfPItoTotalPI(direction) - Normalisation.fromHalfPItoTotalPI(angles.get(i)));
             if(difference < minDifference[0]){
@@ -522,9 +522,7 @@ public class Feeder {
     public List<TrainReal> multiFeeder(IdsaLoader idsaLoader) throws Exception {
         //need to load the number of trajectories given by settings
         List<TrainReal> totalList = new ArrayList<>();
-        IntStream.range(0, ReadConfig.Configurations.getTrajectoriesTrained()).forEach(i -> {
-            this.feedTheEater(idsaLoader,totalList);
-        });
+        IntStream.range(0, ReadConfig.Configurations.getTrajectoriesTrained()).forEach(i -> this.feedTheEater(idsaLoader,totalList));
 
         //it is possible total list is not the right size. Check it
         while(totalList.size() < ReadConfig.Configurations.getTrajectoriesTrained()){

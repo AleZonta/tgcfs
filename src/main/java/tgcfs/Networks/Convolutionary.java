@@ -46,7 +46,7 @@ public class Convolutionary extends Models implements Network {
      * @param dimension height and with of the picture
      *
      * */
-    public Convolutionary(Integer dimension){
+    public Convolutionary(int dimension){
         ComputationGraphConfiguration.GraphBuilder graph = new NeuralNetConfiguration.Builder()
                 .seed(123)
                 .iterations(90)
@@ -141,7 +141,7 @@ public class Convolutionary extends Models implements Network {
      * Inputs of the network
      * @return Integer number
      */
-    public Integer getNumberInputArrays(){
+    public int getNumberInputArrays(){
         return this.net.getNumInputArrays();
     }
 
@@ -150,7 +150,7 @@ public class Convolutionary extends Models implements Network {
      * Output of the network
      * @return Integer number
      */
-    public Integer getNumberOutputArrays(){
+    public int getNumberOutputArrays(){
         return this.net.getNumOutputArrays();
     }
 
@@ -159,7 +159,7 @@ public class Convolutionary extends Models implements Network {
      * @return integer number
      */
     @Override
-    public Integer getNumPar(){
+    public int getNumPar(){
         return this.net.numParams();
     }
 

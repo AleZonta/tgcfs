@@ -61,7 +61,7 @@ public class ENNTest {
     @Test
     public void getNumPar() throws Exception {
         ENN net = new ENN(2,1,1);
-        assertEquals(6, net.getNumPar().longValue());
+        assertEquals(6, net.getNumPar());
     }
 
 }

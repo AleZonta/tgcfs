@@ -89,7 +89,7 @@ public class Classifier extends ENN implements EvolvableModel {
      * @implNote Implementation from Interface
      */
     @Override
-    public Integer getArrayLength() { return this.arrayLength; }
+    public int getArrayLength() { return this.arrayLength; }
 
     /**
      * @implNote Implementation from Interface

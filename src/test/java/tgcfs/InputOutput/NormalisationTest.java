@@ -4,6 +4,7 @@ import org.junit.Test;
 import tgcfs.Agents.InputNetwork;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -80,11 +81,11 @@ public class NormalisationTest {
     public void convertSpeed() throws Exception {
         Double data = 55.5;
         Double data1 = 0.0;
-        assertEquals(new Double(1.0), Normalisation.convertSpeed(data));
-        assertEquals(new Double(-1.0), Normalisation.convertSpeed(data1));
+        assertTrue(1.0 == Normalisation.convertSpeed(data));
+        assertTrue(-1.0 == Normalisation.convertSpeed(data1));
 
         Double data2 = 1111111.0;
-        assertEquals(new Double(1.0), Normalisation.convertSpeed(data2));
+        assertTrue(1.0 == Normalisation.convertSpeed(data2));
 
     }
 
@@ -118,15 +119,15 @@ public class NormalisationTest {
         Double data1 = -100.0;
         Double data2 = 0.0;
 
-        assertEquals(new Double(1.0), Normalisation.convertData(inputNetwork, data));
-        assertEquals(new Double(-1.0), Normalisation.convertData(inputNetwork, data1));
-        assertEquals(new Double(0.0), Normalisation.convertData(inputNetwork, data2));
+        assertTrue(1.0 == Normalisation.convertData(inputNetwork, data));
+        assertTrue(-1.0 == Normalisation.convertData(inputNetwork, data1));
+        assertTrue(0.0 == Normalisation.convertData(inputNetwork, data2));
 
 
         tgcfs.Classifiers.InputNetwork inputNetwork1 = new tgcfs.Classifiers.InputNetwork(5.0,20.0);
-        assertEquals(new Double(1.0), Normalisation.convertData(inputNetwork1, data));
-        assertEquals(new Double(-1.0), Normalisation.convertData(inputNetwork1, data1));
-        assertEquals(new Double(0.0), Normalisation.convertData(inputNetwork1, data2));
+        assertTrue(1.0 == Normalisation.convertData(inputNetwork1, data));
+        assertTrue(-1.0 == Normalisation.convertData(inputNetwork1, data1));
+        assertTrue(0.0 == Normalisation.convertData(inputNetwork1, data2));
     }
 
 }

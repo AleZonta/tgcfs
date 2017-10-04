@@ -16,8 +16,8 @@ import java.lang.reflect.Field;
  * a.zonta@vu.nl
  */
 public class OutputNetwork implements OutputsNetwork{
-    private Boolean real;
-    public static final Integer outputSize = 1; //the size of the output corresponding to the field here
+    private boolean real;
+    public static final int outputSize = 1; //the size of the output corresponding to the field here
 
     /**
      * Contructor zero parameter
@@ -35,7 +35,7 @@ public class OutputNetwork implements OutputsNetwork{
      * Getter for real
      * @return Boolean value
      */
-    public Boolean getReal() {
+    public boolean getReal() {
         return real;
     }
 

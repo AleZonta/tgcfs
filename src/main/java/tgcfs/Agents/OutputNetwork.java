@@ -1,6 +1,7 @@
 package tgcfs.Agents;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -18,10 +19,10 @@ import java.lang.reflect.Field;
  * a.zonta@vu.nl
  */
 public class OutputNetwork implements OutputsNetwork {
-    private Double speed;
-    private Double bearing;
-    private Double distance;
-    public static final Integer outputSize = 3; //the size of the output corresponding to the two fields here
+    private double speed;
+    private double bearing;
+    private double distance;
+    public static final int outputSize = 3; //the size of the output corresponding to the two fields here
 
     /**
      * Constructor zero parameter
@@ -39,7 +40,7 @@ public class OutputNetwork implements OutputsNetwork {
      * @param speed speed parameter
      * @param bearing bearing parameter
      */
-    public OutputNetwork(Double speed, Double bearing, Double distance){
+    public OutputNetwork(double speed, double bearing, double distance){
         this.speed = speed;
         this.bearing = bearing;
         this.distance = distance;
@@ -69,7 +70,7 @@ public class OutputNetwork implements OutputsNetwork {
      * Getter for speed
      * @return Double value of speed
      */
-    public Double getSpeed() {
+    public double getSpeed() {
         return speed;
     }
 
@@ -77,7 +78,7 @@ public class OutputNetwork implements OutputsNetwork {
      * Getter for bearing
      * @return Double value of bearing
      */
-    public Double getBearing() {
+    public double getBearing() {
         return bearing;
     }
 
@@ -85,7 +86,7 @@ public class OutputNetwork implements OutputsNetwork {
      * Getter for distance
      * @return Double value of distance
      */
-    public Double getDistance() { return this.distance;}
+    public double getDistance() { return this.distance;}
 
     /**
      * @implNote Implementation from Abstract class Algorithm
@@ -94,10 +95,21 @@ public class OutputNetwork implements OutputsNetwork {
      */
     @Override
     public void deserialise(INDArray out) {
-        if (out.columns() != outputSize) throw new Error("List size is not correct");
-        this.speed = Normalisation.decodeSpeed(out.getDouble(0));
-        this.bearing = Normalisation.decodeDirectionData(out.getDouble(1));
-        this.distance = Normalisation.decodeDistance(out.getDouble(2));
+
+        if (out.columns() != outputSize) {
+            if (out.rows() != outputSize) {
+                throw new Error("List size is not correct");
+            }
+        }
+        if(out.columns() == outputSize) {
+            this.speed = Normalisation.decodeSpeed(out.getDouble(0));
+            this.bearing = Normalisation.decodeDirectionData(out.getDouble(1));
+            this.distance = Normalisation.decodeDistance(out.getDouble(2));
+        }else{
+            this.speed = Normalisation.decodeSpeed(out.getRow(0).getDouble(0));
+            this.bearing = Normalisation.decodeDirectionData(out.getRow(1).getDouble(0));
+            this.distance = Normalisation.decodeDistance(out.getRow(2).getDouble(0));
+        }
     }
 
     /**
@@ -111,5 +123,17 @@ public class OutputNetwork implements OutputsNetwork {
                 "bearing=" + this.bearing + ", " +
                 "distance=" + this.distance + " " +
                 '}';
+    }
+
+
+    /**
+     * Serialise object ready for the classifier
+     * @return {@link INDArray} vector
+     */
+    public INDArray serialiaseAsInputClassifier(){
+        INDArray array = Nd4j.zeros(2);
+        array.putScalar(0, this.speed);
+        array.putScalar(1, this.bearing);
+        return array;
     }
 }

@@ -24,13 +24,14 @@ import static junit.framework.TestCase.assertNotNull;
  */
 public class IdsaLoaderTest {
 
-
     @Test
     public void initPotentialField1() throws Exception {
+        throw new Exception("Not tested");
     }
 
     @Test
     public void retPossibleTarget() throws Exception {
+        throw new Exception("Not tested");
     }
 
     @Test

@@ -60,10 +60,10 @@ public class Agent extends Models {
             //bearing from this point to next point
             Point actualPoint = this.realOutput.get(i);
             Point nextPoint = this.realOutput.get(i+1);
-            Double bearing = convertitor.obtainBearing(actualPoint,nextPoint);
+            double bearing = convertitor.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
-            Double speed;
-            Double dist;
+            double speed;
+            double dist;
             if(i > 0){
                 Point previousPoint = this.realOutput.get(i - 1);
                 speed = convertitor.obtainSpeed(previousPoint, actualPoint);

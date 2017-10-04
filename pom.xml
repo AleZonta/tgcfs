@@ -23,7 +23,8 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.19</version>
         <configuration>
-          <argLine>-Xmx20480m -Xss4086k</argLine>
+            <argLine>-Xmx20480m -Xss4086k</argLine>
+            <argLine>-XX:+UseG1GC</argLine>
         </configuration>
       </plugin>
       <plugin>
@@ -128,6 +129,13 @@
           <artifactId>nd4j-native-platform</artifactId>
           <version>0.9.1</version>
       </dependency>
+      <!--
+      <dependency>
+          <groupId>org.nd4j</groupId>
+          <artifactId>nd4j-cuda-8.0</artifactId>
+          <version>0.9.1</version>
+      </dependency>
+      -->
       <dependency>
           <groupId>nl.tno</groupId>
           <artifactId>idsa</artifactId>

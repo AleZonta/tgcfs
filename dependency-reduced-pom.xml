@@ -23,6 +23,7 @@
         <version>2.19</version>
         <configuration>
           <argLine>-Xmx20480m -Xss4086k</argLine>
+          <argLine>-XX:+UseG1GC</argLine>
         </configuration>
       </plugin>
       <plugin>

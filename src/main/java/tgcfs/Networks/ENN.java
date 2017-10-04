@@ -9,6 +9,7 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import tgcfs.NN.Models;
@@ -30,10 +31,10 @@ import java.util.stream.IntStream;
  */
 public class ENN extends Models implements Network {
     protected MultiLayerNetworkBis net; //neural network, brain of the agent
-    protected Integer arrayLength; //length of the weight array
-    protected Integer input;
-    protected Integer hiddenNeurons;
-    protected Integer output;
+    protected int arrayLength; //length of the weight array
+    protected int input;
+    protected int hiddenNeurons;
+    protected int output;
 
     /**
      * Default constructor
@@ -46,7 +47,7 @@ public class ENN extends Models implements Network {
      * @param HiddenNeurons number of hidden layer
      * @param output number of nodes used as output
      */
-    public ENN(Integer input, Integer HiddenNeurons, Integer output){
+    public ENN(int input, int HiddenNeurons, int output){
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(12345)
                 .weightInit(WeightInit.XAVIER)
@@ -113,8 +114,8 @@ public class ENN extends Models implements Network {
             IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,pastInput.getDouble(i-this.input)));
         }
 
-//        return this.net.rnnTimeStep(total);
-        return this.net.output(total);
+        return this.net.rnnTimeStep(total);
+        //return this.net.output(total);
     }
 
     /**
@@ -141,6 +142,14 @@ public class ENN extends Models implements Network {
     }
 
     /**
+     * fit the network
+     * @param dataSet dataSet input of the network
+     */
+    public void fit(DataSet dataSet){
+        this.net.fit(dataSet);
+    }
+
+    /**
      * Get string containing description of the network
      * @return String
      */
@@ -154,7 +163,15 @@ public class ENN extends Models implements Network {
      * @return integer number
      */
     @Override
-    public Integer getNumPar() {
+    public int getNumPar() {
         return this.net.numParams();
+    }
+
+
+    /**
+     * clear input parameters
+     */
+    public void cleanParam(){
+        this.net.clear();
     }
 }

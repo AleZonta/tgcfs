@@ -152,7 +152,8 @@ public class GAN implements Framework{
 
             //train the Generator
             logger.log(Level.INFO,"Train Generator...");
-            agents.trainNetwork(combineInputList);
+            throw new Exception("Not yet completed");
+            //agents.trainNetwork(combineInputList);
 
 
         }

@@ -1,14 +1,20 @@
 package tgcfs.Loader;
 
+import lgds.Distance.Distance;
 import lgds.trajectories.Point;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import tgcfs.Agents.OutputNetwork;
 import tgcfs.Idsa.IdsaLoader;
+import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 30/06/2017.
@@ -26,27 +32,37 @@ public class TrainReal {
     private final List<InputsNetwork> trainingPoint;
     private List<Point> firstPart;
     private final List<Point>  followingPart;
+    private List<InputsNetwork> followingPartTransformed;
+    private List<OutputsNetwork> realOutput;
+    private List<InputsNetwork> allThePartTransformedFake;
+    private List<InputsNetwork> allThePartTransformedReal;
     private final String conditionalImage;
     private final String normalImage;
     private List<OutputsNetwork> outputComputed;
     private List<Point> realPointsOutputComputed;
     private IdsaLoader idsaLoader;
+    private List<Point> totalPoints;
 
     /**
      * Constructor with two parameters
      * @param trainingPoint list of inputNetwork
      * @param followingPart list of points
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart){
+    public TrainReal(List<InputsNetwork> trainingPoint, List<Point> followingPart){
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
         this.firstPart = null;
         //the conditional image path is hardcoded -> has to be in the same directory of the program
-        this.conditionalImage = Paths.get(".").toAbsolutePath().normalize().toString() + "/cond.png";
-        this.normalImage = Paths.get(".").toAbsolutePath().normalize().toString() + "/image.png";
+        this.conditionalImage = null;
+        this.normalImage = null;
         this.idsaLoader = null;
         this.outputComputed = null;
         this.realPointsOutputComputed = null;
+        this.totalPoints = null;
+        this.followingPartTransformed = null;
+        this.allThePartTransformedFake = null;
+        this.allThePartTransformedReal = null;
+        this.realOutput = null;
     }
 
     /**
@@ -64,6 +80,11 @@ public class TrainReal {
         this.idsaLoader = null;
         this.outputComputed = null;
         this.realPointsOutputComputed = null;
+        this.totalPoints = null;
+        this.followingPartTransformed = null;
+        this.allThePartTransformedFake = null;
+        this.allThePartTransformedReal = null;
+        this.realOutput = null;
 
     }
 
@@ -83,6 +104,11 @@ public class TrainReal {
         this.idsaLoader = idsaLoader;
         this.outputComputed = null;
         this.realPointsOutputComputed = null;
+        this.totalPoints = null;
+        this.followingPartTransformed = null;
+        this.allThePartTransformedFake = null;
+        this.allThePartTransformedReal = null;
+        this.realOutput = null;
 
     }
 
@@ -153,7 +179,7 @@ public class TrainReal {
 
     /**
      * Getter fot the conditional image
-     * @return
+     * @return String address conditional image
      */
     public String getConditionalImage() {
         return this.conditionalImage;
@@ -198,4 +224,126 @@ public class TrainReal {
     public void setRealPointsOutputComputed(List<Point> realPointsOutputComputed) {
         this.realPointsOutputComputed = realPointsOutputComputed;
     }
+
+    /**
+     * Return the total list of points present in this object
+     * if it is already computed return that one, otherwise compute it and save it
+     * @param real if real True take the real point, if False take the generated one
+     * @return List {@link Point} objects
+     */
+    public List<Point> getTotalList(Boolean real){
+        if(this.totalPoints == null) {
+            this.totalPoints = new ArrayList<>();
+            this.totalPoints.addAll(this.firstPart);
+            //I want the original list
+            if (real) {
+                //check size real output computed
+                int size = this.realPointsOutputComputed.size();
+                IntStream.range(0, size).forEach(i -> this.totalPoints.add(this.followingPart.get(i)));
+            } else {
+                this.totalPoints.addAll(this.realPointsOutputComputed);
+            }
+        }
+        return this.totalPoints;
+    }
+
+    /**
+     * Get number of features from
+     * @return
+     */
+    public int getSingleInputSize(){
+        return this.trainingPoint.get(0).serialise().columns();
+    }
+
+    /**
+     * Get the following part transformed into {@link InputsNetwork}
+     * @return list of {@link InputsNetwork}
+     */
+    public List<InputsNetwork> getFollowingPartTransformed() {
+        //return number of outputcomputed position
+        throw new NotImplementedException();
+       // return this.followingPartTransformed;
+    }
+
+    /**
+     * Getter for all the trajectory transformed (The fake trajectory)
+     * @return List of {@link InputsNetwork}
+     */
+    public List<InputsNetwork> getAllThePartTransformedFake() {
+        return this.allThePartTransformedFake;
+    }
+
+    /**
+     * Setter for the trajectory transformed  (The fake trajectory)
+     * @param allThePartTransformedFake List of {@link InputsNetwork}
+     */
+    public void setAllThePartTransformedFake(List<InputsNetwork> allThePartTransformedFake) {
+        this.allThePartTransformedFake = allThePartTransformedFake;
+    }
+
+    /**
+     * Getter for all the trajectory transformed (The Real trajectory)
+     * @return List of {@link InputsNetwork}
+     */
+    public List<InputsNetwork> getAllThePartTransformedReal() {
+        return this.allThePartTransformedReal;
+    }
+
+    /**
+     * Setter for the trajectory transformed  (The real trajectory)
+     * @param allThePartTransformedFake List of {@link InputsNetwork}
+     */
+    public void setAllThePartTransformedReal(List<InputsNetwork> allThePartTransformedFake) {
+        this.allThePartTransformedReal = allThePartTransformedFake;
+    }
+
+    /**
+     * Getter for the real output
+     * @return list {@link OutputNetwork}
+     */
+    public List<OutputsNetwork> getRealOutput() {
+        if(this.realOutput == null) throw new NullPointerException("Need to compute the real output before using it");
+        return this.realOutput;
+    }
+
+    /**
+     * Transform the point given by output into an outputnetwork
+     */
+    public void createOutput(){
+        //class that compute the conversion point -> speed/bearing
+        PointToSpeedBearing convertitor = new PointToSpeedBearing();
+        List<OutputsNetwork> totalList = new ArrayList<>();
+        Distance distance = new Distance();
+
+        //add the last point to the end to enable the computation of the output
+        List<Point> herePoint = new ArrayList<>();
+        herePoint.add(this.firstPart.get(this.firstPart.size() - 1));
+        herePoint.addAll(this.followingPart);
+
+        IntStream.range(0, herePoint.size() - 1).forEach(i -> {
+            //bearing from this point to next point
+            Point actualPoint = herePoint.get(i);
+            Point nextPoint = herePoint.get(i+1);
+            Double bearing = convertitor.obtainBearing(actualPoint,nextPoint);
+            //speed is the speed I arrived here from previous point
+            Double speed;
+            Double dist;
+            if(i > 0){
+                Point previousPoint = herePoint.get(i - 1);
+                speed = convertitor.obtainSpeed(previousPoint, actualPoint);
+
+                dist = distance.compute(previousPoint,actualPoint);
+            }else{
+                speed = 0.0;
+                dist = 0.0;
+            }
+            //compute the distance
+
+            totalList.add(new OutputNetwork(speed, bearing, dist));
+        });
+        this.realOutput = new ArrayList<>();
+        this.realOutput.addAll(totalList);
+
+    }
 }
+

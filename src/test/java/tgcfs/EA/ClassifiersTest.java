@@ -28,6 +28,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class ClassifiersTest {
     @Test
+    public void createDataSet() throws Exception {
+        throw new Exception("Not tested");
+    }
+
+    @Test
     public void trainNetwork() throws Exception {
         Classifiers classifiers = new Classifiers();
         try {
@@ -84,7 +89,7 @@ public class ClassifiersTest {
             inputHere.add(new InputNetwork(ThreadLocalRandom.current().nextDouble(-5,55), ThreadLocalRandom.current().nextDouble(-180,180)));
             try {
                 OutputNetwork ress = (OutputNetwork) classifiers.runIndividual(classifiers.getPopulation().get(0),inputHere);
-                System.out.println(ress.getReal().toString() );
+                System.out.println(ress.getReal() );
             } catch (Exception e) {
                 e.printStackTrace();
             }
