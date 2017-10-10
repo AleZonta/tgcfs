@@ -75,6 +75,7 @@ public class NormalisationTest {
         Double ret = Normalisation.convertSpeed(data);
         Double redata = Normalisation.decodeSpeed(ret);
         assertEquals(data,redata);
+
     }
 
     @Test

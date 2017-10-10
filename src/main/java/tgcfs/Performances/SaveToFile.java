@@ -3,6 +3,7 @@ package tgcfs.Performances;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import tgcfs.Config.PropertiesFileReader;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 
@@ -155,6 +156,25 @@ public class SaveToFile {
 
 
     /**
+     * Initialise the file with the sha-1 code of the commit
+     * @param name  name of the class/file I am saving
+     */
+    private void initialiseFitness(String name){
+        try {
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-fitness.csv", true));
+            outputWriter.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
+            outputWriter.newLine();
+
+            logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+
+            outputWriter.flush();
+            outputWriter.close();
+        }catch (Exception e){
+            logger.log(Level.WARNING, "Error with " + name + " CSV File " + e.getMessage());
+        }
+    }
+
+    /**
      * Append fitness line to the file saving the finesses
      * @param name name of the class/file I am saving
      * @param listFitness list with the Integer value of the fitness
@@ -195,13 +215,19 @@ public class SaveToFile {
         logger.log(Level.INFO, "Successfully saved " + name + " config File");
     }
 
+
+
+    private void initialiseGenome(String name){
+
+    }
+
+
     /**
      * Save the genome of the best individual
      * @param name name of the class/file I am saving
      * @param genome list with the double value of the genome
      */
     private void saveGenome(String name, INDArray genome){
-
         try {
             BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-genome.csv", true));
             outputWriter.write(genome.data().toString());

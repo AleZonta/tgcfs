@@ -66,7 +66,8 @@ public class FeederTest {
         IdsaLoader idsaLoader = new IdsaLoader();
         idsaLoader.InitPotentialField(system.getTrajectories());
 
-        List<TrainReal> res = system.multiFeeder(idsaLoader);
+        List<TrainReal> res = system.multiFeeder(idsaLoader, null);
+        res = system.multiFeeder(idsaLoader, res);
         assertNotNull(res);
     }
 

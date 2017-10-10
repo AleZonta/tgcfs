@@ -58,7 +58,11 @@ public class SaverTest {
         IntStream.range(0, 1000).forEach(i -> {
             TrainReal ttt = new TrainReal(input, p);
             ttt.setRealPointsOutputComputed(p);
-            ttt.setPoints(p);
+            try {
+                ttt.setPoints(p);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             list.add(ttt);
         });
 

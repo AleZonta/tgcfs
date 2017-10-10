@@ -105,7 +105,7 @@ public class IdsaLoader {
         logger.log(Level.FINE, "Loading Potential Field...");
         this.pot = new PotentialField(world, this.configFile, this.par.getH(), this.par.getZ1(), this.par.getZ2(), this.par.getS2(), this.par.getW2(), this.par.getName(), this.par.getExperiment());
 
-        logger.log(Level.INFO, "Potential Field Online.");
+        logger.log(Level.FINE, "Potential Field Online.");
         //what About the POI for the potential Field?
         //I should generate all the one I have it and then pick it up
         logger.log(Level.FINE, "Computing POIs...");

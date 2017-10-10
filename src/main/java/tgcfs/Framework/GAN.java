@@ -141,7 +141,7 @@ public class GAN implements Framework{
             generation++;
 
             //load several pieces of trajectory
-            List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader);
+            List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader, null);
             //generate the output of the agent
             agents.runIndividuals(combineInputList);
 

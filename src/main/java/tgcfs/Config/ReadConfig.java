@@ -69,6 +69,8 @@ public class ReadConfig {
     private Boolean checkAlsoPast;
     private Boolean automaticCalibration;
 
+    private Integer numberOfTimestepConsidered;
+
 
     /**
      * Constructor with zero parameter
@@ -119,6 +121,8 @@ public class ReadConfig {
         this.dumpTrajectoryPointAndMeaning = null;
 
         this.automaticCalibration = null;
+
+        this.numberOfTimestepConsidered = null;
     }
 
     /**
@@ -461,6 +465,12 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("AutomaticCalibration is wrong or missing.");
         }
+        try {
+            // TimestepsOfTheRealTrajectory
+            this.numberOfTimestepConsidered = ((Long) jsonObject.get("TimestepsOfTheRealTrajectory")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("TimestepsOfTheRealTrajectory is wrong or missing.");
+        }
     }
 
 
@@ -631,9 +641,11 @@ public class ReadConfig {
     @Override
     public String toString() {
         return "ReadConfig{" + ",\n" +
+                "git-sha-1=" + PropertiesFileReader.getGitSha1() + ",\n" +
                 "trajectoriesType=" + trajectoriesType + ",\n" +
                 "howManySplitting=" + howManySplitting + ",\n" +
                 "howManyTrajectories=" + howManyTrajectories + ",\n" +
+                "howManyTrajectories=" + numberOfTimestepConsidered + ",\n" +
                 "agentPopulationSize=" + agentPopulationSize + ",\n" +
                 "agentOffspringSize=" + agentOffspringSize + ",\n" +
                 "agentAlpha=" + agentAlpha + ",\n" +
@@ -745,6 +757,16 @@ public class ReadConfig {
     public boolean getAutomaticCalibration() throws Exception {
         if(this.automaticCalibration == null) throw new Exception("Try to access config file before reading it.");
         return this.automaticCalibration;
+    }
+
+    /**
+     * Getter for the number of timestep considered in the trajectory
+     * @return int number with the number of timesteps
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public int getNumberOfTimestepConsidered() throws Exception {
+        if(this.numberOfTimestepConsidered == null) throw new Exception("Try to access config file before reading it.");
+        return numberOfTimestepConsidered;
     }
 
 
@@ -1075,6 +1097,15 @@ public class ReadConfig {
          */
         public static boolean getAutomaticCalibration() throws Exception {
             return config.getAutomaticCalibration();
+        }
+
+        /**
+         * Getter for the number of timestep considered in the trajectory
+         * @return int number with the number of timesteps
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static int getNumberOfTimestepConsidered() throws Exception {
+            return config.getNumberOfTimestepConsidered();
         }
     }
 

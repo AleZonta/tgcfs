@@ -8,6 +8,7 @@ import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.Classifier;
+import tgcfs.Config.PropertiesFileReader;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Classifiers;
@@ -69,6 +70,7 @@ public class TuringLearning implements Framework{
         //initialise the saving class
         new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
         SaveToFile.Saver.dumpSetting(ReadConfig.Configurations.getConfig());
+        logger.log(Level.INFO, PropertiesFileReader.getGitSha1());
 
         //back up for convolution, in java there are some problems
         if(Objects.equals(ReadConfig.Configurations.getValueModel(), ReadConfig.Configurations.Convolution)) Nd4j.enableFallbackMode(Boolean.TRUE);
@@ -141,7 +143,7 @@ public class TuringLearning implements Framework{
         logger.log(Level.INFO, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
 
         //load several pieces of trajectory
-        List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader);
+        List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader, null);
         //execution agents
         logger.log(Level.INFO,"Run Agents...");
         //train the agents
@@ -184,7 +186,7 @@ public class TuringLearning implements Framework{
             /* { EVALUATE new candidate } */
             try {
                 logger.log(Level.INFO,"Loading new trajectories...");
-                combineInputList = this.feeder.multiFeeder(this.idsaLoader);
+                combineInputList = this.feeder.multiFeeder(this.idsaLoader, combineInputList);
                 //execution agents
                 logger.log(Level.INFO,"Run Agents...");
                 this.agents.runIndividuals(combineInputList);
@@ -230,8 +232,8 @@ public class TuringLearning implements Framework{
 
                 //save the fitness of all the population and best genome
                 logger.log(Level.INFO,"Saving Statistics...");
-                if(evolveAgent) SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
-                if(evolveClassifier) SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(), this.classifiers.retAllFitness());
+                SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
+                SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(), this.classifiers.retAllFitness());
                 if(evolveAgent) SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
                 if(evolveClassifier) SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
                 if(ReadConfig.Configurations.getDumpPop()) {
@@ -354,12 +356,13 @@ public class TuringLearning implements Framework{
      * @throws Exception something wrong happens
      */
     public void generateMoreThanDiscriminate(Integer number) throws Exception {
+        List<TrainReal> combineInputList = null;
         for(int i = 0; i < number - 1; i++) {
             //I have to evolve for this number of time-step -1 only the  agents and not the classifiers
             //The last timestep I am evolving both
             logger.log(Level.INFO, "Evaluation only agents' generation " + i);
                 /* { EVALUATE new candidate } */
-            List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader);
+            combineInputList = this.feeder.multiFeeder(this.idsaLoader, combineInputList);
             //train the agents
             this.agents.trainNetwork(combineInputList);
             //execution agents

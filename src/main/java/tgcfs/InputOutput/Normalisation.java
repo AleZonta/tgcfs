@@ -82,7 +82,7 @@ public class Normalisation {
      * @return normalised speed between ±1
      */
     public static double convertSpeed(double toBeConverted) {
-        double maxSpeed = 55.5; //55.5 metres/seconds means maximum speed of 200 km/h
+        double maxSpeed = 10.0; //55.5 metres/seconds means maximum speed of 200 km/h
         double minSpeed = 0.0;
         if (toBeConverted > maxSpeed) {
             toBeConverted = maxSpeed;
@@ -101,7 +101,7 @@ public class Normalisation {
     public static double decodeSpeed(double toBeConverted){
         double maxSpeed = 1.0;
         double minSpeed = -1.0;
-        double b = 55.5;
+        double b = 10.0;
         double a = 0.0;
         return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
     }

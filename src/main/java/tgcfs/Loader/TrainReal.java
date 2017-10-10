@@ -4,6 +4,7 @@ import lgds.Distance.Distance;
 import lgds.trajectories.Point;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Agents.OutputNetwork;
+import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
@@ -172,9 +173,19 @@ public class TrainReal {
      * Setter for first part of the source
      * @param firstPart point
      */
-    public void setPoints(List<Point> firstPart) {
+    public void setPoints(List<Point> firstPart) throws Exception {
+        //check how many points I want to analise
         this.firstPart = firstPart;
 
+        int timesteps = ReadConfig.Configurations.getNumberOfTimestepConsidered();
+        //if it is zero I do not care and use all the timesteps
+        if(timesteps != 0){
+            //keep only the timesteps that I need
+            while(this.firstPart.size() > timesteps){
+                //remove the first one till I reach the size I want
+                this.firstPart.remove(0);
+            }
+        }
     }
 
     /**
@@ -343,7 +354,14 @@ public class TrainReal {
         });
         this.realOutput = new ArrayList<>();
         this.realOutput.addAll(totalList);
+    }
 
+    /**
+     * Deep copy of the object
+     * @return {@link TrainReal} object
+     */
+    public TrainReal deepCopy(){
+        return new TrainReal(this.trainingPoint,this.followingPart);
     }
 }
 

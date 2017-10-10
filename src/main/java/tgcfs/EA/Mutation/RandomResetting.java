@@ -85,13 +85,13 @@ public class RandomResetting extends Individual {
     @Override
     public void mutate(Integer n) {
         //generate random number of gene that I will mutate
-        Integer top = n / 4;
-        Integer rand = ThreadLocalRandom.current().nextInt(1, top + 1);
+        int top = n / 4;
+        int rand = ThreadLocalRandom.current().nextInt(1, top + 1);
 
         IntStream.range(0,rand).forEach(el -> {
             //generate random position to mutate
-            Integer pos = ThreadLocalRandom.current().nextInt(super.getObjectiveParameters().columns());
-            Double newValue = ThreadLocalRandom.current().nextDouble(-4,4);
+            int pos = ThreadLocalRandom.current().nextInt(super.getObjectiveParameters().columns());
+            double newValue = ThreadLocalRandom.current().nextDouble(-4,4);
             super.getObjectiveParameters().putScalar(pos,newValue);
         });
     }

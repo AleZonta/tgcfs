@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -213,10 +214,15 @@ public class Feeder {
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
         List<InputsNetwork> totalList = new ArrayList<>();
-        IntStream.range(0, points.size() - 1).forEach(i -> {
+        IntStream.range(0, points.size()).forEach(i -> {
             //bearing from this point to next point
             Point actualPoint = points.get(i);
-            Point nextPoint = points.get(i+1);
+            Point nextPoint;
+            try {
+                nextPoint = points.get(i + 1);
+            }catch (Exception e){
+                nextPoint =  points.get(i);
+            }
             Double bearing = conversion.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
             double speed;
@@ -234,8 +240,6 @@ public class Feeder {
             inputNetwork.setTargetPoint(possibleTarget);
             totalList.add(inputNetwork);
         });
-
-
         return totalList;
     }
 
@@ -332,7 +336,6 @@ public class Feeder {
 
         //hardcoded low bound for the size
         if(actualPoint.size() < 10){
-
             //need to find a new trajectory
             //it can happen only if the current one is finished
             this.finished = Boolean.TRUE;
@@ -344,6 +347,17 @@ public class Feeder {
         pointWithTime.forEach(point -> this.points.add(point.deepCopy()));
         //compute the potential field for the actualPoint
         actualPoint.forEach(idsaLoader::compute);
+
+        //check how many points I want to analise
+        int timesteps = ReadConfig.Configurations.getNumberOfTimestepConsidered();
+        //if it is zero I do not care and use all the timesteps
+        if(timesteps != 0){
+            //keep only the timesteps that I need
+            while(actualPoint.size() > timesteps){
+                //remove the first one till I reach the size I want
+                actualPoint.remove(0);
+            }
+        }
 
         //return the list of input network
         return this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)), idsaLoader.retPossibleTarget());
@@ -364,6 +378,7 @@ public class Feeder {
                 realPoint.add(nextPoint);
             }
         });
+
         return realPoint;
     }
 
@@ -516,13 +531,33 @@ public class Feeder {
      * to find the ral part of the trajectory
      *
      * @param idsaLoader reference IDSA system
+     * @param oldList old list of input that we need to keep
      * @return list of {@link TrainReal} object
      * @throws Exception if there are problems with the config file or we reached the maximum number of trajectories usable
      */
-    public List<TrainReal> multiFeeder(IdsaLoader idsaLoader) throws Exception {
+    public List<TrainReal> multiFeeder(IdsaLoader idsaLoader, List<TrainReal> oldList) throws Exception {
+
         //need to load the number of trajectories given by settings
         List<TrainReal> totalList = new ArrayList<>();
-        IntStream.range(0, ReadConfig.Configurations.getTrajectoriesTrained()).forEach(i -> this.feedTheEater(idsaLoader,totalList));
+        int start = 0;
+
+        if(oldList!= null) {
+            //for now I am keeping half of the old trajectories, random selection
+            int total = oldList.size();
+            int kept = total / 2;
+            while (oldList.size() > kept) {
+                int rand = ThreadLocalRandom.current().nextInt(0, oldList.size());
+                oldList.remove(rand);
+            }
+            //now the old list contains only the one I want to be there
+
+            //deep copy so i reset their status on the new list
+            oldList.forEach(trainReal -> totalList.add(trainReal.deepCopy()));
+            start = totalList.size();
+        }
+
+
+        IntStream.range(start, ReadConfig.Configurations.getTrajectoriesTrained()).forEach(i -> this.feedTheEater(idsaLoader,totalList));
 
         //it is possible total list is not the right size. Check it
         while(totalList.size() < ReadConfig.Configurations.getTrajectoriesTrained()){
