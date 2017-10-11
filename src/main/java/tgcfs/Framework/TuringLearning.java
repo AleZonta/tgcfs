@@ -146,8 +146,6 @@ public class TuringLearning implements Framework{
         List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader, null);
         //execution agents
         logger.log(Level.INFO,"Run Agents...");
-        //train the agents
-        this.agents.trainNetwork(combineInputList);
         //run the agents
         this.agents.runIndividuals(combineInputList);
         //classifier are executed and evaluated during agents evaluations

@@ -16,6 +16,7 @@ import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Routing.Routes;
+import tgcfs.Utils.PointWithBearing;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -46,7 +47,7 @@ public class Feeder {
     private Trajectory currentTrajectory; //current trajectory under investigation
     private int maximumNumberOfTrajectories;
     private int actualNumberOfTrajectory;
-    private List<Point> points;
+    private List<PointWithBearing> points;
     private final DatabaseCoordNode db; //database saving all the already visited nodes
     private Boolean isNewTrajectory;
     private Point lastTimeUsed;
@@ -240,7 +241,36 @@ public class Feeder {
             inputNetwork.setTargetPoint(possibleTarget);
             totalList.add(inputNetwork);
         });
-        return totalList;
+
+        //transform everything into linear speed and angular speed
+        List<InputsNetwork> realList = new ArrayList<>();
+        List<PointWithBearing> updatedPoints = new ArrayList<>();
+        int i = 0;
+
+        double previousBearing = totalList.get(0).serialise().getDouble(1);
+        for(InputsNetwork net: totalList){
+            double actualBearing = net.serialise().getDouble(1);
+            double time = 0.2D;
+            double angularSpeed = (previousBearing - actualBearing) / time;
+            double speed = Normalisation.decodeSpeed(net.serialise().getDouble(0));
+            realList.add(new tgcfs.Classifiers.InputNetwork(speed,angularSpeed));
+            previousBearing = actualBearing;
+
+
+
+
+            updatedPoints.add(new PointWithBearing(this.points.get(i), actualBearing));
+            i++;
+
+        }
+
+
+
+        this.points = updatedPoints;
+
+
+
+        return realList;
     }
 
 
@@ -344,7 +374,7 @@ public class Feeder {
 
         //save points
         this.points = new ArrayList<>();
-        pointWithTime.forEach(point -> this.points.add(point.deepCopy()));
+        pointWithTime.forEach(point -> this.points.add(new PointWithBearing(point.deepCopy())));
         //compute the potential field for the actualPoint
         actualPoint.forEach(idsaLoader::compute);
 

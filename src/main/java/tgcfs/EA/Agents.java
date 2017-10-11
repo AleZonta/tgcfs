@@ -20,6 +20,7 @@ import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 import tgcfs.Networks.Convolutionary;
+import tgcfs.Utils.PointWithBearing;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -147,7 +148,7 @@ public class Agents extends Algorithm {
                 //I need to set the feeder
                 transformation.setFeeder(((ConvAgent)model).getFeeder());
                 //and the last point
-                transformation.setLastPoint(growingTrajectory.get(growingTrajectory.size() - 1));
+                transformation.setLastPoint(new PointWithBearing(growingTrajectory.get(growingTrajectory.size() - 1)));
 
                 for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
                     //transform output into input and add the direction
@@ -155,7 +156,7 @@ public class Agents extends Algorithm {
                     outLocal.deserialise(lastOutput);
 
                     Point toAdd = transformation.singlePointConversion(outLocal);
-                    transformation.setLastPoint(toAdd);
+                    transformation.setLastPoint(new PointWithBearing(toAdd));
                     growingTrajectory.add(toAdd);
 
                     res = inputsNetwork.getIdsaLoader().generatePicture(growingTrajectory);

@@ -9,6 +9,7 @@ import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Utils.PointWithBearing;
 
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -31,7 +32,7 @@ import java.util.stream.IntStream;
  */
 public class TrainReal {
     private final List<InputsNetwork> trainingPoint;
-    private List<Point> firstPart;
+    private List<PointWithBearing> firstPart;
     private final List<Point>  followingPart;
     private List<InputsNetwork> followingPartTransformed;
     private List<OutputsNetwork> realOutput;
@@ -150,13 +151,13 @@ public class TrainReal {
      * Getter for last point of source
      * @return Position
      */
-    public Point getLastPoint() {
-        Point p = this.firstPart.get(this.firstPart.size() - 1);
-        Point ret;
+    public PointWithBearing getLastPoint() {
+        PointWithBearing p = this.firstPart.get(this.firstPart.size() - 1);
+        PointWithBearing ret;
         if(p.getTime() == null){
-            ret = new Point(p.getLatitude(), p.getLongitude(), 0.0, 0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+            ret = new PointWithBearing(p.getLatitude(), p.getLongitude(), 0.0, 0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),p.getBearing());
         }else{
-            ret = new Point(p.getLatitude(), p.getLongitude(), p.getAltitude(), p.getDated(), p.getTime(), p.getDates());
+            ret = new PointWithBearing(p.getLatitude(), p.getLongitude(), p.getAltitude(), p.getDated(), p.getTime(), p.getDates(),p.getBearing());
         }
         return ret;
     }
@@ -165,7 +166,7 @@ public class TrainReal {
      * Getter for the points on the first part of trajectories
      * @return Position
      */
-    public List<Point> getPoints() {
+    public List<PointWithBearing> getPoints() {
         return this.firstPart;
     }
 
@@ -173,7 +174,7 @@ public class TrainReal {
      * Setter for first part of the source
      * @param firstPart point
      */
-    public void setPoints(List<Point> firstPart) throws Exception {
+    public void setPoints(List<PointWithBearing> firstPart) throws Exception {
         //check how many points I want to analise
         this.firstPart = firstPart;
 

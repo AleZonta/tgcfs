@@ -8,6 +8,7 @@ import tgcfs.Loader.Feeder;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
  * The output has to be translated into a point in the graph to compute the real bearing
  */
 public class FollowingTheGraph implements Transformation {
-    private Point lastPoint; //last point of the trajectory
+    private PointWithBearing lastPoint; //last point of the trajectory
     private Feeder feeder; //system that will translate from output to new input using graph config
 
     /**
@@ -52,7 +53,7 @@ public class FollowingTheGraph implements Transformation {
      * @param feeder feeder object
      * @param lastPoint last point object
      */
-    public FollowingTheGraph(Feeder feeder, Point lastPoint){
+    public FollowingTheGraph(Feeder feeder, PointWithBearing lastPoint){
         this.feeder = feeder;
         this.lastPoint = lastPoint;
     }
@@ -76,6 +77,7 @@ public class FollowingTheGraph implements Transformation {
         List<InputsNetwork> convertedInputReal = new ArrayList<>();
 
         PointToSpeedBearing converterPointSB = new PointToSpeedBearing();
+        PointToSpeedSpeed convertToAgularSpeed = new PointToSpeedSpeed();
 
         //If I am also checking the first part I am adding that to the result to compute
         try {
@@ -86,7 +88,7 @@ public class FollowingTheGraph implements Transformation {
         } catch (Exception ignored) {}
 
         //remember the last point
-        Point lastp = this.lastPoint.deepCopy();
+        PointWithBearing lastp = this.lastPoint.deepCopy();
 
         int i = 0;
         //this is for the fake part
@@ -94,11 +96,14 @@ public class FollowingTheGraph implements Transformation {
 
             OutputNetwork output = (OutputNetwork) outputsNetwork;
             Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
-            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
+            //this input network has speed and bearing
+            //InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
+            //the new one has velocity and angular speed
+            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position)));
             convertedInput.add(inputNetwork);
 
             //upgrade position
-            this.lastPoint = position;
+            this.lastPoint = new PointWithBearing(position);
             i++;
         }
         //save the entire trajectory for future works
@@ -112,11 +117,11 @@ public class FollowingTheGraph implements Transformation {
         for(int j = 0; j<i; j++){
             OutputNetwork output = (OutputNetwork) out.get(j);
             Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
-            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
+            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position)));
             convertedInputReal.add(inputNetwork);
 
             //upgrade position
-            this.lastPoint = position;
+            this.lastPoint = new PointWithBearing(position);
         }
         trainReal.setAllThePartTransformedReal(convertedInputReal);
 
@@ -127,7 +132,7 @@ public class FollowingTheGraph implements Transformation {
      * Setter for the last point needed for the transformation process
      * @param lastPoint Point
      */
-    public void setLastPoint(Point lastPoint) {
+    public void setLastPoint(PointWithBearing lastPoint) {
         this.lastPoint = lastPoint;
     }
 
