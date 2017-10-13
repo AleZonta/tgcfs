@@ -61,19 +61,6 @@ public class Classifier extends ENN implements EvolvableModel {
         //set the weights
         //this.elmanNetwork.decodeFromArray(weightsVector);
         this.net.setParameters(weights);
-
-
-        //be sure elman neural network is respected
-        INDArray weightsLayer = this.net.getLayer(0).paramTable().get("W");
-        for(int i = this.input; i < this.input + this.hiddenNeurons; i++){
-            if(this.hiddenNeurons == 1) {
-                weightsLayer.putScalar(i, 1.0);
-            }else{
-                for(int j = 0; j < this.hiddenNeurons; j++){
-                    weightsLayer.getColumn(j).putScalar(i, 1.0);
-                }
-            }
-        }
     }
 
     /**

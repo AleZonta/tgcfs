@@ -1,8 +1,8 @@
 package tgcfs.Agents.Models;
 
-import lgds.trajectories.Point;
 import tgcfs.Agents.Agent;
 import tgcfs.Loader.TrainReal;
+import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class RealAgents {
      * Add new real agent to the total list
      * @param points real output for the agent
      */
-    public void newAgent(List<Point> points){
+    public void newAgent(List<PointWithBearing> points){
         Agent agent = new Agent();
         agent.setRealOutput(points);
         this.realAgents.add(agent);
@@ -44,7 +44,7 @@ public class RealAgents {
      * @param points real output for the agent
      * @param realPoint real first part of the agent
      */
-    public void newAgent(List<Point> points, List<Point> realPoint){
+    public void newAgent(List<PointWithBearing> points, List<PointWithBearing> realPoint){
         Agent agent = new Agent();
         agent.setRealOutput(points);
         agent.setRealFirstPart(realPoint);

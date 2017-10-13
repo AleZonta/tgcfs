@@ -1,6 +1,5 @@
 package tgcfs.EA;
 
-import lgds.trajectories.Point;
 import org.junit.Test;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.LSTMAgent;
@@ -9,6 +8,7 @@ import tgcfs.Config.ReadConfig;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
+import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,11 +61,11 @@ public class AgentsTest {
 
         List<TrainReal> i = new ArrayList<>();
 
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
 
         TrainReal t = new TrainReal(input, p);

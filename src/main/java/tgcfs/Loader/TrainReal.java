@@ -1,11 +1,11 @@
 package tgcfs.Loader;
 
-import lgds.Distance.Distance;
 import lgds.trajectories.Point;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
 public class TrainReal {
     private final List<InputsNetwork> trainingPoint;
     private List<PointWithBearing> firstPart;
-    private final List<Point>  followingPart;
+    private final List<PointWithBearing>  followingPart;
     private List<InputsNetwork> followingPartTransformed;
     private List<OutputsNetwork> realOutput;
     private List<InputsNetwork> allThePartTransformedFake;
@@ -41,7 +41,7 @@ public class TrainReal {
     private final String conditionalImage;
     private final String normalImage;
     private List<OutputsNetwork> outputComputed;
-    private List<Point> realPointsOutputComputed;
+    private List<PointWithBearing> realPointsOutputComputed;
     private IdsaLoader idsaLoader;
     private List<Point> totalPoints;
 
@@ -50,7 +50,7 @@ public class TrainReal {
      * @param trainingPoint list of inputNetwork
      * @param followingPart list of points
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<Point> followingPart){
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> followingPart){
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
         this.firstPart = null;
@@ -73,7 +73,7 @@ public class TrainReal {
      * @param followingPart list of points
      * @param conditionalImage path of the conditional image
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart, String conditionalImage, String normalImage){
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing>  followingPart, String conditionalImage, String normalImage){
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
         this.firstPart = null;
@@ -97,7 +97,7 @@ public class TrainReal {
      * @param followingPart the following part
      * @param idsaLoader idsa loader reference
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<Point>  followingPart, IdsaLoader idsaLoader){
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing>  followingPart, IdsaLoader idsaLoader){
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
         this.firstPart = null;
@@ -127,7 +127,7 @@ public class TrainReal {
      * Getter for the real part after the training part
      * @return list of points
      */
-    public List<Point> getFollowingPart() {
+    public List<PointWithBearing> getFollowingPart() {
         return this.followingPart;
     }
 
@@ -157,7 +157,7 @@ public class TrainReal {
         if(p.getTime() == null){
             ret = new PointWithBearing(p.getLatitude(), p.getLongitude(), 0.0, 0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),p.getBearing());
         }else{
-            ret = new PointWithBearing(p.getLatitude(), p.getLongitude(), p.getAltitude(), p.getDated(), p.getTime(), p.getDates(),p.getBearing());
+            ret = new PointWithBearing(p.getLatitude(), p.getLongitude(), 0.0, p.getDated(), p.getTime(), p.getDates(),p.getBearing());
         }
         return ret;
     }
@@ -225,7 +225,7 @@ public class TrainReal {
      * Getter fot the real point output computed
      * @return List<Point>
      */
-    public List<Point> getRealPointsOutputComputed() {
+    public List<PointWithBearing> getRealPointsOutputComputed() {
         return this.realPointsOutputComputed;
     }
 
@@ -233,7 +233,7 @@ public class TrainReal {
      * Setter fot the list of the real output computed
      * @param realPointsOutputComputed List<Point>
      */
-    public void setRealPointsOutputComputed(List<Point> realPointsOutputComputed) {
+    public void setRealPointsOutputComputed(List<PointWithBearing> realPointsOutputComputed) {
         this.realPointsOutputComputed = realPointsOutputComputed;
     }
 
@@ -319,40 +319,37 @@ public class TrainReal {
     }
 
     /**
-     * Transform the point given by output into an outputnetwork
+     * Transform the real point given as real output into an {@link OutputNetwork} for the classifier
      */
-    public void createOutput(){
+    public void createRealOutputConverted(){
         //class that compute the conversion point -> speed/bearing
-        PointToSpeedBearing convertitor = new PointToSpeedBearing();
+        PointToSpeedBearing conversion = new PointToSpeedBearing();
         List<OutputsNetwork> totalList = new ArrayList<>();
-        Distance distance = new Distance();
 
         //add the last point to the end to enable the computation of the output
         List<Point> herePoint = new ArrayList<>();
         herePoint.add(this.firstPart.get(this.firstPart.size() - 1));
         herePoint.addAll(this.followingPart);
 
-        IntStream.range(0, herePoint.size() - 1).forEach(i -> {
+        double previousBearing = 0.0;
+        for(int i = 1; i <  herePoint.size(); i++){
             //bearing from this point to next point
+            Point previousPoint = herePoint.get(i - 1);
             Point actualPoint = herePoint.get(i);
-            Point nextPoint = herePoint.get(i+1);
-            Double bearing = convertitor.obtainBearing(actualPoint,nextPoint);
+
+            double bearing = conversion.obtainBearing(previousPoint, actualPoint);
+
             //speed is the speed I arrived here from previous point
-            Double speed;
-            Double dist;
-            if(i > 0){
-                Point previousPoint = herePoint.get(i - 1);
-                speed = convertitor.obtainSpeed(previousPoint, actualPoint);
+            double speed = Normalisation.convertSpeed(conversion.obtainSpeed(previousPoint, actualPoint));
+            double space = Normalisation.convertDistance(conversion.obtainDistance(previousPoint, actualPoint));
 
-                dist = distance.compute(previousPoint,actualPoint);
-            }else{
-                speed = 0.0;
-                dist = 0.0;
-            }
-            //compute the distance
+            double time = 0.2D;
+            double angularSpeed = Normalisation.convertAngularSpeed(((previousBearing - bearing) / time));
 
-            totalList.add(new OutputNetwork(speed, bearing, dist));
-        });
+            totalList.add(new OutputNetwork(speed, angularSpeed, space));
+            previousBearing = bearing;
+        }
+
         this.realOutput = new ArrayList<>();
         this.realOutput.addAll(totalList);
     }

@@ -1,6 +1,5 @@
 package tgcfs.Performances;
 
-import lgds.trajectories.Point;
 import nl.tno.idsa.framework.config.ConfigFile;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -11,6 +10,7 @@ import tgcfs.EA.Individual;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.InputsNetwork;
+import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +38,11 @@ public class SaverTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
         TrainReal t = new TrainReal(input, p);
         t.setRealPointsOutputComputed(p);
         t.setPoints(p);

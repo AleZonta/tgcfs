@@ -1,6 +1,5 @@
 package tgcfs.Framework;
 
-import lgds.trajectories.Point;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.Clax;
@@ -19,6 +18,7 @@ import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
+import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -400,9 +400,9 @@ public class TuringLearning implements Framework{
         //compute the real point.
         combineInputList.forEach(trainReal -> {
             if(trainReal.getRealPointsOutputComputed() == null) {
-                List<Point> generatedPoint = new ArrayList<>();
+                List<PointWithBearing> generatedPoint = new ArrayList<>();
                 transformation.setLastPoint(trainReal.getLastPoint());
-                trainReal.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(transformation.singlePointConversion(outputsNetwork)));
+                trainReal.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork))));
                 trainReal.setRealPointsOutputComputed(generatedPoint);
             }
         });

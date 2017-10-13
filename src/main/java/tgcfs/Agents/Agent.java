@@ -5,6 +5,7 @@ import lgds.trajectories.Point;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.Models;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Utils.PointWithBearing;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,8 +26,8 @@ import java.util.stream.IntStream;
  * Class representing the real agent in the system
  */
 public class Agent extends Models {
-    private List<Point> realOutput;
-    private List<Point> realFirstPart;
+    private List<PointWithBearing> realOutput;
+    private List<PointWithBearing> realFirstPart;
 
     /**
      * Constructor that calls the father class constructor
@@ -42,7 +43,7 @@ public class Agent extends Models {
      * Setter for the Real Output
      * @param realOutput real output for the test
      */
-    public void setRealOutput(List<Point> realOutput) {
+    public void setRealOutput(List<PointWithBearing> realOutput) {
         this.realOutput = realOutput;
     }
 
@@ -100,7 +101,7 @@ public class Agent extends Models {
      * Getter for the first part
      * @return List of {@link Point}
      */
-    public List<Point> getRealFirstPart() {
+    public List<PointWithBearing> getRealFirstPart() {
         return this.realFirstPart;
     }
 
@@ -108,7 +109,7 @@ public class Agent extends Models {
      * Setter fot the realFirstPart
      * @param realFirstPart List of {@link Point}
      */
-    public void setRealFirstPart(List<Point> realFirstPart) {
+    public void setRealFirstPart(List<PointWithBearing> realFirstPart) {
         this.realFirstPart = realFirstPart;
     }
 }

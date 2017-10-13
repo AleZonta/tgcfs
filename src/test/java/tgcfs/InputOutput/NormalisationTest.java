@@ -95,9 +95,9 @@ public class NormalisationTest {
         Double data = 180.0;
         Double data1 = -180.0;
         Double data2 = 0.0;
-        assertEquals(new Double(1.0), Normalisation.convertDirectionData(data));
-        assertEquals(new Double(-1.0), Normalisation.convertDirectionData(data1));
-        assertEquals(new Double(0.0), Normalisation.convertDirectionData(data2));
+        assertTrue(1.0 == Normalisation.convertDirectionData(data));
+        assertTrue(-1.0 == Normalisation.convertDirectionData(data1));
+        assertTrue(0.0 == Normalisation.convertDirectionData(data2));
 
         Double data3 = 200.0;
         try{

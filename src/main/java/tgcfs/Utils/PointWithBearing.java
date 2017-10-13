@@ -45,6 +45,16 @@ public class PointWithBearing extends Point {
 
     /**
      * Constructor
+     * @param latitude latitude point
+     * @param longitude longitude point
+     */
+    public PointWithBearing(double latitude, double longitude) {
+        super(latitude, longitude);
+        this.bearing = 0.0;
+    }
+
+    /**
+     * Constructor
      * @param point {@link Point} point object
      * @param bearing bearing of the point
      */

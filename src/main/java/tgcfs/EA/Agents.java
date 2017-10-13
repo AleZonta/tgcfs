@@ -270,7 +270,7 @@ public class Agents extends Algorithm {
             //assign the output to this individual
             inputsNetwork.setOutputComputed(outputsNetworks);
             //create the output already computed
-            inputsNetwork.createOutput();
+            inputsNetwork.createRealOutputConverted();
             individual.addMyInputandOutput(inputsNetwork);
         }
     }

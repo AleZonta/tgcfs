@@ -1,6 +1,5 @@
 package tgcfs.Loader;
 
-import lgds.trajectories.Point;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Agents.InputNetwork;
@@ -8,14 +7,13 @@ import tgcfs.Agents.OutputNetwork;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Utils.PointWithBearing;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.*;
 
 /**
  * Created by Alessandro Zonta on 28/08/2017.
@@ -36,11 +34,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         assertNotNull(t.getTrainingPoint());
@@ -63,16 +61,16 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         assertNotNull(t.getFollowingPart());
 
-        List<Point> res = t.getFollowingPart();
+        List<PointWithBearing> res = t.getFollowingPart();
         for(int i = 0; i < res.size(); i++){
             assertEquals(res.get(i).getLatitude(), p.get(i).getLatitude());
             assertEquals(res.get(i).getAltitude(), p.get(i).getAltitude());
@@ -90,11 +88,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         assertNull(t.getOutputComputed());
@@ -116,11 +114,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         assertNull(t.getOutputComputed());
@@ -140,11 +138,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         try {
@@ -169,11 +167,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         try {
@@ -186,7 +184,7 @@ public class TrainRealTest {
         t.setPoints(p);
 
         assertNotNull(t.getPoints());
-        List<Point> res = t.getPoints();
+        List<PointWithBearing> res = t.getPoints();
         for(int i = 0; i < res.size(); i++){
             assertEquals(res.get(i).getLatitude(), p.get(i).getLatitude());
             assertEquals(res.get(i).getLongitude(), p.get(i).getLongitude());
@@ -202,11 +200,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         try {
@@ -229,11 +227,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         String a = Paths.get(".").toAbsolutePath().normalize().toString() + "/cond.png";
@@ -248,11 +246,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         assertNull(t.getIdsaLoader());
@@ -272,11 +270,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         assertNull(t.getIdsaLoader());
@@ -293,11 +291,11 @@ public class TrainRealTest {
         input.add(new InputNetwork(17.0, 32.8, 15.0));
         input.add(new InputNetwork(18.0, 33.8, 15.0));
         input.add(new InputNetwork(19.0, 34.8, 15.0));
-        List<Point> p = new ArrayList<>();
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
-        p.add(new Point(3d,5d));
+        List<PointWithBearing> p = new ArrayList<>();
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
+        p.add(new PointWithBearing(3d,5d));
 
         TrainReal t = new TrainReal(input, p);
         String a =  Paths.get(".").toAbsolutePath().normalize().toString() + "/image.png";

@@ -214,63 +214,45 @@ public class Feeder {
     public List<InputsNetwork> obtainInput(List<Point> points, double attraction, Point possibleTarget){
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
-        List<InputsNetwork> totalList = new ArrayList<>();
-        IntStream.range(0, points.size()).forEach(i -> {
-            //bearing from this point to next point
-            Point actualPoint = points.get(i);
-            Point nextPoint;
-            try {
-                nextPoint = points.get(i + 1);
-            }catch (Exception e){
-                nextPoint =  points.get(i);
-            }
-            Double bearing = conversion.obtainBearing(actualPoint,nextPoint);
-            //speed is the speed I arrived here from previous point
-            double speed;
-            double space;
-            if(i > 0){
-                Point previousPoint = points.get(i - 1);
-                speed = conversion.obtainSpeed(previousPoint, actualPoint);
-                space = conversion.obtainDistance(previousPoint, actualPoint);
-            }else{
-                speed = 0.0;
-                space = 0.0;
-            }
 
-            InputNetwork inputNetwork = new InputNetwork(attraction, speed, bearing, space);
+        //total refactor of the method
+        //this list has all the velocity and angular speed of the points
+        List<InputsNetwork> totalList = new ArrayList<>();
+        //points updated with bearing
+        List<PointWithBearing> updatedPoints = new ArrayList<>();
+
+        //add the first point. No speed, no bearing and no space since it was still
+        InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d, 0d);
+        firstInputNetwork.setTargetPoint(possibleTarget);
+        totalList.add(firstInputNetwork);
+        updatedPoints.add(new PointWithBearing(points.get(0), 0.0));
+
+        double previousBearing = 0.0;
+        for(int i = 1; i <  points.size(); i++){
+            //bearing from this point to next point
+            Point previousPoint = points.get(i - 1);
+            Point actualPoint = points.get(i);
+
+            double bearing = conversion.obtainBearing(previousPoint, actualPoint);
+            updatedPoints.add(new PointWithBearing(points.get(i), bearing));
+
+            //speed is the speed I arrived here from previous point
+            double speed = Normalisation.convertSpeed(conversion.obtainSpeed(previousPoint, actualPoint));
+            double space = Normalisation.convertDistance(conversion.obtainDistance(previousPoint, actualPoint));
+
+            double time = 0.2D;
+            double angularSpeed = Normalisation.convertAngularSpeed(((previousBearing - bearing) / time));
+
+            InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, space);
             inputNetwork.setTargetPoint(possibleTarget);
             totalList.add(inputNetwork);
-        });
-
-        //transform everything into linear speed and angular speed
-        List<InputsNetwork> realList = new ArrayList<>();
-        List<PointWithBearing> updatedPoints = new ArrayList<>();
-        int i = 0;
-
-        double previousBearing = totalList.get(0).serialise().getDouble(1);
-        for(InputsNetwork net: totalList){
-            double actualBearing = net.serialise().getDouble(1);
-            double time = 0.2D;
-            double angularSpeed = (previousBearing - actualBearing) / time;
-            double speed = Normalisation.decodeSpeed(net.serialise().getDouble(0));
-            realList.add(new tgcfs.Classifiers.InputNetwork(speed,angularSpeed));
-            previousBearing = actualBearing;
-
-
-
-
-            updatedPoints.add(new PointWithBearing(this.points.get(i), actualBearing));
-            i++;
-
+            previousBearing = bearing;
         }
+        //update the points
+        this.points.clear();
+        this.points.addAll(updatedPoints);
 
-
-
-        this.points = updatedPoints;
-
-
-
-        return realList;
+        return totalList;
     }
 
 
@@ -398,14 +380,14 @@ public class Feeder {
      * @return the list of points
      * @throws Exception if there are problems with the conf
      */
-    public List<Point> obtainRealAgentSectionTrajectory() throws Exception {
+    public List<PointWithBearing> obtainRealAgentSectionTrajectory() throws Exception {
         //I have trajectory and I have current position.
         //I just need to retrieve next n position
-        List<Point> realPoint = new ArrayList<>();
+        List<PointWithBearing> realPoint = new ArrayList<>();
         IntStream.range(this.position, this.position + ReadConfig.Configurations.getAgentTimeSteps()).forEach(i -> {
             Point nextPoint = this.getNextPoint(this.currentTrajectory);
             if (nextPoint != null){
-                realPoint.add(nextPoint);
+                realPoint.add(new PointWithBearing(nextPoint));
             }
         });
 

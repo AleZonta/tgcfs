@@ -68,20 +68,6 @@ public class ENN extends Models implements Network {
 
         this.net.setListeners(new ScoreIterationListener(20));
 
-
-        //elman neural network requires the weight of the recurrent connection fixed to 1
-        INDArray weights = this.net.getLayer(0).paramTable().get("W");
-        for(int i = input; i < input + HiddenNeurons; i++){
-            if(HiddenNeurons == 1) {
-                weights.putScalar(i, 1.0);
-            }else{
-                for(int j = 0; j < HiddenNeurons; j++){
-                    weights.getColumn(j).putScalar(i, 1.0);
-                }
-            }
-        }
-
-
         this.arrayLength = this.net.numParams();
         this.input = input;
         this.hiddenNeurons = HiddenNeurons;

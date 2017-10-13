@@ -3,6 +3,7 @@ package tgcfs.Agents;
 import lgds.trajectories.Point;
 import org.junit.Test;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +24,15 @@ import static org.junit.Assert.assertNotNull;
 public class AgentTest {
     @Test
     public void getRealFirstPart() throws Exception {
-        List<Point> points = new ArrayList<>();
-        points.add(new Point(5d,5d));
-        points.add(new Point(6d,5d));
-        points.add(new Point(7d,6d));
-        points.add(new Point(8d,7d));
-        points.add(new Point(9d,8d));
+        List<PointWithBearing> points = new ArrayList<>();
+        points.add(new PointWithBearing(5d,5d));
+        points.add(new PointWithBearing(6d,5d));
+        points.add(new PointWithBearing(7d,6d));
+        points.add(new PointWithBearing(8d,7d));
+        points.add(new PointWithBearing(9d,8d));
         Agent agent = new Agent();
         agent.setRealFirstPart(points);
-        List<Point> pointsout = agent.getRealFirstPart();
+        List<PointWithBearing> pointsout = agent.getRealFirstPart();
         assertEquals(points.size(), pointsout.size());
         assertEquals(points, pointsout);
 
@@ -40,20 +41,20 @@ public class AgentTest {
 
     @Test
     public void setRealFirstPart() throws Exception {
-        List<Point> points = new ArrayList<>();
-        points.add(new Point(5d,5d));
-        points.add(new Point(6d,5d));
-        points.add(new Point(7d,6d));
-        points.add(new Point(8d,7d));
-        points.add(new Point(9d,8d));
+        List<PointWithBearing> points = new ArrayList<>();
+        points.add(new PointWithBearing(5d,5d));
+        points.add(new PointWithBearing(6d,5d));
+        points.add(new PointWithBearing(7d,6d));
+        points.add(new PointWithBearing(8d,7d));
+        points.add(new PointWithBearing(9d,8d));
         Agent agent = new Agent();
         agent.setRealFirstPart(points);
     }
 
     @Test
     public void getLastPoint() throws Exception {
-        List<Point> points = new ArrayList<>();
-        points.add(new Point(5d,5d));
+        List<PointWithBearing> points = new ArrayList<>();
+        points.add(new PointWithBearing(5d,5d));
 
         Agent agent = new Agent();
         agent.setRealOutput(points);
@@ -64,12 +65,12 @@ public class AgentTest {
 
     @Test
     public void setRealOutput() throws Exception {
-        List<Point> points = new ArrayList<>();
-        points.add(new Point(5d,5d));
-        points.add(new Point(6d,5d));
-        points.add(new Point(7d,6d));
-        points.add(new Point(8d,7d));
-        points.add(new Point(9d,8d));
+        List<PointWithBearing> points = new ArrayList<>();
+        points.add(new PointWithBearing(5d,5d));
+        points.add(new PointWithBearing(6d,5d));
+        points.add(new PointWithBearing(7d,6d));
+        points.add(new PointWithBearing(8d,7d));
+        points.add(new PointWithBearing(9d,8d));
 
         Agent agent = new Agent();
         agent.setRealOutput(points);
@@ -78,12 +79,12 @@ public class AgentTest {
 
     @Test
     public void realOutput() throws Exception {
-        List<Point> points = new ArrayList<>();
-        points.add(new Point(5d,5d));
-        points.add(new Point(6d,5d));
-        points.add(new Point(7d,6d));
-        points.add(new Point(8d,7d));
-        points.add(new Point(9d,8d));
+        List<PointWithBearing> points = new ArrayList<>();
+        points.add(new PointWithBearing(5d,5d));
+        points.add(new PointWithBearing(6d,5d));
+        points.add(new PointWithBearing(7d,6d));
+        points.add(new PointWithBearing(8d,7d));
+        points.add(new PointWithBearing(9d,8d));
 
         Agent agent = new Agent();
         agent.setRealOutput(points);

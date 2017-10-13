@@ -62,13 +62,46 @@ public class Normalisation {
      * @param toBeConverted angle that needs to be normalised
      * @return normalised angle between ±1
      */
-    public static Double convertDirectionData(double toBeConverted) {
+    public static double convertDirectionData(double toBeConverted) {
         double maxAngle = 180.0;
         double minAngle = -180.0;
-        if (toBeConverted > maxAngle || toBeConverted < minAngle) throw new Error("Wrong range in input");
+        if (toBeConverted > maxAngle || toBeConverted < minAngle) {
+            throw new Error("Wrong range in input");
+        }
         return 2 * ((toBeConverted - minAngle) / (maxAngle - minAngle)) - 1;
     }
 
+
+    /**
+     * Normalise value for angular speed
+     * @param toBeConverted speed that needs to be normalised
+     * @return normalised speed between ±1
+     */
+    public static double convertAngularSpeed(double toBeConverted){
+        double maxAngularSpeed = 300.0;
+        double minAngularSpeed = -10.0;
+        if (toBeConverted > maxAngularSpeed) {
+            toBeConverted = maxAngularSpeed;
+        }
+        if (toBeConverted < minAngularSpeed) {
+            toBeConverted = minAngularSpeed;
+        }
+        return 2 * ((toBeConverted - minAngularSpeed) / (maxAngularSpeed - minAngularSpeed)) - 1;
+    }
+
+
+    /**
+     * Denormalise the angular speed
+     * @param toBeConverted  speed that needs to be denormalised
+     * @return original speed
+     */
+    public static double decodeAngularSpeed(double toBeConverted){
+        double maxAngularSpeed = 1.0;
+        double minAngularSpeed = -1.0;
+        double b = 10.0;
+        double a = -10.0;
+        return (b - a) * ((toBeConverted - minAngularSpeed) / (maxAngularSpeed - minAngularSpeed)) + a;
+    }
 
     /**
      * Normalise value for the speed value.
