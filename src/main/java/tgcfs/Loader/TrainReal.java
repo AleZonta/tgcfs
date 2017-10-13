@@ -5,7 +5,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
-import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -331,24 +330,46 @@ public class TrainReal {
         herePoint.add(this.firstPart.get(this.firstPart.size() - 1));
         herePoint.addAll(this.followingPart);
 
-        double previousBearing = 0.0;
-        for(int i = 1; i <  herePoint.size(); i++){
-            //bearing from this point to next point
+//        double previousBearing = 0.0;
+//        for(int i = 1; i <  herePoint.size(); i++){
+//            //bearing from this point to next point
+//            Point previousPoint = herePoint.get(i - 1);
+//            Point actualPoint = herePoint.get(i);
+//
+//            double bearing = conversion.obtainBearing(previousPoint, actualPoint);
+//
+//            //speed is the speed I arrived here from previous point
+//            double speed = Normalisation.convertSpeed(conversion.obtainSpeed(previousPoint, actualPoint));
+//            double space = Normalisation.convertDistance(conversion.obtainDistance(previousPoint, actualPoint));
+//
+//            double time = 0.2D;
+//            double angularSpeed = Normalisation.convertAngularSpeed(((previousBearing - bearing) / time));
+//
+//            totalList.add(new OutputNetwork(speed, angularSpeed, space));
+//            previousBearing = bearing;
+//        }
+
+        IntStream.range(1, herePoint.size()).forEach(i -> {
+
             Point previousPoint = herePoint.get(i - 1);
             Point actualPoint = herePoint.get(i);
+            Double bearing = conversion.obtainBearing(previousPoint,actualPoint);
 
-            double bearing = conversion.obtainBearing(previousPoint, actualPoint);
 
-            //speed is the speed I arrived here from previous point
-            double speed = Normalisation.convertSpeed(conversion.obtainSpeed(previousPoint, actualPoint));
-            double space = Normalisation.convertDistance(conversion.obtainDistance(previousPoint, actualPoint));
+            Double speed;
+            Double dist;
+            if(i > 0){
+                speed = conversion.obtainSpeed(previousPoint, actualPoint);
 
-            double time = 0.2D;
-            double angularSpeed = Normalisation.convertAngularSpeed(((previousBearing - bearing) / time));
+                dist = conversion.obtainDistance(previousPoint,actualPoint);
+            }else {
+                speed = 0.0;
+                dist = 0.0;
+            }
 
-            totalList.add(new OutputNetwork(speed, angularSpeed, space));
-            previousBearing = bearing;
-        }
+            totalList.add(new OutputNetwork(speed, bearing, dist));
+
+        });
 
         this.realOutput = new ArrayList<>();
         this.realOutput.addAll(totalList);

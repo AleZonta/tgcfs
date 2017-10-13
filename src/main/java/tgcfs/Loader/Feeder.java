@@ -564,7 +564,15 @@ public class Feeder {
             //now the old list contains only the one I want to be there
 
             //deep copy so i reset their status on the new list
-            oldList.forEach(trainReal -> totalList.add(trainReal.deepCopy()));
+            oldList.forEach(trainReal -> {
+                TrainReal newOne = trainReal.deepCopy();
+                try {
+                    newOne.setPoints(trainReal.getPoints());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                totalList.add(newOne);
+            });
             start = totalList.size();
         }
 

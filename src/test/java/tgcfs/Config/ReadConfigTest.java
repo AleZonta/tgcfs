@@ -17,6 +17,46 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getStepSize() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getStepSize();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getStepSize() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getStepSize(), ReadConfig.Configurations.getStepSize());
+    }
+
+    @Test
+    public void getTournamentSize() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getTournamentSize();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getTournamentSize() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getTournamentSize(), ReadConfig.Configurations.getTournamentSize());
+    }
+
+    @Test
     public void getNumberOfTimestepConsidered() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();

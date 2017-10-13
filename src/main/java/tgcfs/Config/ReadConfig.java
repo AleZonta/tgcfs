@@ -38,6 +38,8 @@ public class ReadConfig {
 
     private Integer maxGenerations;
     private Integer seed;
+    private Integer tournamentSize;
+    private Double stepSize;
     private Integer mutation;
     private Boolean recombination;
     private Integer timestepEvolveAgentOverClassifier;
@@ -93,7 +95,9 @@ public class ReadConfig {
 
         this.maxGenerations = null;
         this.seed = null;
+        this.tournamentSize = null;
         this.mutation = null;
+        this.stepSize = null;
         this.recombination = null;
         this.timestepEvolveAgentOverClassifier = null;
 
@@ -470,6 +474,16 @@ public class ReadConfig {
             this.numberOfTimestepConsidered = ((Long) jsonObject.get("TimestepsOfTheRealTrajectory")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("TimestepsOfTheRealTrajectory is wrong or missing.");
+        }try {
+            // tournamentSize
+            this.tournamentSize = ((Long) jsonObject.get("TournamentSize")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("TournamentSize is wrong or missing.");
+        }try {
+            // tournamentSize
+            this.stepSize = ((Double) jsonObject.get("StepSize"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("StepSize is wrong or missing.");
         }
     }
 
@@ -656,7 +670,9 @@ public class ReadConfig {
                 "classifierTimeSteps=" + classifierTimeSteps + ",\n" +
                 "maxGenerations=" + maxGenerations + ",\n" +
                 "seed=" + seed + ",\n" +
+                "tournamentSize=" + tournamentSize + ",\n" +
                 "mutation=" + mutation + ",\n" +
+                "stepSize=" + stepSize + ",\n" +
                 "recombination=" + recombination + ",\n" +
                 "EvolveAgentMoreThanClassifierTimesteps=" + timestepEvolveAgentOverClassifier + ",\n" +
                 "hiddenLayersAgent=" + hiddenLayersAgent + ",\n" +
@@ -767,6 +783,26 @@ public class ReadConfig {
     public int getNumberOfTimestepConsidered() throws Exception {
         if(this.numberOfTimestepConsidered == null) throw new Exception("Try to access config file before reading it.");
         return numberOfTimestepConsidered;
+    }
+
+    /**
+     * Getter for the tournament size
+     * @return integer value for tournament size
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public int getTournamentSize() throws Exception {
+        if(this.tournamentSize == null) throw new Exception("Try to access config file before reading it.");
+        return this.tournamentSize;
+    }
+
+    /**
+     * Getter for the step size
+     * @return double value for tournament size
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public double getStepSize() throws Exception {
+        if(this.stepSize == null) throw new Exception("Try to access config file before reading it.");
+        return this.stepSize;
     }
 
 
@@ -1106,6 +1142,24 @@ public class ReadConfig {
          */
         public static int getNumberOfTimestepConsidered() throws Exception {
             return config.getNumberOfTimestepConsidered();
+        }
+
+        /**
+         * Getter for the tournament size
+         * @return integer value for tournament size
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static int getTournamentSize() throws Exception {
+            return config.getTournamentSize();
+        }
+
+        /**
+         * Getter for the step size
+         * @return double value for tournament size
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static double getStepSize() throws Exception {
+            return config.getStepSize();
         }
     }
 

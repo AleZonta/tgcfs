@@ -2,6 +2,7 @@ package tgcfs.EA;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.ReadConfig;
+import tgcfs.EA.Mutation.NonUniformMutation;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.EA.Recombination.DiscreteRecombination;
@@ -70,10 +71,18 @@ public abstract class Algorithm {
         IntStream.range(0, size).forEach(i ->{
             Individual newBorn;
             try {
-                if(ReadConfig.Configurations.getMutation() == 0){
-                    newBorn = new UncorrelatedMutation(model.getArrayLength());
-                }else{
-                    newBorn = new RandomResetting(model.getArrayLength());
+                switch(ReadConfig.Configurations.getMutation()){
+                    case 0:
+                        newBorn = new UncorrelatedMutation(model.getArrayLength());
+                        break;
+                    case 1:
+                        newBorn = new RandomResetting(model.getArrayLength());
+                        break;
+                    case 2:
+                        newBorn = new NonUniformMutation(model.getArrayLength());
+                        break;
+                    default:
+                        throw new Exception("Mutation argument not correct");
                 }
                 //assign the model to the classifier
                 newBorn.setModel(model.deepCopy());
@@ -136,20 +145,26 @@ public abstract class Algorithm {
             Recombination obj = new DiscreteRecombination(firstParents.getObjectiveParameters().dup(), secondParents.getObjectiveParameters().dup());
 
             Individual son;
-            if(ReadConfig.Configurations.getMutation() == 0){
-                Recombination mut = new IntermediateRecombination(((UncorrelatedMutation)firstParents).getMutationStrengths(), ((UncorrelatedMutation)secondParents).getMutationStrengths(), 0.5);
-                son = new UncorrelatedMutation(obj.recombination(), mut.recombination());
-            }else{
-                son = new RandomResetting(obj.recombination());
+            switch(ReadConfig.Configurations.getMutation()){
+                case 0:
+                    Recombination mut = new IntermediateRecombination(((UncorrelatedMutation)firstParents).getMutationStrengths(), ((UncorrelatedMutation)secondParents).getMutationStrengths(), 0.5);
+                    son = new UncorrelatedMutation(obj.recombination(), mut.recombination());
+                    break;
+                case 1:
+                    son = new RandomResetting(obj.recombination());
+                    break;
+                case 2:
+                    son = new NonUniformMutation(obj.recombination());
+                    break;
+                default:
+                    throw new Exception("Mutation argument not correct");
             }
             //set model to the son
             son.setModel(firstParents.getModel().deepCopy());
 
             //mutate the individual
             if(ReadConfig.Configurations.getMutation() == 0){
-                son.mutate(this.population.size());
-            }else{
-                son.mutate(son.getObjectiveParameters().columns());
+                throw new Exception("Not implemented");
             }
 
             //add the son to the population
@@ -179,12 +194,22 @@ public abstract class Algorithm {
         }
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
-            int idParent = ThreadLocalRandom.current().nextInt(this.population.size());
-            Individual parent = this.population.get(idParent);
+
+            //creating the tournament
+            List<Individual> tournamentPop = new ArrayList<>();
+            IntStream.range(0, ReadConfig.Configurations.getTournamentSize()).forEach(j -> {
+                int idParent = ThreadLocalRandom.current().nextInt(this.population.size());
+                tournamentPop.add(this.population.get(idParent));
+            });
+            //find the winner of the tournament -> the one with the highest fitness
+            tournamentPop.sort(Comparator.comparingInt(Individual::getFitness));
+            //last one has the better fitness
+            Individual parent = tournamentPop.get(tournamentPop.size() - 1);
             //son has the same genome of the father
             Individual son = new RandomResetting(parent.getObjectiveParameters().dup());
             //now the son is mutated 10 times (hardcoded value)
-            IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
+            //IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
+            son.mutate(son.getObjectiveParameters().columns());
             //set model to the son
             son.setModel(parent.getModel().deepCopy());
 
@@ -208,7 +233,7 @@ public abstract class Algorithm {
      *
      * @throws Exception if there are problems in reading the info
      */
-    public void selectParents() throws Exception {
+    public void survivalSelections() throws Exception {
         //check which class is calling this method
         int size = 0;
         if(this.getClass() == Agents.class){
@@ -216,32 +241,7 @@ public abstract class Algorithm {
         }else{
             size = ReadConfig.Configurations.getClassifierPopulationSize();
         }
-        //lets do binary selection
 
-//        List<Individual> newList = new ArrayList<>();
-//
-//        IntStream.range(0, size).forEach(i -> {
-//            Integer firstNumber = ThreadLocalRandom.current().nextInt(0,this.population.size());
-//            Integer secondNumber = ThreadLocalRandom.current().nextInt(0,this.population.size());
-//
-//            Individual one = this.population.get(firstNumber);
-//            Individual two = this.population.get(secondNumber);
-//            if(one.getFitness() > two.getFitness()){
-//                newList.add(one.deepCopy());
-//            }else{
-//                if(one.getFitness() < two.getFitness()){
-//                    newList.add(two.deepCopy());
-//                }else{
-//                    //rando select one of the two
-//                    Double rand = ThreadLocalRandom.current().nextDouble(0,1);
-//                    if(rand >= 0.5){
-//                        newList.add(one.deepCopy());
-//                    }else {
-//                        newList.add(two.deepCopy());
-//                    }
-//                }
-//            }
-//        });
         //sort the list
         this.population.sort(Comparator.comparing(Individual::getFitness));
 

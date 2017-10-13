@@ -225,8 +225,8 @@ public class TuringLearning implements Framework{
 
             /* { SELECT individuals next generation } */
                 logger.log(Level.INFO,"Parent Selection...");
-                if(evolveAgent) this.agents.selectParents();
-                if(evolveClassifier) this.classifiers.selectParents();
+                if(evolveAgent) this.agents.survivalSelections();
+                if(evolveClassifier) this.classifiers.survivalSelections();
 
                 //save the fitness of all the population and best genome
                 logger.log(Level.INFO,"Saving Statistics...");
@@ -373,7 +373,7 @@ public class TuringLearning implements Framework{
             this.classifiers.resetFitness();
                 /* { SELECT individuals next generation } */
             logger.log(Level.INFO, "Parent Selection...");
-            this.agents.selectParents();
+            this.agents.survivalSelections();
             //save the fitness of all the population and best genome
             SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
             SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(), this.agents.retBestGenome());

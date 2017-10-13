@@ -100,7 +100,7 @@ public class UncorrelatedMutation extends Individual {
      * firstly I generate the perturbed mutation strength from the original one according to a log-normal distribution.
      * secondly I mutate the objective parameter according to a normal distribution having the perturbed mutation strength as its variance.
      *
-     * @param n is the population size
+     * @param n is the length of the genome
      */
     @Override
     public void mutate(Integer n)
@@ -136,7 +136,7 @@ public class UncorrelatedMutation extends Individual {
      * @return UncorrelatedMutation object
      */
     public UncorrelatedMutation deepCopy(){
-        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness().intValue()), this.getModel().deepCopy(), this.getMyInputandOutput());
+        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput());
     }
 
 }

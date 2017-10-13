@@ -44,7 +44,7 @@ public class InputNetwork implements InputsNetwork{
      */
     public InputNetwork(Double speed, Double direction){
         this.speed = Normalisation.convertSpeed(speed);
-        this.direction = Normalisation.convertDirectionData(direction);
+        this.direction = Normalisation.convertAngularSpeed(direction);
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
         if (allFields.length != inputSize + 1){
