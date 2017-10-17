@@ -473,7 +473,7 @@ public class Feeder {
 
             //is possible that the distance is already shorter than distance
             if(dist > distance){
-                Integer val = 1;
+                int val = 1;
                 //check the distance
                 while (dist > distance){
                     final double[] dis2 = {0.0};

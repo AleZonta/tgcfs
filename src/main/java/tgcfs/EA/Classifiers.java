@@ -51,7 +51,7 @@ public class Classifiers extends Algorithm {
     @Override
     public void generatePopulation(EvolvableModel model) throws Exception {
         super.generatePopulation(model);
-        this.maxFitnessAchievable = (ReadConfig.Configurations.getAgentPopulationSize() + ReadConfig.Configurations.getAgentOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained();
+        this.maxFitnessAchievable = ((ReadConfig.Configurations.getAgentPopulationSize() + ReadConfig.Configurations.getAgentOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained()) * 2;
     }
 
     /**
