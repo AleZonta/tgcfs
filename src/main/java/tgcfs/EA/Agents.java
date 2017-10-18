@@ -310,24 +310,27 @@ public class Agents extends Algorithm {
             //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
 
+            //transform trajectory in advance to prevent multiprocessing errors
+            List<TrainReal> inputOutput = agent.getMyInputandOutput();
+            inputOutput.forEach(trainReal -> {
+                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
+                transformation.transform(trainReal);
+            });
+
             //for every example I need to run the classifier and check the result
             model.getPopulation().parallelStream().forEach(classifier -> {
 
                 //this is one agent
                 //I need to check for every output for every individual
-                agent.getMyInputandOutput().forEach(trainReal -> {
+                inputOutput.parallelStream().forEach(trainReal -> {
 
-                    ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
                     List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
-                    if(inputFake == null) {
-                        inputFake = transformation.transform(trainReal);
-                    }
 
                     //run the classifier for the Fake trajectory
                     try {
                         this.runClassifier(model ,agent, classifier, inputFake, Boolean.TRUE);
                     } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error " + e.getMessage());
+                        logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
                         e.printStackTrace();
                     }
 
@@ -336,7 +339,7 @@ public class Agents extends Algorithm {
                     try {
                         this.runClassifier(model ,agent, classifier, inputReal, Boolean.FALSE);
                     } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error " + e.getMessage());
+                        logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
                         e.printStackTrace();
                     }
 
