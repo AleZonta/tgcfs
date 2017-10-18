@@ -88,7 +88,8 @@ public class FeederTest {
 
         Feeder system = new Feeder();
         system.loadSystem();
-        Point result = system.getNextLocation(myLocation,speed,distance,direction);
+//        Point result = system.getNextLocation(myLocation,speed,distance,direction);
+        Point result = system.getNextLocation(myLocation,speed,direction);
         System.out.println(result);
         System.out.println(result.getTime());
 
@@ -98,7 +99,8 @@ public class FeederTest {
         distance = 520d;
 
 
-        result = system.getNextLocation(myLocation,speed,distance,direction);
+       // result = system.getNextLocation(myLocation,speed,distance,direction);
+        result = system.getNextLocation(myLocation,speed,direction);
         System.out.println(result);
         System.out.println(result.getTime());
 

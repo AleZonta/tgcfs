@@ -95,7 +95,8 @@ public class FollowingTheGraph implements Transformation {
         for(OutputsNetwork outputsNetwork: outputs){
 
             OutputNetwork output = (OutputNetwork) outputsNetwork;
-            Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+            //Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+            Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getBearing());
             //this input network has speed and bearing
             //InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
             //the new one has velocity and angular speed
@@ -116,7 +117,8 @@ public class FollowingTheGraph implements Transformation {
 
         for(int j = 0; j<i; j++){
             OutputNetwork output = (OutputNetwork) out.get(j);
-            Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+            //Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+            Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getBearing());
             InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position)));
             convertedInputReal.add(inputNetwork);
 
@@ -154,6 +156,7 @@ public class FollowingTheGraph implements Transformation {
         if (this.feeder == null) throw new NullPointerException("System with the graph not instantiate");
         if (this.lastPoint == null) throw new NullPointerException("Last Point not instantiate");
         OutputNetwork output = (OutputNetwork) outputsNetwork;
-        return this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+        return this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getBearing());
+//        return this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
     }
 }

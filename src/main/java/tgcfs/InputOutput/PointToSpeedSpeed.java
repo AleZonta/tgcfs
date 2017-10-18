@@ -22,6 +22,7 @@ public class PointToSpeedSpeed {
      */
     public double obtainAngularSpeed(PointWithBearing previousPoint, double actualBearing){
         double previousBearing = previousPoint.getBearing();
+        //TODO check the time for Geolife
         double time = 0.2D;
         return (previousBearing - actualBearing) / time;
     }

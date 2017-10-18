@@ -21,8 +21,8 @@ import java.lang.reflect.Field;
 public class OutputNetwork implements OutputsNetwork {
     private double speed;
     private double bearing;
-    private double distance;
-    public static final int outputSize = 3; //the size of the output corresponding to the two fields here
+//    private double distance;
+    public static final int outputSize = 2; //the size of the output corresponding to the two fields here
 
     /**
      * Constructor zero parameter
@@ -43,7 +43,7 @@ public class OutputNetwork implements OutputsNetwork {
     public OutputNetwork(double speed, double bearing, double distance){
         this.speed = speed;
         this.bearing = bearing;
-        this.distance = distance;
+//        this.distance = distance;
         Field[] allFields = OutputNetwork.class.getDeclaredFields();
         if (allFields.length != outputSize + 1){
             throw new Error("Number of fields and variable expressing that do not correspond.");
@@ -59,7 +59,7 @@ public class OutputNetwork implements OutputsNetwork {
         InputNetwork net = (InputNetwork)out;
         this.speed = Normalisation.decodeSpeed(net.getSpeed());
         this.bearing = Normalisation.decodeDirectionData(net.getBearing());
-        this.distance = Normalisation.decodeDistance(net.getSpace());
+//        this.distance = Normalisation.decodeDistance(net.getSpace());
         Field[] allFields = OutputNetwork.class.getDeclaredFields();
         if (allFields.length != outputSize + 1){
             throw new Error("Number of fields and variable expressing that do not correspond.");
@@ -82,11 +82,11 @@ public class OutputNetwork implements OutputsNetwork {
         return bearing;
     }
 
-    /**
-     * Getter for distance
-     * @return Double value of distance
-     */
-    public double getDistance() { return this.distance;}
+//    /**
+//     * Getter for distance
+//     * @return Double value of distance
+//     */
+//    public double getDistance() { return this.distance;}
 
     /**
      * @implNote Implementation from Abstract class Algorithm
@@ -104,11 +104,11 @@ public class OutputNetwork implements OutputsNetwork {
         if(out.columns() == outputSize) {
             this.speed = Normalisation.decodeSpeed(out.getDouble(0));
             this.bearing = Normalisation.decodeDirectionData(out.getDouble(1));
-            this.distance = Normalisation.decodeDistance(out.getDouble(2));
+//            this.distance = Normalisation.decodeDistance(out.getDouble(2));
         }else{
             this.speed = Normalisation.decodeSpeed(out.getRow(0).getDouble(0));
             this.bearing = Normalisation.decodeDirectionData(out.getRow(1).getDouble(0));
-            this.distance = Normalisation.decodeDistance(out.getRow(2).getDouble(0));
+//            this.distance = Normalisation.decodeDistance(out.getRow(2).getDouble(0));
         }
     }
 
@@ -121,7 +121,7 @@ public class OutputNetwork implements OutputsNetwork {
         return "OutputNetwork{" + " " +
                 "speed=" + this.speed + ", " +
                 "bearing=" + this.bearing + ", " +
-                "distance=" + this.distance + " " +
+//                "distance=" + this.distance + " " +
                 '}';
     }
 
