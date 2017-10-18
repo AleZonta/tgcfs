@@ -311,11 +311,11 @@ public class Agents extends Algorithm {
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
 
             //for every example I need to run the classifier and check the result
-            model.getPopulation().forEach(classifier -> {
+            model.getPopulation().parallelStream().forEach(classifier -> {
 
                 //this is one agent
                 //I need to check for every output for every individual
-                agent.getMyInputandOutput().parallelStream().forEach(trainReal -> {
+                agent.getMyInputandOutput().forEach(trainReal -> {
 
                     ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
                     List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
