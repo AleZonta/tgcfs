@@ -112,11 +112,13 @@ public class SaveToFile {
         /**
          * Save in JSON format the trajectory and the generated part of it
          * @param combineInputList List of {@link TrainReal}
+         * @param generationAgent number of generation for the agent population
+         * @param generationClassifier number of generation for the classifier population
          * @throws Exception  if the class is not instantiate
          */
-        public static void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList) throws Exception {
+        public static void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int generationAgent, int generationClassifier) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
-            instance.dumpTrajectoryAndGeneratedPart(combineInputList);
+            instance.dumpTrajectoryAndGeneratedPart(combineInputList, generationAgent, generationClassifier);
         }
     }
 
@@ -283,15 +285,17 @@ public class SaveToFile {
 
     /**
      * Save in JSON format the trajectory and the generated part of it
+     * @param generationAgent number of generation for the agent population
+     * @param generationClassifier number of generation for the classifier population
      * @param combineInputList List of {@link TrainReal}
      */
-    private void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList){
-        String path = this.currentPath + "trajectory-generatedPoints" + ".zip";
+    private void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int generationAgent, int generationClassifier){
+        String path = this.currentPath + "trajectory-generatedPoints-" + generationAgent + "-" + generationClassifier + ".zip";
         try (FileOutputStream zipFile = new FileOutputStream(new File(path));
              ZipOutputStream zos = new ZipOutputStream(zipFile);
              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
         ){
-            ZipEntry csvFile = new ZipEntry(  "trajectory-generatedPoints.json");
+            ZipEntry csvFile = new ZipEntry(  "trajectory-generatedPoints-" + generationAgent + "-" + generationClassifier + ".json");
             zos.putNextEntry(csvFile);
 
             JSONObject totalObj = new JSONObject();
@@ -323,12 +327,12 @@ public class SaveToFile {
                 writer.write(totalObj.toJSONString());
                 writer.newLine();
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Error appending line to trajectory-generatedPoints CSV File " + e.getMessage());
+                logger.log(Level.WARNING, "Error appending line to trajectory-generatedPoints CSV File-" + generationAgent + "-" + generationClassifier + " " + e.getMessage());
                 e.printStackTrace();
             }
 
         }catch (Exception e){
-            logger.log(Level.WARNING, "Error with trajectory-generatedPoints Zip File " + e.getMessage());
+            logger.log(Level.WARNING, "Error with trajectory-generatedPoints Zip File-" + generationAgent + "-" + generationClassifier + " " + e.getMessage());
         }
     }
 }

@@ -194,9 +194,9 @@ public class TuringLearning implements Framework{
 
                 //I need to generate this dataset for testing the classifiers and understand visually what is happening
                 //this is happening only in the last generation
-                if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning() && (generationAgent == maxGeneration - 1 || generationClassifier == maxGeneration - 1)){
+                if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
                     logger.log(Level.INFO, "Dump agent generation and real");
-                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder));
+                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
                 }
 
                 //check if I have to evolve or not someone next generation
@@ -394,9 +394,11 @@ public class TuringLearning implements Framework{
      * From the list of {@link TrainReal} element, it computes the real point/points in the map that follow/s the trajectory
      * @param combineInputList all the input used in this session
      * @param transformation {@link FollowingTheGraph} transformation reference to transform the output in real point //TODO generalise this
+     * @param generationAgent number of generation for the agent population
+     * @param generationClassifier number of generation for the classifier population
      * @throws Exception If something goes wrong
      */
-    private void saveTrajectoryAndGeneratedPoints(List<TrainReal> combineInputList, FollowingTheGraph transformation) throws Exception {
+    private void saveTrajectoryAndGeneratedPoints(List<TrainReal> combineInputList, FollowingTheGraph transformation, int generationAgent, int generationClassifier) throws Exception {
         //compute the real point.
         combineInputList.forEach(trainReal -> {
             if(trainReal.getRealPointsOutputComputed() == null) {
@@ -406,7 +408,7 @@ public class TuringLearning implements Framework{
                 trainReal.setRealPointsOutputComputed(generatedPoint);
             }
         });
-        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(combineInputList);
+        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(combineInputList, generationAgent, generationClassifier);
     }
 
     /**
