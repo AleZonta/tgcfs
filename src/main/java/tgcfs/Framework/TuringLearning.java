@@ -119,6 +119,12 @@ public class TuringLearning implements Framework{
         this.agents.generatePopulation(agentModel);
         this.classifiers.generatePopulation(classifierModel);
         logger.log(Level.INFO, "Framework online!");
+
+        //save the sha-1 info in the output files
+        SaveToFile.Saver.initialiseFitnessFile(this.agents.getClass().getName());
+        SaveToFile.Saver.initialiseGenomaFile(this.agents.getClass().getName());
+        SaveToFile.Saver.initialiseFitnessFile(this.classifiers.getClass().getName());
+        SaveToFile.Saver.initialiseGenomaFile(this.classifiers.getClass().getName());
     }
 
     /**

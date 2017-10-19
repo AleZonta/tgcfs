@@ -76,6 +76,16 @@ public class SaveToFile {
         }
 
         /**
+         * Initialise the fitness file adding the sha-1 code of the github verion of the framework
+         * @param name  name of the class/file I am saving
+         * @throws Exception if the class is not instantiate
+         */
+        public static void initialiseFitnessFile(String name) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.initialiseFitness(name);
+        }
+
+        /**
          * Save all the configuration in the same location where all the results are
          * @param setting config files
          */
@@ -95,6 +105,16 @@ public class SaveToFile {
         public static void saveBestGenoma(String name, INDArray genoma) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveGenome(name, genoma);
+        }
+
+        /**
+         * Initialise the genoma file adding the sha-1 code of the github verion of the framework
+         * @param name  name of the class/file I am saving
+         * @throws Exception if the class is not instantiate
+         */
+        public static void initialiseGenomaFile(String name) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.initialiseGenome(name);
         }
 
         /**
@@ -167,7 +187,7 @@ public class SaveToFile {
             outputWriter.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
             outputWriter.newLine();
 
-            logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+            logger.log(Level.INFO, "Successfully Added git-sha-1 to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -220,7 +240,18 @@ public class SaveToFile {
 
 
     private void initialiseGenome(String name){
+        try {
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-genome.csv", true));
+            outputWriter.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
+            outputWriter.newLine();
 
+            logger.log(Level.INFO, "Successfully Added git-sha-1 to " + name + " CSV File");
+
+            outputWriter.flush();
+            outputWriter.close();
+        }catch (Exception e){
+            logger.log(Level.WARNING, "Error with " + name + " CSV File " + e.getMessage());
+        }
     }
 
 
@@ -268,6 +299,7 @@ public class SaveToFile {
         ){
             ZipEntry csvFile = new ZipEntry( name + "-population.csv");
             zos.putNextEntry(csvFile);
+            writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
             population.forEach(individual -> {
                 try {
                     writer.write(individual.getObjectiveParameters().data().toString());
@@ -324,6 +356,7 @@ public class SaveToFile {
 
             totalObj.put("size", combineInputList.size());
             try {
+                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
                 writer.write(totalObj.toJSONString());
                 writer.newLine();
             } catch (IOException e) {
