@@ -655,7 +655,7 @@ public class ReadConfig {
     @Override
     public String toString() {
         return "ReadConfig{" + ",\n" +
-                "git-sha-1=" + PropertiesFileReader.getGitSha1() + ",\n" +
+                "tgcfs git-sha-1=" + PropertiesFileReader.getGitSha1() + ",\n" +
                 "trajectoriesType=" + trajectoriesType + ",\n" +
                 "howManySplitting=" + howManySplitting + ",\n" +
                 "howManyTrajectories=" + howManyTrajectories + ",\n" +

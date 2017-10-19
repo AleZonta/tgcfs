@@ -67,7 +67,7 @@ public class SaverTest {
         });
 
         SaveToFile.Saver saver = new SaveToFile.Saver("test", "1");
-        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(list);
+        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(list,0,0);
     }
 
     @Test
