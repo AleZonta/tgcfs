@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * This class will load IDSA project and use the method that is offering to compute the potential field
  */
 public class IdsaLoader {
-    private static final Logger logger = Logger.getLogger(IdsaLoader.class.getName()); //logger for this class
+    private static Logger logger; //logger for this class
     private PotentialField pot; //This is the base instance of the pot
     private ConfigFile configFile; //file containing configuration for IDSA
     private LoadParameters par; //parameter for potential field
@@ -44,10 +44,12 @@ public class IdsaLoader {
 
     /**
      * Constructor that loads all the configurations for the potential field
+     * @param log logger
      * @throws IOException Error in reading the file
      * @throws ParseException Error in parsing the file
      */
-    public IdsaLoader() throws IOException, ParseException {
+    public IdsaLoader(Logger log) throws IOException, ParseException {
+        logger = log;
         logger.log(Level.INFO, "Loading PF Config...");
         //loading config file for Idsa
         this.configFile = new ConfigFile();
@@ -67,10 +69,12 @@ public class IdsaLoader {
      * It is also checking if the number set as maximum number of trajectory is the same that are in the IDSA config
      * If not is overriding that number
      * @param totalTrack total number of trajectories tested
+     * @param log logger
      * @throws IOException Error in reading the file
      * @throws ParseException Error in parsing the file
      */
-    public IdsaLoader(Integer totalTrack) throws IOException, ParseException {
+    public IdsaLoader(Integer totalTrack, Logger log) throws IOException, ParseException {
+        logger = log;
         logger.log(Level.INFO, "Loading PF Config...");
         //loading config file for Idsa
         this.configFile = new ConfigFile();

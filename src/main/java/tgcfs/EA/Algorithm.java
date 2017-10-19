@@ -39,18 +39,19 @@ import java.util.stream.IntStream;
 public abstract class Algorithm {
     private List<Individual> population; //representation of the population
     protected int maxFitnessAchievable;
-    protected static final Logger logger = Logger.getLogger(Algorithm.class.getName()); //logger for this class
+    protected static Logger logger;
 
 
     /**
      * Constructor zero parameter
      * Initialise the populaiton list
+     * @param log log
      * @throws Exception exception if there is an error in readig the config file
      */
-    public Algorithm() throws Exception{
+    public Algorithm(Logger log) throws Exception{
         this.population = new ArrayList<>();
         this.maxFitnessAchievable = 0;
-
+        logger = log;
     }
 
     /**

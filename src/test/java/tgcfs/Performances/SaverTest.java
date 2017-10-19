@@ -14,6 +14,7 @@ import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import static junit.framework.TestCase.assertEquals;
@@ -66,7 +67,8 @@ public class SaverTest {
             list.add(ttt);
         });
 
-        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1");
+        Logger log =  Logger.getLogger(SaverTest.class.getName());
+        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1", log);
         SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(list,0,0);
     }
 
@@ -84,7 +86,8 @@ public class SaverTest {
         }catch (Exception e){
             assertEquals("Cannot save, the class is not instantiate",e.getMessage());
         }
-        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1");
+        Logger log =  Logger.getLogger(SaverTest.class.getName());
+        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1", log);
         SaveToFile.Saver.dumpPopulation("a", list);
         SaveToFile.Saver.dumpPopulation("a", list);
         List<Individual> list3 = new ArrayList<>();
@@ -111,13 +114,14 @@ public class SaverTest {
         }
 
 
-        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1");
+        Logger log =  Logger.getLogger(SaverTest.class.getName());
+        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1", log);
 
         SaveToFile.Saver.saveFitness("a", list);
         SaveToFile.Saver.saveFitness("a", list);
         SaveToFile.Saver.saveFitness("a", list);
 
-        saver = new SaveToFile.Saver("test", "1", "/Users/alessandrozonta/Desktop");
+        saver = new SaveToFile.Saver("test", "1", "/Users/alessandrozonta/Desktop", log);
         SaveToFile.Saver.saveFitness("a", list);
         SaveToFile.Saver.saveFitness("a", list);
         SaveToFile.Saver.saveFitness("a", list);
@@ -127,7 +131,8 @@ public class SaverTest {
 
     @Test
     public void dumpSetting() throws Exception {
-        new SaveToFile.Saver("test", "1", "/Users/alessandrozonta/Desktop");
+        Logger log =  Logger.getLogger(SaverTest.class.getName());
+        new SaveToFile.Saver("test", "1", "/Users/alessandrozonta/Desktop", log);
 
 
         new ReadConfig.Configurations();
@@ -155,7 +160,8 @@ public class SaverTest {
             assertEquals("Cannot save, the class is not instantiate",e.getMessage());
         }
 
-        new SaveToFile.Saver("test", "1", "/Users/alessandrozonta/Desktop");
+        Logger log =  Logger.getLogger(SaverTest.class.getName());
+        new SaveToFile.Saver("test", "1", "/Users/alessandrozonta/Desktop", log);
         SaveToFile.Saver.saveBestGenoma("a",list);
 
     }

@@ -9,6 +9,7 @@ import tgcfs.Routing.Routes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertNotNull;
 
@@ -38,11 +39,11 @@ public class IdsaLoaderTest {
     public void generatePicture() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(),Logger.getLogger(IdsaLoaderTest.class.getName()));
 
-        IdsaLoader loader = new IdsaLoader(200);
+        IdsaLoader loader = new IdsaLoader(200, Logger.getLogger(IdsaLoaderTest.class.getName()));
 
-        Routes routes = new Routes();
+        Routes routes = new Routes(Logger.getLogger(IdsaLoaderTest.class.getName()));
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());
@@ -62,14 +63,15 @@ public class IdsaLoaderTest {
     public void returnAttraction() throws Exception {
         //initialise the saving class
         new ReadConfig.Configurations();
+        Logger log =  Logger.getLogger(IdsaLoaderTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
 
-        IdsaLoader loader = new IdsaLoader();
+        IdsaLoader loader = new IdsaLoader(log);
 
-        loader = new IdsaLoader(20);
+        loader = new IdsaLoader(20, log);
 
-        Routes routes = new Routes();
+        Routes routes = new Routes(log);
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());
@@ -91,13 +93,14 @@ public class IdsaLoaderTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        Logger log =  Logger.getLogger(IdsaLoaderTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        IdsaLoader loader = new IdsaLoader(log);
 
-        IdsaLoader loader = new IdsaLoader();
-        loader = new IdsaLoader(20);
+        loader = new IdsaLoader(20, log);
 
 
-        Routes routes = new Routes();
+        Routes routes = new Routes(log);
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());
@@ -109,14 +112,14 @@ public class IdsaLoaderTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        Logger log =  Logger.getLogger(IdsaLoaderTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        IdsaLoader loader = new IdsaLoader(log);
 
-        IdsaLoader loader = new IdsaLoader();
-
-        loader = new IdsaLoader(20);
+        loader = new IdsaLoader(20, log);
 
 
-        Routes routes = new Routes();
+        Routes routes = new Routes(log);
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());
@@ -136,14 +139,14 @@ public class IdsaLoaderTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        Logger log =  Logger.getLogger(IdsaLoaderTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        IdsaLoader loader = new IdsaLoader(log);
 
-        IdsaLoader loader = new IdsaLoader();
-
-        loader = new IdsaLoader(20);
+        loader = new IdsaLoader(20, log);
 
 
-        Routes routes = new Routes();
+        Routes routes = new Routes(log);
         routes.readTrajectories();
 
         loader.InitPotentialField(routes.getTra());

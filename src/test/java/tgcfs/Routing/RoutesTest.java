@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import tgcfs.Config.ReadConfig;
 
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -26,7 +27,9 @@ public class RoutesTest {
     public void getTra() throws Exception {
         new ReadConfig.Configurations();
 
-        Routes routes = new Routes();
+        Logger log =  Logger.getLogger(RoutesTest.class.getName());
+
+        Routes routes = new Routes(log);
         routes.readTrajectories();
         assertNotNull(routes.getTra());
     }
@@ -35,7 +38,9 @@ public class RoutesTest {
     public void getNextTrajectory() throws Exception {
         new ReadConfig.Configurations();
 
-        Routes routes = new Routes();
+        Logger log =  Logger.getLogger(RoutesTest.class.getName());
+
+        Routes routes = new Routes(log);
         routes.readTrajectories();
         Trajectory tra = routes.getNextTrajectory();
         Trajectory tra1 = routes.getNextTrajectory();
@@ -55,7 +60,9 @@ public class RoutesTest {
 
         new ReadConfig.Configurations();
 
-        Routes routes = new Routes();
+        Logger log =  Logger.getLogger(RoutesTest.class.getName());
+
+        Routes routes = new Routes(log);
         routes.readTrajectories();
         Trajectory tra = routes.getNextTrajectory();
         Point p1 = routes.getNextPosition(tra);
@@ -79,7 +86,9 @@ public class RoutesTest {
     public void readTrajectories() throws Exception {
         new ReadConfig.Configurations();
 
-        Routes routes = new Routes();
+        Logger log =  Logger.getLogger(RoutesTest.class.getName());
+
+        Routes routes = new Routes(log);
         routes.readTrajectories();
     }
 

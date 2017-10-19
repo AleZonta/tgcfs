@@ -66,7 +66,7 @@ public class GAN implements Framework{
         this.idsaLoader = null;
 
         //initialise the saving class
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), logger);
         SaveToFile.Saver.dumpSetting(ReadConfig.Configurations.getConfig());
 
         //back up for convolution, in java there are some problems
@@ -83,12 +83,12 @@ public class GAN implements Framework{
     public void load() throws Exception {
         logger.log(Level.INFO, "Starting GAN...");
         //loading graph and trajectories
-        this.feeder = new Feeder();
+        this.feeder = new Feeder(logger);
         this.feeder.loadSystem();
         //loading potential field
         //idsa loader I can also add the total number of tracks
         //now all the trajectories are loading
-        this.idsaLoader = new IdsaLoader();
+        this.idsaLoader = new IdsaLoader(logger);
         this.idsaLoader.InitPotentialField(this.feeder.getTrajectories());
         //loading models
         //decide which model to implement here
@@ -128,11 +128,11 @@ public class GAN implements Framework{
 
 
         //generate population of one
-        Agents agents = new Agents();
+        Agents agents = new Agents(logger);
         if(ReadConfig.Configurations.getAgentPopulationSize() > 1) throw new Exception("Population in GAN must be one");
         agents.generatePopulation(this.agent);
 
-        Classifiers classifier = new Classifiers();
+        Classifiers classifier = new Classifiers(logger);
         if(ReadConfig.Configurations.getClassifierPopulationSize() > 1) throw new Exception("Population in GAN must be one");
         classifier.generatePopulation(this.classifier);
 

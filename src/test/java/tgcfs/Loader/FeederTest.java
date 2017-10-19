@@ -10,6 +10,7 @@ import tgcfs.Performances.SaveToFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import static junit.framework.TestCase.*;
@@ -29,10 +30,9 @@ public class FeederTest {
     @Test
     public void retAllEdges() throws Exception {
         new ReadConfig.Configurations();
-
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
         assertEquals(26047,system.retAllEdges().size());
@@ -44,9 +44,9 @@ public class FeederTest {
     public void retAllNodes() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
         assertEquals(12714,system.retAllNodes().size());
@@ -58,12 +58,12 @@ public class FeederTest {
     public void multiFeeder() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         idsaLoader.InitPotentialField(system.getTrajectories());
 
         List<TrainReal> res = system.multiFeeder(idsaLoader, null);
@@ -84,9 +84,9 @@ public class FeederTest {
 
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
         Point result = system.getNextLocation(myLocation,speed,distance,direction);
         System.out.println(result);
@@ -109,9 +109,9 @@ public class FeederTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         assertNotNull(system.getMaximumNumberOfTrajectories());
     }
 
@@ -120,12 +120,12 @@ public class FeederTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         idsaLoader.InitPotentialField(system.getTrajectories());
 
 
@@ -146,9 +146,9 @@ public class FeederTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
         Trajectory trajectory = system.getTrajectory();
         List<Point> points = system.obtainSectionTrajectory(trajectory);
@@ -170,9 +170,9 @@ public class FeederTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
         Trajectory trajectory = system.getTrajectory();
         assertNotNull(system.getNextPoint(trajectory));
@@ -183,9 +183,9 @@ public class FeederTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
         Trajectory trajectory = system.getTrajectory();
         List<Point> points = system.obtainSectionTrajectory(trajectory);
@@ -209,9 +209,9 @@ public class FeederTest {
     public void getTrajectories() throws Exception {//initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
         assertNotNull(system.getTrajectories());
     }
@@ -221,9 +221,9 @@ public class FeederTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
         assertNotNull(system.getTrajectory());
     }
@@ -233,9 +233,9 @@ public class FeederTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);;
         system.loadSystem();
         Trajectory a = system.getTrajectory();
         List<Point> po = new ArrayList<>();
@@ -270,9 +270,9 @@ public class FeederTest {
         //initialise the saving class
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(FeederTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
     }
 

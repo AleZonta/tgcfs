@@ -18,6 +18,7 @@ import tgcfs.NN.OutputsNetwork;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -36,10 +37,11 @@ public class Classifiers extends Algorithm {
     /**
      * Constructor zero parameter
      * Call the super constructor
+     * @param logger logger
      * @throws Exception if the super constructor has problem in reading the config files
      */
-    public Classifiers() throws Exception {
-        super();
+    public Classifiers(Logger logger) throws Exception {
+        super(logger);
     }
 
     /**

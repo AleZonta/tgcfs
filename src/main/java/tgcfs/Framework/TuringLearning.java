@@ -18,6 +18,7 @@ import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
+import tgcfs.Utils.LogSystem;
 import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class TuringLearning implements Framework{
     private Feeder feeder;
     private IdsaLoader idsaLoader;
     private int countingTime;
-    private static final Logger logger = Logger.getLogger(TuringLearning.class.getName()); //logger for this class
+    private static Logger logger; //logger for this class
 
 
     /**
@@ -57,18 +58,20 @@ public class TuringLearning implements Framework{
      * @throws Exception if there are problems with the reading procedure
      */
     public TuringLearning() throws Exception {
+        LogSystem logSystem = new LogSystem(this.getClass());
+        logger = logSystem.getLogger();
         //initialising the config file class
         new ReadConfig.Configurations();
 
         //Creating the agents
-        this.agents = new Agents();
-        this.classifiers = new Classifiers();
+        this.agents = new Agents(logger);
+        this.classifiers = new Classifiers(logger);
 
         this.feeder = null;
         this.idsaLoader = null;
 
         //initialise the saving class
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), logger);
         SaveToFile.Saver.dumpSetting(ReadConfig.Configurations.getConfig());
         logger.log(Level.INFO, PropertiesFileReader.getGitSha1());
 
@@ -88,12 +91,12 @@ public class TuringLearning implements Framework{
     public void load() throws Exception {
         logger.log(Level.INFO, "Starting Turing Learning...");
         //loading graph and trajectories
-        this.feeder = new Feeder();
+        this.feeder = new Feeder(logger);
         this.feeder.loadSystem();
         //loading potential field
         //idsa loader I can also add the total number of tracks
         //now all the trajectories are loading
-        this.idsaLoader = new IdsaLoader();
+        this.idsaLoader = new IdsaLoader(logger);
         this.idsaLoader.InitPotentialField(this.feeder.getTrajectories());
         //loading models
         EvolvableModel agentModel;

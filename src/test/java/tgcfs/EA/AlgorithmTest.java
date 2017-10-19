@@ -8,6 +8,7 @@ import tgcfs.Config.ReadConfig;
 import tgcfs.NN.EvolvableModel;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -28,11 +29,13 @@ public class AlgorithmTest {
         new ReadConfig.Configurations();
         //Random LSTM
         EvolvableModel model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
-        Agents agentsCompeting = new Agents();
+        Logger log =  Logger.getLogger(AlgorithmTest.class.getName());
+
+        Agents agentsCompeting = new Agents(log);
         agentsCompeting.generatePopulation(model);
         System.out.println("agent max fitness achievable -> " + agentsCompeting.getMaxFitnessAchievable());
 
-        Classifiers classifiers = new Classifiers();
+        Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);
         System.out.println("classifier max fitness achievable -> " + classifiers.getMaxFitnessAchievable());
 
@@ -90,7 +93,9 @@ public class AlgorithmTest {
     @Test
     public void retAllFitness() throws Exception {
         new ReadConfig.Configurations();
-        Algorithm algorithm = new Agents();
+        Logger log =  Logger.getLogger(AlgorithmTest.class.getName());
+
+        Algorithm algorithm = new Agents(log);
         EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableModel);
         Integer pop = algorithm.getPopulation().size();
@@ -106,7 +111,9 @@ public class AlgorithmTest {
     @Test
     public void retBestGenome() throws Exception {
         new ReadConfig.Configurations();
-        Algorithm algorithm = new Agents();
+        Logger log =  Logger.getLogger(AlgorithmTest.class.getName());
+
+        Algorithm algorithm = new Agents(log);
         EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableModel);
         assertNotNull(algorithm.retBestGenome());
@@ -115,7 +122,9 @@ public class AlgorithmTest {
     @Test
     public void selectParents() throws Exception {
         new ReadConfig.Configurations();
-        Algorithm algorithm = new Agents();
+        Logger log =  Logger.getLogger(AlgorithmTest.class.getName());
+
+        Algorithm algorithm = new Agents(log);
         EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableModel);
         Integer pop = algorithm.getPopulation().size();
@@ -128,7 +137,9 @@ public class AlgorithmTest {
     @Test
     public void generateOffspring() throws Exception {
         new ReadConfig.Configurations();
-        Algorithm algorithm = new Agents();
+        Logger log =  Logger.getLogger(AlgorithmTest.class.getName());
+
+        Algorithm algorithm = new Agents(log);
         EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableModel);
         Integer pop = algorithm.getPopulation().size();

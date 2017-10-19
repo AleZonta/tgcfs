@@ -51,18 +51,20 @@ public class Feeder {
     private final DatabaseCoordNode db; //database saving all the already visited nodes
     private Boolean isNewTrajectory;
     private Point lastTimeUsed;
-    private static final Logger logger = Logger.getLogger(Feeder.class.getName()); //logger for this class
+    private static Logger logger; //logger for this class
 
     /**
      * Constructor with zero parameter
      * Config file is read
      * The graph system and the trajectories system are initialised
+     * @param log logger
      * @throws Exception Exception raised if there are problems with the files
      */
-    public Feeder() throws Exception{
+    public Feeder(Logger log) throws Exception{
+        logger = log;
         logger.log(Level.INFO, "Initialising system...");
-        this.graph = new Loader();
-        this.routes = new Routes();
+        this.graph = new Loader(logger);
+        this.routes = new Routes(logger);
         this.position = 0;
         this.finished = Boolean.TRUE;
         this.actualNumberOfTrajectory = 0;

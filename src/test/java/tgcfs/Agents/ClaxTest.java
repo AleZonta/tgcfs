@@ -10,6 +10,8 @@ import tgcfs.Idsa.IdsaLoader;
 import tgcfs.Loader.Feeder;
 import tgcfs.Performances.SaveToFile;
 
+import java.util.logging.Logger;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertFalse;
@@ -29,12 +31,15 @@ public class ClaxTest {
     public void getArrayLength() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        Logger log =  Logger.getLogger(ClaxTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
 
-        Feeder system = new Feeder();
+
+
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         idsaLoader.InitPotentialField(system.getTrajectories());
 
         Clax clax = new Clax(system,idsaLoader);
@@ -48,12 +53,13 @@ public class ClaxTest {
     public void getWeights() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        Logger log =  Logger.getLogger(ClaxTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
 
-        Feeder system = new Feeder();
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         idsaLoader.InitPotentialField(system.getTrajectories());
 
         Clax clax = new Clax(system,idsaLoader);
@@ -66,12 +72,13 @@ public class ClaxTest {
     public void setWeights() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        Logger log =  Logger.getLogger(ClaxTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
 
-        Feeder system = new Feeder();
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         idsaLoader.InitPotentialField(system.getTrajectories());
 
         Clax clax = new Clax(system,idsaLoader);
@@ -89,12 +96,12 @@ public class ClaxTest {
     public void deepCopy() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(ClaxTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         idsaLoader.InitPotentialField(system.getTrajectories());
 
         Clax clax = new Clax(system,idsaLoader);
@@ -106,12 +113,12 @@ public class ClaxTest {
     public void fit() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
-
-        Feeder system = new Feeder();
+        Logger log =  Logger.getLogger(ClaxTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         idsaLoader.InitPotentialField(system.getTrajectories());
 
         Clax clax = new Clax(system,idsaLoader);
@@ -126,12 +133,13 @@ public class ClaxTest {
     public void computeOutput() throws Exception {
         new ReadConfig.Configurations();
 
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        Logger log =  Logger.getLogger(ClaxTest.class.getName());
+        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
 
-        Feeder system = new Feeder();
+        Feeder system = new Feeder(log);
         system.loadSystem();
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         idsaLoader.InitPotentialField(system.getTrajectories());
 
         Clax clax = new Clax(system,idsaLoader);

@@ -12,6 +12,7 @@ import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -39,7 +40,9 @@ public class AgentsTest {
         new ReadConfig.Configurations();
         //Random LSTM
         EvolvableModel model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
-        Agents agentsCompeting = new Agents();
+        Logger log =  Logger.getLogger(AgentsTest.class.getName());
+
+        Agents agentsCompeting = new Agents(log);
         agentsCompeting.generatePopulation(model);
         assertNotNull(agentsCompeting.getPopulation());
     }
@@ -55,7 +58,9 @@ public class AgentsTest {
         input.add(new InputNetwork(19.0, 34.8, 15.0));
 
         EvolvableModel model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
-        Agents agentsCompeting = new Agents();
+        Logger log =  Logger.getLogger(AgentsTest.class.getName());
+
+        Agents agentsCompeting = new Agents(log);
         agentsCompeting.generatePopulation(model);
 
 
@@ -78,7 +83,9 @@ public class AgentsTest {
     @Test
     public void runIndividual() throws Exception {
         new ReadConfig.Configurations();
-        Agents agentsCompeting = new Agents();
+        Logger log =  Logger.getLogger(AgentsTest.class.getName());
+
+        Agents agentsCompeting = new Agents(log);
         try {
             agentsCompeting.runIndividual(null, null);
         }catch (Exception e){

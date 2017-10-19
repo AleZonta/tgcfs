@@ -11,6 +11,7 @@ import tgcfs.NN.InputsNetwork;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -34,7 +35,8 @@ public class ClassifiersTest {
 
     @Test
     public void trainNetwork() throws Exception {
-        Classifiers classifiers = new Classifiers();
+        Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
+        Classifiers classifiers = new Classifiers(log);
         try {
             classifiers.trainNetwork(null);
         }catch (Error e){
@@ -47,14 +49,16 @@ public class ClassifiersTest {
         new ReadConfig.Configurations();
         //random classifier
         EvolvableModel model = new Classifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
-        Classifiers classifiers = new Classifiers();
+        Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
+        Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);
         assertNotNull(classifiers.getPopulation());
     }
 
     @Test
     public void runIndividuals() throws Exception {
-        Classifiers classifiers = new Classifiers();
+        Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
+        Classifiers classifiers = new Classifiers(log);
         try {
             classifiers.runIndividuals(null);
         }catch (Exception e){
@@ -66,7 +70,8 @@ public class ClassifiersTest {
     public void runIndividual() throws Exception {
         new ReadConfig.Configurations();
         EvolvableModel model = new Classifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
-        Classifiers classifiers = new Classifiers();
+        Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
+        Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);
 
         List<InputsNetwork> input = new ArrayList<>();
@@ -102,7 +107,8 @@ public class ClassifiersTest {
 
     @Test
     public void evaluateIndividuals() throws Exception {
-        Classifiers classifiers = new Classifiers();
+        Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
+        Classifiers classifiers = new Classifiers(log);
         try {
             classifiers.evaluateIndividuals(null,null);
         }catch (Error e){

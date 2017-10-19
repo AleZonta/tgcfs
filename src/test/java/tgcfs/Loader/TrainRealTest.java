@@ -12,6 +12,7 @@ import tgcfs.Utils.PointWithBearing;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static junit.framework.TestCase.*;
 
@@ -255,7 +256,9 @@ public class TrainRealTest {
         TrainReal t = new TrainReal(input, p);
         assertNull(t.getIdsaLoader());
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        Logger log =  Logger.getLogger(TrainRealTest.class.getName());
+
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         t.setIdsaLoader(idsaLoader);
 
         assertEquals(idsaLoader, t.getIdsaLoader());
@@ -279,7 +282,9 @@ public class TrainRealTest {
         TrainReal t = new TrainReal(input, p);
         assertNull(t.getIdsaLoader());
 
-        IdsaLoader idsaLoader = new IdsaLoader();
+        Logger log =  Logger.getLogger(TrainRealTest.class.getName());
+
+        IdsaLoader idsaLoader = new IdsaLoader(log);
         t.setIdsaLoader(idsaLoader);
     }
 

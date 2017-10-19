@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -45,10 +46,11 @@ public class Agents extends Algorithm {
     /**
      * Constructor zero parameter
      * Call the super constructor
+     * @param logger logger
      * @throws Exception if the super constructor has problem in reading the config files
      */
-    public Agents() throws Exception {
-        super();
+    public Agents(Logger logger) throws Exception {
+        super(logger);
     }
 
     /**

@@ -28,15 +28,17 @@ import java.util.logging.Logger;
 public class Routes {
     private Traces storage; //class that loads the track from file
     private Trajectories tra; //keep track of all the trajectories
-    private static final Logger logger = Logger.getLogger(Routes.class.getName()); //logger for this class
+    private static Logger logger; //logger for this class
     private static int number; //number of trajectories analysed
     public static double timeBetweenIDSATimesteps = 0.2;
 
     /**
      * Constructor with one parameter
+     * @param log logger
      */
-    public Routes(){
+    public Routes(Logger log){
         number = 0;
+        logger = log;
     }
 
 

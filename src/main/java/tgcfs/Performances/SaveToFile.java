@@ -31,7 +31,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class SaveToFile {
     private String currentPath;
-    private static final Logger logger = Logger.getLogger(SaveToFile.class.getName()); //logger for this class
+    private static Logger logger; //logger for this class
 
 
     /**
@@ -47,9 +47,10 @@ public class SaveToFile {
          * It calls the private constructor of the SaveToFile class
          * @param name name of the experiment
          * @param experiment number of the experiment
+         * @param log logger instance
          */
-        public Saver(String name, String experiment){
-            instance = new SaveToFile(name, experiment);
+        public Saver(String name, String experiment, Logger log){
+            instance = new SaveToFile(name, experiment, log);
         }
 
         /**
@@ -58,9 +59,10 @@ public class SaveToFile {
          * @param name name of the experiment
          * @param experiment number of the experiment
          * @param path path where to save
+         * @param log logger instance
          */
-        public Saver(String name, String experiment, String path){
-            instance = new SaveToFile(name, experiment, path);
+        public Saver(String name, String experiment, String path, Logger log){
+            instance = new SaveToFile(name, experiment, path, log);
         }
 
         /**
@@ -151,8 +153,10 @@ public class SaveToFile {
      * This method localises the path where the program is located
      * @param name name of the experiment
      * @param experiment number of the experiment
+     * @param log logger instance
      */
-    private SaveToFile(String name, String experiment){
+    private SaveToFile(String name, String experiment, Logger log){
+        logger = log;
         this.currentPath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Experiment-" + name;
         new File(this.currentPath).mkdirs();
         this.currentPath += "/" + experiment;
@@ -167,8 +171,10 @@ public class SaveToFile {
      * @param name name of the experiment
      * @param experiment number of the experiment
      * @param path path where to save
+     * @param log logger instance
      */
-    private SaveToFile(String name, String experiment, String path){
+    private SaveToFile(String name, String experiment, String path, Logger log){
+        logger = log;
         this.currentPath = path + "/Experiment-" + name;
         new File(this.currentPath).mkdirs();
         this.currentPath += "/" + experiment;
