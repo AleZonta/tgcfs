@@ -1,5 +1,6 @@
 package tgcfs.InputOutput;
 
+import tgcfs.Routing.Routes;
 import tgcfs.Utils.PointWithBearing;
 
 /**
@@ -22,7 +23,7 @@ public class PointToSpeedSpeed {
      */
     public double obtainAngularSpeed(PointWithBearing previousPoint, double actualBearing){
         double previousBearing = previousPoint.getBearing();
-        double time = 0.2D;
+        double time = Routes.timeBetweenIDSATimesteps;
         return (previousBearing - actualBearing) / time;
     }
 }

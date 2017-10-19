@@ -3,6 +3,7 @@ package tgcfs.InputOutput;
 import lgds.Distance.Distance;
 import lgds.trajectories.Point;
 import tgcfs.Config.ReadConfig;
+import tgcfs.Routing.Routes;
 
 /**
  * Created by Alessandro Zonta on 31/05/2017.
@@ -22,11 +23,11 @@ public class PointToSpeedBearing {
      * @param secondPoint second position
      * @return speed of the movement between the two points
      */
-    public Double obtainSpeed(Point firstPoint, Point secondPoint){
+    public double obtainSpeed(Point firstPoint, Point secondPoint){
         //speed = distance / time
         Distance dis = new Distance();
-        Double time = 0.2; //fixed value for IDSA (checked on IDSA)
-        Double distance = dis.compute(firstPoint, secondPoint);
+        double time = Routes.timeBetweenIDSATimesteps; //fixed value for IDSA (checked on IDSA)
+        double distance = dis.compute(firstPoint, secondPoint);
         try {
             if (ReadConfig.Configurations.getTrajectoriesType() != 0) {
                 try {
@@ -50,7 +51,7 @@ public class PointToSpeedBearing {
      * @param secondPoint second position
      * @return bearing of the movement
      */
-    public Double obtainBearing(Point firstPoint, Point secondPoint){
+    public double obtainBearing(Point firstPoint, Point secondPoint){
         return Math.toDegrees(Math.atan2(firstPoint.getLatitude() - secondPoint.getLatitude(), firstPoint.getLongitude() - secondPoint.getLongitude()));
     }
 
@@ -61,7 +62,7 @@ public class PointToSpeedBearing {
      * @param secondPoint second position
      * @return distance
      */
-    public Double obtainDistance(Point firstPoint, Point secondPoint){
+    public double obtainDistance(Point firstPoint, Point secondPoint){
         //speed = distance / time
         Distance dis = new Distance();
         return dis.compute(firstPoint, secondPoint);
@@ -75,12 +76,12 @@ public class PointToSpeedBearing {
      * @param lon2 longitude second point
      * @return Double value indicating the bearing
      */
-    private Double bearing(Double lat1, Double lon1, Double lat2, Double lon2){
-        Double latitude1 = Math.toRadians(lat1);
-        Double latitude2 = Math.toRadians(lat2);
-        Double longDiff= Math.toRadians(lon2 - lon1);
-        Double y= Math.sin(longDiff)*Math.cos(latitude2);
-        Double x=Math.cos(latitude1)*Math.sin(latitude2)-Math.sin(latitude1)*Math.cos(latitude2)*Math.cos(longDiff);
+    private double bearing(double lat1, double lon1, double lat2, double lon2){
+        double latitude1 = Math.toRadians(lat1);
+        double latitude2 = Math.toRadians(lat2);
+        double longDiff= Math.toRadians(lon2 - lon1);
+        double y= Math.sin(longDiff)*Math.cos(latitude2);
+        double x=Math.cos(latitude1)*Math.sin(latitude2)-Math.sin(latitude1)*Math.cos(latitude2)*Math.cos(longDiff);
 
         return (Math.toDegrees(Math.atan2(y, x))+360)%360;
     }

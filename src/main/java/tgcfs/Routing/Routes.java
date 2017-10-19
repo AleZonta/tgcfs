@@ -30,6 +30,7 @@ public class Routes {
     private Trajectories tra; //keep track of all the trajectories
     private static final Logger logger = Logger.getLogger(Routes.class.getName()); //logger for this class
     private static int number; //number of trajectories analysed
+    public static double timeBetweenIDSATimesteps = 0.2;
 
     /**
      * Constructor with one parameter

@@ -240,7 +240,7 @@ public class Feeder {
             double speed = Normalisation.convertSpeed(conversion.obtainSpeed(previousPoint, actualPoint));
             double space = Normalisation.convertDistance(conversion.obtainDistance(previousPoint, actualPoint));
 
-            double time = 0.2D;
+            double time = Routes.timeBetweenIDSATimesteps;
             double angularSpeed = Normalisation.convertAngularSpeed(((previousBearing - bearing) / time));
 
             InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, space);
