@@ -226,16 +226,16 @@ public class Clax implements EvolvableModel {
             //bearing from this point to next point
             Point actualPoint = new Point(result.get(i).getLat(), result.get(i).getLon());
             Point nextPoint = new Point(result.get(i + 1).getLat(), result.get(i + 1 ).getLon());
-            Double bearing = conversion.obtainBearing(actualPoint,nextPoint);
+            double bearing = conversion.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
-            Double speed;
+            double speed;
             if(i > 0){
                 Point previousPoint =  new Point(result.get(i - 1).getLat(), result.get(i - 1).getLon());
                 speed = conversion.obtainSpeed(previousPoint, actualPoint);
             }else{
                 speed = 0.0;
             }
-            Double distance = conversion .obtainDistance(actualPoint,nextPoint);
+            double distance = conversion .obtainDistance(actualPoint,nextPoint);
 
             INDArray arr = Nd4j.zeros(3);
             arr.putScalar(0, bearing);
@@ -292,7 +292,7 @@ public class Clax implements EvolvableModel {
             //return what I have found in this edge
             Map<String, Integer> positions = pr.getElementEdge(infoEdge.getSource().getLat(), infoEdge.getSource().getLon(), infoEdge.getTarget().getLat(), infoEdge.getTarget().getLon());
             //counter
-            final Double[] totalImportance = {0d};
+            final double[] totalImportance = {0d};
 
             //check the index in the array of the thing in the edge
             positions.forEach((element, counting) -> {

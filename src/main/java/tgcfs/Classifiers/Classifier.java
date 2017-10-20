@@ -42,7 +42,7 @@ public class Classifier extends ENN implements EvolvableModel {
      * @param HiddenNeurons number of hidden layer
      * @param output        number of nodes used as output
      */
-    public Classifier(Integer input, Integer HiddenNeurons, Integer output) {
+    public Classifier(int input, int HiddenNeurons, int output) {
         super(input, HiddenNeurons, output);
     }
 

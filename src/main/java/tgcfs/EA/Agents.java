@@ -319,6 +319,8 @@ public class Agents extends Algorithm {
                 transformation.transform(trainReal);
             });
 
+
+
             //for every example I need to run the classifier and check the result
             model.getPopulation().parallelStream().forEach(classifier -> {
 
@@ -327,6 +329,7 @@ public class Agents extends Algorithm {
                 inputOutput.parallelStream().forEach(trainReal -> {
 
                     List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
+
 
                     //run the classifier for the Fake trajectory
                     try {
@@ -345,11 +348,10 @@ public class Agents extends Algorithm {
                         e.printStackTrace();
                     }
 
-
                 });
+
+
             });
-
-
 //
 //
 //            opponent.getPopulation().forEach(classifier -> {
@@ -373,6 +375,7 @@ public class Agents extends Algorithm {
 //                });
 //            });
         });
+
     }
 
 

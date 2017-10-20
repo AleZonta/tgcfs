@@ -37,7 +37,7 @@ public class NonUniformMutation extends Individual {
      * @param size size of the objectiveParameter
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public NonUniformMutation(Integer size) throws Exception {
+    public NonUniformMutation(int size) throws Exception {
         super(size);
     }
 
@@ -62,7 +62,7 @@ public class NonUniformMutation extends Individual {
      * @param n is the genome length
      */
     @Override
-    public void mutate(Integer n) {
+    public void mutate(int n) {
         double stepSize = 0d;
         Random rnd = new Random();
         try {

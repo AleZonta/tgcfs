@@ -16,7 +16,7 @@ import org.nd4j.linalg.factory.Nd4j;
  * Class implementing the intermediate recombination between two individuals
  */
 public class IntermediateRecombination extends AbstractRecombination implements Recombination {
-    private Double alpha; //parameter for the recombination
+    private double alpha; //parameter for the recombination
 
     /**
      * Constructor with two parameters
@@ -28,7 +28,7 @@ public class IntermediateRecombination extends AbstractRecombination implements 
      *              picked at random every time
      * @throws Exception raise an exception if the two individual has different length or the alpha value is not correct
      */
-    public IntermediateRecombination(INDArray mother, INDArray father, Double alpha) throws Exception {
+    public IntermediateRecombination(INDArray mother, INDArray father, double alpha) throws Exception {
         super(mother,father);
         this.alpha = alpha;
         if(this.alpha < 0 || this.alpha > 1){

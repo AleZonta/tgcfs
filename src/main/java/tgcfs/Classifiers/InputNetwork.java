@@ -42,7 +42,7 @@ public class InputNetwork implements InputsNetwork{
      * @param speed speed parameter
      * @param direction direction parameter
      */
-    public InputNetwork(Double speed, Double direction){
+    public InputNetwork(double speed, double direction){
         this.speed = Normalisation.convertSpeed(speed);
         this.direction = Normalisation.convertAngularSpeed(direction);
 

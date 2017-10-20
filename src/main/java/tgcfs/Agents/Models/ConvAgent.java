@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class ConvAgent extends Convolutionary implements EvolvableModel {
     private Feeder feeder;
-    private Integer size;
+    private int size;
 
 
     /**

@@ -43,7 +43,7 @@ public class Feeder {
     private final System graph; //loader of the graph
     private final Routes routes; //loader of the trajectories
     private int position; //I need to remember the position where I am now
-    private Boolean finished; //If the current trajectory is ended
+    private boolean finished; //If the current trajectory is ended
     private Trajectory currentTrajectory; //current trajectory under investigation
     private int maximumNumberOfTrajectories;
     private int actualNumberOfTrajectory;
@@ -100,7 +100,7 @@ public class Feeder {
      * @return number of time step to wait before providing the new part of trajectory
      * @throws Exception raising an exception if the setting file is not available or not correct
      */
-    private Integer selectPositionInTrajectory(Trajectory tra) throws Exception{
+    private int selectPositionInTrajectory(Trajectory tra) throws Exception{
         //decide how many time to analise the trajectory
         int split = ReadConfig.Configurations.getHowManySplitting() + 1;
         //need to check if the trajectory is shorter than the split number
@@ -188,7 +188,7 @@ public class Feeder {
      * Return the maximum number ot trajectories to analise
      * @return Integer number with maximum number
      */
-    public Integer getMaximumNumberOfTrajectories() {
+    public int getMaximumNumberOfTrajectories() {
         return this.maximumNumberOfTrajectories;
     }
 
@@ -294,7 +294,7 @@ public class Feeder {
      * Getter if the trajectory under evaluation is finished
      * @return boolean value
      */
-    public Boolean getFinished() {
+    public boolean getFinished() {
         return finished;
     }
 

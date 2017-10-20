@@ -17,7 +17,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 public class AbstractRecombination{
     private INDArray mother;
     private INDArray father;
-    private Integer size;
+    private int size;
 
     /**
      * Constructor with two parameters
@@ -54,7 +54,7 @@ public class AbstractRecombination{
      * Getter for the size
      * @return
      */
-    public Integer getSize() {
+    public int getSize() {
         return size;
     }
 }

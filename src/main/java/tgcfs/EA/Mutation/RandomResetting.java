@@ -46,7 +46,7 @@ public class RandomResetting extends Individual {
      * @param size size of the objectiveParameter
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public RandomResetting(Integer size) throws Exception {
+    public RandomResetting(int size) throws Exception {
         super(size);
     }
 
@@ -58,7 +58,7 @@ public class RandomResetting extends Individual {
      * @param model model to assign to the individual
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public RandomResetting(Integer size, EvolvableModel model) throws Exception {
+    public RandomResetting(int size, EvolvableModel model) throws Exception {
         super(size, model);
     }
 
@@ -83,7 +83,7 @@ public class RandomResetting extends Individual {
      * @param n is the length of the genome
      */
     @Override
-    public void mutate(Integer n) {
+    public void mutate(int n) {
         //generate random number of gene that I will mutate
         int top = n / 4;
         int rand = ThreadLocalRandom.current().nextInt(1, top + 1);
@@ -102,6 +102,6 @@ public class RandomResetting extends Individual {
      * @return RandomResetting object
      */
     public RandomResetting deepCopy(){
-        return new RandomResetting(this.getObjectiveParameters(), new AtomicInteger(this.getFitness().intValue()), this.getModel().deepCopy(), this.getMyInputandOutput());
+        return new RandomResetting(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput());
     }
 }

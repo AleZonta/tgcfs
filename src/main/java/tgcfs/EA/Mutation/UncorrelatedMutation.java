@@ -60,7 +60,7 @@ public class UncorrelatedMutation extends Individual {
      * @param size size of the objectiveParameter
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public UncorrelatedMutation(Integer size) throws Exception {
+    public UncorrelatedMutation(int size) throws Exception {
         super(size);
         this.mutationStrengths = Nd4j.ones(size);
     }
@@ -73,7 +73,7 @@ public class UncorrelatedMutation extends Individual {
      * @param model model to assign to the individual
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public UncorrelatedMutation(Integer size, EvolvableModel model) throws Exception {
+    public UncorrelatedMutation(int size, EvolvableModel model) throws Exception {
         super(size, model);
         this.mutationStrengths = Nd4j.ones(size);
     }
@@ -103,21 +103,20 @@ public class UncorrelatedMutation extends Individual {
      * @param n is the length of the genome
      */
     @Override
-    public void mutate(Integer n)
-        {
+    public void mutate(int n) {
         //two learning rate parameters
-        Double p1 = 1 / (2 * Math.sqrt( 2 * n));
-        Double p2 = 1 / (2 * Math.sqrt( 2 * Math.sqrt(n)));
+        double p1 = 1 / (2 * Math.sqrt( 2 * n));
+        double p2 = 1 / (2 * Math.sqrt( 2 * Math.sqrt(n)));
 
         //random Double general per each individual
-        Double rand1 = ThreadLocalRandom.current().nextDouble();
+        double rand1 = ThreadLocalRandom.current().nextDouble();
 
         //first mutate the list of mutation strengths
         IntStream.range(0, this.mutationStrengths.columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
-            Double randw = ThreadLocalRandom.current().nextDouble();
+            double randw = ThreadLocalRandom.current().nextDouble();
             //obtain the new mutation value
-            Double newMutation = this.mutationStrengths.getDouble(i) * Math.exp(p1 * rand1 + p2 * randw);
+            double newMutation = this.mutationStrengths.getDouble(i) * Math.exp(p1 * rand1 + p2 * randw);
             //substitute the old one with the new one
             this.mutationStrengths.putScalar(i, newMutation);
         });
@@ -125,8 +124,8 @@ public class UncorrelatedMutation extends Individual {
         //after having mutate all the mutation strengths it is time to mutate the actual objective parameters
         IntStream.range(0, super.getObjectiveParameters().columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
-            Double randw = ThreadLocalRandom.current().nextDouble();
-            Double newObj = super.getObjectiveParameters().getDouble(i) + this.mutationStrengths.getDouble(i) * randw;
+            double randw = ThreadLocalRandom.current().nextDouble();
+            double newObj = super.getObjectiveParameters().getDouble(i) + this.mutationStrengths.getDouble(i) * randw;
             super.getObjectiveParameters().putScalar(i, newObj);
         });
     }

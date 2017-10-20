@@ -132,7 +132,7 @@ public abstract class Individual {
      * Method to mutate the individual.
      * @param n is the population size
      */
-    public abstract void mutate(Integer n);
+    public abstract void mutate(int n);
 
     /**
      * Getter for the model of the individual
