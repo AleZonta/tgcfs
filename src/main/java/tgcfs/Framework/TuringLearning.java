@@ -292,17 +292,17 @@ public class TuringLearning implements Framework{
             double maxFitnessPossibleAgent = this.agents.getMaxFitnessAchievable();
             double maxFitnessPossibleClassifier = this.classifiers.getMaxFitnessAchievable();
 
-            if(fittestAgent <= (maxFitnessPossibleAgent * 2 / 3)){
+            if(fittestAgent <= (maxFitnessPossibleAgent * 1 / 2)){
                 //fitness agent needs more evolution
                 //only if classifier is over the threshold, otherwise not
-                if(fittestClassifier >= (maxFitnessPossibleClassifier * 2 / 3)){
+                if(fittestClassifier >= (maxFitnessPossibleClassifier * 1 / 2)){
                     output = 1;
                 }
                 //both are under threshold, no calibration needed -> no 'else' needed since 0 is the default value
             }else {
                 //fitness agent are okay, but what about the classifier?
                 //if the fitness is below the threshold I need to evaluate more the classifier
-                if (fittestClassifier <= (maxFitnessPossibleClassifier * 2 / 3)) {
+                if (fittestClassifier <= (maxFitnessPossibleClassifier * 1 / 2)) {
                     output = 2;
                 }
                 //both are over threshold, no calibration needed -> no 'else' needed since 0 is the default value

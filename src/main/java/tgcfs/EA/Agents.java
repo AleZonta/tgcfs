@@ -341,6 +341,7 @@ public class Agents extends Algorithm {
 
                     //run the classifier for the Real trajectory
                     List<InputsNetwork> inputReal = trainReal.getAllThePartTransformedReal();
+
                     try {
                         this.runClassifier(model ,agent, classifier, inputReal, Boolean.FALSE);
                     } catch (Exception e) {
@@ -348,10 +349,11 @@ public class Agents extends Algorithm {
                         e.printStackTrace();
                     }
 
+
                 });
-
-
             });
+
+
 //
 //
 //            opponent.getPopulation().forEach(classifier -> {
@@ -375,7 +377,6 @@ public class Agents extends Algorithm {
 //                });
 //            });
         });
-
     }
 
 

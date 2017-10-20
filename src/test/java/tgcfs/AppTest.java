@@ -3,6 +3,7 @@ package tgcfs;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import tgcfs.Framework.TuringLearning;
 
 /**
  * Unit test for simple App.
@@ -34,6 +35,15 @@ public class AppTest
      */
     public void testApp()
     {
-        assertTrue( true );
+//        for(int i = 0; i < 20; i++){
+            try {
+                TuringLearning app = new TuringLearning();
+                app.load();
+                app.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//        }
+
     }
 }

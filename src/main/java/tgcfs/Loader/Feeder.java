@@ -401,11 +401,11 @@ public class Feeder {
      * Find the next location given actual position, distance and direction
      * @param whereIam position where I am
      * @param speed speed I am moving
-     * @param distance distance I have travelled
+//     * @param distance distance I have travelled
      * @param direction direction I am moving
      * @return next point
      */
-    public Point getNextLocation(Point whereIam, Double speed, Double distance, Double direction){
+    public Point getNextLocation(Point whereIam, Double speed, Double direction){
         //find position where I am
         Coord coordA = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
 
@@ -437,6 +437,12 @@ public class Feeder {
             //If there is no closest node just return where I am
             return whereIam;
         }
+
+        //time fixed for idsa
+        double time = Routes.timeBetweenIDSATimesteps;
+        double distance = speed * time;
+
+
         //distance in kilometers
         distance = distance / 1000;
 
