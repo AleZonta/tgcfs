@@ -1,5 +1,6 @@
 package tgcfs.Utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 
@@ -20,10 +21,17 @@ public class LogSystem {
      * Initialise the log
      * @throws IOException
      */
-    public LogSystem(Class c) throws IOException {
+    public LogSystem(Class c, String name, String experiment, String path) throws IOException {
         this.logger = Logger.getLogger(c.getName()); //logger for this class
         Handler consoleHandler = new ConsoleHandler();
-        Handler fileHandler  = new FileHandler("./classifier.log");
+
+        String finalPath = path + "/Experiment-" + name;
+        new File(finalPath).mkdirs();
+        finalPath += "/" + experiment;
+        new File(finalPath).mkdirs();
+        finalPath += "/classifier.log";
+
+        Handler fileHandler  = new FileHandler(finalPath);
         // Setting formatter to the handler
         // Creating SimpleFormatter
         Formatter simpleFormatter = new SimpleFormatter();

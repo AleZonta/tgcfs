@@ -52,7 +52,7 @@
   "PictureSize": 64,
   "_____________________________Sixth section": "Settings for where to save the performances",
   "Name": "Test",
-  "Experiment": "1",
+  "Experiment": "2",
   "Path": "/Users/alessandrozonta/Desktop",
   "DumpPopulationExplanation": "Save the entire population on file.",
   "DumpPopulation" : false,

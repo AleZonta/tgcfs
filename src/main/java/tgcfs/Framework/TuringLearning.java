@@ -58,10 +58,11 @@ public class TuringLearning implements Framework{
      * @throws Exception if there are problems with the reading procedure
      */
     public TuringLearning() throws Exception {
-        LogSystem logSystem = new LogSystem(this.getClass());
-        logger = logSystem.getLogger();
         //initialising the config file class
         new ReadConfig.Configurations();
+
+        LogSystem logSystem = new LogSystem(this.getClass(), ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath());
+        logger = logSystem.getLogger();
 
         //Creating the agents
         this.agents = new Agents(logger);
