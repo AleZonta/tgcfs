@@ -10,6 +10,7 @@ import tgcfs.EA.Individual;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.InputsNetwork;
+import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;

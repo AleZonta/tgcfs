@@ -4,6 +4,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
+import tgcfs.Utils.IndividualStatus;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -34,9 +35,10 @@ public class RandomResetting extends Individual {
     /**
      * Two parameter constructor and set to 0 the fitness
      * @param objPar objectiveParameters list
+     * @param ind kind of individual I am creating
      */
-    public RandomResetting(INDArray objPar){
-        super(objPar);
+    public RandomResetting(INDArray objPar, IndividualStatus ind){
+        super(objPar, ind);
     }
 
     /**
@@ -55,11 +57,24 @@ public class RandomResetting extends Individual {
      * It is loading the objective parameters list with random number
      * and the mutation strengths list with 1.0
      * @param size size of the objectiveParameter
-     * @param model model to assign to the individual
+     * @param ind kind of individual I am creating
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public RandomResetting(int size, EvolvableModel model) throws Exception {
-        super(size, model);
+    public RandomResetting(int size, IndividualStatus ind) throws Exception {
+        super(size, ind);
+    }
+
+    /**
+     * One parameter constructor
+     * It is loading the objective parameters list with random number
+     * and the mutation strengths list with 1.0
+     * @param size size of the objectiveParameter
+     * @param model model to assign to the individual
+     * @param ind kind of individual I am creating
+     * @exception Exception if there are problems with the reading of the seed information
+     */
+    public RandomResetting(int size, EvolvableModel model, IndividualStatus ind) throws Exception {
+        super(size, model, ind);
     }
 
     /**
@@ -68,9 +83,10 @@ public class RandomResetting extends Individual {
      * @param fitness fitness
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
+     * @param ind kind of individual I am creating
      */
-    public RandomResetting(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
-        super(objPar, fitness, model, myInputandOutput);
+    public RandomResetting(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind){
+        super(objPar, fitness, model, myInputandOutput, ind);
     }
 
 
@@ -102,6 +118,6 @@ public class RandomResetting extends Individual {
      * @return RandomResetting object
      */
     public RandomResetting deepCopy(){
-        return new RandomResetting(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput());
+        return new RandomResetting(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind);
     }
 }

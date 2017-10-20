@@ -13,6 +13,7 @@ import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Utils.IndividualStatus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -62,10 +63,13 @@ public abstract class Algorithm {
     public void generatePopulation(EvolvableModel model) throws Exception {
         //check which class is calling this method
         int size = 0;
+        IndividualStatus status;
         if(this.getClass() == Agents.class){
             size = ReadConfig.Configurations.getAgentPopulationSize();
+            status = IndividualStatus.AGENT;
             logger.log(Level.INFO, "Generating Agents Population...");
         }else{
+            status = IndividualStatus.CLASSIFIER;
             size = ReadConfig.Configurations.getClassifierPopulationSize();
             logger.log(Level.INFO, "Generating Classifiers Population...");
         }
@@ -74,13 +78,13 @@ public abstract class Algorithm {
             try {
                 switch(ReadConfig.Configurations.getMutation()){
                     case 0:
-                        newBorn = new UncorrelatedMutation(model.getArrayLength());
+                        newBorn = new UncorrelatedMutation(model.getArrayLength(), status);
                         break;
                     case 1:
-                        newBorn = new RandomResetting(model.getArrayLength());
+                        newBorn = new RandomResetting(model.getArrayLength(), status);
                         break;
                     case 2:
-                        newBorn = new NonUniformMutation(model.getArrayLength());
+                        newBorn = new NonUniformMutation(model.getArrayLength(), status);
                         break;
                     default:
                         throw new Exception("Mutation argument not correct");
@@ -128,10 +132,13 @@ public abstract class Algorithm {
     public void generateOffspring() throws Exception {
         //check which class is calling this method
         int size = 0;
+        IndividualStatus status;
         if(this.getClass() == Agents.class){
             size = ReadConfig.Configurations.getAgentOffspringSize();
+            status = IndividualStatus.AGENT;
         }else{
             size = ReadConfig.Configurations.getClassifierOffspringSize();
+            status = IndividualStatus.CLASSIFIER;
         }
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
@@ -149,13 +156,13 @@ public abstract class Algorithm {
             switch(ReadConfig.Configurations.getMutation()){
                 case 0:
                     Recombination mut = new IntermediateRecombination(((UncorrelatedMutation)firstParents).getMutationStrengths(), ((UncorrelatedMutation)secondParents).getMutationStrengths(), 0.5);
-                    son = new UncorrelatedMutation(obj.recombination(), mut.recombination());
+                    son = new UncorrelatedMutation(obj.recombination(), mut.recombination(), status);
                     break;
                 case 1:
-                    son = new RandomResetting(obj.recombination());
+                    son = new RandomResetting(obj.recombination(), status);
                     break;
                 case 2:
-                    son = new NonUniformMutation(obj.recombination());
+                    son = new NonUniformMutation(obj.recombination(), status);
                     break;
                 default:
                     throw new Exception("Mutation argument not correct");
@@ -188,10 +195,13 @@ public abstract class Algorithm {
     public void generateOffspringOnlyWithMutation() throws Exception {
         //check which class is calling this method
         int size = 0;
+        IndividualStatus status;
         if(this.getClass() == Agents.class){
             size = ReadConfig.Configurations.getAgentOffspringSize();
+            status = IndividualStatus.AGENT;
         }else{
             size = ReadConfig.Configurations.getClassifierOffspringSize();
+            status = IndividualStatus.CLASSIFIER;
         }
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
@@ -207,7 +217,7 @@ public abstract class Algorithm {
             //last one has the better fitness
             Individual parent = tournamentPop.get(tournamentPop.size() - 1);
             //son has the same genome of the father
-            Individual son = new RandomResetting(parent.getObjectiveParameters().dup());
+            Individual son = new RandomResetting(parent.getObjectiveParameters().dup(), status);
             //now the son is mutated 10 times (hardcoded value)
             //IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
             son.mutate(son.getObjectiveParameters().columns());

@@ -5,6 +5,7 @@ import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
+import tgcfs.Utils.IndividualStatus;
 
 import java.util.List;
 import java.util.Random;
@@ -25,9 +26,10 @@ public class NonUniformMutation extends Individual {
     /**
      * Two parameter constructor and set to 0 the fitness
      * @param objPar objectiveParameters list
+     * @param ind kind of individual I am creating
      */
-    public NonUniformMutation(INDArray objPar){
-        super(objPar);
+    public NonUniformMutation(INDArray objPar, IndividualStatus ind){
+        super(objPar, ind);
     }
 
     /**
@@ -42,14 +44,27 @@ public class NonUniformMutation extends Individual {
     }
 
     /**
+     * One parameter constructor
+     * It is loading the objective parameters list with random number
+     * and the mutation strengths list with 1.0
+     * @param size size of the objectiveParameter
+     * @param ind kind of individual I am creating
+     * @exception Exception if there are problems with the reading of the seed information
+     */
+    public NonUniformMutation(int size, IndividualStatus ind) throws Exception {
+        super(size, ind);
+    }
+
+    /**
      * four parameters constructor
      * @param objectiveParameters objectiveParameters list
      * @param atomicInteger fitness
      * @param evolvableModel model to assign to the individual
      * @param myInputandOutput input output last
+     * @param ind kind of individual I am creating
      */
-    public NonUniformMutation(INDArray objectiveParameters, AtomicInteger atomicInteger, EvolvableModel evolvableModel, List<TrainReal> myInputandOutput) {
-        super(objectiveParameters, atomicInteger, evolvableModel, myInputandOutput);
+    public NonUniformMutation(INDArray objectiveParameters, AtomicInteger atomicInteger, EvolvableModel evolvableModel, List<TrainReal> myInputandOutput, IndividualStatus ind) {
+        super(objectiveParameters, atomicInteger, evolvableModel, myInputandOutput, ind);
     }
 
     /**
@@ -66,7 +81,11 @@ public class NonUniformMutation extends Individual {
         double stepSize = 0d;
         Random rnd = new Random();
         try {
-            stepSize = ReadConfig.Configurations.getStepSize();
+            if(this.ind == IndividualStatus.AGENT) {
+                stepSize = ReadConfig.Configurations.getStepSizeAgents();
+            }else {
+                stepSize = ReadConfig.Configurations.getStepSizeClassifiers();
+            }
         } catch (Exception ignored) { }
         for(int i = 0; i < super.getObjectiveParameters().columns(); i++){
             double newValue = super.getObjectiveParameters().getDouble(i) + stepSize * rnd.nextGaussian();
@@ -89,7 +108,7 @@ public class NonUniformMutation extends Individual {
      */
     @Override
     public Individual deepCopy() {
-        return new NonUniformMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput());
+        return new NonUniformMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind);
 
     }
 }

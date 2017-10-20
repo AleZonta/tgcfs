@@ -5,6 +5,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
+import tgcfs.Utils.IndividualStatus;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -47,9 +48,10 @@ public class UncorrelatedMutation extends Individual {
      * Two parameter constructor and set to 0 the fitness
      * @param objPar objectiveParameters list
      * @param mutStr mutationStrengths list
+     * @param ind kind of individual I am creating
      */
-    public UncorrelatedMutation(INDArray objPar,INDArray mutStr){
-        super(objPar);
+    public UncorrelatedMutation(INDArray objPar,INDArray mutStr, IndividualStatus ind){
+        super(objPar, ind);
         this.mutationStrengths = mutStr;
     }
 
@@ -70,11 +72,25 @@ public class UncorrelatedMutation extends Individual {
      * It is loading the objective parameters list with random number
      * and the mutation strengths list with 1.0
      * @param size size of the objectiveParameter
-     * @param model model to assign to the individual
+     * @param ind kind of individual I am creating
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public UncorrelatedMutation(int size, EvolvableModel model) throws Exception {
-        super(size, model);
+    public UncorrelatedMutation(int size, IndividualStatus ind) throws Exception {
+        super(size, ind);
+        this.mutationStrengths = Nd4j.ones(size);
+    }
+
+    /**
+     * One parameter constructor
+     * It is loading the objective parameters list with random number
+     * and the mutation strengths list with 1.0
+     * @param size size of the objectiveParameter
+     * @param model model to assign to the individual
+     * @param ind kind of individual I am creating
+     * @exception Exception if there are problems with the reading of the seed information
+     */
+    public UncorrelatedMutation(int size, EvolvableModel model, IndividualStatus ind) throws Exception {
+        super(size, model, ind);
         this.mutationStrengths = Nd4j.ones(size);
     }
 
@@ -84,9 +100,10 @@ public class UncorrelatedMutation extends Individual {
      * @param fitness fitness
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
+     * @param ind kind of individual I am creating
      */
-    public UncorrelatedMutation(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
-        super(objPar, fitness, model, myInputandOutput);
+    public UncorrelatedMutation(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind){
+        super(objPar, fitness, model, myInputandOutput, ind);
     }
 
     /**
@@ -135,7 +152,7 @@ public class UncorrelatedMutation extends Individual {
      * @return UncorrelatedMutation object
      */
     public UncorrelatedMutation deepCopy(){
-        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput());
+        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind);
     }
 
 }

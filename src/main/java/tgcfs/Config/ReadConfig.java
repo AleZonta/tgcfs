@@ -39,7 +39,8 @@ public class ReadConfig {
     private Integer maxGenerations;
     private Integer seed;
     private Integer tournamentSize;
-    private Double stepSize;
+    private Double stepSizeAgents;
+    private Double stepSizeClassifiers;
     private Integer mutation;
     private Boolean recombination;
     private Integer timestepEvolveAgentOverClassifier;
@@ -97,7 +98,8 @@ public class ReadConfig {
         this.seed = null;
         this.tournamentSize = null;
         this.mutation = null;
-        this.stepSize = null;
+        this.stepSizeAgents = null;
+        this.stepSizeClassifiers = null;
         this.recombination = null;
         this.timestepEvolveAgentOverClassifier = null;
 
@@ -481,9 +483,14 @@ public class ReadConfig {
             throw new Exception("TournamentSize is wrong or missing.");
         }try {
             // tournamentSize
-            this.stepSize = ((Double) jsonObject.get("StepSize"));
+            this.stepSizeClassifiers = ((Double) jsonObject.get("StepSizeClassifiers"));
         }catch (ClassCastException | NullPointerException e) {
-            throw new Exception("StepSize is wrong or missing.");
+            throw new Exception("StepSizeClassifiers is wrong or missing.");
+        }try {
+            // tournamentSize
+            this.stepSizeAgents = ((Double) jsonObject.get("StepSizeAgents"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("StepSizeAgents is wrong or missing.");
         }
     }
 
@@ -672,7 +679,8 @@ public class ReadConfig {
                 "seed=" + seed + ",\n" +
                 "tournamentSize=" + tournamentSize + ",\n" +
                 "mutation=" + mutation + ",\n" +
-                "stepSize=" + stepSize + ",\n" +
+                "stepSizeAgents=" + stepSizeAgents + ",\n" +
+                "stepSizeClassifiers=" + stepSizeClassifiers + ",\n" +
                 "recombination=" + recombination + ",\n" +
                 "EvolveAgentMoreThanClassifierTimesteps=" + timestepEvolveAgentOverClassifier + ",\n" +
                 "hiddenLayersAgent=" + hiddenLayersAgent + ",\n" +
@@ -800,9 +808,19 @@ public class ReadConfig {
      * @return double value for tournament size
      * @throws Exception  if I am trying to access it before reading it
      */
-    public double getStepSize() throws Exception {
-        if(this.stepSize == null) throw new Exception("Try to access config file before reading it.");
-        return this.stepSize;
+    public double getStepSizeAgents() throws Exception {
+        if(this.stepSizeAgents == null) throw new Exception("Try to access config file before reading it.");
+        return this.stepSizeAgents;
+    }
+
+    /**
+     * Getter for the step size
+     * @return double value for tournament size
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public double getStepSizeClassifiers() throws Exception {
+        if(this.stepSizeClassifiers == null) throw new Exception("Try to access config file before reading it.");
+        return this.stepSizeClassifiers;
     }
 
 
@@ -1158,8 +1176,17 @@ public class ReadConfig {
          * @return double value for tournament size
          * @throws Exception  if I am trying to access it before reading it
          */
-        public static double getStepSize() throws Exception {
-            return config.getStepSize();
+        public static double getStepSizeAgents() throws Exception {
+            return config.getStepSizeAgents();
+        }
+
+        /**
+         * Getter for the step size
+         * @return double value for tournament size
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static double getStepSizeClassifiers() throws Exception {
+            return config.getStepSizeClassifiers();
         }
     }
 

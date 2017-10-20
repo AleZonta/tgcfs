@@ -17,11 +17,11 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
-    public void getStepSize() throws Exception {
+    public void getStepSizeAgents() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();
         try {
-            conf.getStepSize();
+            conf.getStepSizeAgents();
         } catch (Exception e) {
             assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
         }
@@ -30,10 +30,30 @@ public class ReadConfigTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assertTrue(conf.getStepSize() >= 0);
+        assertTrue(conf.getStepSizeAgents() >= 0);
 
         new ReadConfig.Configurations();
-        assertEquals(conf.getStepSize(), ReadConfig.Configurations.getStepSize());
+        assertEquals(conf.getStepSizeAgents(), ReadConfig.Configurations.getStepSizeAgents());
+    }
+
+    @Test
+    public void getStepSizeClassifiers() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getStepSizeClassifiers();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getStepSizeClassifiers() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getStepSizeClassifiers(), ReadConfig.Configurations.getStepSizeClassifiers());
     }
 
     @Test

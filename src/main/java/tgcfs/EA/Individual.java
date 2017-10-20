@@ -7,6 +7,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
+import tgcfs.Utils.IndividualStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public abstract class Individual {
     private List<TrainReal> myInputandOutput;
     private AtomicInteger fitness;
     private EvolvableModel model;
-
+    protected final IndividualStatus ind;
     /**
      * Getter fot the objective parameter
      * @return list of double
@@ -65,17 +66,20 @@ public abstract class Individual {
         this.fitness = null;
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
+        this.ind = null;
     }
 
     /**
      * Two parameter constructor and set to 0 the fitness
      * @param objPar objectiveParameters list
+     * @param ind kind of individual I am creating
      */
-    public Individual(INDArray objPar){
+    public Individual(INDArray objPar, IndividualStatus ind){
         this.objectiveParameters = objPar;
         this.fitness = new AtomicInteger(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
+        this.ind = ind;
     }
 
     /**
@@ -94,6 +98,27 @@ public abstract class Individual {
         this.fitness = new AtomicInteger(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
+        this.ind = null;
+    }
+
+    /**
+     * One parameter constructor
+     * It is loading the objective parameters list with random number
+     * and the mutation strengths list with 1.0
+     * @param size size of the objectiveParameter
+     * @param ind kind of individual I am creating
+     * @exception Exception if there are problems with the reading of the seed information
+     */
+    public Individual(int size, IndividualStatus ind) throws Exception {
+        //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
+        this.objectiveParameters = Nd4j.rand(1, size);
+        for(int j = 0; j< size; j++){
+            this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
+        }
+        this.fitness = new AtomicInteger(0);
+        this.model = null;
+        this.myInputandOutput = new ArrayList<>();
+        this.ind = ind;
     }
 
     /**
@@ -102,9 +127,10 @@ public abstract class Individual {
      * and the mutation strengths list with 1.0
      * @param size size of the objectiveParameter
      * @param model model to assign to the individual
+     * @param ind kind of individual I am creating
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public Individual(int size, EvolvableModel model) throws Exception {
+    public Individual(int size, EvolvableModel model, IndividualStatus ind) throws Exception {
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
             this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
@@ -112,6 +138,7 @@ public abstract class Individual {
         this.fitness = new AtomicInteger(0);
         this.model = model;
         this.myInputandOutput = new ArrayList<>();
+        this.ind = ind;
     }
 
     /**
@@ -120,12 +147,14 @@ public abstract class Individual {
      * @param fitness fitness
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
+     * @param ind kind of individual I am creating
      */
-    public Individual(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput){
+    public Individual(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind){
         this.objectiveParameters = objPar;
         this.fitness = fitness;
         this.model = model.deepCopy();
         this.myInputandOutput = myInputandOutput;
+        this.ind = ind;
     }
 
     /**

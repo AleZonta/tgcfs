@@ -10,6 +10,7 @@ import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
+import tgcfs.Utils.IndividualStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class IndividualTest {
 
         new ReadConfig.Configurations();
         EvolvableModel model = new LSTMAgent(3,1,5,3);
-        Individual individual = new RandomResetting(model.getArrayLength(),model);
+        Individual individual = new RandomResetting(model.getArrayLength(),model, IndividualStatus.AGENT);
         IntStream.range(0, 10).forEach(j -> {
             INDArray weights = individual.getObjectiveParameters().dup();
             try {
