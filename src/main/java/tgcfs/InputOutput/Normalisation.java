@@ -100,7 +100,7 @@ public class Normalisation {
         double minAngularSpeed = -1.0;
         double b = 10.0;
         double a = -10.0;
-        return (b - a) * ((toBeConverted - minAngularSpeed) / (maxAngularSpeed - minAngularSpeed)) + a;
+        return convertToSomething(maxAngularSpeed, minAngularSpeed, b, a, toBeConverted);
     }
 
     /**
@@ -136,7 +136,7 @@ public class Normalisation {
         double minSpeed = -1.0;
         double b = 10.0;
         double a = 0.0;
-        return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
+        return convertToSomething(maxSpeed, minSpeed, b, a, toBeConverted);
     }
 
     /**
@@ -149,7 +149,7 @@ public class Normalisation {
         double minAngle = -1.0;
         double b = 180.0;
         double a = -180.0;
-        return (b - a) * ((toBeConverted - minAngle) / (maxAngle - minAngle)) + a;
+        return convertToSomething(maxAngle, minAngle, b, a, toBeConverted);
     }
 
     /**
@@ -193,7 +193,7 @@ public class Normalisation {
         double minSpeed = -1.0;
         double b = 555.0;
         double a = 0.0;
-        return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
+        return convertToSomething(maxSpeed, minSpeed, b, a, toBeConverted);
     }
 
     /**
@@ -210,7 +210,20 @@ public class Normalisation {
         double minSpeed = 0.0;
         double b = 1.0;
         double a = -1.0;
-        return (b - a) * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) + a;
+        return convertToSomething(maxSpeed, minSpeed, b, a, toBeConverted);
+    }
+
+    /**
+     * Normalise a number to a new range
+     * @param maxStart max of the range of the original value
+     * @param minStart min of the range of the original value
+     * @param maxEnd max of the range of the converted value
+     * @param minEnd min of the range of the converted value
+     * @param value value to convert
+     * @return converted value
+     */
+    public static double convertToSomething(double maxStart, double minStart, double maxEnd, double minEnd, double value){
+        return  (maxEnd - minEnd) * ((value - minStart) / (maxStart - minStart)) + minEnd;
     }
 
 }

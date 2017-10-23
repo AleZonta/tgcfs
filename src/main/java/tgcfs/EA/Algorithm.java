@@ -8,6 +8,7 @@ import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.EA.Recombination.DiscreteRecombination;
 import tgcfs.EA.Recombination.IntermediateRecombination;
 import tgcfs.EA.Recombination.Recombination;
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -16,6 +17,7 @@ import tgcfs.NN.OutputsNetwork;
 import tgcfs.Utils.IndividualStatus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -360,6 +362,56 @@ public abstract class Algorithm {
      */
     public int getMaxFitnessAchievable() {
         return maxFitnessAchievable;
+    }
+
+
+    /**
+     * Implementation of the method explained in:
+     * Cartlidge, J., & Bullock, S. (2004). Combating coevolutionary disengagement by reducing parasite virulence.
+     * Evolutionary Computation, 12(2), 193–222. http://doi.org/10.1162/106365604773955148
+     *
+     *
+     * The scores are normalised with respect to the maximum score achieved that generation such that the best current parasite always achieves a score of 1
+     *
+     * It needs a parameter (virulence) from outside
+     * Maximum virulence (1.0) normal situation
+     * Moderate virulence (0.75) win rate three quarters that of the highest scoring current parasite
+     * Null virulence (0.5) half the win rate
+     * < 0.5 encourage cooperation between populations
+     *
+     * reducing virulance can be thought of as maintaining a gradient for selection, forcing paeasites to evolve in difficulty at a similar speed to hosts
+     */
+    public void reduceVirulence(){
+        double virulence = 0.75;
+        try {
+            if(this.getClass() == Agents.class) {
+                virulence = ReadConfig.Configurations.getVirulenceAgents();
+            }else{
+                virulence = ReadConfig.Configurations.getVirulenceClassifiers();
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, e.getMessage() + " -> set virulence to 0.75 by default");
+        }
+
+        double maxFitness = Collections.max(this.population, Comparator.comparing(Individual::getFitness)).getFitness();
+
+        double finalVirulence = virulence;
+        this.population.forEach(individual -> {
+            double normalisedFitness = Normalisation.convertToSomething(maxFitness, 0.0, 1.0,0.0, individual.getFitness());
+            double virulencedFitness = this.functionFitness(normalisedFitness, finalVirulence);
+            individual.setFitness((int) Normalisation.convertToSomething(1.0, 0.0, maxFitness,0.0, virulencedFitness));
+        });
+
+    }
+
+    /**
+     * Compute the new fitness following the reducing virulence method
+     * @param fitness old fitness
+     * @param virulence virulence parameter
+     * @return new fitness
+     */
+    private double functionFitness(double fitness, double virulence){
+        return (((2 * fitness) / virulence) - (Math.pow(fitness, 2) / Math.pow(virulence, 2)));
     }
 
 }

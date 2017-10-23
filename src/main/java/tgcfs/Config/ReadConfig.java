@@ -74,6 +74,12 @@ public class ReadConfig {
 
     private Integer numberOfTimestepConsidered;
 
+    //drift
+    private Boolean usingReducedVirulenceMethodOnAgents;
+    private Double virulenceAgents;
+    private Boolean usingReducedVirulenceMethodOnClassifiers;
+    private Double virulenceClassifiers;
+
 
     /**
      * Constructor with zero parameter
@@ -129,6 +135,11 @@ public class ReadConfig {
         this.automaticCalibration = null;
 
         this.numberOfTimestepConsidered = null;
+
+        this.usingReducedVirulenceMethodOnAgents = null;
+        this.usingReducedVirulenceMethodOnClassifiers = null;
+        this.virulenceAgents = null;
+        this.virulenceClassifiers = null;
     }
 
     /**
@@ -491,6 +502,26 @@ public class ReadConfig {
             this.stepSizeAgents = ((Double) jsonObject.get("StepSizeAgents"));
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("StepSizeAgents is wrong or missing.");
+        }try {
+            // virulence
+            this.virulenceAgents = ((Double) jsonObject.get("VirulenceAgents"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("VirulenceAgents is wrong or missing.");
+        }try {
+            // AutomaticCalibration
+            this.usingReducedVirulenceMethodOnAgents = ((Boolean) jsonObject.get("UsingReducedVirulenceMethodOnAgents"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("UsingReducedVirulenceMethodOnAgents is wrong or missing.");
+        }try {
+            // virulence
+            this.virulenceClassifiers = ((Double) jsonObject.get("VirulenceClassifiers"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("VirulenceClassifiers is wrong or missing.");
+        }try {
+            // AutomaticCalibration
+            this.usingReducedVirulenceMethodOnClassifiers = ((Boolean) jsonObject.get("UsingReducedVirulenceMethodOnClassifiers"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("UsingReducedVirulenceMethodOnClassifiers is wrong or missing.");
         }
     }
 
@@ -700,6 +731,10 @@ public class ReadConfig {
                 "LSTM=" + LSTM + ",\n" +
                 "Convolution=" + convolution + ",\n" +
                 "Clax=" + clax + ",\n" +
+                "VirulenceAgents=" + virulenceAgents + ",\n" +
+                "VirulenceClassifiers=" + virulenceClassifiers + ",\n" +
+                "UsingReducedVirulenceMethodOnAgents=" + usingReducedVirulenceMethodOnAgents + ",\n" +
+                "UsingReducedVirulenceMethodOnClassifiers=" + usingReducedVirulenceMethodOnClassifiers + ",\n" +
                 '}';
     }
 
@@ -821,6 +856,46 @@ public class ReadConfig {
     public double getStepSizeClassifiers() throws Exception {
         if(this.stepSizeClassifiers == null) throw new Exception("Try to access config file before reading it.");
         return this.stepSizeClassifiers;
+    }
+
+    /**
+     * Getter if I am using the reduced virulence way
+     * @return boolean value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public boolean getUsingReducedVirulenceMethodOnAgents() throws Exception {
+        if(this.usingReducedVirulenceMethodOnAgents == null) throw new Exception("Try to access config file before reading it.");
+        return this.usingReducedVirulenceMethodOnAgents;
+    }
+
+    /**
+     * Getter of the value of the virulence
+     * @return double value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public double getVirulenceAgents() throws Exception {
+        if(this.virulenceAgents == null) throw new Exception("Try to access config file before reading it.");
+        return this.virulenceAgents;
+    }
+
+    /**
+     * Getter if I am using the reduced virulence way
+     * @return boolean value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public boolean getUsingReducedVirulenceMethodOnClassifiers() throws Exception {
+        if(this.usingReducedVirulenceMethodOnClassifiers == null) throw new Exception("Try to access config file before reading it.");
+        return this.usingReducedVirulenceMethodOnClassifiers;
+    }
+
+    /**
+     * Getter of the value of the virulence
+     * @return double value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public double getVirulenceClassifiers() throws Exception {
+        if(this.virulenceClassifiers == null) throw new Exception("Try to access config file before reading it.");
+        return this.virulenceClassifiers;
     }
 
 
@@ -1187,6 +1262,41 @@ public class ReadConfig {
          */
         public static double getStepSizeClassifiers() throws Exception {
             return config.getStepSizeClassifiers();
+        }
+
+        /**
+         * Getter if I am using the reduced virulence way
+         * @return boolean value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static boolean getUsingReducedVirulenceMethodOnAgents() throws Exception {
+            return config.getUsingReducedVirulenceMethodOnAgents();
+        }
+
+        /**
+         * Getter of the value of the virulence
+         * @return double value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static double getVirulenceAgents() throws Exception {
+            return config.getVirulenceAgents();
+        }
+        /**
+         * Getter if I am using the reduced virulence way
+         * @return boolean value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static boolean getUsingReducedVirulenceMethodOnClassifiers() throws Exception {
+            return config.getUsingReducedVirulenceMethodOnClassifiers();
+        }
+
+        /**
+         * Getter of the value of the virulence
+         * @return double value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static double getVirulenceClassifiers() throws Exception {
+            return config.getVirulenceClassifiers();
         }
     }
 

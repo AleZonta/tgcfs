@@ -233,6 +233,12 @@ public class TuringLearning implements Framework{
                         break;
                 }
 
+
+                //am I using the virulence method?
+                if(ReadConfig.Configurations.getUsingReducedVirulenceMethodOnAgents()) this.agents.reduceVirulence();
+                if(ReadConfig.Configurations.getUsingReducedVirulenceMethodOnClassifiers()) this.classifiers.reduceVirulence();
+                
+
             /* { SELECT individuals next generation } */
                 logger.log(Level.INFO,"Parent Selection...");
                 if(evolveAgent) this.agents.survivalSelections();

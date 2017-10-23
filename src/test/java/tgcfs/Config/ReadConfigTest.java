@@ -17,6 +17,86 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getUsingReducedVirulenceMethodOnAgents() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getUsingReducedVirulenceMethodOnAgents();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getUsingReducedVirulenceMethodOnAgents() || !conf.getUsingReducedVirulenceMethodOnAgents());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getUsingReducedVirulenceMethodOnAgents(), ReadConfig.Configurations.getUsingReducedVirulenceMethodOnAgents());
+    }
+
+    @Test
+    public void getVirulenceAgents() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getVirulenceAgents();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getVirulenceAgents() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getVirulenceAgents(), ReadConfig.Configurations.getVirulenceAgents());
+    }
+
+    @Test
+    public void getUsingReducedVirulenceMethodOnClassifiers() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getUsingReducedVirulenceMethodOnClassifiers();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getUsingReducedVirulenceMethodOnClassifiers() || !conf.getUsingReducedVirulenceMethodOnClassifiers());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getUsingReducedVirulenceMethodOnClassifiers(), ReadConfig.Configurations.getUsingReducedVirulenceMethodOnClassifiers());
+    }
+
+    @Test
+    public void getVirulenceClassifiers() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getVirulenceClassifiers();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getVirulenceClassifiers() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getVirulenceClassifiers(), ReadConfig.Configurations.getVirulenceClassifiers());
+    }
+
+    @Test
     public void getStepSizeAgents() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();
