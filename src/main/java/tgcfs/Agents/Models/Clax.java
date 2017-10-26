@@ -165,6 +165,11 @@ public class Clax implements EvolvableModel {
         throw new NotImplementedException();
     }
 
+    @Override
+    public String getSummary() {
+        return null;
+    }
+
     /**
      * Return list of the weight of the classes
      * @return list of double

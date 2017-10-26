@@ -82,8 +82,8 @@ public class FollowingTheGraph implements Transformation {
         //If I am also checking the first part I am adding that to the result to compute
         try {
             if(ReadConfig.Configurations.getCheckAlsoPast()){
-                convertedInput.addAll(trainReal.getTrainingPoint());
-                convertedInputReal.addAll(trainReal.getTrainingPoint());
+                convertedInput.addAll(trainReal.getTrainingPointSettedForTheClassifier());
+                convertedInputReal.addAll(trainReal.getTrainingPointSettedForTheClassifier());
             }
         } catch (Exception ignored) {}
 

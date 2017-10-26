@@ -31,7 +31,7 @@
   "ClassifierAlphaIntermediateRecombination": 0.5,
   "ClassifierTimeStepsExplanation": "Not implemented now",
   "ClassifierTimeSteps": 1,
-  "MaxGenerations": 1,
+  "MaxGenerations": 3,
   "Seed": 1,
   "TournamentSize": 2,
   "MutationExplanation": "0 is Uncorrelated mutation, 1 is RandomResetting, 2 is NonUniformMutation",
@@ -68,8 +68,11 @@
   "usingDB": false,
   "dbNameCoordNode": "dbcn",
   "dbNameDistance": " dbd",
-  "_____________________________Eight section": "what model use in the system",
+  "_____________________________Eight section": "what model use in the system -> agent",
   "LSTM": true,
   "Convolution": false,
-  "Clax": false
+  "Clax": false,
+  "_____________________________Ninth section": "what model use in the system -> classifier",
+  "LSTMClassifier": false,
+  "ENN": true
 }

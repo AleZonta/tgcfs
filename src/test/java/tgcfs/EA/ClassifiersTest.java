@@ -1,8 +1,8 @@
 package tgcfs.EA;
 
 import org.junit.Test;
-import tgcfs.Classifiers.Classifier;
 import tgcfs.Classifiers.InputNetwork;
+import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.NN.EvolvableModel;
@@ -48,7 +48,7 @@ public class ClassifiersTest {
     public void generatePopulation() throws Exception {
         new ReadConfig.Configurations();
         //random classifier
-        EvolvableModel model = new Classifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
+        EvolvableModel model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
         Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
         Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);
@@ -69,7 +69,7 @@ public class ClassifiersTest {
     @Test
     public void runIndividual() throws Exception {
         new ReadConfig.Configurations();
-        EvolvableModel model = new Classifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
+        EvolvableModel model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
         Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
         Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);

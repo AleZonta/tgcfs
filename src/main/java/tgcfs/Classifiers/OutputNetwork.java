@@ -1,6 +1,7 @@
 package tgcfs.Classifiers;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import tgcfs.Config.ReadConfig;
 import tgcfs.NN.OutputsNetwork;
 
 import java.lang.reflect.Field;
@@ -17,7 +18,14 @@ import java.lang.reflect.Field;
  */
 public class OutputNetwork implements OutputsNetwork{
     private boolean real;
-    public static final int outputSize = 1; //the size of the output corresponding to the field here
+    public static int outputSize = 1; //the size of the output corresponding to the field here
+    private int kindOfClassifier;
+
+
+    public static void setOutputSize(int number){
+        outputSize = number;
+    }
+
 
     /**
      * Contructor zero parameter
@@ -25,8 +33,21 @@ public class OutputNetwork implements OutputsNetwork{
      */
     public OutputNetwork(){
         Field[] allFields = OutputNetwork.class.getDeclaredFields();
-        if (allFields.length != outputSize + 1){
-            throw new Error("Number of fields and variable expressing that do not correspond.");
+
+        this.kindOfClassifier = 0; //0 means ENN
+        try {
+            this.kindOfClassifier = ReadConfig.Configurations.getValueClassifier();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(this.kindOfClassifier == 1){ //1 means LSTM
+            if (allFields.length != outputSize + 1){
+                throw new Error("Number of fields and variable expressing that do not correspond.");
+            }
+        }else{
+            if (allFields.length != outputSize + 2){
+                throw new Error("Number of fields and variable expressing that do not correspond.");
+            }
         }
     }
 
@@ -46,12 +67,27 @@ public class OutputNetwork implements OutputsNetwork{
      */
     @Override
     public void deserialise(INDArray out) {
-        if (out.columns() != outputSize) throw new Error("List size is not correct");
-        if(out.getDouble(0) >= 0.0){
-            this.real = Boolean.TRUE;
-        }else{
-            this.real = Boolean.FALSE;
+        if (out.columns() != outputSize) {
+            if (out.rows() != outputSize) {
+                throw new Error("List size is not correct");
+            }
         }
+        //enn
+        if(this.kindOfClassifier == 0){
+            if(out.getDouble(0) >= 0.0){
+                this.real = Boolean.TRUE;
+            }else{
+                this.real = Boolean.FALSE;
+            }
+        }else{
+            //lstm
+            if(out.getDouble(0) >= out.getDouble(1)){
+                this.real = Boolean.TRUE;
+            }else{
+                this.real = Boolean.FALSE;
+            }
+        }
+
     }
 
 

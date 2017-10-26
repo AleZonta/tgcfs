@@ -239,11 +239,11 @@ public class Feeder {
             updatedPoints.add(new PointWithBearing(points.get(i), bearing));
 
             //speed is the speed I arrived here from previous point
-            double speed = Normalisation.convertSpeed(conversion.obtainSpeed(previousPoint, actualPoint));
-            double space = Normalisation.convertDistance(conversion.obtainDistance(previousPoint, actualPoint));
+            double speed = conversion.obtainSpeed(previousPoint, actualPoint);
+            double space = conversion.obtainDistance(previousPoint, actualPoint);
 
             double time = Routes.timeBetweenIDSATimesteps;
-            double angularSpeed = Normalisation.convertAngularSpeed(((previousBearing - bearing) / time));
+            double angularSpeed =((previousBearing - bearing) / time);
 
             InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, space);
             inputNetwork.setTargetPoint(possibleTarget);

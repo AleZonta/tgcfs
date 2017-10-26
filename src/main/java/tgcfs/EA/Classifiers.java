@@ -7,6 +7,7 @@ import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.RealAgents;
+import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.InputOutput.Transformation;
@@ -18,6 +19,7 @@ import tgcfs.NN.OutputsNetwork;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -81,17 +83,36 @@ public class Classifiers extends Algorithm {
         //set the weights
         model.setWeights(individual.getObjectiveParameters());
         //compute Output of the network
+
+
         INDArray lastOutput = null;
-        for (InputsNetwork inputsNetwork : input) {
-            //System.out.println("------- input ------");
-            //System.out.println(inputsNetwork.serialise());
-            lastOutput = model.computeOutput(inputsNetwork.serialise());
-            //System.out.println("------- output ------");
-            //System.out.println(lastOutput);
-        }
-        //I am interested only in the last output of this network
         OutputNetwork out = new OutputNetwork();
-        out.deserialise(lastOutput);
+        if(model.getClass().equals(ENNClassifier.class)){
+            //if the model is ENN
+            for (InputsNetwork inputsNetwork : input) {
+                lastOutput = model.computeOutput(inputsNetwork.serialise());
+            }
+            //I am interested only in the last output of this network
+            out.deserialise(lastOutput);
+        }else {
+            //else
+            //if it is a lstm
+            int size = input.size();
+            INDArray features = Nd4j.create(new int[]{1, tgcfs.Classifiers.InputNetwork.inputSize, size}, 'f');
+            for (int j = 0; j < size; j++) {
+                INDArray vector = input.get(j).serialise();
+                features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
+            }
+            lastOutput = model.computeOutput(features);
+            logger.log(Level.INFO, lastOutput.toString());
+            int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
+            INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
+            //I am interested only in the last output of this network
+            out.deserialise(realLastOut);
+        }
+
+
+
         return out;
     }
 

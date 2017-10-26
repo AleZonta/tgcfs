@@ -6,7 +6,8 @@ import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
-import tgcfs.Classifiers.Classifier;
+import tgcfs.Classifiers.Models.ENNClassifier;
+import tgcfs.Classifiers.Models.LSTMClassifier;
 import tgcfs.Config.PropertiesFileReader;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
@@ -117,11 +118,24 @@ public class TuringLearning implements Framework{
             default:
                 throw new NoSuchMethodError("Model not yet implemented");
         }
-        EvolvableModel classifierModel = new Classifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+        EvolvableModel classifierModel;
+        //decide which model to implement here
+        switch (ReadConfig.Configurations.getValueClassifier()){
+            case 0:
+                classifierModel = new ENNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+                break;
+            case 1:
+                classifierModel = new LSTMClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+                break;
+            default:
+                throw new NoSuchMethodError("Model not yet implemented");
+        }
         //generate population
         //INITIALISE population EA with random candidate solution
         this.agents.generatePopulation(agentModel);
         this.classifiers.generatePopulation(classifierModel);
+        logger.log(Level.INFO, agentModel.getSummary());
+        logger.log(Level.INFO, classifierModel.getSummary());
         logger.log(Level.INFO, "Framework online!");
 
         //save the sha-1 info in the output files
@@ -237,7 +251,7 @@ public class TuringLearning implements Framework{
                 //am I using the virulence method?
                 if(ReadConfig.Configurations.getUsingReducedVirulenceMethodOnAgents()) this.agents.reduceVirulence();
                 if(ReadConfig.Configurations.getUsingReducedVirulenceMethodOnClassifiers()) this.classifiers.reduceVirulence();
-                
+
 
             /* { SELECT individuals next generation } */
                 logger.log(Level.INFO,"Parent Selection...");

@@ -3,6 +3,7 @@ package tgcfs.Config;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import tgcfs.Classifiers.OutputNetwork;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -67,6 +68,10 @@ public class ReadConfig {
     private Boolean convolution;
     private Boolean clax;
 
+    private Integer valueClassifier;
+    private Boolean LSTMClassifier;
+    private Boolean ENN;
+
     private Integer pictureSize;
 
     private Boolean checkAlsoPast;
@@ -126,6 +131,9 @@ public class ReadConfig {
         this.convolution = null;
         this.clax = null;
         this.valueModel = null;
+        this.valueClassifier = null;
+        this.LSTMClassifier = null;
+        this.ENN = null;
 
 
         this.pictureSize = null;
@@ -447,7 +455,18 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("Clax is wrong or missing.");
         }
-
+        try {
+            // LSTMClassifier
+            this.LSTMClassifier = ((Boolean) jsonObject.get("LSTMClassifier"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("LSTMClassifier is wrong or missing.");
+        }
+        try {
+            // convolution
+            this.ENN = ((Boolean) jsonObject.get("ENN"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("ENN is wrong or missing.");
+        }
         //check that only one between LSTM / Convolution / Clax can be true
         int countTrue = this.LSTM ? 1 : 0;
         countTrue += this.convolution ? 1 : 0;
@@ -458,6 +477,16 @@ public class ReadConfig {
         if(this.clax) this.valueModel = 2;
         if(countTrue > 1) throw new Exception("More models are set as true, only one is allowed");
         if (this.clax && this.train) throw new Exception("Training is not allowed with clax system");
+
+
+        //check that only one between LSTM / Convolution / Clax can be true
+        int countTrueClassifier = this.LSTMClassifier ? 1 : 0;
+        countTrueClassifier += this.ENN ? 1 : 0;
+
+        if(this.ENN) this.valueClassifier = 0;
+        if(this.LSTMClassifier) this.valueClassifier = 1;
+        if(this.LSTMClassifier) OutputNetwork.setOutputSize(2);
+        if(countTrueClassifier > 1) throw new Exception("More models are set as true, only one is allowed");
 
         try {
             // picturesize
@@ -731,6 +760,8 @@ public class ReadConfig {
                 "LSTM=" + LSTM + ",\n" +
                 "Convolution=" + convolution + ",\n" +
                 "Clax=" + clax + ",\n" +
+                "LSTMClassifier=" + LSTMClassifier + ",\n" +
+                "ENN=" + ENN + ",\n" +
                 "VirulenceAgents=" + virulenceAgents + ",\n" +
                 "VirulenceClassifiers=" + virulenceClassifiers + ",\n" +
                 "UsingReducedVirulenceMethodOnAgents=" + usingReducedVirulenceMethodOnAgents + ",\n" +
@@ -896,6 +927,36 @@ public class ReadConfig {
     public double getVirulenceClassifiers() throws Exception {
         if(this.virulenceClassifiers == null) throw new Exception("Try to access config file before reading it.");
         return this.virulenceClassifiers;
+    }
+
+    /**
+     * Getter if I am using the LSTM also for the classifier
+     * @return boolena value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public boolean getLSTMClassifier() throws Exception {
+        if(this.LSTMClassifier == null) throw new Exception("Try to access config file before reading it.");
+        return this.LSTMClassifier;
+    }
+
+    /**
+     * Getter if I am using the ENN for the classifier
+     * @return boolena value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public boolean getENN() throws Exception {
+        if(this.ENN == null) throw new Exception("Try to access config file before reading it.");
+        return this.ENN;
+    }
+
+    /**
+     * Get the model used as a number
+     * @return int value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public int getValueClassifier() throws Exception {
+        if(this.valueClassifier == null) throw new Exception("Try to access config file before reading it.");
+        return this.valueClassifier;
     }
 
 
@@ -1298,6 +1359,33 @@ public class ReadConfig {
         public static double getVirulenceClassifiers() throws Exception {
             return config.getVirulenceClassifiers();
         }
+        /**
+         * Getter if I am using the LSTM also for the classifier
+         * @return boolena value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static boolean getLSTMClassifier() throws Exception {
+            return config.getLSTMClassifier();
+        }
+
+        /**
+         * Getter if I am using the ENN for the classifier
+         * @return boolena value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static boolean getENN() throws Exception {
+            return config.getENN();
+        }
+
+        /**
+         * Get the model used as a number
+         * @return int value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static int getValueClassifier() throws Exception {
+            return config.getValueClassifier();
+        }
+
     }
 
 }

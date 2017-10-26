@@ -1,19 +1,20 @@
-package tgcfs.Agents.Models;
+package tgcfs.Classifiers.Models;
 
 import lgds.trajectories.Point;
+import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.LSTM;
 
 import java.util.List;
 
-
 /**
- * Created by Alessandro Zonta on 22/05/2017.
+ * Created by Alessandro Zonta on 24/10/2017.
  * PhD Situational Analytics
  * <p>
  * Computational Intelligence Group
@@ -22,24 +23,26 @@ import java.util.List;
  * <p>
  * a.zonta@vu.nl
  *
- * Class representing a fake agent implemented using LSTM Neural Network
+ * Class representing a the classifier implemented using LSTM Neural Network
  * The LSMT NN is implemented using the deeplearning4j library
  * Deeplearning4j Development Team. Deeplearning4j: Open-source distributed deep learning for the JVM, Apache Software Foundation License 2.0. http://deeplearning4j.org
  *
  * The LSTMAgent is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class LSTMAgent extends LSTM implements EvolvableModel {
+public class LSTMClassifier extends LSTM implements EvolvableModel {
 
     /**
      * Building of the Recurrent Neural NN.Network
+     *
+     * since is used as a classifiers, we need the output function function be a SOFTMAX, to have the sum of the outputs be 1
      *
      * @param inputSize     integer value containing the size of the input
      * @param hiddenLayers  integer value containing how many hidden layers the network will have
      * @param hiddenNeurons integer value containing how many neurons the hidden layers will have
      * @param outputSize    integer value containing how many output neurons the network will have
      */
-    public LSTMAgent(int inputSize, int hiddenLayers, int hiddenNeurons, int outputSize) {
-        super(inputSize, hiddenLayers, hiddenNeurons, outputSize);
+    public LSTMClassifier(int inputSize, int hiddenLayers, int hiddenNeurons, int outputSize) {
+        super(inputSize, hiddenLayers, hiddenNeurons, outputSize, Activation.SOFTMAX);
     }
 
     /**
@@ -105,9 +108,4 @@ public class LSTMAgent extends LSTM implements EvolvableModel {
     public void fit(DataSet dataSet) {
         throw new NotImplementedException();
     }
-
-
-
-
-
 }

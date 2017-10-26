@@ -53,6 +53,27 @@ public class InputNetwork implements InputsNetwork{
     }
 
     /**
+     * Constructor two parameters
+     * @param speed speed parameter
+     * @param direction direction parameter
+     * @param translation if the data needs to be translated
+     */
+    public InputNetwork(double speed, double direction, boolean translation){
+        if(translation){
+            this.speed = Normalisation.convertSpeed(speed);
+            this.direction = Normalisation.convertAngularSpeed(direction);
+        }else {
+            this.speed = speed;
+            this.direction = direction;
+        }
+
+        Field[] allFields = InputNetwork.class.getDeclaredFields();
+        if (allFields.length != inputSize + 1){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
+    }
+
+    /**
      * Getter for the speed variable
      * @return Double number
      */

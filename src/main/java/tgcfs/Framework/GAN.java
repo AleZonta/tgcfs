@@ -7,7 +7,8 @@ import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Agents.OutputNetwork;
-import tgcfs.Classifiers.Classifier;
+import tgcfs.Classifiers.Models.ENNClassifier;
+import tgcfs.Classifiers.Models.LSTMClassifier;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Classifiers;
@@ -107,7 +108,17 @@ public class GAN implements Framework{
             default:
                 throw new NoSuchMethodError("Model not yet implemented");
         }
-        this.classifier = new Classifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+        //decide which model to implement here
+        switch (ReadConfig.Configurations.getValueClassifier()){
+            case 0:
+                this.classifier = new ENNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+                break;
+            case 1:
+                this.classifier = new LSTMClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+                break;
+            default:
+                throw new NoSuchMethodError("Model not yet implemented");
+        }
         logger.log(Level.INFO, "Framework online!");
     }
 

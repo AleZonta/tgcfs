@@ -1,8 +1,9 @@
-package tgcfs.Classifiers;
+package tgcfs.Classifiers.Models;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import tgcfs.Classifiers.InputNetwork;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.ENN;
@@ -10,7 +11,7 @@ import tgcfs.Networks.ENN;
 import java.util.List;
 
 /**
- * Created by Alessandro Zonta on 18/05/2017.
+ * Created by Alessandro Zonta on 24/10/2017.
  * PhD Situational Analytics
  * <p>
  * Computational Intelligence Group
@@ -18,6 +19,7 @@ import java.util.List;
  * Faculty of Sciences - VU University Amsterdam
  * <p>
  * a.zonta@vu.nl
+ *
  *
  * This method implements the classifier for the Touring system
  * The classifier is an Elman Neural Network
@@ -27,12 +29,11 @@ import java.util.List;
  *
  * The Classier is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class Classifier extends ENN implements EvolvableModel {
-
+public class ENNClassifier extends ENN implements EvolvableModel {
     /**
      * Default constructor
      */
-    public Classifier(){}
+    public ENNClassifier(){}
 
 
     /**
@@ -42,7 +43,7 @@ public class Classifier extends ENN implements EvolvableModel {
      * @param HiddenNeurons number of hidden layer
      * @param output        number of nodes used as output
      */
-    public Classifier(int input, int HiddenNeurons, int output) {
+    public ENNClassifier(int input, int HiddenNeurons, int output) {
         super(input, HiddenNeurons, output);
     }
 
@@ -84,7 +85,7 @@ public class Classifier extends ENN implements EvolvableModel {
      */
     @Override
     public EvolvableModel deepCopy() {
-        return new Classifier(this.input, this.hiddenNeurons, this.output);
+        return new ENNClassifier(this.input, this.hiddenNeurons, this.output);
     }
 
     /**
@@ -139,5 +140,6 @@ public class Classifier extends ENN implements EvolvableModel {
         }
         return result;
     }
+
 
 }

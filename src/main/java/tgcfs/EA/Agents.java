@@ -307,7 +307,7 @@ public class Agents extends Algorithm {
      */
     public void evaluateIndividuals(Algorithm model, Transformation transformation){
         //I need to evaluate the agent using the classifiers
-        super.getPopulation().parallelStream().forEach(agent -> {
+        super.getPopulation().forEach(agent -> {
 //            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
             //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
@@ -322,11 +322,11 @@ public class Agents extends Algorithm {
 
 
             //for every example I need to run the classifier and check the result
-            model.getPopulation().parallelStream().forEach(classifier -> {
+            model.getPopulation().forEach(classifier -> {
 
                 //this is one agent
                 //I need to check for every output for every individual
-                inputOutput.parallelStream().forEach(trainReal -> {
+                inputOutput.forEach(trainReal -> {
 
                     List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
 

@@ -1,10 +1,13 @@
 package tgcfs.Loader;
 
 import lgds.trajectories.Point;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Agents.OutputNetwork;
+import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -120,6 +123,21 @@ public class TrainReal {
      */
     public List<InputsNetwork> getTrainingPoint() {
         return this.trainingPoint;
+    }
+
+    /**
+     *  Getter for the input part of the trajectory
+     *  setted to be used as a classifier input network
+     * @return {@link InputNetwork} list
+     */
+    public List<InputsNetwork> getTrainingPointSettedForTheClassifier(){
+        List<InputsNetwork> newlist = new ArrayList<>();
+        this.trainingPoint.forEach(tr -> {
+            INDArray ind = ((tgcfs.Agents.InputNetwork)tr).serialiaseAsInputClassifier();
+            InputNetwork in = new InputNetwork(ind.getDouble(0), ind.getDouble(1), false);
+            newlist.add(in);
+        });
+        return newlist;
     }
 
     /**

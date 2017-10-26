@@ -67,4 +67,10 @@ public interface EvolvableModel {
      * @return list of output of the network
      */
     INDArray computeOutput(INDArray input);
+
+    /**
+     * Get string containing description of the network
+     * @return String
+     */
+    String getSummary();
 }

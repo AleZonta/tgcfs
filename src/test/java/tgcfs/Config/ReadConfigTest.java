@@ -17,6 +17,46 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getLSTMClassifier() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getLSTMClassifier();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getLSTMClassifier() || !conf.getLSTMClassifier());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getLSTMClassifier(), ReadConfig.Configurations.getLSTMClassifier());
+    }
+
+    @Test
+    public void getENN() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getENN();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getENN() || !conf.getENN());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getENN(), ReadConfig.Configurations.getENN());
+    }
+
+    @Test
     public void getUsingReducedVirulenceMethodOnAgents() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();

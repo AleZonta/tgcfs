@@ -36,7 +36,7 @@ public class InputNetwork implements InputsNetwork {
      * @param bearing Double number corresponding to the bearing
      */
     public InputNetwork(double directionAPF, double speed, double bearing){
-        this.bearing = Normalisation.convertDirectionData(bearing);
+        this.bearing = Normalisation.convertAngularSpeed(bearing);
         this.speed = Normalisation.convertSpeed(speed);
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.targetPoint = null;
@@ -57,7 +57,7 @@ public class InputNetwork implements InputsNetwork {
      * @param space distance between the two points
      */
     public InputNetwork(double directionAPF, double speed, double bearing, double space){
-        this.bearing = Normalisation.convertDirectionData(bearing);
+        this.bearing = Normalisation.convertAngularSpeed(bearing);
         this.speed = Normalisation.convertSpeed(speed);
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.space = Normalisation.convertDistance(space);
