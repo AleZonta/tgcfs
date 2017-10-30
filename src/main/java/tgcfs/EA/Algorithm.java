@@ -414,4 +414,7 @@ public abstract class Algorithm {
         return (((2 * fitness) / virulence) - (Math.pow(fitness, 2) / Math.pow(virulence, 2)));
     }
 
+
+
+
 }
