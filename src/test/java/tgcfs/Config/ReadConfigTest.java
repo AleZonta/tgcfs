@@ -17,6 +17,85 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getValueClassifier() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getValueClassifier();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getValueClassifier() >= 0);
+        new ReadConfig.Configurations();
+        assertEquals(conf.getValueClassifier(), ReadConfig.Configurations.getValueClassifier());
+    }
+
+    @Test
+    public void getAutomaticEvolutionDisengagementSystem() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getAutomaticEvolutionDisengagementSystem();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getAutomaticEvolutionDisengagementSystem() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getAutomaticEvolutionDisengagementSystem(), ReadConfig.Configurations.getAutomaticEvolutionDisengagementSystem());
+    }
+
+    @Test
+    public void getMeasureUsedForAutomaticDisengagement() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getMeasureUsedForAutomaticDisengagement();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getMeasureUsedForAutomaticDisengagement() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getMeasureUsedForAutomaticDisengagement(), ReadConfig.Configurations.getMeasureUsedForAutomaticDisengagement());
+    }
+
+    @Test
+    public void getPopulationWillUseTheAutomaticDisengagementSystem() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getPopulationWillUseTheAutomaticDisengagementSystem();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getPopulationWillUseTheAutomaticDisengagementSystem() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getPopulationWillUseTheAutomaticDisengagementSystem(), ReadConfig.Configurations.getPopulationWillUseTheAutomaticDisengagementSystem());
+    }
+
+    @Test
     public void getLSTMClassifier() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();

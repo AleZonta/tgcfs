@@ -85,6 +85,10 @@ public class ReadConfig {
     private Boolean usingReducedVirulenceMethodOnClassifiers;
     private Double virulenceClassifiers;
 
+    private Integer automaticEvolutionDisengagementSystem;
+    private Integer measureUsedForAutomaticDisengagement;
+    private Integer populationWillUseTheAutomaticDisengagementSystem;
+
 
     /**
      * Constructor with zero parameter
@@ -148,6 +152,10 @@ public class ReadConfig {
         this.usingReducedVirulenceMethodOnClassifiers = null;
         this.virulenceAgents = null;
         this.virulenceClassifiers = null;
+
+        this.automaticEvolutionDisengagementSystem = null;
+        this.measureUsedForAutomaticDisengagement = null;
+        this.populationWillUseTheAutomaticDisengagementSystem = null;
     }
 
     /**
@@ -551,6 +559,21 @@ public class ReadConfig {
             this.usingReducedVirulenceMethodOnClassifiers = ((Boolean) jsonObject.get("UsingReducedVirulenceMethodOnClassifiers"));
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("UsingReducedVirulenceMethodOnClassifiers is wrong or missing.");
+        }try {
+            // automaticEvolutionDisengagementSystem
+            this.automaticEvolutionDisengagementSystem = ((Long) jsonObject.get("AutomaticEvolutionDisengagement")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("AutomaticEvolutionDisengagementn is wrong or missing.");
+        }try {
+            // measureUsedForAutomaticDisengagement
+            this.measureUsedForAutomaticDisengagement = ((Long) jsonObject.get("MeasureUsedForAutomaticDisengagement")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("MeasureUsedForAutomaticDisengagement is wrong or missing.");
+        }try {
+            // populationWillUseTheAutomaticDisengagementSystem
+            this.populationWillUseTheAutomaticDisengagementSystem = ((Long) jsonObject.get("PopulationWithAutomaticDisengagement")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("PopulationWithAutomaticDisengagement is wrong or missing.");
         }
     }
 
@@ -766,6 +789,9 @@ public class ReadConfig {
                 "VirulenceClassifiers=" + virulenceClassifiers + ",\n" +
                 "UsingReducedVirulenceMethodOnAgents=" + usingReducedVirulenceMethodOnAgents + ",\n" +
                 "UsingReducedVirulenceMethodOnClassifiers=" + usingReducedVirulenceMethodOnClassifiers + ",\n" +
+                "AutomaticEvolutionDisengagement=" + automaticEvolutionDisengagementSystem + ",\n" +
+                "MeasureUsedForAutomaticDisengagement=" + measureUsedForAutomaticDisengagement + ",\n" +
+                "PopulationWithAutomaticDisengagement=" + populationWillUseTheAutomaticDisengagementSystem + ",\n" +
                 '}';
     }
 
@@ -957,6 +983,36 @@ public class ReadConfig {
     public int getValueClassifier() throws Exception {
         if(this.valueClassifier == null) throw new Exception("Try to access config file before reading it.");
         return this.valueClassifier;
+    }
+
+    /**
+     * Getter for the selector if using the automatic disengagement system
+     * @return int value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public int getAutomaticEvolutionDisengagementSystem() throws Exception {
+        if(this.automaticEvolutionDisengagementSystem == null) throw new Exception("Try to access config file before reading it.");
+        return automaticEvolutionDisengagementSystem;
+    }
+
+    /**
+     * Getter for the measure used in the automatic system
+     * @return int value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public int getMeasureUsedForAutomaticDisengagement() throws Exception {
+        if(this.measureUsedForAutomaticDisengagement == null) throw new Exception("Try to access config file before reading it.");
+        return measureUsedForAutomaticDisengagement;
+    }
+
+    /**
+     * Getter for the population that will use the automatic disengagement system
+     * @return int value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public int getPopulationWillUseTheAutomaticDisengagementSystem() throws Exception {
+        if(this.populationWillUseTheAutomaticDisengagementSystem == null) throw new Exception("Try to access config file before reading it.");
+        return populationWillUseTheAutomaticDisengagementSystem;
     }
 
 
@@ -1386,6 +1442,33 @@ public class ReadConfig {
             return config.getValueClassifier();
         }
 
+
+        /**
+         * Getter for the selector if using the automatic disengagement system
+         * @return int value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static int getAutomaticEvolutionDisengagementSystem() throws Exception {
+            return config.getAutomaticEvolutionDisengagementSystem();
+        }
+
+        /**
+         * Getter for the measure used in the automatic system
+         * @return int value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static int getMeasureUsedForAutomaticDisengagement() throws Exception {
+            return config.getMeasureUsedForAutomaticDisengagement();
+        }
+
+        /**
+         * Getter for the population that will use the automatic disengagement system
+         * @return int value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static int getPopulationWillUseTheAutomaticDisengagementSystem() throws Exception {
+            return config.getPopulationWillUseTheAutomaticDisengagementSystem();
+        }
     }
 
 }
