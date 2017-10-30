@@ -22,10 +22,9 @@ public class OutputNetworkTest {
     @Test
     public void serialiaseAsInputClassifier() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
-        INDArray array2 = Nd4j.create(3);
+        INDArray array2 = Nd4j.create(2);
         array2.putScalar(0, 1.0);
         array2.putScalar(1, 0.5);
-        array2.putScalar(2, 0.7);
         outputNetwork.deserialise(array2);
 
         INDArray res = outputNetwork.serialiaseAsInputClassifier();
@@ -55,7 +54,7 @@ public class OutputNetworkTest {
     @Test
     public void getSpeed() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
-        INDArray array = Nd4j.create(2);
+        INDArray array = Nd4j.create(3);
         array.putScalar(0, 1.0);
         array.putScalar(1, 0.5);
         try {
@@ -63,10 +62,9 @@ public class OutputNetworkTest {
         }catch (Error e){
             assertEquals("List size is not correct",e.getMessage());
         }
-        INDArray array2 = Nd4j.create(3);
+        INDArray array2 = Nd4j.create(2);
         array2.putScalar(0, 1.0);
         array2.putScalar(1, 0.5);
-        array2.putScalar(2, 0.7);
         outputNetwork.deserialise(array2);
         assertTrue(Normalisation.decodeSpeed(1.0) ==outputNetwork.getSpeed());
     }
@@ -74,7 +72,7 @@ public class OutputNetworkTest {
     @Test
     public void getBearing() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
-        INDArray array = Nd4j.create(2);
+        INDArray array = Nd4j.create(3);
         array.putScalar(0, 1.0);
         array.putScalar(1, 0.5);
         try {
@@ -82,10 +80,9 @@ public class OutputNetworkTest {
         }catch (Error e){
             assertEquals("List size is not correct",e.getMessage());
         }
-        INDArray array2 = Nd4j.create(3);
+        INDArray array2 = Nd4j.create(2);
         array2.putScalar(0, 1.0);
         array2.putScalar(1, 0.5);
-        array2.putScalar(2, 0.7);
         outputNetwork.deserialise(array2);
         assertTrue(Normalisation.decodeDirectionData(0.5) == outputNetwork.getBearing());
     }
@@ -93,7 +90,7 @@ public class OutputNetworkTest {
     @Test
     public void deserialise() throws Exception {
         OutputNetwork outputNetwork = new OutputNetwork();
-        INDArray array = Nd4j.create(2);
+        INDArray array = Nd4j.create(3);
         array.putScalar(0, 1.0);
         array.putScalar(1, 0.5);
         try {
@@ -101,10 +98,9 @@ public class OutputNetworkTest {
         }catch (Error e){
             assertEquals("List size is not correct",e.getMessage());
         }
-        INDArray array2 = Nd4j.create(3);
+        INDArray array2 = Nd4j.create(2);
         array2.putScalar(0, 1.0);
         array2.putScalar(1, 0.5);
-        array2.putScalar(2, 0.7);
         outputNetwork.deserialise(array2);
     }
 

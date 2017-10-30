@@ -46,7 +46,7 @@
   "UsingReducedVirulenceMethodOnAgents": false,
   "UsingReducedVirulenceMethodOnClassifiers": false,
   "VirulenceAgents": 0.75,
-  "VirulenceClassifiers": 0.75,
+  "VirulenceClassifiers": 0.35,
   "_____________________________Fifth section": "Settings for the models",
   "HiddenLayersAgent": 1,
   "HiddenNeuronsAgent": 5,

@@ -36,13 +36,13 @@ public class AlgorithmTest {
         EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableModel);
 
-        algorithm.getPopulation().forEach(individual -> individual.setFitness(ThreadLocalRandom.current().nextInt(8000)));
+        algorithm.getPopulation().forEach(individual -> individual.setFitness(ThreadLocalRandom.current().nextInt(16000)));
 
 
         double virulence = ReadConfig.Configurations.getVirulenceAgents();
         List<Integer> listFitnesses = new ArrayList<>();
         algorithm.getPopulation().forEach(individual -> listFitnesses.add(individual.getFitness()));
-
+        System.out.println(listFitnesses.toString());
 
 
         List<Integer> listDeNormalisedFitnesses = new ArrayList<>();
