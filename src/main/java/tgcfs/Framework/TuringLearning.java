@@ -20,6 +20,8 @@ import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
+import tgcfs.Utils.EngagementPopulation;
+import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.LogSystem;
 import tgcfs.Utils.PointWithBearing;
 
@@ -52,6 +54,7 @@ public class TuringLearning implements Framework{
     private IdsaLoader idsaLoader;
     private int countingTime;
     private static Logger logger; //logger for this class
+    private EngagementPopulation countermeasures;
 
 
     /**
@@ -82,6 +85,8 @@ public class TuringLearning implements Framework{
         if(Objects.equals(ReadConfig.Configurations.getValueModel(), ReadConfig.Configurations.Convolution)) Nd4j.enableFallbackMode(Boolean.TRUE);
 
         this.countingTime = 0;
+        //load countermeasures
+        this.countermeasures = new EngagementPopulation(logger);
     }
 
 
@@ -147,6 +152,9 @@ public class TuringLearning implements Framework{
 
         //load the stepsize
         new StepSize();
+
+        //load max fitness on countermeasures class
+        this.countermeasures.setMaxFitness(this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable());
     }
 
     /**
@@ -226,35 +234,13 @@ public class TuringLearning implements Framework{
                     logger.log(Level.INFO, "Dump agent generation and real");
                     this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
                 }
-
-                //check if I have to evolve or not someone next generation
-                int caseEvolution = this.checkEvolutionOnlyOnePopulation();
-                switch (caseEvolution){
-                    case 0:
-                        evolveAgent = Boolean.TRUE;
-                        evolveClassifier = Boolean.TRUE;
-                        break;
-                    case 1:
-                        evolveAgent = Boolean.TRUE;
-                        evolveClassifier = Boolean.FALSE;
-                        this.classifiers.resetFitness();
-                        break;
-                    case 2:
-                        evolveAgent = Boolean.FALSE;
-                        evolveClassifier = Boolean.TRUE;
-                        this.agents.resetFitness();
-                        break;
-                    default:
-                        //should never happen but in any case lets put it here.
-                        evolveAgent = Boolean.TRUE;
-                        evolveClassifier = Boolean.TRUE;
-                        break;
-                }
-
-
-                //am I using the virulence method?
-                if(ReadConfig.Configurations.getUsingReducedVirulenceMethodOnAgents()) this.agents.reduceVirulence();
-                if(ReadConfig.Configurations.getUsingReducedVirulenceMethodOnClassifiers()) this.classifiers.reduceVirulence();
+                
+                //countermeasures system against disengagement
+                this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);
+                evolveAgent = this.countermeasures.isEvolveAgent();
+                evolveClassifier = this.countermeasures.isEvolveClassifier();
+                this.countermeasures.executeCountermeasuresAgainstDisengagement(this.agents.getPopulation(), IndividualStatus.AGENT);
+                this.countermeasures.executeCountermeasuresAgainstDisengagement(this.classifiers.getPopulation(), IndividualStatus.CLASSIFIER);
 
 
             /* { SELECT individuals next generation } */
@@ -286,99 +272,6 @@ public class TuringLearning implements Framework{
             }
         }
         logger.log(Level.INFO, "Coevolution ended");
-    }
-
-
-    /**
-     * Check if I need to evolve one population more than another one
-     *
-     * if AutomaticCalibration is TRUE:
-     * - getTimestepEvolveAgentOverClassifier is not considered
-     * - it checks the fitness of the fittest member of the populations
-     *   if it is under a certain threshold and the second population is over, the first population need an evolution more
-     *   than the second one
-     *
-     * if AutomaticCalibration is False:
-     * - getTimestepEvolveAgentOverClassifier is considered
-     *
-     * @return int value
-     * -> 0 if the calibration is not needed
-     * -> 1 if more evolution of agents are needed
-     * -> 2 if more evolution of classifier are needed
-     *
-     * @exception Exception if there are problems reading the configfile
-     */
-    private int checkEvolutionOnlyOnePopulation() throws Exception {
-        if(ReadConfig.Configurations.getAutomaticCalibration()){
-            int output = 0;
-            double fittestAgent = this.agents.getFittestIndividual().getFitness();
-            double fittestClassifier = this.classifiers.getFittestIndividual().getFitness();
-
-            double maxFitnessPossibleAgent = this.agents.getMaxFitnessAchievable();
-            double maxFitnessPossibleClassifier = this.classifiers.getMaxFitnessAchievable();
-
-            if(fittestAgent <= (maxFitnessPossibleAgent * 1 / 2)){
-                //fitness agent needs more evolution
-                //only if classifier is over the threshold, otherwise not
-                if(fittestClassifier >= (maxFitnessPossibleClassifier * 1 / 2)){
-                    output = 1;
-                }
-                //both are under threshold, no calibration needed -> no 'else' needed since 0 is the default value
-            }else {
-                //fitness agent are okay, but what about the classifier?
-                //if the fitness is below the threshold I need to evaluate more the classifier
-                if (fittestClassifier <= (maxFitnessPossibleClassifier * 1 / 2)) {
-                    output = 2;
-                }
-                //both are over threshold, no calibration needed -> no 'else' needed since 0 is the default value
-            }
-            StringBuilder sb = new StringBuilder();
-            sb.append("Fittest agent: ");
-            sb.append(fittestAgent);
-            sb.append(" over ");
-            sb.append(maxFitnessPossibleAgent);
-            sb.append("; fittest classifier:  ");
-            sb.append(fittestClassifier);
-            sb.append(" over ");
-            sb.append(maxFitnessPossibleClassifier);
-            switch (output){
-                case 0:
-                    sb.append("; No Calibration Needed");
-                    break;
-                case 1:
-                    sb.append("; Agents need more evolutions");
-                    break;
-                case 2:
-                    sb.append("; Classifiers need more evolutions");
-                    break;
-                default:
-                    sb.append("; Something really wrong happened");
-                    break;
-            }
-            logger.log(Level.INFO, sb.toString());
-            //reset counting time
-            this.countingTime = 0;
-            return output;
-        }else{
-            int number = ReadConfig.Configurations.getTimestepEvolveAgentOverClassifier();
-            if(number == 0){
-                //no calibration needed
-                logger.log(Level.INFO, "No Calibration Needed");
-                return 0;
-            }else{
-                this.countingTime++;
-                if(this.countingTime == number){
-                    this.countingTime = 0;
-                    //if I evolved the agent the times required return okay to evolve both
-                    logger.log(Level.INFO, "Finished Fixed Calibration");
-                    return 0;
-                }else {
-                    //otherwise return evolve only Agents
-                    logger.log(Level.INFO, "Agents need more evolutions");
-                    return 1;
-                }
-            }
-        }
     }
 
 
@@ -451,5 +344,21 @@ public class TuringLearning implements Framework{
      */
     public Agents getAgents(){
         return this.agents;
+    }
+
+    /**
+     * Modify the counting time value for this class
+     * @param countingTime new int value
+     */
+    public void setCountingTime(int countingTime) {
+        this.countingTime = countingTime;
+    }
+
+    /**
+     * Getter for the counting time value
+     * @return int value
+     */
+    public int getCountingTime() {
+        return this.countingTime;
     }
 }

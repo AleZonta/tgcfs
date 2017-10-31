@@ -223,6 +223,8 @@ public class Normalisation {
      * @return converted value
      */
     public static double convertToSomething(double maxStart, double minStart, double maxEnd, double minEnd, double value){
+        if(value > maxStart) value = maxStart;
+        if(value < minStart) value = minStart;
         return  (maxEnd - minEnd) * ((value - minStart) / (maxStart - minStart)) + minEnd;
     }
 

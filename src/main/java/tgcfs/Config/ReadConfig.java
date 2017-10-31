@@ -581,11 +581,6 @@ public class ReadConfig {
                 throw new Exception("If using the automatic evolution of step size, the usage of the virulence method is not allowed.");
             }
         }
-        if(this.automaticEvolutionDisengagementSystem == 3){
-            if(!this.usingReducedVirulenceMethodOnClassifiers && !this.usingReducedVirulenceMethodOnAgents){
-                throw new Exception("At least one virulence method must be enabled");
-            }
-        }
     }
 
 

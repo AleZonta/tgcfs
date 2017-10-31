@@ -19,6 +19,49 @@ import static org.junit.Assert.assertTrue;
  */
 public class NormalisationTest {
     @Test
+    public void convertToSomethingTest() throws Exception {
+        double data = 30.4;
+        double ret = Normalisation.convertSpeed(data);
+        double redata = Normalisation.decodeSpeed(ret);
+
+        double maxSpeed = 1.0;
+        double minSpeed = -1.0;
+        double b = 10.0;
+        double a = 0.0;
+        double val = Normalisation.convertToSomething(maxSpeed, minSpeed, b, a, ret);
+
+        assertTrue(val == redata);
+
+        double vall = 0d;
+        double valllll = 0.1d;
+        double vallllll = 0.2d;
+        double valllllll = 0.3d;
+        double vallllllll = 0.4d;
+        double valllllllll = 0.5d;
+        double vallllllllll = 0.6d;
+        double valllllllllll = 0.7d;
+        double vallllllllllll = 0.8d;
+        double valllllllllllll = 0.9d;
+        double valll = 1d;
+
+
+
+
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, vall));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, valllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, vallllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, valllllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, vallllllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, valllllllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, vallllllllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, valllllllllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, vallllllllllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, valllllllllllll));
+        System.out.println(Normalisation.convertToSomething(1d, 0d, 0.001d,0.3d, valll));
+
+    }
+
+    @Test
     public void decodeDistance() throws Exception {
         Double top = 1.0;
         Double ret = Normalisation.decodeDistance(top);
