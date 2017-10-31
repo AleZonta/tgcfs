@@ -1,7 +1,6 @@
 package tgcfs.EA.Mutation;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
-import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -82,9 +81,9 @@ public class NonUniformMutation extends Individual {
         Random rnd = new Random();
         try {
             if(this.ind == IndividualStatus.AGENT) {
-                stepSize = ReadConfig.Configurations.getStepSizeAgents();
+                stepSize = StepSize.getStepSizeAgents();
             }else {
-                stepSize = ReadConfig.Configurations.getStepSizeClassifiers();
+                stepSize = StepSize.getStepSizeClassifiers();
             }
         } catch (Exception ignored) { }
         for(int i = 0; i < super.getObjectiveParameters().columns(); i++){

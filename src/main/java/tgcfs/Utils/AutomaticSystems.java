@@ -1,7 +1,7 @@
 package tgcfs.Utils;
 
 /**
- * Created by Alessandro Zonta on 20/10/2017.
+ * Created by Alessandro Zonta on 31/10/2017.
  * PhD Situational Analytics
  * <p>
  * Computational Intelligence Group
@@ -10,7 +10,9 @@ package tgcfs.Utils;
  * <p>
  * a.zonta@vu.nl
  */
-public enum IndividualStatus {
-    AGENT,
-    CLASSIFIER
+public enum AutomaticSystems {
+    NONE,
+    STEP_SIZE,
+    VIRULENCE,
+    BOTH,
 }

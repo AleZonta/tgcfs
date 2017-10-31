@@ -12,6 +12,7 @@ import tgcfs.Config.PropertiesFileReader;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Classifiers;
+import tgcfs.EA.Mutation.StepSize;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.Loader.Feeder;
@@ -143,6 +144,9 @@ public class TuringLearning implements Framework{
         SaveToFile.Saver.initialiseGenomaFile(this.agents.getClass().getName());
         SaveToFile.Saver.initialiseFitnessFile(this.classifiers.getClass().getName());
         SaveToFile.Saver.initialiseGenomaFile(this.classifiers.getClass().getName());
+
+        //load the stepsize
+        new StepSize();
     }
 
     /**

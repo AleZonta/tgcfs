@@ -415,6 +415,20 @@ public abstract class Algorithm {
     }
 
 
+    /**
+     * Method that implements all the system to combat disengagement.
+     *
+     * I have two different way to compute measures that help us to understand if the population are disengaged
+     * -> mean and standard deviation of the population's fitness
+     * -> engagement metric
+     *
+     * How can I stop the disengagement in an automatic way? I can evolve two different parameters that can help the population to stabilise
+     * -> I can change the step size following one of the previous metrics
+     * -> I can change the virulence parameter in an automatic way
+     */
+    public void combactDisengagement(){
+
+    }
 
 
 }
