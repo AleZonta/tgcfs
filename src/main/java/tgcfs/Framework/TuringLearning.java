@@ -15,6 +15,7 @@ import tgcfs.EA.Classifiers;
 import tgcfs.EA.Mutation.StepSize;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
+import tgcfs.InputOutput.LoadExternalPopulation;
 import tgcfs.Loader.Feeder;
 import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.Loader.TrainReal;
@@ -138,8 +139,17 @@ public class TuringLearning implements Framework{
         }
         //generate population
         //INITIALISE population EA with random candidate solution
-        this.agents.generatePopulation(agentModel);
-        this.classifiers.generatePopulation(classifierModel);
+        //check if I am loading the population from file or not
+        if(ReadConfig.Configurations.getLoadDumpPop()){
+            LoadExternalPopulation load = new LoadExternalPopulation(logger);
+            load.readFile();
+            this.agents.generatePopulation(agentModel, load.getAgents());
+            this.classifiers.generatePopulation(classifierModel, load.getClassifiers());
+        }else{
+            this.agents.generatePopulation(agentModel);
+            this.classifiers.generatePopulation(classifierModel);
+        }
+
         logger.log(Level.INFO, agentModel.getSummary());
         logger.log(Level.INFO, classifierModel.getSummary());
         logger.log(Level.INFO, "Framework online!");

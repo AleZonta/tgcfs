@@ -66,6 +66,20 @@ public class Agents extends Algorithm {
     }
 
     /**
+     * Generate the population for the EA
+     * set the max fitness achievable by an agent
+     * using the information loaded from file
+     * @param model the model of the population
+     * @param populationLoaded the popolation loaded from file
+     * @throws Exception exception
+     */
+    @Override
+    public void generatePopulation(EvolvableModel model, List<INDArray> populationLoaded) throws Exception {
+        super.generatePopulation(model,populationLoaded);
+        this.maxFitnessAchievable = (ReadConfig.Configurations.getClassifierPopulationSize() + ReadConfig.Configurations.getClassifierOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained();
+    }
+
+    /**
      * @implNote Implementation from Abstract class Algorithm
      * @param input the input of the model
      * @throws Exception if there are problems in reading the info

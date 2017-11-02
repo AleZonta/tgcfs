@@ -1,6 +1,7 @@
 package tgcfs.EA;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Mutation.NonUniformMutation;
 import tgcfs.EA.Mutation.RandomResetting;
@@ -97,6 +98,53 @@ public abstract class Algorithm {
                 e.printStackTrace();
             }
 
+        });
+    }
+
+    /**
+     * Generate the population for the EA
+     * using the information loaded from file
+     * @param model the model of the population
+     * @param populationLoaded the popolation loaded from file
+     * @throws Exception exception
+     */
+    public void generatePopulation(EvolvableModel model, List<INDArray> populationLoaded) throws Exception {
+        //check which class is calling this method
+        int size = 0;
+        IndividualStatus status;
+        if(this.getClass() == Agents.class){
+            size = ReadConfig.Configurations.getAgentPopulationSize();
+            status = IndividualStatus.AGENT;
+            logger.log(Level.INFO, "Generating Loaded Agents Population...");
+        }else{
+            status = IndividualStatus.CLASSIFIER;
+            size = ReadConfig.Configurations.getClassifierPopulationSize();
+            logger.log(Level.INFO, "Generating Loaded Classifiers Population...");
+        }
+        int finalSize = size;
+        populationLoaded.forEach(ind -> {
+            Individual newBorn;
+            try {
+                switch(ReadConfig.Configurations.getMutation()){
+                    case 0:
+                        newBorn = new UncorrelatedMutation(ind, Nd4j.create(finalSize), status);
+                        break;
+                    case 1:
+                        newBorn = new RandomResetting(ind, status);
+                        break;
+                    case 2:
+                        newBorn = new NonUniformMutation(ind, status);
+                        break;
+                    default:
+                        throw new Exception("Mutation argument not correct");
+                }
+                //assign the model to the classifier
+                newBorn.setModel(model.deepCopy());
+                this.addIndividual(newBorn);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error with generating population");
+                e.printStackTrace();
+            }
         });
     }
 

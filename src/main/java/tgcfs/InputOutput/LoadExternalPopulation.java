@@ -1,5 +1,7 @@
 package tgcfs.InputOutput;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Config.ReadConfig;
 
 import java.io.*;
@@ -29,8 +31,8 @@ public class LoadExternalPopulation {
     private static Logger logger; //logger for this class
     private String nameAgents;
     private String nameClassifier;
-    private List<List<Double>> agents;
-    private List<List<Double>> classifiers;
+    private List<INDArray> agents;
+    private List<INDArray> classifiers;
 
     /**
      * Constructor one parameter
@@ -75,7 +77,7 @@ public class LoadExternalPopulation {
      * @return list of double
      * @throws Exception if there are problems in reading the file
      */
-    private List<List<Double>> readZip(String name) throws Exception {
+    private List<INDArray> readZip(String name) throws Exception {
         List<String> res = new ArrayList<>();
 
         ZipFile zipFile = new ZipFile(name);
@@ -96,12 +98,13 @@ public class LoadExternalPopulation {
         int pos = res.get(0).indexOf("[");
         res.set(0, res.get(0).substring(pos));
 
-        List<List<Double>> population = new ArrayList<>();
+        List<INDArray> population = new ArrayList<>();
         res.forEach(line -> {
             List<String> ind =  Arrays.asList(line.replace("[","").replace("]","").split(","));
             List<Double> individual = new ArrayList<>();
             ind.forEach(weight -> individual.add(Double.parseDouble(weight)));
-            population.add(individual);
+
+            population.add(Nd4j.create(individual.stream().mapToDouble(Double::doubleValue).toArray()));
         });
 
         return population;
@@ -111,7 +114,7 @@ public class LoadExternalPopulation {
      * Getter for the list of the weights for the agents
      * @return list of list of doubles
      */
-    public List<List<Double>> getAgents() {
+    public List<INDArray> getAgents() {
         return agents;
     }
 
@@ -119,7 +122,7 @@ public class LoadExternalPopulation {
      * Getter for the list of the weights for the classifiers
      * @return list of list of doubles
      */
-    public List<List<Double>> getClassifiers() {
+    public List<INDArray> getClassifiers() {
         return classifiers;
     }
 }
