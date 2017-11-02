@@ -5,6 +5,7 @@ import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Algorithm;
+import tgcfs.EA.EngagementPopulation;
 import tgcfs.EA.Individual;
 import tgcfs.NN.EvolvableModel;
 

@@ -1,10 +1,11 @@
-package tgcfs.Utils;
+package tgcfs.EA;
 
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.EA.Mutation.StepSize;
 import tgcfs.Framework.TuringLearning;
 import tgcfs.InputOutput.Normalisation;
+import tgcfs.Utils.*;
 
 import java.util.Collections;
 import java.util.Comparator;

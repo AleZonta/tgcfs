@@ -20,7 +20,7 @@ import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
-import tgcfs.Utils.EngagementPopulation;
+import tgcfs.EA.EngagementPopulation;
 import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.LogSystem;
 import tgcfs.Utils.PointWithBearing;
@@ -234,7 +234,7 @@ public class TuringLearning implements Framework{
                     logger.log(Level.INFO, "Dump agent generation and real");
                     this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
                 }
-                
+
                 //countermeasures system against disengagement
                 this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);
                 evolveAgent = this.countermeasures.isEvolveAgent();
