@@ -32,6 +32,8 @@ public abstract class Individual {
     private AtomicInteger fitness;
     private EvolvableModel model;
     protected final IndividualStatus ind;
+    private final boolean isSon;
+
     /**
      * Getter fot the objective parameter
      * @return list of double
@@ -67,6 +69,7 @@ public abstract class Individual {
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
         this.ind = null;
+        this.isSon = false;
     }
 
     /**
@@ -80,6 +83,22 @@ public abstract class Individual {
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
         this.ind = ind;
+        this.isSon = false;
+    }
+
+    /**
+     * Three parameter constructor and set to 0 the fitness
+     * @param objPar objectiveParameters list
+     * @param ind kind of individual I am creating
+     * @param isSon boolean variable if the individual is a son
+     */
+    public Individual(INDArray objPar, IndividualStatus ind, boolean isSon){
+        this.objectiveParameters = objPar;
+        this.fitness = new AtomicInteger(0);
+        this.model = null;
+        this.myInputandOutput = new ArrayList<>();
+        this.ind = ind;
+        this.isSon = isSon;
     }
 
     /**
@@ -99,6 +118,7 @@ public abstract class Individual {
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
         this.ind = null;
+        this.isSon = false;
     }
 
     /**
@@ -119,6 +139,7 @@ public abstract class Individual {
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
         this.ind = ind;
+        this.isSon = false;
     }
 
     /**
@@ -139,6 +160,7 @@ public abstract class Individual {
         this.model = model;
         this.myInputandOutput = new ArrayList<>();
         this.ind = ind;
+        this.isSon = false;
     }
 
     /**
@@ -155,6 +177,7 @@ public abstract class Individual {
         this.model = model.deepCopy();
         this.myInputandOutput = myInputandOutput;
         this.ind = ind;
+        this.isSon = false;
     }
 
     /**
@@ -247,4 +270,11 @@ public abstract class Individual {
      */
     public abstract Individual deepCopy();
 
+    /**
+     * getter for the property if the individual is a son
+     * @return boolean value
+     */
+    public boolean isSon() {
+        return this.isSon;
+    }
 }

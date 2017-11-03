@@ -42,6 +42,17 @@ public class RandomResetting extends Individual {
     }
 
     /**
+     * Three parameter constructor
+     * @param objPar objectiveParameters list
+     * @param ind kind of individual I am creating
+     * @param isSon boolean variable if the individual is a son
+     * @exception Exception if there are problems with the reading of the seed information
+     */
+    public RandomResetting(INDArray objPar, IndividualStatus ind, boolean isSon) throws Exception {
+        super(objPar, ind, isSon);
+    }
+
+    /**
      * One parameter constructor
      * It is loading the objective parameters list with random number
      * and the mutation strengths list with 1.0

@@ -45,13 +45,26 @@ public class UncorrelatedMutation extends Individual {
     }
 
     /**
-     * Two parameter constructor and set to 0 the fitness
+     * three parameter constructor and set to 0 the fitness
      * @param objPar objectiveParameters list
      * @param mutStr mutationStrengths list
      * @param ind kind of individual I am creating
      */
     public UncorrelatedMutation(INDArray objPar,INDArray mutStr, IndividualStatus ind){
         super(objPar, ind);
+        this.mutationStrengths = mutStr;
+    }
+
+    /**
+     * four parameter constructor
+     * @param objPar objectiveParameters list
+     * @param mutStr mutationStrengths list
+     * @param ind kind of individual I am creating
+     * @param isSon boolean variable if the individual is a son
+     * @exception Exception if there are problems with the reading of the seed information
+     */
+    public UncorrelatedMutation(INDArray objPar,INDArray mutStr, IndividualStatus ind, boolean isSon) throws Exception {
+        super(objPar, ind, isSon);
         this.mutationStrengths = mutStr;
     }
 

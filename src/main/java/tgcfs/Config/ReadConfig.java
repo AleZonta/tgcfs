@@ -39,7 +39,8 @@ public class ReadConfig {
 
     private Integer maxGenerations;
     private Integer seed;
-    private Integer tournamentSize;
+    private Integer tournamentSizeAgents;
+    private Integer tournamentSizeClassifiers;
     private Double stepSizeAgents;
     private Double stepSizeClassifiers;
     private Integer mutation;
@@ -89,6 +90,8 @@ public class ReadConfig {
     private Integer measureUsedForAutomaticDisengagement;
     private Integer populationWillUseTheAutomaticDisengagementSystem;
 
+    private Integer differentSelectionForClassifiers;
+
 
     /**
      * Constructor with zero parameter
@@ -111,7 +114,8 @@ public class ReadConfig {
 
         this.maxGenerations = null;
         this.seed = null;
-        this.tournamentSize = null;
+        this.tournamentSizeAgents = null;
+        this.tournamentSizeClassifiers = null;
         this.mutation = null;
         this.stepSizeAgents = null;
         this.stepSizeClassifiers = null;
@@ -156,6 +160,8 @@ public class ReadConfig {
         this.automaticEvolutionDisengagementSystem = null;
         this.measureUsedForAutomaticDisengagement = null;
         this.populationWillUseTheAutomaticDisengagementSystem = null;
+
+        this.differentSelectionForClassifiers = null;
     }
 
     /**
@@ -525,8 +531,13 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("TimestepsOfTheRealTrajectory is wrong or missing.");
         }try {
-            // tournamentSize
-            this.tournamentSize = ((Long) jsonObject.get("TournamentSize")).intValue();
+            // tournamentSizeAgents
+            this.tournamentSizeAgents = ((Long) jsonObject.get("TournamentSizeAgents")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("TournamentSize is wrong or missing.");
+        }try {
+            // tournamentSizeClassifiers
+            this.tournamentSizeClassifiers = ((Long) jsonObject.get("TournamentSizeClassifiers")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("TournamentSize is wrong or missing.");
         }try {
@@ -574,6 +585,11 @@ public class ReadConfig {
             this.populationWillUseTheAutomaticDisengagementSystem = ((Long) jsonObject.get("PopulationWithAutomaticDisengagement")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("PopulationWithAutomaticDisengagement is wrong or missing.");
+        }try {
+            // DifferentSelectionForClassifiers
+            this.differentSelectionForClassifiers = ((Long) jsonObject.get("DifferentSelectionForClassifiers")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("DifferentSelectionForClassifiers is wrong or missing.");
         }
 
         if(this.automaticEvolutionDisengagementSystem == 1){
@@ -766,7 +782,8 @@ public class ReadConfig {
                 "classifierTimeSteps=" + classifierTimeSteps + ",\n" +
                 "maxGenerations=" + maxGenerations + ",\n" +
                 "seed=" + seed + ",\n" +
-                "tournamentSize=" + tournamentSize + ",\n" +
+                "tournamentSizeAgents=" + tournamentSizeAgents + ",\n" +
+                "tournamentSizeClassifiers=" + tournamentSizeClassifiers + ",\n" +
                 "mutation=" + mutation + ",\n" +
                 "stepSizeAgents=" + stepSizeAgents + ",\n" +
                 "stepSizeClassifiers=" + stepSizeClassifiers + ",\n" +
@@ -798,6 +815,7 @@ public class ReadConfig {
                 "AutomaticEvolutionDisengagement=" + automaticEvolutionDisengagementSystem + ",\n" +
                 "MeasureUsedForAutomaticDisengagement=" + measureUsedForAutomaticDisengagement + ",\n" +
                 "PopulationWithAutomaticDisengagement=" + populationWillUseTheAutomaticDisengagementSystem + ",\n" +
+                "DifferentSelectionForClassifiers=" + differentSelectionForClassifiers + ",\n" +
                 '}';
     }
 
@@ -892,13 +910,23 @@ public class ReadConfig {
     }
 
     /**
-     * Getter for the tournament size
+     * Getter for the agent tournament size
      * @return integer value for tournament size
      * @throws Exception  if I am trying to access it before reading it
      */
-    public int getTournamentSize() throws Exception {
-        if(this.tournamentSize == null) throw new Exception("Try to access config file before reading it.");
-        return this.tournamentSize;
+    public int getTournamentSizeAgents() throws Exception {
+        if(this.tournamentSizeAgents == null) throw new Exception("Try to access config file before reading it.");
+        return this.tournamentSizeAgents;
+    }
+
+    /**
+     * Getter for the classifier tournament size
+     * @return integer value for tournament size
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public int getTournamentSizeClassifiers() throws Exception {
+        if(this.tournamentSizeClassifiers == null) throw new Exception("Try to access config file before reading it.");
+        return this.tournamentSizeClassifiers;
     }
 
     /**
@@ -1019,6 +1047,16 @@ public class ReadConfig {
     public int getPopulationWillUseTheAutomaticDisengagementSystem() throws Exception {
         if(this.populationWillUseTheAutomaticDisengagementSystem == null) throw new Exception("Try to access config file before reading it.");
         return populationWillUseTheAutomaticDisengagementSystem;
+    }
+
+    /**
+     * Getter for the property if the classifiers has a different selection method
+     * @return int
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getDifferentSelectionForClassifiers() throws Exception {
+        if(this.differentSelectionForClassifiers == null) throw new Exception("Try to access config file before reading it.");
+        return differentSelectionForClassifiers;
     }
 
 
@@ -1361,12 +1399,21 @@ public class ReadConfig {
         }
 
         /**
-         * Getter for the tournament size
+         * Getter for the agents tournament size
          * @return integer value for tournament size
          * @throws Exception  if I am trying to access it before reading it
          */
-        public static int getTournamentSize() throws Exception {
-            return config.getTournamentSize();
+        public static int getTournamentSizeAgents() throws Exception {
+            return config.getTournamentSizeAgents();
+        }
+
+        /**
+         * Getter for the classifiers tournament size
+         * @return integer value for tournament size
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static int getTournamentSizeClassifiers() throws Exception {
+            return config.getTournamentSizeClassifiers();
         }
 
         /**
@@ -1474,6 +1521,15 @@ public class ReadConfig {
          */
         public static int getPopulationWillUseTheAutomaticDisengagementSystem() throws Exception {
             return config.getPopulationWillUseTheAutomaticDisengagementSystem();
+        }
+
+        /**
+         * Getter for the property if the classifiers has a different selection method
+         * @return int
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getDifferentSelectionForClassifiers() throws Exception {
+            return config.getDifferentSelectionForClassifiers();
         }
     }
 

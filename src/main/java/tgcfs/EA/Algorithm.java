@@ -204,13 +204,13 @@ public abstract class Algorithm {
             switch(ReadConfig.Configurations.getMutation()){
                 case 0:
                     Recombination mut = new IntermediateRecombination(((UncorrelatedMutation)firstParents).getMutationStrengths(), ((UncorrelatedMutation)secondParents).getMutationStrengths(), 0.5);
-                    son = new UncorrelatedMutation(obj.recombination(), mut.recombination(), status);
+                    son = new UncorrelatedMutation(obj.recombination(), mut.recombination(), status, true);
                     break;
                 case 1:
-                    son = new RandomResetting(obj.recombination(), status);
+                    son = new RandomResetting(obj.recombination(), status, true);
                     break;
                 case 2:
-                    son = new NonUniformMutation(obj.recombination(), status);
+                    son = new NonUniformMutation(obj.recombination(), status, true);
                     break;
                 default:
                     throw new Exception("Mutation argument not correct");
@@ -243,12 +243,15 @@ public abstract class Algorithm {
     public void generateOffspringOnlyWithMutation() throws Exception {
         //check which class is calling this method
         int size = 0;
+        int tournamentSize = 0;
         IndividualStatus status;
         if(this.getClass() == Agents.class){
             size = ReadConfig.Configurations.getAgentOffspringSize();
+            tournamentSize =  ReadConfig.Configurations.getTournamentSizeAgents();
             status = IndividualStatus.AGENT;
         }else{
             size = ReadConfig.Configurations.getClassifierOffspringSize();
+            tournamentSize =  ReadConfig.Configurations.getTournamentSizeClassifiers();
             status = IndividualStatus.CLASSIFIER;
         }
         //create offspring_size offspring
@@ -256,7 +259,7 @@ public abstract class Algorithm {
 
             //creating the tournament
             List<Individual> tournamentPop = new ArrayList<>();
-            IntStream.range(0, ReadConfig.Configurations.getTournamentSize()).forEach(j -> {
+            IntStream.range(0, tournamentSize).forEach(j -> {
                 int idParent = ThreadLocalRandom.current().nextInt(this.population.size());
                 tournamentPop.add(this.population.get(idParent));
             });
@@ -265,7 +268,20 @@ public abstract class Algorithm {
             //last one has the better fitness
             Individual parent = tournamentPop.get(tournamentPop.size() - 1);
             //son has the same genome of the father
-            Individual son = new RandomResetting(parent.getObjectiveParameters().dup(), status);
+            Individual son;
+            switch(ReadConfig.Configurations.getMutation()){
+                case 0:
+                    son = new UncorrelatedMutation(parent.getObjectiveParameters().dup(), Nd4j.create(parent.getObjectiveParameters().columns()), status, true);
+                    break;
+                case 1:
+                    son = new RandomResetting(parent.getObjectiveParameters().dup(), status, true);
+                    break;
+                case 2:
+                    son = new NonUniformMutation(parent.getObjectiveParameters().dup(), status, true);
+                    break;
+                default:
+                    throw new Exception("Mutation argument not correct");
+            }
             //now the son is mutated 10 times (hardcoded value)
             //IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
             son.mutate(son.getObjectiveParameters().columns());
@@ -411,20 +427,12 @@ public abstract class Algorithm {
     }
 
 
-
     /**
-     * Method that implements all the system to combat disengagement.
-     *
-     * I have two different way to compute measures that help us to understand if the population are disengaged
-     * -> mean and standard deviation of the population's fitness
-     * -> engagement metric
-     *
-     * How can I stop the disengagement in an automatic way? I can evolve two different parameters that can help the population to stabilise
-     * -> I can change the step size following one of the previous metrics
-     * -> I can change the virulence parameter in an automatic way
+     * Setter for the population
+     * @param population new population
      */
-    public void combactDisengagement(){
-
+    protected void setPopulation(List<Individual> population){
+        this.population = population;
     }
 
 

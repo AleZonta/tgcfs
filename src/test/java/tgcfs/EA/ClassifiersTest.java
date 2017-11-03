@@ -29,6 +29,23 @@ import static org.junit.Assert.assertEquals;
  */
 public class ClassifiersTest {
     @Test
+    public void survivalSelections() throws Exception {
+        new ReadConfig.Configurations();
+        //random classifier
+        EvolvableModel model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
+        Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
+        Classifiers classifiers = new Classifiers(log);
+        classifiers.generatePopulation(model);
+
+        classifiers.generateOffspringOnlyWithMutation();
+
+        classifiers.getPopulation().forEach(individual -> individual.setFitness(ThreadLocalRandom.current().nextInt(16000)));
+
+        classifiers.survivalSelections();
+
+    }
+
+    @Test
     public void createDataSet() throws Exception {
         throw new Exception("Not tested");
     }

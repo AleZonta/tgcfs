@@ -18,9 +18,11 @@ import tgcfs.NN.OutputsNetwork;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -291,5 +293,56 @@ public class Classifiers extends Algorithm {
 
         return new DataSet(features,labels,featuresMask,labelsMask);
     }
+
+    /**
+     * Select parents for the next generation.
+     *
+     * I will keep only the best one and then replace all the rest of the population with the sons.
+     *
+     *
+     * @throws Exception if there are problems in reading the info
+     */
+    @Override
+    public void survivalSelections() throws Exception {
+        if(ReadConfig.Configurations.getDifferentSelectionForClassifiers() == 0) {
+            super.survivalSelections();
+        }else{
+            //log the fitness of all the population
+            List<Integer> fitn = new ArrayList<>();
+            super.getPopulation().forEach(p -> fitn.add(p.getFitness()));
+
+            logger.log(Level.INFO, "--Fitness population before selection--");
+            logger.log(Level.INFO, fitn.toString());
+
+            List<Individual> nextGeneration = new ArrayList<>();
+
+            // lets find out who are all the sons
+            List<Individual> sons = super.getPopulation().stream().filter(Individual::isSon).collect(Collectors.toList());
+            List<Individual> parents = super.getPopulation().stream().filter(individual -> !individual.isSon()).collect(Collectors.toList());
+
+            // keep the best parents -> order the parents and keep the one with highest fitness
+            parents.sort(Comparator.comparing(Individual::getFitness));
+            nextGeneration.add(parents.get(parents.size() - 1).deepCopy());
+
+            int size = ReadConfig.Configurations.getClassifierPopulationSize();
+
+            sons.forEach(s -> nextGeneration.add(s.deepCopy()));
+
+            while(nextGeneration.size() > size){
+                nextGeneration.remove(nextGeneration.size() - 1);
+            }
+            nextGeneration.sort(Comparator.comparing(Individual::getFitness));
+
+
+            List<Integer> fitnd = new ArrayList<>();
+            nextGeneration.forEach(p -> fitnd.add(p.getFitness()));
+
+            logger.log(Level.INFO, "--Fitness population after selection--");
+            logger.log(Level.INFO, fitnd.toString());
+
+            super.setPopulation(nextGeneration);
+        }
+    }
+
 
 }

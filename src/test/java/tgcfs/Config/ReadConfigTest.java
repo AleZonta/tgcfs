@@ -17,6 +17,25 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getDifferentSelectionForClassifiers() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getDifferentSelectionForClassifiers();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getDifferentSelectionForClassifiers() >= 0);
+        new ReadConfig.Configurations();
+        assertEquals(conf.getDifferentSelectionForClassifiers(), ReadConfig.Configurations.getDifferentSelectionForClassifiers());
+    }
+
+    @Test
     public void getValueClassifier() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();
@@ -45,6 +64,7 @@ public class ReadConfigTest {
             assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
         }
         try {
+            conf.readFile();
             conf.readFile();
         } catch (IOException e) {
             e.printStackTrace();
@@ -256,11 +276,11 @@ public class ReadConfigTest {
     }
 
     @Test
-    public void getTournamentSize() throws Exception {
+    public void getTournamentSizeAgents() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();
         try {
-            conf.getTournamentSize();
+            conf.getTournamentSizeAgents();
         } catch (Exception e) {
             assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
         }
@@ -269,10 +289,30 @@ public class ReadConfigTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assertTrue(conf.getTournamentSize() >= 0);
+        assertTrue(conf.getTournamentSizeAgents() >= 0);
 
         new ReadConfig.Configurations();
-        assertEquals(conf.getTournamentSize(), ReadConfig.Configurations.getTournamentSize());
+        assertEquals(conf.getTournamentSizeAgents(), ReadConfig.Configurations.getTournamentSizeAgents());
+    }
+
+    @Test
+    public void getTournamentSizeClassifiers() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getTournamentSizeClassifiers();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getTournamentSizeClassifiers() >= 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getTournamentSizeClassifiers(), ReadConfig.Configurations.getTournamentSizeClassifiers());
     }
 
     @Test
