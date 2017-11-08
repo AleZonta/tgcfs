@@ -91,6 +91,7 @@ public class ReadConfig {
     private Integer populationWillUseTheAutomaticDisengagementSystem;
 
     private Integer differentSelectionForClassifiers;
+    private Integer howManyAmIChangingBetweenGeneration;
 
 
     /**
@@ -162,6 +163,7 @@ public class ReadConfig {
         this.populationWillUseTheAutomaticDisengagementSystem = null;
 
         this.differentSelectionForClassifiers = null;
+        this.howManyAmIChangingBetweenGeneration = null;
     }
 
     /**
@@ -590,6 +592,11 @@ public class ReadConfig {
             this.differentSelectionForClassifiers = ((Long) jsonObject.get("DifferentSelectionForClassifiers")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("DifferentSelectionForClassifiers is wrong or missing.");
+        }try {
+            // DifferentSelectionForClassifiers
+            this.howManyAmIChangingBetweenGeneration = ((Long) jsonObject.get("HowManyAmIChangingBetweenGeneration")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HowManyAmIChangingBetweenGeneration is wrong or missing.");
         }
 
         if(this.automaticEvolutionDisengagementSystem == 1){
@@ -793,6 +800,7 @@ public class ReadConfig {
                 "hiddenNeuronsAgent=" + hiddenNeuronsAgent + ",\n" +
                 "hiddenNeuronsClassifier=" + hiddenNeuronsClassifier + ",\n" +
                 "trajectoriesTrained=" + trajectoriesTrained + ",\n" +
+                "HowManyAmIKeepingBetweenGeneration=" + howManyAmIChangingBetweenGeneration + ",\n" +
                 "train=" + train + ",\n" +
                 "pictureSize=" + pictureSize  + ",\n" +
                 "CheckAlsoPast=" + checkAlsoPast + ",\n" +
@@ -1057,6 +1065,16 @@ public class ReadConfig {
     public int getDifferentSelectionForClassifiers() throws Exception {
         if(this.differentSelectionForClassifiers == null) throw new Exception("Try to access config file before reading it.");
         return differentSelectionForClassifiers;
+    }
+
+    /**
+     * Getter for the percentage of trajectory kept between generations
+     * @return int number
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getHowManyAmIChangingBetweenGeneration() throws Exception {
+        if(this.howManyAmIChangingBetweenGeneration == null) throw new Exception("Try to access config file before reading it.");
+        return this.howManyAmIChangingBetweenGeneration;
     }
 
 
@@ -1530,6 +1548,15 @@ public class ReadConfig {
          */
         public static int getDifferentSelectionForClassifiers() throws Exception {
             return config.getDifferentSelectionForClassifiers();
+        }
+
+        /**
+         * Getter for the percentage of trajectory kept between generations
+         * @return int number
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getHowManyAmIChangingBetweenGeneration() throws Exception {
+            return config.getHowManyAmIChangingBetweenGeneration();
         }
     }
 

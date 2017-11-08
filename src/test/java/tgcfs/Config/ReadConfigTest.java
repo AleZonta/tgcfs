@@ -17,6 +17,25 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getHowManyAmIKeepingBetweenGeneration() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getHowManyAmIChangingBetweenGeneration();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getHowManyAmIChangingBetweenGeneration() >= 0 && conf.getHowManyAmIChangingBetweenGeneration() <= 100);
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHowManyAmIChangingBetweenGeneration(), ReadConfig.Configurations.getHowManyAmIChangingBetweenGeneration());
+    }
+
+    @Test
     public void getDifferentSelectionForClassifiers() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();

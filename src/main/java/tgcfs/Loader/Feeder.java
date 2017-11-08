@@ -564,7 +564,8 @@ public class Feeder {
         if(oldList!= null) {
             //for now I am keeping half of the old trajectories, random selection
             int total = oldList.size();
-            int kept = total / 2;
+            int percent = (int)((total / 100f) * ReadConfig.Configurations.getHowManyAmIChangingBetweenGeneration());
+            int kept = total - percent;
             while (oldList.size() > kept) {
                 int rand = ThreadLocalRandom.current().nextInt(0, oldList.size());
                 oldList.remove(rand);
