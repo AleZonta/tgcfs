@@ -574,7 +574,7 @@ public class Feeder {
 
             //deep copy so i reset their status on the new list
             oldList.forEach(trainReal -> {
-                TrainReal newOne = trainReal.deepCopy();
+                TrainReal newOne = trainReal.softCopy();
                 try {
                     newOne.setPoints(trainReal.getPoints());
                 } catch (Exception e) {

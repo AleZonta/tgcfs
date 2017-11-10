@@ -73,4 +73,10 @@ public interface EvolvableModel {
      * @return String
      */
     String getSummary();
+
+    /**
+     * Get Id model
+     * @return int id
+     */
+    int getId();
 }

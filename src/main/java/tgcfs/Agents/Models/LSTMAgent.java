@@ -107,7 +107,9 @@ public class LSTMAgent extends LSTM implements EvolvableModel {
     }
 
 
-
+    public int getId(){
+        return super.getId();
+    }
 
 
 }

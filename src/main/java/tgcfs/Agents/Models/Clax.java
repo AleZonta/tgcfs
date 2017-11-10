@@ -170,6 +170,11 @@ public class Clax implements EvolvableModel {
         return null;
     }
 
+    @Override
+    public int getId() {
+        return 0;
+    }
+
     /**
      * Return list of the weight of the classes
      * @return list of double

@@ -24,9 +24,7 @@ import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
 import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.LogSystem;
-import tgcfs.Utils.PointWithBearing;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -213,6 +211,7 @@ public class TuringLearning implements Framework{
         while(!reachedEndTrajectory && !randomError && (generationAgent <= maxGeneration || generationClassifier <= maxGeneration)) {
             if(evolveAgent) generationAgent++;
             if(evolveClassifier) generationClassifier++;
+            this.agents.resetScore();
             /* { SELECT parent }
                { RECOMBINE parents }
                { MUTATE offspring } */
@@ -242,7 +241,9 @@ public class TuringLearning implements Framework{
                 //this is happening only in the last generation
                 if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
                     logger.log(Level.INFO, "Dump agent generation and real");
-                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
+//                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
+                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier);
+                    this.agents.saveScoresBattle(generationAgent, generationClassifier);
                 }
 
                 //countermeasures system against disengagement
@@ -335,18 +336,19 @@ public class TuringLearning implements Framework{
      * @param generationClassifier number of generation for the classifier population
      * @throws Exception If something goes wrong
      */
-    private void saveTrajectoryAndGeneratedPoints(List<TrainReal> combineInputList, FollowingTheGraph transformation, int generationAgent, int generationClassifier) throws Exception {
-        //compute the real point.
-        combineInputList.forEach(trainReal -> {
-            if(trainReal.getRealPointsOutputComputed() == null) {
-                List<PointWithBearing> generatedPoint = new ArrayList<>();
-                transformation.setLastPoint(trainReal.getLastPoint());
-                trainReal.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork))));
-                trainReal.setRealPointsOutputComputed(generatedPoint);
-            }
-        });
-        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(combineInputList, generationAgent, generationClassifier);
-    }
+//    private void saveTrajectoryAndGeneratedPoints(List<TrainReal> combineInputList, FollowingTheGraph transformation, int generationAgent, int generationClassifier) throws Exception {
+//        //compute the real point.
+//        combineInputList.forEach(trainReal -> {
+//            if(trainReal.getRealPointsOutputComputed() == null) {
+//                List<PointWithBearing> generatedPoint = new ArrayList<>();
+//                transformation.setLastPoint(trainReal.getLastPoint());
+//                trainReal.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork))));
+//                trainReal.setRealPointsOutputComputed(generatedPoint);
+//            }
+//        });
+//        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(combineInputList, generationAgent, generationClassifier);
+//    }
+
 
     /**
      * Getter for the agents

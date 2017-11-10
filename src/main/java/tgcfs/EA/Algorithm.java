@@ -435,5 +435,4 @@ public abstract class Algorithm {
         this.population = population;
     }
 
-
 }

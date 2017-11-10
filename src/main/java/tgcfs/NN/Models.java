@@ -32,7 +32,7 @@ public abstract class Models {
      * Getter for the ID
      * @return Integer value used as ID
      */
-    public Integer getId() {
+    public int getId() {
         return this.id;
     }
 

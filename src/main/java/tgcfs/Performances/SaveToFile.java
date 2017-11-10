@@ -6,6 +6,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.PropertiesFileReader;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
+import tgcfs.Utils.Scores;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -141,6 +142,18 @@ public class SaveToFile {
         public static void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int generationAgent, int generationClassifier) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.dumpTrajectoryAndGeneratedPart(combineInputList, generationAgent, generationClassifier);
+        }
+
+        /**
+         * Save in JSON format the scores
+         * @param generationAgent number of generation for the agent population
+         * @param generationClassifier number of generation for the classifier population
+         * @param scores List of {@link Scores}
+         * @throws Exception  if the class is not instantiate
+         */
+        public static void saveScoresBattle(List<Scores> scores, int generationAgent, int generationClassifier) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.saveScoresBattle(scores,generationAgent,generationClassifier);
         }
     }
 
@@ -372,6 +385,42 @@ public class SaveToFile {
 
         }catch (Exception e){
             logger.log(Level.WARNING, "Error with trajectory-generatedPoints Zip File-" + generationAgent + "-" + generationClassifier + " " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Save in JSON format the scores
+     * @param generationAgent number of generation for the agent population
+     * @param generationClassifier number of generation for the classifier population
+     * @param scores List of {@link Scores}
+     */
+    private void saveScoresBattle(List<Scores> scores, int generationAgent, int generationClassifier){
+        String path = this.currentPath + "scores-" + generationAgent + "-" + generationClassifier + ".zip";
+        try (FileOutputStream zipFile = new FileOutputStream(new File(path));
+             ZipOutputStream zos = new ZipOutputStream(zipFile);
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
+        ){
+            ZipEntry csvFile = new ZipEntry(  "scores-" + generationAgent + "-" + generationClassifier + ".json");
+            zos.putNextEntry(csvFile);
+
+            JSONObject obj = new JSONObject();
+
+            JSONArray allTheScores = new JSONArray();
+            scores.forEach(s -> allTheScores.add(s.toString()));
+            obj.put("scores", allTheScores);
+
+            try {
+                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
+                writer.write(obj.toJSONString());
+                writer.newLine();
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Error appending line to scores CSV File-" + generationAgent + "-" + generationClassifier + " " + e.getMessage());
+                e.printStackTrace();
+            }
+
+        }catch (Exception e){
+            logger.log(Level.WARNING, "Error with scores Zip File-" + generationAgent + "-" + generationClassifier + " " + e.getMessage());
         }
     }
 }

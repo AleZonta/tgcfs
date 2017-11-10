@@ -20,7 +20,10 @@ import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
 import tgcfs.Networks.Convolutionary;
+import tgcfs.Performances.SaveToFile;
+import tgcfs.Utils.MultyScores;
 import tgcfs.Utils.PointWithBearing;
+import tgcfs.Utils.Scores;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,7 +44,7 @@ import java.util.logging.Logger;
  * Class implementing the algorithm for the agents.
  */
 public class Agents extends Algorithm {
-
+    MultyScores scores;
 
     /**
      * Constructor zero parameter
@@ -51,6 +54,7 @@ public class Agents extends Algorithm {
      */
     public Agents(Logger logger) throws Exception {
         super(logger);
+        this.scores = new MultyScores();
     }
 
     /**
@@ -321,7 +325,7 @@ public class Agents extends Algorithm {
      */
     public void evaluateIndividuals(Algorithm model, Transformation transformation){
         //I need to evaluate the agent using the classifiers
-        super.getPopulation().forEach(agent -> {
+        super.getPopulation().parallelStream().forEach(agent -> {
 //            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
             //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
@@ -336,11 +340,11 @@ public class Agents extends Algorithm {
 
 
             //for every example I need to run the classifier and check the result
-            model.getPopulation().forEach(classifier -> {
+            model.getPopulation().parallelStream().forEach(classifier -> {
 
                 //this is one agent
                 //I need to check for every output for every individual
-                inputOutput.forEach(trainReal -> {
+                inputOutput.parallelStream().forEach(trainReal -> {
 
                     List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
 
@@ -366,30 +370,6 @@ public class Agents extends Algorithm {
 
                 });
             });
-
-
-//
-//
-//            opponent.getPopulation().forEach(classifier -> {
-//                //I need to check for every output for every individual
-//                individual.getMyInputandOutput().forEach(trainReal -> {
-//                    ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
-//                    try {
-//                        tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) opponent.runIndividual(classifier, transformation.transform(trainReal.getOutputComputed(), trainReal.getPoints()));
-//                        //if the classifier is saying true -> it is wrongly judging the agent
-//                        if(result.getReal()){
-//                            individual.increaseFitness();
-//                        }else{
-//                            //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
-//                            //For each correct judgement, the classifier’s fitness increases by one
-//                            classifier.increaseFitness();
-//                        }
-//                    } catch (Exception e) {
-//                        logger.log(Level.SEVERE, "Error " + e.getMessage());
-//                        e.printStackTrace();
-//                    }
-//                });
-//            });
         });
     }
 
@@ -406,11 +386,20 @@ public class Agents extends Algorithm {
         tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
         //if the classifier is saying true -> it is wrongly judging the agent
         if(result.getReal()){
-            if(real) agent.increaseFitness();
+            //counting this only if the fake trajectory
+            if(real) {
+                agent.increaseFitness();
+                //store score -> generator wins
+                this.scores.addScore(new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0));
+            }
         }else{
             //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
             //For each correct judgement, the classifier’s fitness increases by one
             classifier.increaseFitness();
+            //store score -> classifiers wins
+            if(real) {
+                this.scores.addScore(new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 1));
+            }
         }
     }
 
@@ -443,6 +432,35 @@ public class Agents extends Algorithm {
         }
     }
 
+
+    /**
+     * Save in JSON format the trajectory and the generated part of it
+     * @param generationAgent number of generation for the agent population
+     * @param generationClassifier number of generation for the classifier population
+     * @throws Exception if something wrong happens in saving everything
+     */
+    public void saveTrajectoriesAndPointGenerated(int generationAgent, int generationClassifier) throws Exception {
+        List<TrainReal> totalList = new ArrayList<>();
+        super.getPopulation().forEach(individual -> individual.getMyInputandOutput().forEach(tra -> totalList.add(tra.deepCopy())));
+        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(totalList, generationAgent, generationClassifier);
+    }
+
+    /**
+     * Save score of the battle
+     * @param generationAgent number of generation for the agent population
+     * @param generationClassifier number of generation for the classifier population
+     * @throws Exception if something wrong happens in saving everything
+     */
+    public void saveScoresBattle(int generationAgent, int generationClassifier) throws Exception {
+        SaveToFile.Saver.saveScoresBattle(this.scores.getScore(), generationAgent, generationClassifier);
+    }
+
+    /**
+     * Reset scores
+     */
+    public void resetScore(){
+        this.scores = new MultyScores();
+    }
 
 }
 

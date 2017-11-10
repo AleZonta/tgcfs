@@ -63,7 +63,7 @@ public class MeasuresTest {
                     return null;
                 }
             };
-            a.setFitness(ThreadLocalRandom.current().nextInt(10));
+            a.setFitness(ThreadLocalRandom.current().nextInt(16000));
             population.add(a);
         });
 

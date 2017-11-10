@@ -7,7 +7,6 @@ import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
-import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
@@ -113,7 +112,39 @@ public class TrainReal {
         this.allThePartTransformedFake = null;
         this.allThePartTransformedReal = null;
         this.realOutput = null;
+    }
 
+
+    /**
+     * Deep copy constructor
+     * @param trainingPoint
+     * @param firstPart
+     * @param followingPart
+     * @param followingPartTransformed
+     * @param realOutput
+     * @param allThePartTransformedFake
+     * @param allThePartTransformedReal
+     * @param conditionalImage
+     * @param normalImage
+     * @param outputComputed
+     * @param realPointsOutputComputed
+     * @param idsaLoader
+     * @param totalPoints
+     */
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints) {
+        this.trainingPoint = trainingPoint;
+        this.firstPart = firstPart;
+        this.followingPart = followingPart;
+        this.followingPartTransformed = followingPartTransformed;
+        this.realOutput = realOutput;
+        this.allThePartTransformedFake = allThePartTransformedFake;
+        this.allThePartTransformedReal = allThePartTransformedReal;
+        this.conditionalImage = conditionalImage;
+        this.normalImage = normalImage;
+        this.outputComputed = outputComputed;
+        this.realPointsOutputComputed = realPointsOutputComputed;
+        this.idsaLoader = idsaLoader;
+        this.totalPoints = totalPoints;
     }
 
 
@@ -394,11 +425,20 @@ public class TrainReal {
     }
 
     /**
-     * Deep copy of the object
+     * Soft copy of the object -> reset it
+     * @return {@link TrainReal} object
+     */
+    public TrainReal softCopy(){
+        return new TrainReal(this.trainingPoint,this.followingPart);
+    }
+
+    /**
+     * Deep Copy
      * @return {@link TrainReal} object
      */
     public TrainReal deepCopy(){
-        return new TrainReal(this.trainingPoint,this.followingPart);
+        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints);
     }
+
 }
 
