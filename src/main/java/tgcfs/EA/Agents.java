@@ -290,7 +290,6 @@ public class Agents extends Algorithm {
             }
             //assign the output to this individual
             currentInputsNetwork.setOutputComputed(outputsNetworks);
-            logger.log(Level.INFO, "-- Output Generated From LSTM " + model.getId() + " -- \n" + outputsNetworks.toString());
 
             //create the output already computed
             currentInputsNetwork.createRealOutputConverted();
