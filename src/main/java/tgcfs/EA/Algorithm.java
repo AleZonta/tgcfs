@@ -254,6 +254,10 @@ public abstract class Algorithm {
             tournamentSize =  ReadConfig.Configurations.getTournamentSizeClassifiers();
             status = IndividualStatus.CLASSIFIER;
         }
+
+        //set everyone as a parent now
+        this.population.forEach(Individual::isParent);
+
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
 
@@ -344,6 +348,20 @@ public abstract class Algorithm {
         this.population = new ArrayList<>();
         this.population = newList;
         //now the population is again under the maximum size allowed and containing only the element with highest fitness.
+
+        //check who is parents and who is son
+        List<Integer> sonAndParent = new ArrayList<>();
+        this.population.forEach(p -> {
+            if(p.isSon()){
+                // zero for offspring
+                sonAndParent.add(0);
+            }else{
+                // one for parent
+                sonAndParent.add(1);
+            }
+        });
+        logger.log(Level.INFO, "--Parents vs Sons--");
+        logger.log(Level.INFO, sonAndParent.toString());
     }
 
     /**
@@ -431,7 +449,7 @@ public abstract class Algorithm {
      * Setter for the population
      * @param population new population
      */
-    protected void setPopulation(List<Individual> population){
+    public void setPopulation(List<Individual> population){
         this.population = population;
     }
 

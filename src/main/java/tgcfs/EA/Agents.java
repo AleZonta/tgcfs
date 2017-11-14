@@ -100,7 +100,6 @@ public class Agents extends Algorithm {
                 EvolvableModel model = individual.getModel();
                 //set the weights
                 model.setWeights(individual.getObjectiveParameters());
-
                 //select which model I am using
                 if(model.getClass().equals(LSTMAgent.class)){
                     this.runLSTM(input, model, individual);
@@ -250,12 +249,14 @@ public class Agents extends Algorithm {
             number = 1;
         }
 
-
         for (TrainReal inputsNetwork : input) {
+
+            TrainReal currentInputsNetwork = inputsNetwork.deepCopy();
+
             //now for the number of time step that I want to check save the output
             List<OutputsNetwork> outputsNetworks = new ArrayList<>();
 
-            List<InputsNetwork> in = inputsNetwork.getTrainingPoint();
+            List<InputsNetwork> in = currentInputsNetwork.getTrainingPoint();
             int size = in.size();
             INDArray features = Nd4j.create(new int[]{1, InputNetwork.inputSize, size}, 'f');
             for (int j = 0; j < size; j++) {
@@ -275,7 +276,7 @@ public class Agents extends Algorithm {
             //output has only two fields, input needs three
             //I am using the last direction present into input I am adding that one to the last output
 
-            Double directionAPF = ((InputNetwork) inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
+            Double directionAPF = ((InputNetwork) currentInputsNetwork.getTrainingPoint().get(currentInputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
             for (int i = 0; i < number - 1; i++) {
                 //transform output into input and add the direction
                 OutputNetwork outLocal = new OutputNetwork();
@@ -288,10 +289,14 @@ public class Agents extends Algorithm {
                 outputsNetworks.add(out);
             }
             //assign the output to this individual
-            inputsNetwork.setOutputComputed(outputsNetworks);
+            currentInputsNetwork.setOutputComputed(outputsNetworks);
+            logger.log(Level.INFO, "-- Output Generated From LSTM " + model.getId() + " -- \n" + outputsNetworks.toString());
+
             //create the output already computed
-            inputsNetwork.createRealOutputConverted();
-            individual.addMyInputandOutput(inputsNetwork);
+            currentInputsNetwork.createRealOutputConverted();
+            individual.addMyInputandOutput(currentInputsNetwork);
+
+            ((LSTMAgent)model).clearPreviousState();
         }
     }
 
@@ -324,18 +329,27 @@ public class Agents extends Algorithm {
      * @param transformation the class that will transform from one output to the new input
      */
     public void evaluateIndividuals(Algorithm model, Transformation transformation){
+        super.getPopulation().forEach(a -> {
+            //transform trajectory in advance to prevent multiprocessing errors
+            List<TrainReal> inputOutput = a.getMyInputandOutput();
+            inputOutput.forEach(trainReal -> {
+                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
+                transformation.transform(trainReal);
+            });
+        });
+
         //I need to evaluate the agent using the classifiers
         super.getPopulation().parallelStream().forEach(agent -> {
 //            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
             //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
 
-            //transform trajectory in advance to prevent multiprocessing errors
+//            //transform trajectory in advance to prevent multiprocessing errors
             List<TrainReal> inputOutput = agent.getMyInputandOutput();
-            inputOutput.forEach(trainReal -> {
-                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
-                transformation.transform(trainReal);
-            });
+//            inputOutput.forEach(trainReal -> {
+//                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
+//                transformation.transform(trainReal);
+//            });
 
 
 
@@ -344,7 +358,7 @@ public class Agents extends Algorithm {
 
                 //this is one agent
                 //I need to check for every output for every individual
-                inputOutput.parallelStream().forEach(trainReal -> {
+                inputOutput.forEach(trainReal -> {
 
                     List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
 
@@ -373,6 +387,55 @@ public class Agents extends Algorithm {
         });
     }
 
+//    public void evaluateIndividualsParallelVersion(Algorithm model, Transformation transformation){
+//
+//        super.getPopulation().forEach(a -> {
+//            //transform trajectory in advance to prevent multiprocessing errors
+//            List<TrainReal> inputOutput = a.getMyInputandOutput();
+//            inputOutput.forEach(trainReal -> {
+//                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
+//                transformation.transform(trainReal);
+//            });
+//        });
+//
+//        //I need to evaluate the agent using the classifiers
+//        super.getPopulation().parallelStream().forEach(agent -> {
+//
+////            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
+//            //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
+//            //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
+//            List<TrainReal> inputOutput = agent.getMyInputandOutput();
+//            //for every example I need to run the classifier and check the result
+//            model.getPopulation().parallelStream().forEach(classifier -> {
+//                //this is one agent
+//                //I need to check for every output for every individual
+//                inputOutput.forEach(trainReal -> {
+//
+//                    List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
+//
+//                    //run the classifier for the Fake trajectory
+//                    try {
+//                        this.runClassifier(model, agent, classifier, inputFake, Boolean.TRUE);
+//                    } catch (Exception e) {
+//                        logger.log(Level.SEVERE, "Error" + e.getMessage());
+//                        e.printStackTrace();
+//                    }
+//
+//                    //run the classifier for the Real trajectory
+//                    List<InputsNetwork> inputReal = trainReal.getAllThePartTransformedReal();
+//
+//                    try {
+//                        this.runClassifier(model, agent, classifier, inputReal, Boolean.FALSE);
+//                    } catch (Exception e) {
+//                        logger.log(Level.SEVERE, "Error" + e.getMessage());
+//                        e.printStackTrace();
+//                    }
+//
+//                });
+//            });
+//        });
+//    }
+
 
     /**
      * Run the classifier
@@ -382,7 +445,7 @@ public class Agents extends Algorithm {
      * @param input input for the classifier
      * @param real Boolean value. If it is false I do not need to increment the agent fitness since I am checking the real trajectory
      */
-    private void runClassifier(Algorithm model, Individual agent, Individual classifier, List<InputsNetwork> input, boolean real) throws Exception {
+    private synchronized void runClassifier(Algorithm model, Individual agent, Individual classifier, List<InputsNetwork> input, boolean real) throws Exception {
         tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
         //if the classifier is saying true -> it is wrongly judging the agent
         if(result.getReal()){
@@ -390,7 +453,8 @@ public class Agents extends Algorithm {
             if(real) {
                 agent.increaseFitness();
                 //store score -> generator wins
-                this.scores.addScore(new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0));
+                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0);
+                this.scores.addScore(sc);
             }
         }else{
             //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
@@ -398,7 +462,8 @@ public class Agents extends Algorithm {
             classifier.increaseFitness();
             //store score -> classifiers wins
             if(real) {
-                this.scores.addScore(new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 1));
+                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1);
+                this.scores.addScore(sc);
             }
         }
     }
@@ -437,11 +502,23 @@ public class Agents extends Algorithm {
      * Save in JSON format the trajectory and the generated part of it
      * @param generationAgent number of generation for the agent population
      * @param generationClassifier number of generation for the classifier population
+     * @param transformation {@link FollowingTheGraph} transformation reference to transform the output in real point //TODO generalise this
      * @throws Exception if something wrong happens in saving everything
      */
-    public void saveTrajectoriesAndPointGenerated(int generationAgent, int generationClassifier) throws Exception {
+    public void saveTrajectoriesAndPointGenerated(int generationAgent, int generationClassifier, FollowingTheGraph transformation) throws Exception {
         List<TrainReal> totalList = new ArrayList<>();
         super.getPopulation().forEach(individual -> individual.getMyInputandOutput().forEach(tra -> totalList.add(tra.deepCopy())));
+
+
+        totalList.forEach(t -> {
+            if(t.getRealPointsOutputComputed() == null) {
+                List<PointWithBearing> generatedPoint = new ArrayList<>();
+                transformation.setLastPoint(t.getLastPoint());
+                t.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork))));
+                t.setRealPointsOutputComputed(generatedPoint);
+            }
+        });
+
         SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(totalList, generationAgent, generationClassifier);
     }
 

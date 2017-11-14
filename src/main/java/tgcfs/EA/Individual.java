@@ -32,7 +32,7 @@ public abstract class Individual {
     private AtomicInteger fitness;
     private EvolvableModel model;
     protected final IndividualStatus ind;
-    private final boolean isSon;
+    private boolean isSon;
 
     /**
      * Getter fot the objective parameter
@@ -206,7 +206,7 @@ public abstract class Individual {
      * Increase Fitness by one
      * @exception Exception if the individual is not initialised
      */
-    public void increaseFitness() throws Exception {
+    public synchronized void increaseFitness() throws Exception {
         if(this.fitness == null) throw new Exception("Individual not correctly initialised");
         this.fitness.incrementAndGet();
     }
@@ -276,5 +276,12 @@ public abstract class Individual {
      */
     public boolean isSon() {
         return this.isSon;
+    }
+
+    /**
+     * The element is not son anymore
+     */
+    public void isParent() {
+        this.isSon = false;
     }
 }

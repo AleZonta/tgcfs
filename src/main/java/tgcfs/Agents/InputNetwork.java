@@ -143,4 +143,9 @@ public class InputNetwork implements InputsNetwork {
         array.putScalar(1, this.bearing);
         return array;
     }
+
+    @Override
+    public String toString() {
+        return "{" + this.speed + ", " + this.bearing + "}";
+    }
 }

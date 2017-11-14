@@ -64,19 +64,18 @@ public class Agent extends Models {
             double bearing = convertitor.obtainBearing(actualPoint,nextPoint);
             //speed is the speed I arrived here from previous point
             double speed;
-            double dist;
             if(i > 0){
                 Point previousPoint = this.realOutput.get(i - 1);
                 speed = convertitor.obtainSpeed(previousPoint, actualPoint);
 
-                dist = distance.compute(previousPoint,actualPoint);
+//                dist = distance.compute(previousPoint,actualPoint);
             }else{
                 speed = 0.0;
-                dist = 0.0;
+//                dist = 0.0;
             }
             //compute the distance
 
-            totalList.add(new OutputNetwork(speed, bearing, dist));
+            totalList.add(new OutputNetwork(speed, bearing));
         });
         return totalList;
     }

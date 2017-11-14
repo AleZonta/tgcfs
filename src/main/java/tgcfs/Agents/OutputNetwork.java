@@ -35,6 +35,7 @@ public class OutputNetwork implements OutputsNetwork {
         }
     }
 
+
     /**
      * Constructor two parameters
      * @param speed speed parameter
@@ -44,6 +45,21 @@ public class OutputNetwork implements OutputsNetwork {
         this.speed = speed;
         this.bearing = bearing;
 //        this.distance = distance;
+        Field[] allFields = OutputNetwork.class.getDeclaredFields();
+        if (allFields.length != outputSize + 1){
+            throw new Error("Number of fields and variable expressing that do not correspond.");
+        }
+    }
+
+
+    /**
+     * Constructor two parameters
+     * @param speed speed parameter
+     * @param bearing bearing parameter
+     */
+    public OutputNetwork(double speed, double bearing){
+        this.speed = speed;
+        this.bearing = bearing;
         Field[] allFields = OutputNetwork.class.getDeclaredFields();
         if (allFields.length != outputSize + 1){
             throw new Error("Number of fields and variable expressing that do not correspond.");
@@ -110,6 +126,15 @@ public class OutputNetwork implements OutputsNetwork {
             this.bearing = Normalisation.decodeDirectionData(out.getRow(1).getDouble(0));
 //            this.distance = Normalisation.decodeDistance(out.getRow(2).getDouble(0));
         }
+    }
+
+    /**
+     * Deep copy
+     * @return {@link OutputNetwork} object
+     */
+    @Override
+    public OutputNetwork deepCopy() {
+        return new OutputNetwork(this.speed, this.bearing);
     }
 
     /**

@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
  */
 public class OutputNetwork implements OutputsNetwork{
     private boolean real;
+    private double realValue;
     public static int outputSize = 1; //the size of the output corresponding to the field here
     private int kindOfClassifier;
 
@@ -26,7 +27,15 @@ public class OutputNetwork implements OutputsNetwork{
         outputSize = number;
     }
 
-
+    /**
+     * Constructor for deep copy
+     * @param value boolean if it is real
+     * @param realValue real value obtained as a result
+     */
+    public OutputNetwork(boolean value, double realValue){
+        this.realValue = realValue;
+        this.real = value;
+    }
     /**
      * Contructor zero parameter
      * check if the numebr express as output size is correct
@@ -41,11 +50,11 @@ public class OutputNetwork implements OutputsNetwork{
             e.printStackTrace();
         }
         if(this.kindOfClassifier == 1){ //1 means LSTM
-            if (allFields.length != outputSize + 1){
+            if (allFields.length != outputSize + 2){
                 throw new Error("Number of fields and variable expressing that do not correspond.");
             }
         }else{
-            if (allFields.length != outputSize + 2){
+            if (allFields.length != outputSize + 3){
                 throw new Error("Number of fields and variable expressing that do not correspond.");
             }
         }
@@ -74,6 +83,7 @@ public class OutputNetwork implements OutputsNetwork{
         }
         //enn
         if(this.kindOfClassifier == 0){
+            this.realValue = out.getDouble(0);
             if(out.getDouble(0) >= 0.0){
                 this.real = Boolean.TRUE;
             }else{
@@ -90,5 +100,20 @@ public class OutputNetwork implements OutputsNetwork{
 
     }
 
+    /**
+     * Deep copy
+     * @return new {@link OutputNetwork} object
+     */
+    @Override
+    public OutputNetwork deepCopy() {
+        return new OutputNetwork(this.real, this.realValue);
+    }
 
+    /**
+     * Getter for the real value obtained as a result
+     * @return double var
+     */
+    public double getRealValue() {
+        return realValue;
+    }
 }

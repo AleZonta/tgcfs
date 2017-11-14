@@ -242,7 +242,7 @@ public class TuringLearning implements Framework{
                 if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
                     logger.log(Level.INFO, "Dump agent generation and real");
 //                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
-                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier);
+                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier, new FollowingTheGraph(this.feeder));
                     this.agents.saveScoresBattle(generationAgent, generationClassifier);
                 }
 

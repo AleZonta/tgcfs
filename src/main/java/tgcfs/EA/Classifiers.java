@@ -93,7 +93,7 @@ public class Classifiers extends Algorithm {
      * @throws Exception if the nn has problem an exception is raised
      */
     @Override
-    public OutputsNetwork runIndividual(Individual individual, List<InputsNetwork> input) throws Exception {
+    public synchronized OutputsNetwork runIndividual(Individual individual, List<InputsNetwork> input) throws Exception {
         //retrive model from the individual
         EvolvableModel model = individual.getModel();
         //set the weights
@@ -110,6 +110,7 @@ public class Classifiers extends Algorithm {
             }
             //I am interested only in the last output of this network
             out.deserialise(lastOutput);
+            ((ENNClassifier)model).cleanParam();
         }else {
             //else
             //if it is a lstm
@@ -341,6 +342,20 @@ public class Classifiers extends Algorithm {
             logger.log(Level.INFO, fitnd.toString());
 
             super.setPopulation(nextGeneration);
+
+            //check who is parents and who is son
+            List<Integer> sonAndParent = new ArrayList<>();
+            super.getPopulation().forEach(p -> {
+                if(p.isSon()){
+                    // zero for offspring
+                    sonAndParent.add(0);
+                }else{
+                    // one for parent
+                    sonAndParent.add(1);
+                }
+            });
+            logger.log(Level.INFO, "--Parents vs Sons--");
+            logger.log(Level.INFO, sonAndParent.toString());
         }
     }
 

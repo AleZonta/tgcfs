@@ -562,7 +562,7 @@ public class Feeder {
         int start = 0;
 
         if(oldList!= null) {
-            //for now I am keeping half of the old trajectories, random selection
+            //for now I am keeping half of the old trajectories, random selectionsystem.
             int total = oldList.size();
             int percent = (int)((total / 100f) * ReadConfig.Configurations.getHowManyAmIChangingBetweenGeneration());
             int kept = total - percent;
@@ -593,6 +593,7 @@ public class Feeder {
             this.feedTheEater(idsaLoader,totalList);
             //logger.log(Level.INFO, "TrainReal sit size not correct, adding one more example");
         }
+
         return totalList;
     }
 

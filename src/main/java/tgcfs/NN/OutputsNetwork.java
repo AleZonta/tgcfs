@@ -21,4 +21,10 @@ public interface OutputsNetwork {
      * @param out list containing all the fields
      */
     void deserialise(INDArray out);
+
+    /**
+     * Deep Copy method
+     * @return OutputsNetwork object
+     */
+    OutputsNetwork deepCopy();
 }

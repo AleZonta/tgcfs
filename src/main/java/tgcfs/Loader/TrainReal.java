@@ -192,7 +192,8 @@ public class TrainReal {
      * @param outputComputed output computed by the NN
      */
     public void setOutputComputed(List<OutputsNetwork> outputComputed) {
-        this.outputComputed = outputComputed;
+        this.outputComputed = new ArrayList<>();
+        outputComputed.forEach(outputsNetwork -> this.outputComputed.add(outputsNetwork.deepCopy()));
     }
 
     /**
@@ -410,13 +411,13 @@ public class TrainReal {
             if(i > 0){
                 speed = conversion.obtainSpeed(previousPoint, actualPoint);
 
-                dist = conversion.obtainDistance(previousPoint,actualPoint);
+               /// dist = conversion.obtainDistance(previousPoint,actualPoint);
             }else {
                 speed = 0.0;
-                dist = 0.0;
+                ///dist = 0.0;
             }
 
-            totalList.add(new OutputNetwork(speed, bearing, dist));
+            totalList.add(new OutputNetwork(speed, bearing));
 
         });
 
