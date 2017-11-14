@@ -194,7 +194,7 @@ public class TuringLearning implements Framework{
         this.agents.runIndividuals(combineInputList);
         //classifier are executed and evaluated during agents evaluations
         logger.log(Level.INFO,"Run Classifiers...");
-        this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
+        this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, logger));
         //save the fitness of all the population and the best genome
         SaveToFile.Saver.saveFitness(this.agents.getClass().getName(),this.agents.retAllFitness());
         SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(),this.classifiers.retAllFitness());
@@ -235,14 +235,14 @@ public class TuringLearning implements Framework{
                 this.agents.runIndividuals(combineInputList);
                 logger.log(Level.INFO,"Run Classifiers...");
                 //classifier are executed and evaluated during agents evaluations
-                this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
+                this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, logger));
 
                 //I need to generate this dataset for testing the classifiers and understand visually what is happening
                 //this is happening only in the last generation
                 if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
                     logger.log(Level.INFO, "Dump agent generation and real");
 //                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
-                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier, new FollowingTheGraph(this.feeder));
+                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier, new FollowingTheGraph(this.feeder, logger));
                     this.agents.saveScoresBattle(generationAgent, generationClassifier);
                 }
 
@@ -306,7 +306,7 @@ public class TuringLearning implements Framework{
             this.agents.runIndividuals(combineInputList);
             logger.log(Level.INFO, "Evaluate Agents...");
             //classifier are executed and evaluated during agents evaluations
-            this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder));
+            this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, logger));
             //reset classifier, I am not evolving them now
             this.classifiers.resetFitness();
                 /* { SELECT individuals next generation } */

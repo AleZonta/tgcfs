@@ -172,7 +172,7 @@ public class AgentsTest {
 
             System.out.println("--------- parallel version ---------");
 
-            agents.evaluateIndividuals(classifiers, new FollowingTheGraph(feeder));
+            agents.evaluateIndividuals(classifiers, new FollowingTheGraph(feeder,log));
 
 
             List<Integer> fitnessFirstA = new ArrayList<>();
@@ -205,7 +205,7 @@ public class AgentsTest {
 
             System.out.println("--------- parallel version ---------");
 
-            agents.evaluateIndividuals(classifiers, new FollowingTheGraph(feeder));
+            agents.evaluateIndividuals(classifiers, new FollowingTheGraph(feeder,log));
 
             List<Integer> fitnessFirstAP = new ArrayList<>();
             List<Integer> idFirstAP = new ArrayList<>();

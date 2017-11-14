@@ -86,4 +86,10 @@ public class PointWithBearing extends Point {
     public PointWithBearing deepCopy() {
         return new PointWithBearing(this.getLatitude(),this.getLongitude(), this.getAltitude(), this.getDated(), this.getDates(), this.getTime(), this.bearing);
     }
+
+
+    @Override
+    public String toString() {
+        return "(" + this.getLatitude() + ", " + this.getLongitude()  + ", " + this.bearing+ ")";
+    }
 }

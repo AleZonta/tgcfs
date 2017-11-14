@@ -18,6 +18,10 @@ import tgcfs.NN.InputsNetwork;
  *
  */
 public class Normalisation {
+    private static double max_speed = 200.0; //metres per second
+    private static double min_speed = 0.0;
+    private static double max_angular_speed = 500.0; //radiant per second
+    private static double min_angular_speed = -500.0;
 
     /**
      * Normalisation of the number
@@ -78,8 +82,8 @@ public class Normalisation {
      * @return normalised speed between ±1
      */
     public static double convertAngularSpeed(double toBeConverted){
-        double maxAngularSpeed = 300.0;
-        double minAngularSpeed = -10.0;
+        double maxAngularSpeed = max_angular_speed;
+        double minAngularSpeed = min_angular_speed;
         if (toBeConverted > maxAngularSpeed) {
             toBeConverted = maxAngularSpeed;
         }
@@ -98,8 +102,8 @@ public class Normalisation {
     public static double decodeAngularSpeed(double toBeConverted){
         double maxAngularSpeed = 1.0;
         double minAngularSpeed = -1.0;
-        double b = 10.0;
-        double a = -10.0;
+        double b = max_angular_speed;
+        double a = min_angular_speed;
         return convertToSomething(maxAngularSpeed, minAngularSpeed, b, a, toBeConverted);
     }
 
@@ -115,8 +119,8 @@ public class Normalisation {
      * @return normalised speed between ±1
      */
     public static double convertSpeed(double toBeConverted) {
-        double maxSpeed = 10.0; //55.5 metres/seconds means maximum speed of 200 km/h
-        double minSpeed = 0.0;
+        double maxSpeed = max_speed; //55.5 metres/seconds means maximum speed of 200 km/h
+        double minSpeed = min_speed;
         if (toBeConverted > maxSpeed) {
             toBeConverted = maxSpeed;
         }
@@ -134,8 +138,8 @@ public class Normalisation {
     public static double decodeSpeed(double toBeConverted){
         double maxSpeed = 1.0;
         double minSpeed = -1.0;
-        double b = 10.0;
-        double a = 0.0;
+        double b = max_speed;
+        double a = min_speed;
         return convertToSomething(maxSpeed, minSpeed, b, a, toBeConverted);
     }
 

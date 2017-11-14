@@ -360,7 +360,7 @@ public abstract class Algorithm {
                 sonAndParent.add(1);
             }
         });
-        logger.log(Level.INFO, "--Parents vs Sons--");
+        logger.log(Level.INFO, "--Parents[1] vs Sons[0]--");
         logger.log(Level.INFO, sonAndParent.toString());
     }
 
