@@ -401,7 +401,6 @@ public class Feeder {
      * Find the next location given actual position, distance and direction
      * @param whereIam position where I am
      * @param speed speed I am moving
-//     * @param distance distance I have travelled
      * @param direction direction I am moving
      * @return next point
      */
@@ -526,6 +525,129 @@ public class Feeder {
         return whereIam;
     }
 
+    /**
+     * Find the next location given actual position, speed and direction but in a different way than the method before
+     * @param whereIam position where I am
+     * @param speed speed I am moving
+     * @param direction direction I am moving
+     * @return next point
+     */
+    public Point getNextLocationDifferentMethod(Point whereIam, Double speed, Double direction){
+        //I know where I am
+        Coord coordWhereIam = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
+        java.lang.System.out.println("Where I am -> " + coordWhereIam.getLat() + ", " + coordWhereIam.getLon());
+        InfoNode source = this.graph.findNodes(coordWhereIam);
+        java.lang.System.out.println("Source -> " + source.getLat() + ", " + source.getLon());
+
+        //find position where I am going using speed and direction
+        //time fixed for idsa
+        double time = Routes.timeBetweenIDSATimesteps;
+        double distance = speed * time;
+
+        //distance in kilometers
+        distance = distance / 1000;
+
+        //compute next point where I am going in the plane (not in the graph)
+        double earthRadious = 6378.14;
+        double latRad = Math.toRadians(whereIam.getLatitude());
+        double lonRad = Math.toRadians(whereIam.getLongitude());
+        double bearRad = Math.toRadians(direction);
+
+        double lat2 = Math.asin(Math.sin(latRad) * Math.cos(distance/earthRadious) + Math.cos(latRad)*Math.sin(distance/earthRadious) * Math.cos(bearRad));
+        double long2 = lonRad + Math.atan2(Math.sin(bearRad)*Math.sin(distance/earthRadious)*Math.cos(latRad), Math.cos(distance/earthRadious)-Math.sin(latRad)*Math.sin(lat2));
+
+        double latDeg = Math.toDegrees(lat2);
+        double longDeg = Math.toDegrees(long2);
+
+        Coord nextPoint = new Coord(latDeg, longDeg);
+        java.lang.System.out.println("nextPoint - > " + nextPoint.getLat().toString() + ", " + nextPoint.getLon().toString());
+
+        //now I can try to find this point in the graph
+        InfoNode destination = this.graph.findNodes(nextPoint);
+        java.lang.System.out.println("Destination -> " + destination.getLat() + ", " + destination.getLon());
+
+
+        //distance in metres again
+        distance = distance * 1000;
+        List<InfoNode> list = null;
+        try {
+            list = this.graph.findPathBetweenNodes(source, destination);
+
+            //check distance of the path
+            double distanceFollowingThePath = 0d;
+            for (int i = 1; i < list.size(); i++){
+                distanceFollowingThePath += this.graph.findDistanceBetweenNodesConnected(list.get(i-1), list.get(i));
+            }
+
+            java.lang.System.out.println("distanceFollowingThePath = " + distanceFollowingThePath + ", vs distance = " + distance );
+
+            //is possible that the distance is already shorter than distance
+            if(distanceFollowingThePath > distance){
+                int val = 1;
+                //check the distance
+                while (distanceFollowingThePath > distance){
+                    distanceFollowingThePath = 0d;
+                    for (int i = 1; i < list.size() - val; i++){
+                        distanceFollowingThePath += this.graph.findDistanceBetweenNodesConnected(list.get(i-1), list.get(i));
+                    }
+                    val++;
+                }
+
+
+                //now I am in the middle of two nodes and I need to find the right point at the right distance
+                double realDistance = distance - distanceFollowingThePath;
+                Coord position = this.graph.findPointInEdge(list.get(list.size() - val), list.get(list.size() - val + 1), realDistance);
+                double plusTime = distance / speed;
+                return new Point(position.getLat(), position.getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+            }
+            double plusTime = distance / speed;
+            return new Point(list.get(list.size() - 1).getLat(), list.get(list.size() - 1).getLon(), whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+        } catch (Exception e) {
+            //If there is no path I am returning the first point, if there are other errors I am returning something different
+            if (!Objects.equals(e.getMessage(), "No path is found in the graph")) {
+                logger.log(Level.WARNING, "Error with " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        //No path between the two points, returning the first point
+        return whereIam;
+    }
+
+    /**
+     * Find the next location given actual position, speed and direction but not using the graph
+     * @param whereIam position where I am
+     * @param speed speed I am moving
+     * @param direction direction I am moving
+     * @return next point
+     */
+    public Point getNextLocationNoGraph(Point whereIam, Double speed, Double direction){
+        //I know where I am
+        //find position where I am going using speed and direction
+        //time fixed for idsa
+        double time = Routes.timeBetweenIDSATimesteps;
+        double distance = speed * time;
+
+        //distance in kilometers
+        distance = distance / 1000;
+
+        //compute next point where I am going in the plane (not in the graph)
+        double earthRadious = 6378.14;
+        double latRad = Math.toRadians(whereIam.getLatitude());
+        double lonRad = Math.toRadians(whereIam.getLongitude());
+        double bearRad = Math.toRadians(direction);
+
+        double lat2 = Math.asin(Math.sin(latRad) * Math.cos(distance/earthRadious) + Math.cos(latRad)*Math.sin(distance/earthRadious) * Math.cos(bearRad));
+        double long2 = lonRad + Math.atan2(Math.sin(bearRad)*Math.sin(distance/earthRadious)*Math.cos(latRad), Math.cos(distance/earthRadious)-Math.sin(latRad)*Math.sin(lat2));
+
+        double latDeg = Math.toDegrees(lat2);
+        double longDeg = Math.toDegrees(long2);
+
+        distance = distance * 1000;
+        double plusTime = distance / speed;
+        return new Point(latDeg, longDeg, whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+    }
+
+
 
     /**
      * Get initialNode closest node
@@ -559,6 +681,7 @@ public class Feeder {
         //not correct direction? I am staying here
         return endNodes.get(index[0]);
     }
+
 
 
     /**

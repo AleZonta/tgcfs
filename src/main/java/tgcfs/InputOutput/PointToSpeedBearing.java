@@ -41,7 +41,6 @@ public class PointToSpeedBearing {
             //e.printStackTrace();
         }
 
-
         return distance / time;
     }
 
