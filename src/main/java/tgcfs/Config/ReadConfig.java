@@ -92,6 +92,7 @@ public class ReadConfig {
 
     private Integer differentSelectionForClassifiers;
     private Integer howManyAmIChangingBetweenGeneration;
+    public static boolean debug;
 
 
     /**
@@ -164,6 +165,8 @@ public class ReadConfig {
 
         this.differentSelectionForClassifiers = null;
         this.howManyAmIChangingBetweenGeneration = null;
+
+        debug = false;
     }
 
     /**
@@ -603,6 +606,13 @@ public class ReadConfig {
             if(this.usingReducedVirulenceMethodOnClassifiers || this.usingReducedVirulenceMethodOnAgents){
                 throw new Exception("If using the automatic evolution of step size, the usage of the virulence method is not allowed.");
             }
+        }
+
+        try {
+            // debug
+            debug = ((Boolean) jsonObject.get("Debug"));
+        }catch (ClassCastException | NullPointerException e) {
+            debug = false;
         }
     }
 

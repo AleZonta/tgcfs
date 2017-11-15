@@ -407,7 +407,7 @@ public class Feeder {
     public Point getNextLocation(Point whereIam, Double speed, Double direction){
         //find position where I am
         Coord coordA = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
-        java.lang.System.out.println("coordA -> " + coordA.getLat().toString() + ", " + coordA.getLon().toString());
+        if(ReadConfig.debug) java.lang.System.out.println("coordA -> " + coordA.getLat().toString() + ", " + coordA.getLon().toString());
 
         InfoNode initialNode = null;
         //If I am using the db system
@@ -429,11 +429,11 @@ public class Feeder {
             initialNode = this.graph.findNodes(coordA);
         }
 
-        java.lang.System.out.println("initialNode -> " + initialNode.getLat().toString() + ", " + initialNode.getLon().toString());
+        if(ReadConfig.debug) java.lang.System.out.println("initialNode -> " + initialNode.getLat().toString() + ", " + initialNode.getLon().toString());
         InfoNode closestNode = null;
         try {
             closestNode = this.getClosestNode(initialNode, whereIam, direction);
-            java.lang.System.out.println("closestNode -> " + closestNode.getLat().toString() + ", " + closestNode.getLon().toString());
+            if(ReadConfig.debug) java.lang.System.out.println("closestNode -> " + closestNode.getLat().toString() + ", " + closestNode.getLon().toString());
         }catch (Exception e){
             //some problems in finding the closest node?
             //If there is no closest node just return where I am
@@ -443,12 +443,12 @@ public class Feeder {
         //time fixed for idsa
         double time = Routes.timeBetweenIDSATimesteps;
         double distance = speed * time;
-        java.lang.System.out.println("distance - > " + distance + ", speed is = " + speed + ", time is = " + time);
+        if(ReadConfig.debug) java.lang.System.out.println("distance - > " + distance + ", speed is = " + speed + ", time is = " + time);
 
 
         //distance in kilometers
         distance = distance / 1000;
-        java.lang.System.out.println("distance km - > " + distance);
+        if(ReadConfig.debug) java.lang.System.out.println("distance km - > " + distance);
 
 
         double earthRadious = 6378.14;
@@ -463,7 +463,7 @@ public class Feeder {
         double longDeg = Math.toDegrees(long2);
 
         Coord coordTest = new Coord(latDeg, longDeg);
-        java.lang.System.out.println("coordTest - > " + coordTest.getLat().toString() + ", " + coordTest.getLon().toString());
+        if(ReadConfig.debug) java.lang.System.out.println("coordTest - > " + coordTest.getLat().toString() + ", " + coordTest.getLon().toString());
 
 
         //Is the new Point inside the border of the area in interest?
@@ -472,7 +472,7 @@ public class Feeder {
         //Checked, In that case the closest node in the graph is returned and used. I think I can use this system in any case
         //or load a bigger map
         InfoNode testNode = this.graph.findNodes(coordTest);
-        java.lang.System.out.println("testNode -> " + testNode.getLat().toString() + ", " + testNode.getLon().toString());
+        if(ReadConfig.debug) java.lang.System.out.println("testNode -> " + testNode.getLat().toString() + ", " + testNode.getLon().toString());
 
 
         //distance in metres
@@ -480,7 +480,7 @@ public class Feeder {
         final double[] dis = {0.0};
         List<InfoNode> list = null;
         try {
-            java.lang.System.out.println(" (" + closestNode.getLat().toString() + " " + closestNode.getLon().toString()  + ")  -  (" + testNode.getLat().toString() + " " + testNode.getLon().toString() + ")");
+            if(ReadConfig.debug) java.lang.System.out.println(" (" + closestNode.getLat().toString() + " " + closestNode.getLon().toString()  + ")  -  (" + testNode.getLat().toString() + " " + testNode.getLon().toString() + ")");
             list = this.graph.findPathBetweenNodes(closestNode, testNode);
 
 
@@ -493,7 +493,7 @@ public class Feeder {
                 String aaa = "stop";
             }
 
-            java.lang.System.out.println("dist = " + dist + ", vs distance = " + distance );
+            if(ReadConfig.debug) java.lang.System.out.println("dist = " + dist + ", vs distance = " + distance );
             //is possible that the distance is already shorter than distance
             if(dist > distance){
                 int val = 1;
@@ -535,9 +535,9 @@ public class Feeder {
     public Point getNextLocationDifferentMethod(Point whereIam, Double speed, Double direction){
         //I know where I am
         Coord coordWhereIam = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
-        java.lang.System.out.println("Where I am -> " + coordWhereIam.getLat() + ", " + coordWhereIam.getLon());
+        if(ReadConfig.debug) java.lang.System.out.println("Where I am -> " + coordWhereIam.getLat() + ", " + coordWhereIam.getLon());
         InfoNode source = this.graph.findNodes(coordWhereIam);
-        java.lang.System.out.println("Source -> " + source.getLat() + ", " + source.getLon());
+        if(ReadConfig.debug) java.lang.System.out.println("Source -> " + source.getLat() + ", " + source.getLon());
 
         //find position where I am going using speed and direction
         //time fixed for idsa
@@ -560,11 +560,11 @@ public class Feeder {
         double longDeg = Math.toDegrees(long2);
 
         Coord nextPoint = new Coord(latDeg, longDeg);
-        java.lang.System.out.println("nextPoint - > " + nextPoint.getLat().toString() + ", " + nextPoint.getLon().toString());
+        if(ReadConfig.debug) java.lang.System.out.println("nextPoint - > " + nextPoint.getLat().toString() + ", " + nextPoint.getLon().toString());
 
         //now I can try to find this point in the graph
         InfoNode destination = this.graph.findNodes(nextPoint);
-        java.lang.System.out.println("Destination -> " + destination.getLat() + ", " + destination.getLon());
+        if(ReadConfig.debug) java.lang.System.out.println("Destination -> " + destination.getLat() + ", " + destination.getLon());
 
 
         //distance in metres again
@@ -579,7 +579,7 @@ public class Feeder {
                 distanceFollowingThePath += this.graph.findDistanceBetweenNodesConnected(list.get(i-1), list.get(i));
             }
 
-            java.lang.System.out.println("distanceFollowingThePath = " + distanceFollowingThePath + ", vs distance = " + distance );
+            if(ReadConfig.debug) java.lang.System.out.println("distanceFollowingThePath = " + distanceFollowingThePath + ", vs distance = " + distance );
 
             //is possible that the distance is already shorter than distance
             if(distanceFollowingThePath > distance){
