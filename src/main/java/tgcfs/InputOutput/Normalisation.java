@@ -22,6 +22,8 @@ public class Normalisation {
     private static double min_speed = 0.0;
     private static double max_angular_speed = 500.0; //radiant per second
     private static double min_angular_speed = -500.0;
+    private static double max_distance = 555.0; //radiant per second
+    private static double min_distance = 0.0;
 
     /**
      * Normalisation of the number
@@ -72,7 +74,8 @@ public class Normalisation {
         if (toBeConverted > maxAngle || toBeConverted < minAngle) {
             throw new Error("Wrong range in input");
         }
-        return 2 * ((toBeConverted - minAngle) / (maxAngle - minAngle)) - 1;
+
+        return convertToSomething(maxAngle, minAngle, 1.0,-1.0, toBeConverted);
     }
 
 
@@ -82,15 +85,7 @@ public class Normalisation {
      * @return normalised speed between ±1
      */
     public static double convertAngularSpeed(double toBeConverted){
-        double maxAngularSpeed = max_angular_speed;
-        double minAngularSpeed = min_angular_speed;
-        if (toBeConverted > maxAngularSpeed) {
-            toBeConverted = maxAngularSpeed;
-        }
-        if (toBeConverted < minAngularSpeed) {
-            toBeConverted = minAngularSpeed;
-        }
-        return 2 * ((toBeConverted - minAngularSpeed) / (maxAngularSpeed - minAngularSpeed)) - 1;
+        return convertToSomething(max_angular_speed, min_angular_speed, 1.0,-1.0, toBeConverted);
     }
 
 
@@ -100,11 +95,7 @@ public class Normalisation {
      * @return original speed
      */
     public static double decodeAngularSpeed(double toBeConverted){
-        double maxAngularSpeed = 1.0;
-        double minAngularSpeed = -1.0;
-        double b = max_angular_speed;
-        double a = min_angular_speed;
-        return convertToSomething(maxAngularSpeed, minAngularSpeed, b, a, toBeConverted);
+        return convertToSomething(1.0, -1.0, max_angular_speed, min_angular_speed, toBeConverted);
     }
 
     /**
@@ -119,15 +110,7 @@ public class Normalisation {
      * @return normalised speed between ±1
      */
     public static double convertSpeed(double toBeConverted) {
-        double maxSpeed = max_speed; //55.5 metres/seconds means maximum speed of 200 km/h
-        double minSpeed = min_speed;
-        if (toBeConverted > maxSpeed) {
-            toBeConverted = maxSpeed;
-        }
-        if (toBeConverted < minSpeed) {
-            toBeConverted = minSpeed;
-        }
-        return 2 * ((toBeConverted - minSpeed) / (maxSpeed - minSpeed)) - 1;
+        return convertToSomething(max_speed, min_speed, 1.0,-1.0, toBeConverted);
     }
 
     /**
@@ -136,11 +119,7 @@ public class Normalisation {
      * @return double real value
      */
     public static double decodeSpeed(double toBeConverted){
-        double maxSpeed = 1.0;
-        double minSpeed = -1.0;
-        double b = max_speed;
-        double a = min_speed;
-        return convertToSomething(maxSpeed, minSpeed, b, a, toBeConverted);
+        return convertToSomething(1.0, -1.0, max_speed, min_speed, toBeConverted);
     }
 
     /**
@@ -149,11 +128,7 @@ public class Normalisation {
      * @return double real value
      */
     public static double decodeDirectionData(double toBeConverted){
-        double maxAngle = 1.0;
-        double minAngle = -1.0;
-        double b = 180.0;
-        double a = -180.0;
-        return convertToSomething(maxAngle, minAngle, b, a, toBeConverted);
+        return convertToSomething(1.0, -1.0, 180.0,-180.0, toBeConverted);
     }
 
     /**
@@ -193,11 +168,7 @@ public class Normalisation {
      * @return double real value
      */
     public static double decodeDistance(double toBeConverted){
-        double maxSpeed = 1.0;
-        double minSpeed = -1.0;
-        double b = 555.0;
-        double a = 0.0;
-        return convertToSomething(maxSpeed, minSpeed, b, a, toBeConverted);
+        return convertToSomething(1.0, -1.0, max_distance, min_distance, toBeConverted);
     }
 
     /**
@@ -210,11 +181,7 @@ public class Normalisation {
      * @return double real value
      */
     public static double convertDistance(double toBeConverted){
-        double maxSpeed = 555.0;
-        double minSpeed = 0.0;
-        double b = 1.0;
-        double a = -1.0;
-        return convertToSomething(maxSpeed, minSpeed, b, a, toBeConverted);
+        return convertToSomething(max_distance, min_distance, 1.0, -1.0, toBeConverted);
     }
 
     /**

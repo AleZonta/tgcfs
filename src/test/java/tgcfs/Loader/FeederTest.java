@@ -77,33 +77,43 @@ public class FeederTest {
 
     @Test
     public void getNextLocation() throws Exception {
-        Point myLocation = new Point(52.038615372493936, 4.29910204641889, 0d,12345.6, "123456", "14:20:10");
-        Double speed = 23d;
-        Double direction = 170d;
-        Double distance = 500d;
+//        Point myLocation = new Point(52.038615372493936, 4.29910204641889, 0d,12345.6, "123456", "14:20:10");
+//        Double speed = 23d;
+//        Double direction = 170d;
+//        Double distance = 500d;
+//
+//        new ReadConfig.Configurations();
+//
+//        Logger log =  Logger.getLogger(FeederTest.class.getName());
+//        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
+//        Feeder system = new Feeder(log);
+//        system.loadSystem();
+////        Point result = system.getNextLocation(myLocation,speed,distance,direction);
+//        Point result = system.getNextLocation(myLocation,speed,direction);
+//        System.out.println(result);
+//        System.out.println(result.getTime());
+//
+//        myLocation = new Point(52.01912786045312, 4.307028977339069, 0d,12345.6, "123456", "14:20:10");
+//        speed = 32d;
+//        direction = 171d;
+//        distance = 520d;
+//
+//
+//       // result = system.getNextLocation(myLocation,speed,distance,direction);
+//        result = system.getNextLocation(myLocation,speed,direction);
+//        System.out.println(result);
+//        System.out.println(result.getTime());
 
+        Point myLocation = new Point(52.0463, 4.3316, 0d,12345.6, "123456", "14:20:10");
+        double speed = 53.93202602863312;
+        double distance = 10.786405205726624;
         new ReadConfig.Configurations();
 
         Logger log =  Logger.getLogger(FeederTest.class.getName());
-        new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
         Feeder system = new Feeder(log);
         system.loadSystem();
-//        Point result = system.getNextLocation(myLocation,speed,distance,direction);
-        Point result = system.getNextLocation(myLocation,speed,direction);
+        Point result = system.getNextLocation(myLocation,speed,distance);
         System.out.println(result);
-        System.out.println(result.getTime());
-
-        myLocation = new Point(52.01912786045312, 4.307028977339069, 0d,12345.6, "123456", "14:20:10");
-        speed = 32d;
-        direction = 171d;
-        distance = 520d;
-
-
-       // result = system.getNextLocation(myLocation,speed,distance,direction);
-        result = system.getNextLocation(myLocation,speed,direction);
-        System.out.println(result);
-        System.out.println(result.getTime());
-
     }
 
     @Test

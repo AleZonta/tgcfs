@@ -408,6 +408,7 @@ public class Feeder {
     public Point getNextLocation(Point whereIam, Double speed, Double direction){
         //find position where I am
         Coord coordA = new Coord(whereIam.getLatitude(), whereIam.getLongitude());
+        java.lang.System.out.println("coordA -> " + coordA.getLat().toString() + ", " + coordA.getLon().toString());
 
         InfoNode initialNode = null;
         //If I am using the db system
@@ -429,9 +430,11 @@ public class Feeder {
             initialNode = this.graph.findNodes(coordA);
         }
 
+        java.lang.System.out.println("initialNode -> " + initialNode.getLat().toString() + ", " + initialNode.getLon().toString());
         InfoNode closestNode = null;
         try {
             closestNode = this.getClosestNode(initialNode, whereIam, direction);
+            java.lang.System.out.println("closestNode -> " + closestNode.getLat().toString() + ", " + closestNode.getLon().toString());
         }catch (Exception e){
             //some problems in finding the closest node?
             //If there is no closest node just return where I am
@@ -441,10 +444,13 @@ public class Feeder {
         //time fixed for idsa
         double time = Routes.timeBetweenIDSATimesteps;
         double distance = speed * time;
+        java.lang.System.out.println("distance - > " + distance + ", speed is = " + speed + ", time is = " + time);
 
 
         //distance in kilometers
         distance = distance / 1000;
+        java.lang.System.out.println("distance km - > " + distance);
+
 
         double earthRadious = 6378.14;
         double latRad = Math.toRadians(whereIam.getLatitude());
@@ -458,6 +464,8 @@ public class Feeder {
         double longDeg = Math.toDegrees(long2);
 
         Coord coordTest = new Coord(latDeg, longDeg);
+        java.lang.System.out.println("coordTest - > " + coordTest.getLat().toString() + ", " + coordTest.getLon().toString());
+
 
         //Is the new Point inside the border of the area in interest?
         //need some test on loading the graph and see what is happening if I chose an external Point
@@ -465,12 +473,15 @@ public class Feeder {
         //Checked, In that case the closest node in the graph is returned and used. I think I can use this system in any case
         //or load a bigger map
         InfoNode testNode = this.graph.findNodes(coordTest);
+        java.lang.System.out.println("testNode -> " + testNode.getLat().toString() + ", " + testNode.getLon().toString());
 
 
+        //distance in metres
         distance = distance * 1000;
         final double[] dis = {0.0};
         List<InfoNode> list = null;
         try {
+            java.lang.System.out.println(" (" + closestNode.getLat().toString() + " " + closestNode.getLon().toString()  + ")  -  (" + testNode.getLat().toString() + " " + testNode.getLon().toString() + ")");
             list = this.graph.findPathBetweenNodes(closestNode, testNode);
 
 
@@ -479,6 +490,11 @@ public class Feeder {
 
             double dist = dis[0];
 
+            if(dist == 0){
+                String aaa = "stop";
+            }
+
+            java.lang.System.out.println("dist = " + dist + ", vs distance = " + distance );
             //is possible that the distance is already shorter than distance
             if(dist > distance){
                 int val = 1;
