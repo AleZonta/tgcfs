@@ -24,6 +24,7 @@ import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
 import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.LogSystem;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
 import java.util.Objects;
@@ -86,6 +87,9 @@ public class TuringLearning implements Framework{
         this.countingTime = 0;
         //load countermeasures
         this.countermeasures = new EngagementPopulation(logger);
+
+        //load random number generator
+        new RandomGenerator();
     }
 
 
@@ -206,7 +210,7 @@ public class TuringLearning implements Framework{
         boolean reachedEndTrajectory = Boolean.FALSE;
         boolean randomError = Boolean.FALSE;
         boolean evolveAgent = Boolean.TRUE;
-        boolean evolveClassifier = Boolean.TRUE;
+        boolean evolveClassifier = Boolean.FALSE;
         Integer maxGeneration = ReadConfig.Configurations.getMaxGenerations();
         while(!reachedEndTrajectory && !randomError && (generationAgent <= maxGeneration || generationClassifier <= maxGeneration)) {
             if(evolveAgent) generationAgent++;
@@ -250,6 +254,7 @@ public class TuringLearning implements Framework{
                 this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);
                 evolveAgent = this.countermeasures.isEvolveAgent();
                 evolveClassifier = this.countermeasures.isEvolveClassifier();
+                evolveClassifier = Boolean.FALSE;
                 this.countermeasures.executeCountermeasuresAgainstDisengagement(this.agents.getPopulation(), IndividualStatus.AGENT);
                 this.countermeasures.executeCountermeasuresAgainstDisengagement(this.classifiers.getPopulation(), IndividualStatus.CLASSIFIER);
 

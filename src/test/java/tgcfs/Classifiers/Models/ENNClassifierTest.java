@@ -3,13 +3,11 @@ package tgcfs.Classifiers.Models;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import tgcfs.Utils.RandomGenerator;
 
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -69,7 +67,7 @@ public class ENNClassifierTest {
 
             INDArray array = Nd4j.rand(1, test.getArrayLength());
             for (int j = 0; j < test.getArrayLength(); j++) {
-                array.putScalar(j, ThreadLocalRandom.current().nextDouble(-1, 1));
+                array.putScalar(j, RandomGenerator.getNextDouble(-1,1));
 
             }
 
@@ -79,7 +77,7 @@ public class ENNClassifierTest {
             IntStream.range(0, 1000).forEach(i -> {
                 INDArray arrayy = Nd4j.rand(1, 3);
                 for (int j = 0; j < 3; j++) {
-                    arrayy.putScalar(j, ThreadLocalRandom.current().nextDouble(-1, 1));
+                    arrayy.putScalar(j, RandomGenerator.getNextDouble(-1,1));
                 }
 
 

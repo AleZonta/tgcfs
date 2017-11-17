@@ -7,6 +7,7 @@ import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class ClassifiersTest {
 
         classifiers.generateOffspringOnlyWithMutation();
 
-        classifiers.getPopulation().forEach(individual -> individual.setFitness(ThreadLocalRandom.current().nextInt(16000)));
+        classifiers.getPopulation().forEach(individual -> individual.setFitness(RandomGenerator.getNextInt(0, 160000)));
 
         classifiers.survivalSelections();
 

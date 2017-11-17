@@ -17,6 +17,7 @@ import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Routing.Routes;
 import tgcfs.Utils.PointWithBearing;
+import tgcfs.Utils.RandomGenerator;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -706,7 +706,7 @@ public class Feeder {
             int percent = (int)((total / 100f) * ReadConfig.Configurations.getHowManyAmIChangingBetweenGeneration());
             int kept = total - percent;
             while (oldList.size() > kept) {
-                int rand = ThreadLocalRandom.current().nextInt(0, oldList.size());
+                int rand = RandomGenerator.getNextInt(0, oldList.size());
                 oldList.remove(rand);
             }
             //now the old list contains only the one I want to be there

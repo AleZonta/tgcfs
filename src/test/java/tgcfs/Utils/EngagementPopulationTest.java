@@ -11,7 +11,6 @@ import tgcfs.NN.EvolvableModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertTrue;
@@ -44,7 +43,7 @@ public class EngagementPopulationTest {
         EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
         algorithm.generatePopulation(evolvableModel);
 
-        algorithm.getPopulation().forEach(individual -> individual.setFitness(ThreadLocalRandom.current().nextInt(16000)));
+        algorithm.getPopulation().forEach(individual -> individual.setFitness(RandomGenerator.getNextInt(0, 16000)));
 
         List<Individual> ind = new ArrayList<>();
         algorithm.getPopulation().forEach(individual -> ind.add(individual.deepCopy()));

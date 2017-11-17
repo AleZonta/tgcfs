@@ -23,6 +23,7 @@ import tgcfs.Networks.Convolutionary;
 import tgcfs.Performances.SaveToFile;
 import tgcfs.Utils.MultyScores;
 import tgcfs.Utils.PointWithBearing;
+import tgcfs.Utils.RandomGenerator;
 import tgcfs.Utils.Scores;
 
 import java.io.File;
@@ -44,7 +45,8 @@ import java.util.logging.Logger;
  * Class implementing the algorithm for the agents.
  */
 public class Agents extends Algorithm {
-    MultyScores scores;
+    private MultyScores scores;
+    private RandomGenerator randomGenerator;
 
     /**
      * Constructor zero parameter
@@ -55,6 +57,7 @@ public class Agents extends Algorithm {
     public Agents(Logger logger) throws Exception {
         super(logger);
         this.scores = new MultyScores();
+        this.randomGenerator = new RandomGenerator();
     }
 
     /**

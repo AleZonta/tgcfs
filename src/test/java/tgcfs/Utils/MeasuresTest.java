@@ -5,7 +5,6 @@ import tgcfs.EA.Individual;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertTrue;
@@ -63,7 +62,7 @@ public class MeasuresTest {
                     return null;
                 }
             };
-            a.setFitness(ThreadLocalRandom.current().nextInt(16000));
+            a.setFitness(RandomGenerator.getNextInt(0,16000));
             population.add(a);
         });
 

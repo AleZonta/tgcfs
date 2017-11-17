@@ -6,9 +6,9 @@ import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Utils.IndividualStatus;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -139,12 +139,12 @@ public class UncorrelatedMutation extends Individual {
         double p2 = 1 / (2 * Math.sqrt( 2 * Math.sqrt(n)));
 
         //random Double general per each individual
-        double rand1 = ThreadLocalRandom.current().nextDouble();
+        double rand1 = RandomGenerator.getNextDouble();
 
         //first mutate the list of mutation strengths
         IntStream.range(0, this.mutationStrengths.columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
-            double randw = ThreadLocalRandom.current().nextDouble();
+            double randw = RandomGenerator.getNextDouble();
             //obtain the new mutation value
             double newMutation = this.mutationStrengths.getDouble(i) * Math.exp(p1 * rand1 + p2 * randw);
             //substitute the old one with the new one
@@ -154,7 +154,7 @@ public class UncorrelatedMutation extends Individual {
         //after having mutate all the mutation strengths it is time to mutate the actual objective parameters
         IntStream.range(0, super.getObjectiveParameters().columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
-            double randw = ThreadLocalRandom.current().nextDouble();
+            double randw = RandomGenerator.getNextDouble();
             double newObj = super.getObjectiveParameters().getDouble(i) + this.mutationStrengths.getDouble(i) * randw;
             super.getObjectiveParameters().putScalar(i, newObj);
         });

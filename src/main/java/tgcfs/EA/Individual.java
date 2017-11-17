@@ -8,10 +8,10 @@ import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Utils.IndividualStatus;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -112,7 +112,7 @@ public abstract class Individual {
         //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
-            this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
+            this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
         }
         this.fitness = new AtomicInteger(0);
         this.model = null;
@@ -133,7 +133,7 @@ public abstract class Individual {
         //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
-            this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
+            this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
         }
         this.fitness = new AtomicInteger(0);
         this.model = null;
@@ -154,7 +154,7 @@ public abstract class Individual {
     public Individual(int size, EvolvableModel model, IndividualStatus ind) throws Exception {
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
-            this.objectiveParameters.putScalar(j, ThreadLocalRandom.current().nextDouble(-1,1));
+            this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
         }
         this.fitness = new AtomicInteger(0);
         this.model = model;

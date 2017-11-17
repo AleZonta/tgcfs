@@ -5,9 +5,9 @@ import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Utils.IndividualStatus;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -113,12 +113,12 @@ public class RandomResetting extends Individual {
     public void mutate(int n) {
         //generate random number of gene that I will mutate
         int top = n / 4;
-        int rand = ThreadLocalRandom.current().nextInt(1, top + 1);
+        int rand = RandomGenerator.getNextInt(1, top+1);
 
         IntStream.range(0,rand).forEach(el -> {
             //generate random position to mutate
-            int pos = ThreadLocalRandom.current().nextInt(super.getObjectiveParameters().columns());
-            double newValue = ThreadLocalRandom.current().nextDouble(-4,4);
+            int pos = RandomGenerator.getNextInt(0,super.getObjectiveParameters().columns());
+            double newValue = RandomGenerator.getNextDouble(-4,4);
             super.getObjectiveParameters().putScalar(pos,newValue);
         });
     }
