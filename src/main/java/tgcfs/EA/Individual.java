@@ -170,14 +170,15 @@ public abstract class Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      * @param ind kind of individual I am creating
+     * @param isSon boolean variable if the individual is a son
      */
-    public Individual(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind){
+    public Individual(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
         this.objectiveParameters = objPar;
         this.fitness = fitness;
         this.model = model.deepCopy();
         this.myInputandOutput = myInputandOutput;
         this.ind = ind;
-        this.isSon = false;
+        this.isSon = isSon;
     }
 
     /**

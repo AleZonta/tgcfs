@@ -72,9 +72,10 @@ public class NonUniformMutation extends Individual {
      * @param evolvableModel model to assign to the individual
      * @param myInputandOutput input output last
      * @param ind kind of individual I am creating
+     * @param isSon boolean variable if the individual is a son
      */
-    public NonUniformMutation(INDArray objectiveParameters, AtomicInteger atomicInteger, EvolvableModel evolvableModel, List<TrainReal> myInputandOutput, IndividualStatus ind) {
-        super(objectiveParameters, atomicInteger, evolvableModel, myInputandOutput, ind);
+    public NonUniformMutation(INDArray objectiveParameters, AtomicInteger atomicInteger, EvolvableModel evolvableModel, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon) {
+        super(objectiveParameters, atomicInteger, evolvableModel, myInputandOutput, ind, isSon);
     }
 
     /**
@@ -118,7 +119,7 @@ public class NonUniformMutation extends Individual {
      */
     @Override
     public Individual deepCopy() {
-        return new NonUniformMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind);
+        return new NonUniformMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
 
     }
 }

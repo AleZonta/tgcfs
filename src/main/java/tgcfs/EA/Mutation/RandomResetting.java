@@ -95,9 +95,10 @@ public class RandomResetting extends Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      * @param ind kind of individual I am creating
+     * @param isSon boolean variable if the individual is a son
      */
-    public RandomResetting(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind){
-        super(objPar, fitness, model, myInputandOutput, ind);
+    public RandomResetting(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
+        super(objPar, fitness, model, myInputandOutput, ind, isSon);
     }
 
 
@@ -129,6 +130,6 @@ public class RandomResetting extends Individual {
      * @return RandomResetting object
      */
     public RandomResetting deepCopy(){
-        return new RandomResetting(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind);
+        return new RandomResetting(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
     }
 }

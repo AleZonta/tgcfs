@@ -114,9 +114,10 @@ public class UncorrelatedMutation extends Individual {
      * @param model model to assign to the individual
      * @param myInputandOutput input output last
      * @param ind kind of individual I am creating
+     * @param isSon boolean variable if the individual is a son
      */
-    public UncorrelatedMutation(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind){
-        super(objPar, fitness, model, myInputandOutput, ind);
+    public UncorrelatedMutation(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
+        super(objPar, fitness, model, myInputandOutput, ind, isSon);
     }
 
     /**
@@ -165,7 +166,7 @@ public class UncorrelatedMutation extends Individual {
      * @return UncorrelatedMutation object
      */
     public UncorrelatedMutation deepCopy(){
-        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind);
+        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
     }
 
 }

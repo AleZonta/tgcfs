@@ -65,7 +65,7 @@
   "Train": false,
   "PictureSize": 64,
   "_____________________________Sixth section": "Settings for where to save the performances",
-  "Name": "NoClassifierEvolution",
+  "Name": "Test",
   "Experiment": "2",
   "Path": "/Users/alessandrozonta/Desktop",
   "DumpPopulationExplanation": "Save the entire population on file.",

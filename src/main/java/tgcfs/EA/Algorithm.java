@@ -265,9 +265,9 @@ public abstract class Algorithm {
             List<Individual> tournamentPop = new ArrayList<>();
             IntStream.range(0, tournamentSize).forEach(j -> {
                 int idParent = RandomGenerator.getNextInt(0,this.population.size());
-                logger.log(Level.INFO, "idParent for tournament selection: " + idParent);
+                logger.log(Level.FINE, "idParent for tournament selection: " + idParent);
                 Individual ind = this.population.get(idParent);
-                logger.log(Level.INFO,  idParent + ": " + ind.getObjectiveParameters().toString());
+                logger.log(Level.FINE,  idParent + ": " + ind.getObjectiveParameters().toString());
                 tournamentPop.add(ind);
             });
             //find the winner of the tournament -> the one with the highest fitness
@@ -278,13 +278,13 @@ public abstract class Algorithm {
             List<Integer> fitn = new ArrayList<>();
             tournamentPop.forEach(p -> fitn.add(p.getFitness()));
 
-            logger.log(Level.INFO, "--Fitness population on the tournament--");
-            logger.log(Level.INFO, fitn.toString());
+            logger.log(Level.FINE, "--Fitness population on the tournament--");
+            logger.log(Level.FINE, fitn.toString());
 
 
             //last one has the better fitness
             Individual parent = tournamentPop.get(tournamentPop.size() - 1);
-            logger.log(Level.INFO, "Parent selected to mutate: \n" + parent.getObjectiveParameters());
+            logger.log(Level.FINE, "Parent selected to mutate: \n" + parent.getObjectiveParameters());
 
             //son has the same genome of the father
             Individual son;
@@ -304,7 +304,7 @@ public abstract class Algorithm {
             //now the son is mutated 10 times (hardcoded value)
             //IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
             son.mutate(son.getObjectiveParameters().columns());
-            logger.log(Level.INFO, "Son: \n" + son.getObjectiveParameters());
+            logger.log(Level.FINE, "Son: \n" + son.getObjectiveParameters());
             //set model to the son
             son.setModel(parent.getModel().deepCopy());
 

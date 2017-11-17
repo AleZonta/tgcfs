@@ -210,7 +210,7 @@ public class TuringLearning implements Framework{
         boolean reachedEndTrajectory = Boolean.FALSE;
         boolean randomError = Boolean.FALSE;
         boolean evolveAgent = Boolean.TRUE;
-        boolean evolveClassifier = Boolean.FALSE;
+        boolean evolveClassifier = Boolean.TRUE;
         Integer maxGeneration = ReadConfig.Configurations.getMaxGenerations();
         while(!reachedEndTrajectory && !randomError && (generationAgent <= maxGeneration || generationClassifier <= maxGeneration)) {
             if(evolveAgent) generationAgent++;
@@ -254,7 +254,6 @@ public class TuringLearning implements Framework{
                 this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);
                 evolveAgent = this.countermeasures.isEvolveAgent();
                 evolveClassifier = this.countermeasures.isEvolveClassifier();
-                evolveClassifier = Boolean.FALSE;
                 this.countermeasures.executeCountermeasuresAgainstDisengagement(this.agents.getPopulation(), IndividualStatus.AGENT);
                 this.countermeasures.executeCountermeasuresAgainstDisengagement(this.classifiers.getPopulation(), IndividualStatus.CLASSIFIER);
 
