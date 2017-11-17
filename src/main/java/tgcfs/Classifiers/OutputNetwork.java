@@ -2,6 +2,7 @@ package tgcfs.Classifiers;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.ReadConfig;
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.OutputsNetwork;
 
 import java.lang.reflect.Field;
@@ -114,6 +115,14 @@ public class OutputNetwork implements OutputsNetwork{
      * @return double var
      */
     public double getRealValue() {
-        return realValue;
+        return this.realValue;
+    }
+
+    /**
+     * Getter for the real value scaled from 0 to 1
+     * @return doubel value
+     */
+    public double getRealValue01() {
+        return Normalisation.convertToSomething(1,-1,1,0,this.realValue);
     }
 }

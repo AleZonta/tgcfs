@@ -449,25 +449,51 @@ public class Agents extends Algorithm {
      */
     private synchronized void runClassifier(Algorithm model, Individual agent, Individual classifier, List<InputsNetwork> input, boolean real) throws Exception {
         tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
-        //if the classifier is saying true -> it is wrongly judging the agent
-        if(result.getReal()){
+
+
+        double decision = result.getRealValue01();
+
+        if( decision>0.5 ) {
+            //it is saying it is true
             //counting this only if the fake trajectory
             if(real) {
-                agent.increaseFitness();
-                //store score -> generator wins
-                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0);
+                agent.increaseFitness(decision);
+                classifier.increaseFitness(1 - decision);
+                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0d);
                 this.scores.addScore(sc);
             }
         }else{
-            //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
-            //For each correct judgement, the classifier’s fitness increases by one
-            classifier.increaseFitness();
-            //store score -> classifiers wins
-            if(real) {
-                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1);
-                this.scores.addScore(sc);
-            }
+            //it is false
+            classifier.increaseFitness(decision);
+            agent.increaseFitness(1- decision);
+            Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1d);
+            this.scores.addScore(sc);
         }
+
+//        //if the classifier is saying true -> it is wrongly judging the agent
+//        if(result.getReal()){
+//            //counting this only if the fake trajectory
+//            if(real) {
+//                agent.increaseFitness();
+//                //store score -> generator wins
+//                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0d);
+//                this.scores.addScore(sc);
+//            }
+//        }else{
+//            //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
+//            //For each correct judgement, the classifier’s fitness increases by one
+//            classifier.increaseFitness();
+//            //store score -> classifiers wins
+//            if(real) {
+//                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1d);
+//                this.scores.addScore(sc);
+//            }
+//        }
+
+
+
+
+
     }
 
     /**

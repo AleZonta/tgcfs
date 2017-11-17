@@ -66,7 +66,7 @@ public class MeasuresTest {
             population.add(a);
         });
 
-        population.forEach(individual -> System.out.println(individual.getFitness().toString()));
+        population.forEach(individual -> System.out.println(individual.getFitness()));
 
         return population;
     }

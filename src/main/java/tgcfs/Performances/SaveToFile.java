@@ -73,7 +73,7 @@ public class SaveToFile {
          * @param listFitness list with the integer value of the fitness
          * @throws Exception if the class is not instantiate
          */
-        public static void saveFitness(String name, List<Integer> listFitness) throws Exception {
+        public static void saveFitness(String name, List<Double> listFitness) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveFitness(name, listFitness);
         }
@@ -220,12 +220,12 @@ public class SaveToFile {
      * @param name name of the class/file I am saving
      * @param listFitness list with the Integer value of the fitness
      */
-    private void saveFitness(String name, List<Integer> listFitness){
+    private void saveFitness(String name, List<Double> listFitness){
         try {
             BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-fitness.csv", true));
             listFitness.forEach(fitness -> {
                 try {
-                    outputWriter.write(Integer.toString(fitness) + ", ");
+                    outputWriter.write(Double.toString(fitness) + ", ");
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Error appending line to" + name + " CSV File " + e.getMessage());
                 }

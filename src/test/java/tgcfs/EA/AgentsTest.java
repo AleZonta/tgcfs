@@ -100,8 +100,8 @@ public class AgentsTest {
         List<Individual> agentPopulationFirst = agents.getPopulation();
         agentPopulationFirst.forEach(p -> agentPopulationSecond.add(p.deepCopy()));
 
-        List<Integer> fitnessFirst = new ArrayList<>();
-        List<Integer> fitnessSecond = new ArrayList<>();
+        List<Double> fitnessFirst = new ArrayList<>();
+        List<Double> fitnessSecond = new ArrayList<>();
         List<Integer> idFirst = new ArrayList<>();
         List<Integer> idSecond = new ArrayList<>();
         agentPopulationFirst.forEach(p -> {
@@ -132,8 +132,8 @@ public class AgentsTest {
         List<Individual> classifierPopulationFirst = classifiers.getPopulation();
         classifierPopulationFirst.forEach(p -> classifierPopulationSecond.add(p.deepCopy()));
 
-        List<Integer> fitnessFirstC = new ArrayList<>();
-        List<Integer> fitnessSecondC= new ArrayList<>();
+        List<Double> fitnessFirstC = new ArrayList<>();
+        List<Double> fitnessSecondC= new ArrayList<>();
         List<Integer> idFirstC = new ArrayList<>();
         List<Integer> idSecondC = new ArrayList<>();
         classifierPopulationFirst.forEach(p -> {
@@ -175,13 +175,13 @@ public class AgentsTest {
             agents.evaluateIndividuals(classifiers, new FollowingTheGraph(feeder,log));
 
 
-            List<Integer> fitnessFirstA = new ArrayList<>();
+            List<Double> fitnessFirstA = new ArrayList<>();
             List<Integer> idFirstA = new ArrayList<>();
             agents.getPopulation().forEach(p -> {
                 fitnessFirstA.add(p.getFitness());
                 idFirstA.add(p.getModel().getId());
             });
-            List<Integer> fitnessFirstCC = new ArrayList<>();
+            List<Double> fitnessFirstCC = new ArrayList<>();
             List<Integer> idFirstCC = new ArrayList<>();
             classifiers.getPopulation().forEach(p -> {
                 fitnessFirstCC.add(p.getFitness());
@@ -207,13 +207,13 @@ public class AgentsTest {
 
             agents.evaluateIndividuals(classifiers, new FollowingTheGraph(feeder,log));
 
-            List<Integer> fitnessFirstAP = new ArrayList<>();
+            List<Double> fitnessFirstAP = new ArrayList<>();
             List<Integer> idFirstAP = new ArrayList<>();
             agents.getPopulation().forEach(p -> {
                 fitnessFirstAP.add(p.getFitness());
                 idFirstAP.add(p.getModel().getId());
             });
-            List<Integer> fitnessFirstCCP = new ArrayList<>();
+            List<Double> fitnessFirstCCP = new ArrayList<>();
             List<Integer> idFirstCCP = new ArrayList<>();
             classifiers.getPopulation().forEach(p -> {
                 fitnessFirstCCP.add(p.getFitness());

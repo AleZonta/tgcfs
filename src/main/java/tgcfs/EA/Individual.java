@@ -4,6 +4,7 @@ import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.primitives.AtomicDouble;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
@@ -12,7 +13,6 @@ import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class Individual {
     private INDArray objectiveParameters;
     private List<TrainReal> myInputandOutput;
-    private AtomicInteger fitness;
+    private AtomicDouble fitness;
     private EvolvableModel model;
     protected final IndividualStatus ind;
     private boolean isSon;
@@ -46,16 +46,16 @@ public abstract class Individual {
      * Getter fot the fitness
      * @return Integer value
      */
-    public Integer getFitness() {
-        return this.fitness.intValue();
+    public double getFitness() {
+        return this.fitness.doubleValue();
     }
 
     /**
      * Setter for fitness
      * @param fitness the value to assign to fitness
      */
-    public void setFitness(Integer fitness) {
-        this.fitness = new AtomicInteger(fitness);
+    public void setFitness(double fitness) {
+        this.fitness = new AtomicDouble(fitness);
     }
 
 
@@ -79,7 +79,7 @@ public abstract class Individual {
      */
     public Individual(INDArray objPar, IndividualStatus ind){
         this.objectiveParameters = objPar;
-        this.fitness = new AtomicInteger(0);
+        this.fitness = new AtomicDouble(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
         this.ind = ind;
@@ -94,7 +94,7 @@ public abstract class Individual {
      */
     public Individual(INDArray objPar, IndividualStatus ind, boolean isSon){
         this.objectiveParameters = objPar;
-        this.fitness = new AtomicInteger(0);
+        this.fitness = new AtomicDouble(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
         this.ind = ind;
@@ -114,7 +114,7 @@ public abstract class Individual {
         for(int j = 0; j< size; j++){
             this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
         }
-        this.fitness = new AtomicInteger(0);
+        this.fitness = new AtomicDouble(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
         this.ind = null;
@@ -135,7 +135,7 @@ public abstract class Individual {
         for(int j = 0; j< size; j++){
             this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
         }
-        this.fitness = new AtomicInteger(0);
+        this.fitness = new AtomicDouble(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
         this.ind = ind;
@@ -156,7 +156,7 @@ public abstract class Individual {
         for(int j = 0; j< size; j++){
             this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
         }
-        this.fitness = new AtomicInteger(0);
+        this.fitness = new AtomicDouble(0);
         this.model = model;
         this.myInputandOutput = new ArrayList<>();
         this.ind = ind;
@@ -172,7 +172,7 @@ public abstract class Individual {
      * @param ind kind of individual I am creating
      * @param isSon boolean variable if the individual is a son
      */
-    public Individual(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
+    public Individual(INDArray objPar, AtomicDouble fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
         this.objectiveParameters = objPar;
         this.fitness = fitness;
         this.model = model.deepCopy();
@@ -209,7 +209,17 @@ public abstract class Individual {
      */
     public synchronized void increaseFitness() throws Exception {
         if(this.fitness == null) throw new Exception("Individual not correctly initialised");
-        this.fitness.incrementAndGet();
+        this.fitness.addAndGet(1);
+    }
+
+    /**
+     * Increase Fitness by ovalue
+     * @param value value
+     * @throws Exception if the individual is not initialised
+     */
+    public synchronized void increaseFitness(double value) throws Exception {
+        if(this.fitness == null) throw new Exception("Individual not correctly initialised");
+        this.fitness.addAndGet(value);
     }
 
     /**

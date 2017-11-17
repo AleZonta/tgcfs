@@ -309,7 +309,7 @@ public class Classifiers extends Algorithm {
             super.survivalSelections();
         }else{
             //log the fitness of all the population
-            List<Integer> fitn = new ArrayList<>();
+            List<Double> fitn = new ArrayList<>();
             super.getPopulation().forEach(p -> fitn.add(p.getFitness()));
 
             logger.log(Level.INFO, "--Fitness population before selection--");
@@ -335,7 +335,7 @@ public class Classifiers extends Algorithm {
             nextGeneration.sort(Comparator.comparing(Individual::getFitness));
 
 
-            List<Integer> fitnd = new ArrayList<>();
+            List<Double> fitnd = new ArrayList<>();
             nextGeneration.forEach(p -> fitnd.add(p.getFitness()));
 
             logger.log(Level.INFO, "--Fitness population after selection--");

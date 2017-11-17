@@ -16,7 +16,7 @@ package tgcfs.Utils;
 public class Scores {
     private int idAgent;
     private int idClassifier;
-    private int score;
+    private double score;
     private int trajectory;
 
     /**
@@ -26,7 +26,7 @@ public class Scores {
      * @param idClassifier id classifiers
      * @param score score of the battle -> 0 wins the agent, 1 wins the classifier
      */
-    public Scores(int idAgent, int trajectory, int idClassifier, int score) {
+    public Scores(int idAgent, int trajectory, int idClassifier, double score) {
         this.idAgent = idAgent;
         this.trajectory = trajectory;
         this.idClassifier = idClassifier;
@@ -37,7 +37,7 @@ public class Scores {
      * Get score
      * @return int value -> 0 wins the agent, 1 wins the classifier
      */
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 

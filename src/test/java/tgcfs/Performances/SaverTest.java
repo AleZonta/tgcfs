@@ -10,7 +10,6 @@ import tgcfs.EA.Individual;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.InputsNetwork;
-import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
@@ -103,11 +102,11 @@ public class SaverTest {
     @Test
     public void saveFitness() throws Exception {
 
-        List<Integer> list = new ArrayList<>();
-        list.add(1);
-        list.add(2);
-        list.add(3);
-        list.add(4);
+        List<Double> list = new ArrayList<>();
+        list.add(1d);
+        list.add(2d);
+        list.add(3d);
+        list.add(4d);
         try {
             SaveToFile.Saver.saveFitness("a", list);
         }catch (Exception e){

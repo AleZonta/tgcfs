@@ -1,6 +1,7 @@
 package tgcfs.EA.Mutation;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.primitives.AtomicDouble;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -8,7 +9,6 @@ import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 /**
@@ -97,7 +97,7 @@ public class RandomResetting extends Individual {
      * @param ind kind of individual I am creating
      * @param isSon boolean variable if the individual is a son
      */
-    public RandomResetting(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
+    public RandomResetting(INDArray objPar, AtomicDouble fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
         super(objPar, fitness, model, myInputandOutput, ind, isSon);
     }
 
@@ -130,6 +130,6 @@ public class RandomResetting extends Individual {
      * @return RandomResetting object
      */
     public RandomResetting deepCopy(){
-        return new RandomResetting(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
+        return new RandomResetting(this.getObjectiveParameters(), new AtomicDouble(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
     }
 }

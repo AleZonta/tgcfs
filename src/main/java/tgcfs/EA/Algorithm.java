@@ -271,11 +271,11 @@ public abstract class Algorithm {
                 tournamentPop.add(ind);
             });
             //find the winner of the tournament -> the one with the highest fitness
-            tournamentPop.sort(Comparator.comparingInt(Individual::getFitness));
+            tournamentPop.sort(Comparator.comparingDouble(Individual::getFitness));
 
 
             //log the fitness of all the tournament
-            List<Integer> fitn = new ArrayList<>();
+            List<Double> fitn = new ArrayList<>();
             tournamentPop.forEach(p -> fitn.add(p.getFitness()));
 
             logger.log(Level.FINE, "--Fitness population on the tournament--");
@@ -341,7 +341,7 @@ public abstract class Algorithm {
         this.population.sort(Comparator.comparing(Individual::getFitness));
 
         //log the fitness of all the population
-        List<Integer> fitn = new ArrayList<>();
+        List<Double> fitn = new ArrayList<>();
         this.population.forEach(p -> fitn.add(p.getFitness()));
 
         logger.log(Level.INFO, "--Fitness population before selection--");
@@ -355,7 +355,7 @@ public abstract class Algorithm {
         List<Individual> newList = new ArrayList<>();
         this.population.forEach(p -> newList.add(p.deepCopy()));
 
-        List<Integer> fitnd = new ArrayList<>();
+        List<Double> fitnd = new ArrayList<>();
         newList.forEach(p -> fitnd.add(p.getFitness()));
 
         logger.log(Level.INFO, "--Fitness population after selection--");
@@ -410,8 +410,8 @@ public abstract class Algorithm {
      * Method to return the fitness of all the individuals
      * @return list of integer values
      */
-    public List<Integer> retAllFitness(){
-        List<Integer> list = new ArrayList<>();
+    public List<Double> retAllFitness(){
+        List<Double> list = new ArrayList<>();
         this.population.forEach(individual -> list.add(individual.getFitness()));
         return list;
     }

@@ -2,6 +2,7 @@ package tgcfs.EA.Mutation;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.primitives.AtomicDouble;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -9,7 +10,6 @@ import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 /**
@@ -116,7 +116,7 @@ public class UncorrelatedMutation extends Individual {
      * @param ind kind of individual I am creating
      * @param isSon boolean variable if the individual is a son
      */
-    public UncorrelatedMutation(INDArray objPar, AtomicInteger fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
+    public UncorrelatedMutation(INDArray objPar, AtomicDouble fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
         super(objPar, fitness, model, myInputandOutput, ind, isSon);
     }
 
@@ -166,7 +166,7 @@ public class UncorrelatedMutation extends Individual {
      * @return UncorrelatedMutation object
      */
     public UncorrelatedMutation deepCopy(){
-        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicInteger(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
+        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicDouble(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
     }
 
 }

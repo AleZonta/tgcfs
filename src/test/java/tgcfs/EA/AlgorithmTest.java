@@ -162,7 +162,7 @@ public class AlgorithmTest {
         algorithm.generatePopulation(evolvableModel);
         Integer pop = algorithm.getPopulation().size();
         algorithm.generateOffspring();
-        List<Integer> fitness = algorithm.retAllFitness();
+        List<Double> fitness = algorithm.retAllFitness();
         assertNotNull(fitness);
         assertEquals(pop + pop, fitness.size());
         fitness.forEach(f -> {
