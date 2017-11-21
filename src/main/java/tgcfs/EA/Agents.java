@@ -360,7 +360,7 @@ public class Agents extends Algorithm {
 
                 //this is one agent
                 //I need to check for every output for every individual
-                inputOutput.forEach(trainReal -> {
+                inputOutput.parallelStream().forEach(trainReal -> {
 
                     List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
 
@@ -389,7 +389,7 @@ public class Agents extends Algorithm {
         });
     }
 
-//    public void evaluateIndividualsParallelVersion(Algorithm model, Transformation transformation){
+//    public void evaluateIndividualsNonParallel(Algorithm model, Transformation transformation){
 //
 //        super.getPopulation().forEach(a -> {
 //            //transform trajectory in advance to prevent multiprocessing errors
@@ -401,14 +401,14 @@ public class Agents extends Algorithm {
 //        });
 //
 //        //I need to evaluate the agent using the classifiers
-//        super.getPopulation().parallelStream().forEach(agent -> {
+//        super.getPopulation().forEach(agent -> {
 //
 ////            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
 //            //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
 //            //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
 //            List<TrainReal> inputOutput = agent.getMyInputandOutput();
 //            //for every example I need to run the classifier and check the result
-//            model.getPopulation().parallelStream().forEach(classifier -> {
+//            model.getPopulation().forEach(classifier -> {
 //                //this is one agent
 //                //I need to check for every output for every individual
 //                inputOutput.forEach(trainReal -> {
@@ -465,9 +465,11 @@ public class Agents extends Algorithm {
         }else{
             //it is false
             classifier.increaseFitness(decision);
-            agent.increaseFitness(1- decision);
-            Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1d);
-            this.scores.addScore(sc);
+            if(real) {
+                agent.increaseFitness(1 - decision);
+                Scores sc = new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 1d);
+                this.scores.addScore(sc);
+            }
         }
 
 //        //if the classifier is saying true -> it is wrongly judging the agent
