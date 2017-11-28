@@ -191,7 +191,10 @@ public class IdsaLoader {
         this.computed = Boolean.FALSE;
         //this.pot.returnDirectionAttraction returns the angle of the attraction
         //should I convert to a real direction
-        return Normalisation.fromDirectionToBearing(this.pot.returnDirectionAttraction(new nl.tno.idsa.framework.world.Point(lastPoint.getLatitude(), lastPoint.getLongitude())));
+
+        double bearing = Normalisation.fromDirectionToBearing(this.pot.returnDirectionAttraction(new nl.tno.idsa.framework.world.Point(lastPoint.getLatitude(), lastPoint.getLongitude())));
+        logger.log(Level.INFO, "Last Point -> " + lastPoint.toString() + "  with attraction bearing -> " + bearing);
+        return bearing;
     }
 
 
