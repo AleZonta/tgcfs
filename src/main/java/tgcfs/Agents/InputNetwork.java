@@ -101,7 +101,7 @@ public class InputNetwork implements InputsNetwork {
      */
     @Override
     public INDArray serialise(){
-        INDArray array = Nd4j.zeros(3);
+        INDArray array = Nd4j.zeros(inputSize);
         array.putScalar(0, this.speed);
         array.putScalar(1, this.bearing);
         array.putScalar(2, this.directionAPF);

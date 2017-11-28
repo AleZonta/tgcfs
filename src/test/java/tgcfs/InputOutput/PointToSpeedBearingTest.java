@@ -3,6 +3,7 @@ package tgcfs.InputOutput;
 import lgds.trajectories.Point;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 /**
@@ -44,6 +45,9 @@ public class PointToSpeedBearingTest {
         PointToSpeedBearing convertitor = new PointToSpeedBearing();
         Double result = convertitor.obtainBearing(start, end);
         assertNotNull(result);
+        assertEquals(358.31, result, 0.01);
+        // https://www.sunearthtools.com/tools/distance.php
+        // tested with this website
         System.out.println(result);
     }
 

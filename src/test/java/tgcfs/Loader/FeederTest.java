@@ -104,15 +104,15 @@ public class FeederTest {
 //        System.out.println(result);
 //        System.out.println(result.getTime());
 
-        Point myLocation = new Point(52.0459872, 4.3314804, 0d,12345.6, "123456", "14:20:10");
-        double speed = 54.62595224380493;
-        double distance = 10.925190448760986;
+        Point myLocation = new Point(52.320961, 4.869281, 0d,12345.6, "123456", "14:20:10");
+        double speed = 10;
+        double bearing = 358.31;
         new ReadConfig.Configurations();
 
         Logger log =  Logger.getLogger(FeederTest.class.getName());
         Feeder system = new Feeder(log);
         system.loadSystem();
-        Point result = system.getNextLocationDifferentMethod(myLocation,speed,distance);
+        Point result = system.getNextLocationNoGraph(myLocation,speed,bearing);
         System.out.println(result);
 
 

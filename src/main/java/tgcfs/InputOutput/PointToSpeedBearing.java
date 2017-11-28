@@ -51,7 +51,7 @@ public class PointToSpeedBearing {
      * @return bearing of the movement
      */
     public double obtainBearing(Point firstPoint, Point secondPoint){
-        return Math.toDegrees(Math.atan2(firstPoint.getLatitude() - secondPoint.getLatitude(), firstPoint.getLongitude() - secondPoint.getLongitude()));
+        return this.bearing(firstPoint.getLatitude(), firstPoint.getLongitude(), secondPoint.getLatitude(), secondPoint.getLongitude());
     }
 
 
