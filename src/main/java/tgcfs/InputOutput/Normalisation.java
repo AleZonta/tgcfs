@@ -69,8 +69,8 @@ public class Normalisation {
      * @return normalised angle between ±1
      */
     public static double convertDirectionData(double toBeConverted) {
-        double maxAngle = 180.0;
-        double minAngle = -180.0;
+        double maxAngle = 360.0;
+        double minAngle = 0.0;
         if (toBeConverted > maxAngle || toBeConverted < minAngle) {
             throw new Error("Wrong range in input");
         }
@@ -128,7 +128,7 @@ public class Normalisation {
      * @return double real value
      */
     public static double decodeDirectionData(double toBeConverted){
-        return convertToSomething(1.0, -1.0, 180.0,-180.0, toBeConverted);
+        return convertToSomething(1.0, -1.0, 360.0,0.0, toBeConverted);
     }
 
     /**
@@ -197,6 +197,23 @@ public class Normalisation {
         if(value > maxStart) value = maxStart;
         if(value < minStart) value = minStart;
         return  (maxEnd - minEnd) * ((value - minStart) / (maxStart - minStart)) + minEnd;
+    }
+
+
+    /**
+     * Convert direction data into bearing data
+     * @param angle direction
+     * @return double value with bearing
+     */
+    public static double fromDirectionToBearing(double angle){
+        if(0 <= angle && angle <= 90){
+            return 90 - angle;
+        }else if(0 > angle && angle >= -180){
+            return 90 + (-angle);
+        }else if(90 < angle && angle <= 180){
+            return 360 - (angle - 90);
+        }
+        return angle;
     }
 
 }

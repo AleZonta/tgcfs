@@ -10,6 +10,7 @@ import nl.tno.idsa.framework.potential_field.save_to_file.LoadParameters;
 import nl.tno.idsa.framework.simulator.TrajectorySim;
 import nl.tno.idsa.framework.world.World;
 import org.json.simple.parser.ParseException;
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.Performances.SaveToFile;
 
 import java.io.IOException;
@@ -188,7 +189,9 @@ public class IdsaLoader {
     public Double returnAttraction(Point lastPoint) throws Exception {
         if(!this.computed) throw new Exception("The computation of the APF is needed to retrieve the direction of attraction");
         this.computed = Boolean.FALSE;
-        return this.pot.returnDirectionAttraction(new nl.tno.idsa.framework.world.Point(lastPoint.getLatitude(), lastPoint.getLongitude()));
+        //this.pot.returnDirectionAttraction returns the angle of the attraction
+        //should I convert to a real direction
+        return Normalisation.fromDirectionToBearing(this.pot.returnDirectionAttraction(new nl.tno.idsa.framework.world.Point(lastPoint.getLatitude(), lastPoint.getLongitude())));
     }
 
 

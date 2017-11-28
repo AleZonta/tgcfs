@@ -19,6 +19,25 @@ import static org.junit.Assert.assertTrue;
  */
 public class NormalisationTest {
     @Test
+    public void fromDirectionToBearing() throws Exception {
+
+        double i = 0;
+        while (i < 180) {
+
+            double ret = Normalisation.fromDirectionToBearing(i);
+            System.out.println(ret);
+            i += 0.5;
+        }
+        i = 0;
+        while (i > -180) {
+
+            double ret = Normalisation.fromDirectionToBearing(i);
+            System.out.println(ret);
+            i -= 0.5;
+        }
+    }
+
+    @Test
     public void convertToSomethingTest() throws Exception {
         double data = 30.4;
         double ret = Normalisation.convertSpeed(data);
