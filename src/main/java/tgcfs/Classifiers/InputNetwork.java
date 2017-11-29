@@ -43,7 +43,11 @@ public class InputNetwork implements InputsNetwork{
      * @param direction direction parameter
      */
     public InputNetwork(double speed, double direction){
-        this.speed = Normalisation.convertSpeed(speed);
+        try {
+            this.speed = Normalisation.convertSpeed(speed);
+        } catch (Exception e) {
+            throw new Error("Error with speed.");
+        }
         this.direction = Normalisation.convertAngularSpeed(direction);
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
@@ -60,7 +64,11 @@ public class InputNetwork implements InputsNetwork{
      */
     public InputNetwork(double speed, double direction, boolean translation){
         if(translation){
-            this.speed = Normalisation.convertSpeed(speed);
+            try {
+                this.speed = Normalisation.convertSpeed(speed);
+            } catch (Exception e) {
+                throw new Error("Error with speed.");
+            }
             this.direction = Normalisation.convertAngularSpeed(direction);
         }else {
             this.speed = speed;

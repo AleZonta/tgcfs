@@ -94,6 +94,8 @@ public class ReadConfig {
     private Integer howManyAmIChangingBetweenGeneration;
     public static boolean debug;
 
+    private Double maxSpeed;
+
 
     /**
      * Constructor with zero parameter
@@ -166,6 +168,7 @@ public class ReadConfig {
         this.differentSelectionForClassifiers = null;
         this.howManyAmIChangingBetweenGeneration = null;
 
+        this.maxSpeed = null;
         debug = false;
     }
 
@@ -614,6 +617,13 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             debug = false;
         }
+
+        try {
+            // MaxSpeed
+            this.maxSpeed = ((Double) jsonObject.get("MaxSpeed"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("MaxSpeed is wrong or missing.");
+        }
     }
 
 
@@ -834,6 +844,7 @@ public class ReadConfig {
                 "MeasureUsedForAutomaticDisengagement=" + measureUsedForAutomaticDisengagement + ",\n" +
                 "PopulationWithAutomaticDisengagement=" + populationWillUseTheAutomaticDisengagementSystem + ",\n" +
                 "DifferentSelectionForClassifiers=" + differentSelectionForClassifiers + ",\n" +
+                "MaxSpeed=" + maxSpeed + ",\n" +
                 '}';
     }
 
@@ -1085,6 +1096,17 @@ public class ReadConfig {
     public int getHowManyAmIChangingBetweenGeneration() throws Exception {
         if(this.howManyAmIChangingBetweenGeneration == null) throw new Exception("Try to access config file before reading it.");
         return this.howManyAmIChangingBetweenGeneration;
+    }
+
+
+    /**
+     * Getter of the value of the maxSpeed
+     * @return double value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public double getMaxSpeed() throws Exception {
+        if(this.maxSpeed == null) throw new Exception("Try to access config file before reading it.");
+        return this.maxSpeed;
     }
 
 
@@ -1567,6 +1589,15 @@ public class ReadConfig {
          */
         public static int getHowManyAmIChangingBetweenGeneration() throws Exception {
             return config.getHowManyAmIChangingBetweenGeneration();
+        }
+
+        /**
+         * Getter of the value of the maxSpeed
+         * @return double value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static double getMaxSpeed() throws Exception {
+            return config.getMaxSpeed();
         }
     }
 
