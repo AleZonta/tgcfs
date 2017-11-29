@@ -18,11 +18,11 @@ import tgcfs.NN.InputsNetwork;
  *
  */
 public class Normalisation {
-    private static double max_speed = 200.0; //metres per second
+    private static double max_speed = 3.0; //metres per second
     private static double min_speed = 0.0;
     private static double max_angular_speed = 500.0; //radiant per second
     private static double min_angular_speed = -500.0;
-    private static double max_distance = 555.0; //radiant per second
+    private static double max_distance = 555.0;
     private static double min_distance = 0.0;
 
     /**

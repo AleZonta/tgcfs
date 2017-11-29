@@ -31,7 +31,7 @@
   "ClassifierAlphaIntermediateRecombination": 0.5,
   "ClassifierTimeStepsExplanation": "Not implemented now",
   "ClassifierTimeSteps": 1,
-  "MaxGenerations": 2,
+  "MaxGenerations": 20,
   "Seed": 1,
   "TournamentSizeAgents": 2,
   "TournamentSizeClassifiers": 2,
