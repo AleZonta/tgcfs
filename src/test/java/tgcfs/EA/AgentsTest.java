@@ -203,7 +203,7 @@ public class AgentsTest {
             combineInputList = feeder.multiFeeder(idsaLoader, combineInputList);
             agents.runIndividuals(combineInputList);
 
-            System.out.println("--------- single version ---------");
+            System.out.println("--------- parallel version ---------");
 
             agents.evaluateIndividuals(classifiers, new FollowingTheGraph(feeder,log));
 

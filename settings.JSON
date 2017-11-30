@@ -35,7 +35,7 @@
   "MaxGenerations": 20,
   "Seed": 1,
   "TournamentSizeAgents": 2,
-  "TournamentSizeClassifiers": 2,
+  "TournamentSizeClassifiers": 1,
   "MutationExplanation": "0 is Uncorrelated mutation, 1 is RandomResetting, 2 is NonUniformMutation",
   "Mutation": 2,
   "StepSizeAgents": 0.1,
@@ -66,7 +66,11 @@
   "Train": false,
   "PictureSize": 64,
   "_____________________________Sixth section": "Settings for where to save the performances",
+<<<<<<< HEAD
   "Name": "NoTarget",
+=======
+  "Name": "TestTest",
+>>>>>>> parent of 7e8cee2... bug fix
   "Experiment": "0",
   "Path": "/Users/alessandrozonta/Desktop",
   "DumpPopulationExplanation": "Save the entire population on file.",
