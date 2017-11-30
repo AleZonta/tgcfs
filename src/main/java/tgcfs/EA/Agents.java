@@ -267,7 +267,7 @@ public class Agents extends Algorithm {
                 features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
             }
             lastOutput = model.computeOutput(features);
-
+            if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
 
             int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
             INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
@@ -275,6 +275,7 @@ public class Agents extends Algorithm {
             OutputNetwork out = new OutputNetwork();
             out.deserialise(realLastOut);
             outputsNetworks.add(out);
+            if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM transformed ->" + outputsNetworks.toString());
 
             //output has only two fields, input needs three
             //I am using the last direction present into input I am adding that one to the last output
@@ -286,6 +287,8 @@ public class Agents extends Algorithm {
                 outLocal.deserialise(lastOutput);
                 InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
                 lastOutput = model.computeOutput(inputLocal.serialise());
+
+                if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
 
                 out = new OutputNetwork();
                 out.deserialise(lastOutput);
