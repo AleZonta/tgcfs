@@ -8,7 +8,6 @@ import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.GravesLSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -16,6 +15,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.Models;
+import tgcfs.Utils.MultiLayerNetworkExtended;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
  * Class implementing the LSTM neural Networks
  */
 public class LSTM extends Models implements Network{
-    protected MultiLayerNetwork net; //neural network, brain of the agent
+    protected MultiLayerNetworkExtended net; //neural network, brain of the agent
     protected int inputSize;
     protected int hiddenLayers;
     protected int hiddenNeurons;
@@ -92,7 +92,7 @@ public class LSTM extends Models implements Network{
 
         // create network
         MultiLayerConfiguration conf = listBuilder.build();
-        this.net = new MultiLayerNetwork(conf);
+        this.net = new MultiLayerNetworkExtended(conf);
         this.net.init();
 
         this.inputSize = inputSize;
@@ -155,7 +155,7 @@ public class LSTM extends Models implements Network{
 
         // create network
         MultiLayerConfiguration conf = listBuilder.build();
-        this.net = new MultiLayerNetwork(conf);
+        this.net = new MultiLayerNetworkExtended(conf);
         this.net.init();
 
         this.inputSize = inputSize;
@@ -171,7 +171,8 @@ public class LSTM extends Models implements Network{
      */
     @Override
     public INDArray computeOutput(INDArray input) {
-        //If this MultiLayerNetwork contains one or more RNN layers: conduct forward pass (prediction) but using previous stored state for any RNN layers.
+        //If this MultiLayerNetwork contains one or more RNN layers: conduct forward pass (prediction) but using
+        // previous stored state for any RNN layers.
         return this.net.rnnTimeStep(input);
     }
 

@@ -97,7 +97,7 @@ public class Agents extends Algorithm {
         super.getPopulation().forEach(Individual::resetInputOutput);
 
         //every individual in parallel
-        super.getPopulation().parallelStream().forEach(individual -> {
+        super.getPopulation().forEach(individual -> {
             try {
                 //retrieve model from the individual
                 EvolvableModel model = individual.getModel();
@@ -269,8 +269,10 @@ public class Agents extends Algorithm {
             lastOutput = model.computeOutput(features);
             if(ReadConfig.debug) logger.log(Level.INFO, "Input LSTM ->"  + features.toString() +  " // Output LSTM ->" + lastOutput.toString() + " // Model Weights" + model.getWeights().toString());
 
+
             int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
             INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
+            if(ReadConfig.debug) logger.log(Level.INFO, "Real Last Output -> " + realLastOut);
 
             OutputNetwork out = new OutputNetwork();
             out.deserialise(realLastOut);

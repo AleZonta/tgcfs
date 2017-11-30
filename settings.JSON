@@ -87,5 +87,5 @@
   "LSTMClassifier": false,
   "ENN": true,
   "_____________________________Debug Mode": "Enable Debug mode",
-  "Debug": false
+  "Debug": true
 }

@@ -70,6 +70,10 @@ public class LSTMAgentTest {
         assertTrue(out.columns() == 1);
         assertTrue((out.getDouble(0) >= -1.0)  && (out.getDouble(0) <= 1.0) );
 
+
+
+
+
     }
 
     @Test
