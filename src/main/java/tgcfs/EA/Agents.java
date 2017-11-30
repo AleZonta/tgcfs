@@ -267,7 +267,7 @@ public class Agents extends Algorithm {
                 features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
             }
             lastOutput = model.computeOutput(features);
-            if(ReadConfig.debug) logger.log(Level.INFO, "Input LSTM ->"  + features.toString() +  " // Output LSTM ->" + lastOutput.toString() + " // Model Weights" + model.getWeights().toString());
+            if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
 
             int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
             INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
