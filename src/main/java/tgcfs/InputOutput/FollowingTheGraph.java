@@ -122,16 +122,13 @@ public class FollowingTheGraph implements Transformation {
             if(ReadConfig.debug) {
                 double speed = converterPointSB.obtainSpeed(this.lastPoint, position);
                 double angularSpeed = convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position));
-                System.out.println("--speed");
-                System.out.println(speed);
-                System.out.println("--angularSpeed");
-                System.out.println(angularSpeed);
+                logger.log(Level.INFO, "--speed " + speed +  "; --angularSpeed " + angularSpeed);
             }
 
 
 //            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position)));
             InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, output.getBearing()));
-            if(ReadConfig.debug) System.out.println(inputNetwork.toString() + " ->" + position);
+            if(ReadConfig.debug) logger.log(Level.INFO,inputNetwork.toString() + " ->" + position);
             convertedInput.add(inputNetwork);
 
             //upgrade position
@@ -150,11 +147,11 @@ public class FollowingTheGraph implements Transformation {
             OutputNetwork output = (OutputNetwork) out.get(j);
             //Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
             Point position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
-            if(ReadConfig.debug) System.out.println(output.toString() + " ->" + position + " --> " + lastp.toString() + " real");
+            if(ReadConfig.debug) logger.log(Level.INFO,output.toString() + " ->" + position + " --> " + lastp.toString() + " real");
 
 //            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position)));
             InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, output.getBearing()));
-            if(ReadConfig.debug) System.out.println(inputNetwork.toString() + " ->" + position + " --> " + lastp.toString() + " real");
+            if(ReadConfig.debug) logger.log(Level.INFO,inputNetwork.toString() + " ->" + position + " --> " + lastp.toString() + " real");
 
             convertedInputReal.add(inputNetwork);
 
