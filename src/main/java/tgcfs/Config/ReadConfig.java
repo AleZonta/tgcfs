@@ -92,6 +92,9 @@ public class ReadConfig {
 
     private Integer differentSelectionForClassifiers;
     private Integer howManyAmIChangingBetweenGeneration;
+    public static boolean debug;
+
+    private Double maxSpeed;
 
 
     /**
@@ -165,12 +168,9 @@ public class ReadConfig {
         this.differentSelectionForClassifiers = null;
         this.howManyAmIChangingBetweenGeneration = null;
 
-<<<<<<< HEAD
         this.maxSpeed = null;
 
-=======
         debug = false;
->>>>>>> parent of 1b0d5f6... set speed value from config file
     }
 
     /**
@@ -612,8 +612,6 @@ public class ReadConfig {
             }
         }
 
-<<<<<<< HEAD
-
         try {
             // MaxSpeed
             this.maxSpeed = ((Double) jsonObject.get("MaxSpeed"));
@@ -621,14 +619,13 @@ public class ReadConfig {
             throw new Exception("MaxSpeed is wrong or missing.");
         }
 
-=======
         try {
             // debug
             debug = ((Boolean) jsonObject.get("Debug"));
         }catch (ClassCastException | NullPointerException e) {
             debug = false;
         }
->>>>>>> parent of 1b0d5f6... set speed value from config file
+
     }
 
 
