@@ -3,6 +3,8 @@ package tgcfs.Utils;
 import org.apache.commons.math3.random.MersenneTwister;
 import tgcfs.Config.ReadConfig;
 
+import java.util.Random;
+
 /**
  * Created by Alessandro Zonta on 17/11/2017.
  * PhD Situational Analytics
@@ -15,6 +17,7 @@ import tgcfs.Config.ReadConfig;
  */
 public class RandomGenerator {
     private static MersenneTwister rand;
+    private static Random random;
 
     /**
      * Initialise with the seed
@@ -22,7 +25,8 @@ public class RandomGenerator {
      */
     public RandomGenerator() throws Exception {
         //read seed and set it
-        rand = new MersenneTwister(ReadConfig.Configurations.getSeed());
+//        rand = new MersenneTwister(ReadConfig.Configurations.getSeed());
+        random = new Random(ReadConfig.Configurations.getSeed());
     }
 
     /**
