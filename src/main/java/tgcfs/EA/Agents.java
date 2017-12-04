@@ -1,32 +1,24 @@
 package tgcfs.EA;
 
-import lgds.trajectories.Point;
-import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.Models.Clax;
-import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
-import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
-import tgcfs.Networks.Convolutionary;
 import tgcfs.Performances.SaveToFile;
 import tgcfs.Utils.MultyScores;
 import tgcfs.Utils.PointWithBearing;
-import tgcfs.Utils.RandomGenerator;
 import tgcfs.Utils.Scores;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -46,7 +38,6 @@ import java.util.logging.Logger;
  */
 public class Agents extends Algorithm {
     private MultyScores scores;
-    private RandomGenerator randomGenerator;
 
     /**
      * Constructor zero parameter
@@ -57,7 +48,6 @@ public class Agents extends Algorithm {
     public Agents(Logger logger) throws Exception {
         super(logger);
         this.scores = new MultyScores();
-        this.randomGenerator = new RandomGenerator();
     }
 
     /**
@@ -104,13 +94,7 @@ public class Agents extends Algorithm {
                 //set the weights
                 model.setWeights(individual.getObjectiveParameters());
                 //select which model I am using
-                if(model.getClass().equals(LSTMAgent.class)){
-                    this.runLSTM(input, model, individual);
-                }else if(model.getClass().equals(Clax.class)){
-                    this.runClax(input, model, individual);
-                }else if(model.getClass().equals(ConvAgent.class)){
-                    this.runConvol(input, model, individual);
-                }
+                this.runLSTM(input, model, individual);
 
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Errors with the neural network " + e.getMessage());
@@ -118,120 +102,6 @@ public class Agents extends Algorithm {
             }
 
         });
-    }
-
-    /**
-     * run the convolutional model
-     * @param input the input of the model
-     * @param model the model Convolutional used
-     * @param individual the individual under evaluation
-     * @throws Exception if something bad happened
-     */
-    private void runConvol(List<TrainReal> input, EvolvableModel model, Individual individual) throws Exception {
-        NativeImageLoader imageLoader = new NativeImageLoader();
-        INDArray lastOutput = null;
-        INDArray conditionalInputConverted = null;
-
-        IdsaLoader refLoader = input.get(0).getIdsaLoader();
-
-        for (TrainReal inputsNetwork : input) {
-            //need to genereta a picture for every timestep of the trajectory
-            List<Point> growingTrajectory = new ArrayList<>();
-            for(Point p : inputsNetwork.getPoints()){
-                growingTrajectory.add(p);
-                Boolean res = inputsNetwork.getIdsaLoader().generatePicture(growingTrajectory);
-                if(!res) throw new Exception("Creation of the pictures did not work out");
-                //erase image
-                //((ConvAgent)model).erasePictureCreated(Paths.get(inputsNetwork.getNormalImage()));
-                //if the conversion worked correctly I know where the actual picture is stored
-                File realInput = new File(inputsNetwork.getNormalImage());
-                INDArray realInputConverted = imageLoader.asMatrix(realInput);
-
-                //since it is always the same lets compute it only the first time
-                if(conditionalInputConverted == null) {
-                    File conditionalInput = new File(inputsNetwork.getConditionalImage());
-                    conditionalInputConverted = imageLoader.asMatrix(conditionalInput);
-                    ((Convolutionary)model).setConditionalPicture(conditionalInputConverted);
-                }
-
-                //compute output
-                lastOutput = model.computeOutput(realInputConverted);
-
-
-                //now for the number of time step that I want to check save the output
-                List<OutputsNetwork> outputsNetworks = new ArrayList<>();
-
-                OutputNetwork out = new OutputNetwork();
-                out.deserialise(lastOutput);
-                outputsNetworks.add(out);
-
-                //need this to transform the the value into point
-                FollowingTheGraph transformation = new FollowingTheGraph();
-                //I need to set the feeder
-                transformation.setFeeder(((ConvAgent)model).getFeeder());
-                //and the last point
-                transformation.setLastPoint(new PointWithBearing(growingTrajectory.get(growingTrajectory.size() - 1)));
-
-                for (int i = 0; i < ReadConfig.Configurations.getAgentTimeSteps(); i++) {
-                    //transform output into input and add the direction
-                    OutputNetwork outLocal = new OutputNetwork();
-                    outLocal.deserialise(lastOutput);
-
-                    Point toAdd = transformation.singlePointConversion(outLocal);
-                    transformation.setLastPoint(new PointWithBearing(toAdd));
-                    growingTrajectory.add(toAdd);
-
-                    res = inputsNetwork.getIdsaLoader().generatePicture(growingTrajectory);
-                    if(!res) throw new Exception("Creation of the pictures did not work out");
-                    //erase image
-                    //((ConvAgent)model).erasePictureCreated(Paths.get(inputsNetwork.getNormalImage()));
-
-                    realInput = new File(inputsNetwork.getNormalImage());
-                    realInputConverted = imageLoader.asMatrix(realInput);
-                    //compute output
-                    lastOutput = model.computeOutput(realInputConverted);
-
-                    out = new OutputNetwork();
-                    out.deserialise(lastOutput);
-                    outputsNetworks.add(out);
-                }
-                //assign the output to this individual
-                inputsNetwork.setOutputComputed(outputsNetworks);
-                individual.addMyInputandOutput(inputsNetwork);
-            }
-
-        }
-    }
-
-    /**
-     * run the Clax model
-     * @param input the input of the model
-     * @param model the model Clax used
-     * @param individual the individual under evaluation
-     * @throws Exception if something bad happened
-     */
-    private void runClax(List<TrainReal> input, EvolvableModel model, Individual individual) throws Exception {
-        //with clax is slightly different
-        Clax m = (Clax) model; //cast to clax for the proprietary method
-
-        //I have more training input in the list
-        for (TrainReal inputsNetwork : input) {
-            m.setStart(inputsNetwork.getLastPoint());
-            m.setTarget(((InputNetwork)inputsNetwork.getTrainingPoint().get(inputsNetwork.getTrainingPoint().size())).getTargetPoint());
-
-            //need to compute the trajectory
-            List<INDArray> out = m.computeTrajectory();
-            //now for the number of time step that I want to check save the output
-            List<OutputsNetwork> outputsNetworks = new ArrayList<>();
-            out.forEach(o -> {
-                OutputNetwork outClax = new OutputNetwork();
-                outClax.deserialise(o);
-                outputsNetworks.add(outClax);
-            });
-            //assign the output to this individual
-            inputsNetwork.setOutputComputed(outputsNetworks);
-            individual.addMyInputandOutput(inputsNetwork);
-        }
     }
 
     /**
@@ -392,54 +262,6 @@ public class Agents extends Algorithm {
         });
     }
 
-//    public void evaluateIndividualsNonParallel(Algorithm model, Transformation transformation){
-//
-//        super.getPopulation().forEach(a -> {
-//            //transform trajectory in advance to prevent multiprocessing errors
-//            List<TrainReal> inputOutput = a.getMyInputandOutput();
-//            inputOutput.forEach(trainReal -> {
-//                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
-//                transformation.transform(trainReal);
-//            });
-//        });
-//
-//        //I need to evaluate the agent using the classifiers
-//        super.getPopulation().forEach(agent -> {
-//
-////            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
-//            //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
-//            //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
-//            List<TrainReal> inputOutput = agent.getMyInputandOutput();
-//            //for every example I need to run the classifier and check the result
-//            model.getPopulation().forEach(classifier -> {
-//                //this is one agent
-//                //I need to check for every output for every individual
-//                inputOutput.forEach(trainReal -> {
-//
-//                    List<InputsNetwork> inputFake = trainReal.getAllThePartTransformedFake();
-//
-//                    //run the classifier for the Fake trajectory
-//                    try {
-//                        this.runClassifier(model, agent, classifier, inputFake, Boolean.TRUE);
-//                    } catch (Exception e) {
-//                        logger.log(Level.SEVERE, "Error" + e.getMessage());
-//                        e.printStackTrace();
-//                    }
-//
-//                    //run the classifier for the Real trajectory
-//                    List<InputsNetwork> inputReal = trainReal.getAllThePartTransformedReal();
-//
-//                    try {
-//                        this.runClassifier(model, agent, classifier, inputReal, Boolean.FALSE);
-//                    } catch (Exception e) {
-//                        logger.log(Level.SEVERE, "Error" + e.getMessage());
-//                        e.printStackTrace();
-//                    }
-//
-//                });
-//            });
-//        });
-//    }
 
 
     /**
@@ -474,27 +296,6 @@ public class Agents extends Algorithm {
                 this.scores.addScore(sc);
             }
         }
-
-//        //if the classifier is saying true -> it is wrongly judging the agent
-//        if(result.getReal()){
-//            //counting this only if the fake trajectory
-//            if(real) {
-//                agent.increaseFitness();
-//                //store score -> generator wins
-//                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0d);
-//                this.scores.addScore(sc);
-//            }
-//        }else{
-//            //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
-//            //For each correct judgement, the classifier’s fitness increases by one
-//            classifier.increaseFitness();
-//            //store score -> classifiers wins
-//            if(real) {
-//                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1d);
-//                this.scores.addScore(sc);
-//            }
-//        }
-
 
 
 

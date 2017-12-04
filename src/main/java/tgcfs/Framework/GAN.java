@@ -2,10 +2,8 @@ package tgcfs.Framework;
 
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.Models.Clax;
-import tgcfs.Agents.Models.ConvAgent;
+
 import tgcfs.Agents.Models.LSTMAgent;
-import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.Models.LSTMClassifier;
@@ -45,7 +43,6 @@ public class GAN implements Framework{
     private EvolvableModel classifier;
     private Feeder feeder;
     private IdsaLoader idsaLoader;
-    private RealAgents realAgent;
     private static final Logger logger = Logger.getLogger(GAN.class.getName()); //logger for this class
 
 
@@ -62,7 +59,6 @@ public class GAN implements Framework{
         this.agent = null;
         this.classifier = null;
 
-        this.realAgent = null;
         this.feeder = null;
         this.idsaLoader = null;
 
@@ -96,14 +92,6 @@ public class GAN implements Framework{
         switch (ReadConfig.Configurations.getValueModel()){
             case 0:
                 this.agent = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
-                break;
-            case 1:
-            // fixed size for now
-                this.agent = new ConvAgent(ReadConfig.Configurations.getPictureSize());
-                ((ConvAgent)this.agent).setFeeder(this.feeder);
-            break;
-            case 2:
-                this.agent = new Clax(this.feeder, this.idsaLoader);
                 break;
             default:
                 throw new NoSuchMethodError("Model not yet implemented");

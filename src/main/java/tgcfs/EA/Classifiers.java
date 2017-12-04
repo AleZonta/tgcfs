@@ -6,7 +6,6 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.Models.RealAgents;
 import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
@@ -161,34 +160,6 @@ public class Classifiers extends Algorithm {
             }
         });
         throw new Error("Method not usable for a Classifier");
-    }
-
-    /**
-     * Evaluate the classifier on the real agent
-     * Each classifier is evaluated on the real agent oer "agent_population" times
-     * @param agents the real agent
-     */
-    public void evaluateRealAgent(RealAgents agents, Transformation transformation){
-        throw new NoSuchMethodError("Not needed anymore");
-//        super.getPopulation().parallelStream().forEach(individual -> {
-//            try {
-//                //evaluate classifier with real agents
-//                agents.getRealAgents().forEach(agent -> {
-//                    try {
-//                        ((FollowingTheGraph)transformation).setLastPoint(agent.getLastPoint());
-//                        OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(agent.realOutput(),agent.getRealFirstPart()));
-//                        //if the classifier is saying true -> it is correctly judging the agent
-//                        if(result.getReal()){
-//                            individual.increaseFitness();
-//                        }
-//                    } catch (Exception e) {
-//                        logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage() + " " + e.toString());
-//                    }
-//                });
-//            } catch (Exception e) {
-//                logger.log(Level.SEVERE, "Error with the file" + e.getMessage());
-//            }
-//        });
     }
 
 
