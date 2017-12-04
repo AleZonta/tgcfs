@@ -35,7 +35,7 @@
   "MaxGenerations": 20,
   "Seed": 1,
   "TournamentSizeAgents": 2,
-  "TournamentSizeClassifiers": 1,
+  "TournamentSizeClassifiers": 2,
   "MutationExplanation": "0 is Uncorrelated mutation, 1 is RandomResetting, 2 is NonUniformMutation",
   "Mutation": 2,
   "StepSizeAgents": 0.1,
