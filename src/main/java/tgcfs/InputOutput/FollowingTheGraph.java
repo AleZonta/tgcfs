@@ -113,13 +113,20 @@ public class FollowingTheGraph implements Transformation {
 
             OutputNetwork output = (OutputNetwork) outputsNetwork;
             //Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
-            Point position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
+            Point position = null;
+            try {
+                if(ReadConfig.Configurations.getConversionWithGraph()){
+                    position = this.feeder.getNextLocationDifferentMethod(this.lastPoint, output.getSpeed(), output.getBearing());
+                }else{
+                    position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
+                }
+            } catch (Exception e) {
+                 logger.log(Level.INFO, " -> " + e.getMessage() );
+            }
             logger.log(Level.INFO,output.toString() + " -> " + position );
             //this input network has speed and bearing
             //InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
             //the new one has velocity and angular speed
-
-
 
 
 //            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position)));

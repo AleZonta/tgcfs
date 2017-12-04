@@ -85,7 +85,9 @@ public class Feeder {
     public void loadSystem() throws Exception {
         logger.log(Level.INFO, "Loading system...");
         this.routes.readTrajectories();
-        this.graph.loadGraph();
+        boolean loadGraph = ReadConfig.Configurations.getConversionWithGraph();
+        logger.log(Level.INFO, "Am I loading the graph? -> " + loadGraph);
+        if (loadGraph) this.graph.loadGraph();
         if(this.maximumNumberOfTrajectories == 99999){
             this.maximumNumberOfTrajectories = this.routes.getTra().getTrajectories().size();
         }

@@ -16,6 +16,26 @@ import static junit.framework.TestCase.*;
  * a.zonta@vu.nl
  */
 public class ReadConfigTest {
+
+    @Test
+    public void getConversionWithGraph() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getConversionWithGraph();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getMaxSpeed() >= 0);
+        new ReadConfig.Configurations();
+        assertEquals(conf.getConversionWithGraph(), ReadConfig.Configurations.getConversionWithGraph());
+    }
+
     @Test
     public void getMaxSpeed() throws Exception {
         //test if I return a location -> that is not null

@@ -32,7 +32,7 @@
   "ClassifierAlphaIntermediateRecombination": 0.5,
   "ClassifierTimeStepsExplanation": "Not implemented now",
   "ClassifierTimeSteps": 1,
-  "MaxGenerations": 20,
+  "MaxGenerations": 2,
   "Seed": 1,
   "TournamentSizeAgents": 2,
   "TournamentSizeClassifiers": 2,
@@ -56,7 +56,7 @@
   "PopulationWithAutomaticDisengagementExplanation": "0 means both population, 1 means agents, 2 means classifiers",
   "PopulationWithAutomaticDisengagement": 0,
   "DifferentSelectionForClassifiers" : 1,
-  "ConversionOutputWithGraph": false
+  "ConversionOutputWithGraph": false,
   "_____________________________Fifth section": "Settings for the models",
   "HiddenLayersAgent": 1,
   "HiddenNeuronsAgent": 5,

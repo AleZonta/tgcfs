@@ -96,6 +96,8 @@ public class ReadConfig {
 
     private Double maxSpeed;
 
+    private Boolean conversionWithGraph;
+
 
     /**
      * Constructor with zero parameter
@@ -169,6 +171,7 @@ public class ReadConfig {
         this.howManyAmIChangingBetweenGeneration = null;
 
         this.maxSpeed = null;
+        this.conversionWithGraph = null;
 
         debug = false;
     }
@@ -626,6 +629,14 @@ public class ReadConfig {
             debug = false;
         }
 
+
+        //ConversionOutputWithGraph
+        try {
+            // AutomaticCalibration
+            this.conversionWithGraph = ((Boolean) jsonObject.get("ConversionOutputWithGraph"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("ConversionOutputWithGraph is wrong or missing.");
+        }
     }
 
 
@@ -847,6 +858,7 @@ public class ReadConfig {
                 "PopulationWithAutomaticDisengagement=" + populationWillUseTheAutomaticDisengagementSystem + ",\n" +
                 "DifferentSelectionForClassifiers=" + differentSelectionForClassifiers + ",\n" +
                 "MaxSpeed=" + maxSpeed + ",\n" +
+                "conversionWithGraph=" + conversionWithGraph + ",\n" +
                 '}';
     }
 
@@ -1108,6 +1120,17 @@ public class ReadConfig {
     public double getMaxSpeed() throws Exception {
         if(this.maxSpeed == null) throw new Exception("Try to access config file before reading it.");
         return this.maxSpeed;
+    }
+
+
+    /**
+     * Getter if I am using the conversion with graph
+     * @return boolena value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public boolean getConversionWithGraph() throws Exception {
+        if(this.conversionWithGraph == null) throw new Exception("Try to access config file before reading it.");
+        return this.conversionWithGraph;
     }
 
     /**
@@ -1598,6 +1621,15 @@ public class ReadConfig {
          */
         public static double getMaxSpeed() throws Exception {
             return config.getMaxSpeed();
+        }
+
+        /**
+         * Getter if I am using the conversion with graph
+         * @return boolena value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static boolean getConversionWithGraph() throws Exception {
+            return config.getConversionWithGraph();
         }
     }
 
