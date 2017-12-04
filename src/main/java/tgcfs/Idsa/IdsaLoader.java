@@ -12,12 +12,12 @@ import nl.tno.idsa.framework.world.World;
 import org.json.simple.parser.ParseException;
 import tgcfs.InputOutput.Normalisation;
 import tgcfs.Performances.SaveToFile;
+import tgcfs.Utils.RandomGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -140,8 +140,7 @@ public class IdsaLoader {
             }
 
             for(int i = 0; i < numberToRemove; i ++ ){
-                Random rn = new Random();
-                int numb = rn.nextInt(pois.size());
+                int numb = RandomGenerator.getNextInt(0,pois.size());
                 pois.remove(numb);
                 //TODO remember to check If I have the end point of the trajectory in the group of POI
             }
