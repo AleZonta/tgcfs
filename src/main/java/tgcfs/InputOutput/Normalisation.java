@@ -1,7 +1,6 @@
 package tgcfs.InputOutput;
 
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Config.ReadConfig;
 import tgcfs.NN.InputsNetwork;
 
 /**
@@ -19,6 +18,7 @@ import tgcfs.NN.InputsNetwork;
  *
  */
 public class Normalisation {
+    private static double max_speed = 3.0; //metres per second
     private static double min_speed = 0.0;
     private static double max_angular_speed = 500.0; //radiant per second
     private static double min_angular_speed = -500.0;
@@ -109,8 +109,8 @@ public class Normalisation {
      * @param toBeConverted speed that needs to be normalised
      * @return normalised speed between ±1
      */
-    public static double convertSpeed(double toBeConverted) throws Exception {
-        return convertToSomething(ReadConfig.Configurations.getMaxSpeed(), min_speed, 1.0,-1.0, toBeConverted);
+    public static double convertSpeed(double toBeConverted) {
+        return convertToSomething(max_speed, min_speed, 1.0,-1.0, toBeConverted);
     }
 
     /**
@@ -118,8 +118,8 @@ public class Normalisation {
      * @param toBeConverted speed that has to be de normalised
      * @return double real value
      */
-    public static double decodeSpeed(double toBeConverted) throws Exception {
-        return convertToSomething(1.0, -1.0, ReadConfig.Configurations.getMaxSpeed(), min_speed, toBeConverted);
+    public static double decodeSpeed(double toBeConverted){
+        return convertToSomething(1.0, -1.0, max_speed, min_speed, toBeConverted);
     }
 
     /**

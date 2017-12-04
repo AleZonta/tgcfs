@@ -73,11 +73,7 @@ public class OutputNetwork implements OutputsNetwork {
     public OutputNetwork(InputsNetwork out){
         if(!out.getClass().equals(InputNetwork.class)) throw new Error("Only InputNetwork Are accepted");
         InputNetwork net = (InputNetwork)out;
-        try {
-            this.speed = Normalisation.decodeSpeed(net.getSpeed());
-        } catch (Exception e) {
-            throw new Error("Erro with speed.");
-        }
+        this.speed = Normalisation.decodeSpeed(net.getSpeed());
         this.bearing = Normalisation.decodeDirectionData(net.getBearing());
 //        this.distance = Normalisation.decodeDistance(net.getSpace());
         Field[] allFields = OutputNetwork.class.getDeclaredFields();
@@ -122,19 +118,11 @@ public class OutputNetwork implements OutputsNetwork {
             }
         }
         if(out.columns() == outputSize) {
-            try {
-                this.speed = Normalisation.decodeSpeed(out.getDouble(0));
-            } catch (Exception e) {
-                throw new Error("Erro with speed.");
-            }
+            this.speed = Normalisation.decodeSpeed(out.getDouble(0));
             this.bearing = Normalisation.decodeDirectionData(out.getDouble(1));
 //            this.distance = Normalisation.decodeDistance(out.getDouble(2));
         }else{
-            try {
-                this.speed = Normalisation.decodeSpeed(out.getRow(0).getDouble(0));
-            } catch (Exception e) {
-                throw new Error("Erro with speed.");
-            }
+            this.speed = Normalisation.decodeSpeed(out.getRow(0).getDouble(0));
             this.bearing = Normalisation.decodeDirectionData(out.getRow(1).getDouble(0));
 //            this.distance = Normalisation.decodeDistance(out.getRow(2).getDouble(0));
         }

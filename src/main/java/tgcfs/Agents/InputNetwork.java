@@ -37,11 +37,7 @@ public class InputNetwork implements InputsNetwork {
      */
     public InputNetwork(double directionAPF, double speed, double bearing){
         this.bearing = Normalisation.convertAngularSpeed(bearing);
-        try {
-            this.speed = Normalisation.convertSpeed(speed);
-        } catch (Exception e) {
-            throw new Error("Error with speed.");
-        }
+        this.speed = Normalisation.convertSpeed(speed);
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.targetPoint = null;
 
@@ -62,11 +58,7 @@ public class InputNetwork implements InputsNetwork {
      */
     public InputNetwork(double directionAPF, double speed, double bearing, double space){
         this.bearing = Normalisation.convertAngularSpeed(bearing);
-        try {
-            this.speed = Normalisation.convertSpeed(speed);
-        } catch (Exception e) {
-            throw new Error("Error with speed.");
-        }
+        this.speed = Normalisation.convertSpeed(speed);
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.space = Normalisation.convertDistance(space);
         this.targetPoint = null;

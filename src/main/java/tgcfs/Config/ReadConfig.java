@@ -93,8 +93,6 @@ public class ReadConfig {
     private Integer differentSelectionForClassifiers;
     private Integer howManyAmIChangingBetweenGeneration;
 
-    private Double maxSpeed;
-
 
     /**
      * Constructor with zero parameter
@@ -167,8 +165,12 @@ public class ReadConfig {
         this.differentSelectionForClassifiers = null;
         this.howManyAmIChangingBetweenGeneration = null;
 
+<<<<<<< HEAD
         this.maxSpeed = null;
 
+=======
+        debug = false;
+>>>>>>> parent of 1b0d5f6... set speed value from config file
     }
 
     /**
@@ -610,6 +612,7 @@ public class ReadConfig {
             }
         }
 
+<<<<<<< HEAD
 
         try {
             // MaxSpeed
@@ -618,6 +621,14 @@ public class ReadConfig {
             throw new Exception("MaxSpeed is wrong or missing.");
         }
 
+=======
+        try {
+            // debug
+            debug = ((Boolean) jsonObject.get("Debug"));
+        }catch (ClassCastException | NullPointerException e) {
+            debug = false;
+        }
+>>>>>>> parent of 1b0d5f6... set speed value from config file
     }
 
 
@@ -838,7 +849,6 @@ public class ReadConfig {
                 "MeasureUsedForAutomaticDisengagement=" + measureUsedForAutomaticDisengagement + ",\n" +
                 "PopulationWithAutomaticDisengagement=" + populationWillUseTheAutomaticDisengagementSystem + ",\n" +
                 "DifferentSelectionForClassifiers=" + differentSelectionForClassifiers + ",\n" +
-                "MaxSpeed=" + maxSpeed + ",\n" +
                 '}';
     }
 
@@ -1090,17 +1100,6 @@ public class ReadConfig {
     public int getHowManyAmIChangingBetweenGeneration() throws Exception {
         if(this.howManyAmIChangingBetweenGeneration == null) throw new Exception("Try to access config file before reading it.");
         return this.howManyAmIChangingBetweenGeneration;
-    }
-
-
-    /**
-     * Getter of the value of the maxSpeed
-     * @return double value
-     * @throws Exception  if I am trying to access it before reading it
-     */
-    public double getMaxSpeed() throws Exception {
-        if(this.maxSpeed == null) throw new Exception("Try to access config file before reading it.");
-        return this.maxSpeed;
     }
 
 
@@ -1583,15 +1582,6 @@ public class ReadConfig {
          */
         public static int getHowManyAmIChangingBetweenGeneration() throws Exception {
             return config.getHowManyAmIChangingBetweenGeneration();
-        }
-
-        /**
-         * Getter of the value of the maxSpeed
-         * @return double value
-         * @throws Exception  if I am trying to access it before reading it
-         */
-        public static double getMaxSpeed() throws Exception {
-            return config.getMaxSpeed();
         }
     }
 

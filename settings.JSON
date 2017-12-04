@@ -20,7 +20,6 @@
   "HowManyTrajectories": 99999,
   "TimestepsOfTheRealTrajectoryExplanation": "0 means all the time steps are used, number bigger than 0 select the last n time steps",
   "TimestepsOfTheRealTrajectory": 10,
-  "MaxSpeed": 3.0,
   "_____________________________Fourth Section": "Setting for the EA algorithm",
   "AgentPopulationSize": 10,
   "AgentOffspringSize": 10,
