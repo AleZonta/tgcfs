@@ -20,6 +20,7 @@
   "HowManyTrajectories": 99999,
   "TimestepsOfTheRealTrajectoryExplanation": "0 means all the time steps are used, number bigger than 0 select the last n time steps",
   "TimestepsOfTheRealTrajectory": 10,
+  "MaxSpeed": 3.0,
   "_____________________________Fourth Section": "Setting for the EA algorithm",
   "AgentPopulationSize": 10,
   "AgentOffspringSize": 10,
@@ -55,6 +56,7 @@
   "PopulationWithAutomaticDisengagementExplanation": "0 means both population, 1 means agents, 2 means classifiers",
   "PopulationWithAutomaticDisengagement": 0,
   "DifferentSelectionForClassifiers" : 1,
+  "ConversionOutputWithGraph": false
   "_____________________________Fifth section": "Settings for the models",
   "HiddenLayersAgent": 1,
   "HiddenNeuronsAgent": 5,
@@ -84,5 +86,8 @@
   "Clax": false,
   "_____________________________Ninth section": "what model use in the system -> classifier",
   "LSTMClassifier": false,
-  "ENN": true
+  "ENN": true,
+  "_____________________________Debug Mode": "Enable Debug mode",
+  "Debug": false
+
 }

@@ -846,6 +846,7 @@ public class ReadConfig {
                 "MeasureUsedForAutomaticDisengagement=" + measureUsedForAutomaticDisengagement + ",\n" +
                 "PopulationWithAutomaticDisengagement=" + populationWillUseTheAutomaticDisengagementSystem + ",\n" +
                 "DifferentSelectionForClassifiers=" + differentSelectionForClassifiers + ",\n" +
+                "MaxSpeed=" + maxSpeed + ",\n" +
                 '}';
     }
 
@@ -1099,6 +1100,15 @@ public class ReadConfig {
         return this.howManyAmIChangingBetweenGeneration;
     }
 
+    /**
+     * Getter of the value of the maxSpeed
+     * @return double value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public double getMaxSpeed() throws Exception {
+        if(this.maxSpeed == null) throw new Exception("Try to access config file before reading it.");
+        return this.maxSpeed;
+    }
 
     /**
      * Static class offering all the info read from file
@@ -1579,6 +1589,15 @@ public class ReadConfig {
          */
         public static int getHowManyAmIChangingBetweenGeneration() throws Exception {
             return config.getHowManyAmIChangingBetweenGeneration();
+        }
+
+        /**
+         * Getter of the value of the maxSpeed
+         * @return double value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static double getMaxSpeed() throws Exception {
+            return config.getMaxSpeed();
         }
     }
 
