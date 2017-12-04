@@ -85,7 +85,5 @@
   "Clax": false,
   "_____________________________Ninth section": "what model use in the system -> classifier",
   "LSTMClassifier": false,
-  "ENN": true,
-  "_____________________________Debug Mode": "Enable Debug mode",
-  "Debug": false
+  "ENN": true
 }
