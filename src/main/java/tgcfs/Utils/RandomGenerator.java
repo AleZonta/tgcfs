@@ -34,7 +34,7 @@ public class RandomGenerator {
      * @return int value
      */
     public static int getNextInt(){
-        return rand.nextInt();
+        return random.nextInt();
     }
 
     /**
@@ -44,7 +44,8 @@ public class RandomGenerator {
      * @return int value
      */
     public static int getNextInt(int lowerBound, int upperBound) {
-        return rand.nextInt(upperBound - lowerBound) + lowerBound;
+        return random.nextInt(upperBound);
+//        return random.nextInt(upperBound - lowerBound) + lowerBound;
     }
 
     /**
@@ -52,7 +53,7 @@ public class RandomGenerator {
      * @return double value
      */
     public static double getNextDouble(){
-        return rand.nextDouble();
+        return random.nextDouble();
     }
 
     /**
@@ -62,6 +63,6 @@ public class RandomGenerator {
      * @return int value
      */
     public static double getNextDouble(double lowerBound, double upperBound) {
-        return  lowerBound + (upperBound - lowerBound) * rand.nextDouble();
+        return  lowerBound + (upperBound - lowerBound) * random.nextDouble();
     }
 }
