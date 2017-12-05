@@ -114,6 +114,7 @@ public abstract class Individual {
         for(int j = 0; j< size; j++){
             random.add(RandomGenerator.getNextDouble(-4,4));
         }
+        System.out.println("Individual -> " + random.toString());
         this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
         this.fitness = new AtomicDouble(0);
         this.model = null;
@@ -136,6 +137,7 @@ public abstract class Individual {
         for(int j = 0; j< size; j++){
             random.add(RandomGenerator.getNextDouble(-4,4));
         }
+        System.out.println("Individual -> " + random.toString());
         this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
         this.fitness = new AtomicDouble(0);
         this.model = null;
@@ -158,7 +160,7 @@ public abstract class Individual {
         for(int j = 0; j< size; j++){
             random.add(RandomGenerator.getNextDouble(-4,4));
         }
-        System.out.println("Double Value -> \n" + random.toString());
+        System.out.println("Individual -> " + random.toString());
         this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
 
         this.fitness = new AtomicDouble(0);
