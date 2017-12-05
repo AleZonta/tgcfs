@@ -158,6 +158,8 @@ public abstract class Individual {
         }
 
         System.out.println("Individual First -> " + random.toString() + "\ndouble[] -> " + Arrays.toString(v) + "\nIndividual After -> " + list.toString());
+
+
         this.fitness = new AtomicDouble(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
