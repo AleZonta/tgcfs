@@ -160,8 +160,14 @@ public abstract class Individual {
         for(int j = 0; j< size; j++){
             random.add(RandomGenerator.getNextDouble(-4,4));
         }
-        System.out.println("Individual -> " + random.toString());
         this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
+
+        List<Double> list = new ArrayList<>();
+        for(int i=0; i< this.objectiveParameters.columns(); i++){
+            list.add(this.objectiveParameters.getDouble(i));
+        }
+
+        System.out.println("Individual First -> " + random.toString() + "\nIndividual After -> " + list.toString());
 
         this.fitness = new AtomicDouble(0);
         this.model = model;

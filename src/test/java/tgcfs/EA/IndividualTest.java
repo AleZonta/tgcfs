@@ -6,11 +6,13 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Config.ReadConfig;
+import tgcfs.EA.Mutation.NonUniformMutation;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Utils.IndividualStatus;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +96,7 @@ public class IndividualTest {
     @Test
     public void getObjectiveParameters() throws Exception {
         new ReadConfig.Configurations();
+        new RandomGenerator();
         Individual individual = new UncorrelatedMutation();
         assertNull(individual.getObjectiveParameters());
         individual = new UncorrelatedMutation(5);
@@ -104,18 +107,22 @@ public class IndividualTest {
         individual = new RandomResetting(5);
         assertNotNull(individual.getObjectiveParameters());
 
-        Individual secInd = new RandomResetting(5);
+        Individual secInd = new NonUniformMutation(100);
         assertNotNull(secInd.getObjectiveParameters());
 
-        INDArray a = individual.getObjectiveParameters();
+//        INDArray a = individual.getObjectiveParameters();
         INDArray b = secInd.getObjectiveParameters();
-        for (int i = 0; i< a.columns(); i++){
-            System.out.println(a.getDouble(i) + " " + b.getDouble(i));
-            assertFalse(a.getDouble(i) == b.getDouble(i));
-        }
-        System.out.println(a.toString());
+//        for (int i = 0; i< a.columns(); i++){
+//            System.out.println(a.getDouble(i) + " " + b.getDouble(i));
+//            assertFalse(a.getDouble(i) == b.getDouble(i));
+//        }
         System.out.println(b.toString());
 
+        List<Double> list = new ArrayList<>();
+        for(int i=0; i< b.columns(); i++){
+            list.add(b.getDouble(i));
+        }
+        System.out.println(list.toString());
 
     }
 
