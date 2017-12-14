@@ -55,7 +55,7 @@
   "MeasureUsedForAutomaticDisengagement": 0,
   "PopulationWithAutomaticDisengagementExplanation": "0 means both population, 1 means agents, 2 means classifiers",
   "PopulationWithAutomaticDisengagement": 0,
-  "DifferentSelectionForClassifiers" : 1,
+  "DifferentSelectionForClassifiers" : 0,
   "ConversionOutputWithGraph": false,
   "_____________________________Fifth section": "Settings for the models",
   "HiddenLayersAgent": 1,

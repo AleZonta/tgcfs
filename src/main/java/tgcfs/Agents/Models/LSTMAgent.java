@@ -41,6 +41,7 @@ import java.util.stream.IntStream;
  */
 public class LSTMAgent{
     private MultiLayerNetwork net; //neural network, brain of the agent
+
     private int inputSize;
     private int hiddenLayers;
     private int hiddenNeurons;
@@ -152,7 +153,7 @@ public class LSTMAgent{
         }
 
 
-        System.out.println("SetWeights function: " + weights.toString() + " \n model weights: " + this.net.params().toString() + " \n normal rapresentation: " + list.toString() + " \n" + list2.toString());
+        System.out.println("SetWeights function: " + weights.toString() + " \n model weights: \n" + this.net.params().toString() + " \n normal rapresentation: \n" + list.toString() + " \n weight after\n" + list2.toString());
 
         //automatically clear the previous status
         this.clearPreviousState();
