@@ -16,7 +16,6 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 
 import java.util.List;
@@ -39,7 +38,7 @@ import java.util.stream.IntStream;
  *
  * The LSTMAgent is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class LSTMAgent implements EvolvableModel {
+public class LSTMAgent{
     private MultiLayerNetwork net; //neural network, brain of the agent
     private int inputSize;
     private int hiddenLayers;

@@ -14,7 +14,6 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import tgcfs.Classifiers.InputNetwork;
-import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.DeepLearning4j.MultiLayerNetworkBis;
 
@@ -40,7 +39,7 @@ import java.util.stream.IntStream;
  *
  * The Classier is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class ENNClassifier implements EvolvableModel{
+public class ENNClassifier{
     private MultiLayerNetworkBis net; //neural network, brain of the agent
     private int arrayLength; //length of the weight array
     private int input;
@@ -237,7 +236,6 @@ public class ENNClassifier implements EvolvableModel{
         return this.net.summary();
     }
 
-    @Override
     public int getId() {
         return 0;
     }

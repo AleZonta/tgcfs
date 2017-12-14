@@ -5,7 +5,6 @@ import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
-import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Utils.RandomGenerator;
 
@@ -33,7 +32,7 @@ public class ClassifiersTest {
     public void survivalSelections() throws Exception {
         new ReadConfig.Configurations();
         //random classifier
-        EvolvableModel model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
+        ENNClassifier model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
         Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
         Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);
@@ -51,22 +50,12 @@ public class ClassifiersTest {
         throw new Exception("Not tested");
     }
 
-    @Test
-    public void trainNetwork() throws Exception {
-        Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
-        Classifiers classifiers = new Classifiers(log);
-        try {
-            classifiers.trainNetwork(null);
-        }catch (Error e){
-            assertEquals("Method not usable for a Classifier", e.getMessage());
-        }
-    }
 
     @Test
     public void generatePopulation() throws Exception {
         new ReadConfig.Configurations();
         //random classifier
-        EvolvableModel model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
+        ENNClassifier model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
         Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
         Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);
@@ -87,7 +76,7 @@ public class ClassifiersTest {
     @Test
     public void runIndividual() throws Exception {
         new ReadConfig.Configurations();
-        EvolvableModel model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
+        ENNClassifier model = new ENNClassifier(InputNetwork.inputSize,2, OutputNetwork.outputSize);
         Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
         Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);
@@ -121,17 +110,6 @@ public class ClassifiersTest {
 
 
 
-    }
-
-    @Test
-    public void evaluateIndividuals() throws Exception {
-        Logger log =  Logger.getLogger(ClassifiersTest.class.getName());
-        Classifiers classifiers = new Classifiers(log);
-        try {
-            classifiers.evaluateIndividuals(null,null);
-        }catch (Error e){
-            assertEquals("Method not usable for a Classifier", e.getMessage());
-        }
     }
 
     @Test

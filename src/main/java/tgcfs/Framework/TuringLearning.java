@@ -9,16 +9,13 @@ import tgcfs.Config.PropertiesFileReader;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Classifiers;
-import tgcfs.EA.EngagementPopulation;
 import tgcfs.EA.Mutation.StepSize;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
-import tgcfs.InputOutput.LoadExternalPopulation;
 import tgcfs.Loader.Feeder;
 import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.Loader.TrainReal;
 import tgcfs.Performances.SaveToFile;
-import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.LogSystem;
 import tgcfs.Utils.RandomGenerator;
 
@@ -50,7 +47,6 @@ public class TuringLearning implements Framework{
     private IdsaLoader idsaLoader;
     private int countingTime;
     private static Logger logger; //logger for this class
-    private EngagementPopulation countermeasures;
 
 
     /**
@@ -82,7 +78,6 @@ public class TuringLearning implements Framework{
 
         this.countingTime = 0;
         //load countermeasures
-        this.countermeasures = new EngagementPopulation(logger);
 
         //load random number generator
         new RandomGenerator();
@@ -112,15 +107,8 @@ public class TuringLearning implements Framework{
         //generate population
         //INITIALISE population EA with random candidate solution
         //check if I am loading the population from file or not
-        if(ReadConfig.Configurations.getLoadDumpPop()){
-            LoadExternalPopulation load = new LoadExternalPopulation(logger);
-            load.readFile();
-            this.agents.generatePopulation(agentModel, load.getAgents());
-            this.classifiers.generatePopulation(classifierModel, load.getClassifiers());
-        }else{
-            this.agents.generatePopulation(agentModel);
-            this.classifiers.generatePopulation(classifierModel);
-        }
+        this.agents.generatePopulation(agentModel);
+        this.classifiers.generatePopulation(classifierModel);
 
         logger.log(Level.INFO, agentModel.getSummary());
         logger.log(Level.INFO, classifierModel.getSummary());
@@ -136,7 +124,6 @@ public class TuringLearning implements Framework{
         new StepSize();
 
         //load max fitness on countermeasures class
-        this.countermeasures.setMaxFitness(this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable());
     }
 
     /**
@@ -179,25 +166,18 @@ public class TuringLearning implements Framework{
         /* { REPEAT until TERMINAL CONDITION } */
         boolean reachedEndTrajectory = Boolean.FALSE;
         boolean randomError = Boolean.FALSE;
-        boolean evolveAgent = Boolean.TRUE;
-        boolean evolveClassifier = Boolean.TRUE;
         Integer maxGeneration = ReadConfig.Configurations.getMaxGenerations();
         while(!reachedEndTrajectory && !randomError && (generationAgent <= maxGeneration || generationClassifier <= maxGeneration)) {
-            if(evolveAgent) generationAgent++;
-            if(evolveClassifier) generationClassifier++;
+            generationAgent++;
+            generationClassifier++;
             this.agents.resetScore();
             /* { SELECT parent }
                { RECOMBINE parents }
                { MUTATE offspring } */
             logger.log(Level.INFO,"Generating Offspring...");
 
-            if(ReadConfig.Configurations.isRecombination()) {
-                if(evolveAgent) this.agents.generateOffspring();
-                if(evolveClassifier) this.classifiers.generateOffspring();
-            }else{
-                if(evolveAgent) this.agents.generateOffspringOnlyWithMutation();
-                if(evolveClassifier) this.classifiers.generateOffspringOnlyWithMutation();
-            }
+            this.agents.generateOffspringOnlyWithMutation();
+            this.classifiers.generateOffspringOnlyWithMutation();
 
             logger.log(Level.INFO, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
             /* { EVALUATE new candidate } */
@@ -220,30 +200,20 @@ public class TuringLearning implements Framework{
                     this.agents.saveScoresBattle(generationAgent, generationClassifier);
                 }
 
-                //countermeasures system against disengagement
-                this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);
-                evolveAgent = this.countermeasures.isEvolveAgent();
-                evolveClassifier = this.countermeasures.isEvolveClassifier();
-                this.countermeasures.executeCountermeasuresAgainstDisengagement(this.agents.getPopulation(), IndividualStatus.AGENT);
-                this.countermeasures.executeCountermeasuresAgainstDisengagement(this.classifiers.getPopulation(), IndividualStatus.CLASSIFIER);
+
 
 
             /* { SELECT individuals next generation } */
                 logger.log(Level.INFO,"Parent Selection...");
-                if(evolveAgent) this.agents.survivalSelections();
-                if(evolveClassifier) this.classifiers.survivalSelections();
+                this.agents.survivalSelections();
+                this.classifiers.survivalSelections();
 
                 //save the fitness of all the population and best genome
                 logger.log(Level.INFO,"Saving Statistics...");
                 SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
                 SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(), this.classifiers.retAllFitness());
-                if(evolveAgent) SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
-                if(evolveClassifier) SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
-                if(ReadConfig.Configurations.getDumpPop()) {
-                    logger.log(Level.INFO,"Dump Population...");
-                    if(evolveAgent) SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
-                    if(evolveClassifier) SaveToFile.Saver.dumpPopulation(this.classifiers.getClass().getName(), this.classifiers.getPopulation());
-                }
+                SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
+                SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
 
 
 
@@ -289,16 +259,9 @@ public class TuringLearning implements Framework{
             //save the fitness of all the population and best genome
             SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
             SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(), this.agents.retBestGenome());
-            if (ReadConfig.Configurations.getDumpPop()) {
-                logger.log(Level.INFO, "Dump Population...");
-                SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
-            }
-            //generate new offspring for new evolution
-            if(ReadConfig.Configurations.isRecombination()) {
-                this.agents.generateOffspring();
-            }else{
-                this.agents.generateOffspringOnlyWithMutation();
-            }
+
+
+            this.agents.generateOffspringOnlyWithMutation();
         }
     }
 

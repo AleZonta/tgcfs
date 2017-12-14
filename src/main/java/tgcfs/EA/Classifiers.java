@@ -1,27 +1,24 @@
 package tgcfs.EA;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
-import tgcfs.Agents.InputNetwork;
 import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
-import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Utils.IndividualStatus;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -35,16 +32,21 @@ import java.util.stream.Collectors;
  *
  * Class implementing the algorithm for the classifiers.
  */
-public class Classifiers extends Algorithm {
+public class Classifiers{
+    private List<IndividualClassifier> population; //representation of the population
+    private int maxFitnessAchievable;
+    private static Logger logger;
 
     /**
      * Constructor zero parameter
      * Call the super constructor
-     * @param logger logger
+     * @param log logger
      * @throws Exception if the super constructor has problem in reading the config files
      */
-    public Classifiers(Logger logger) throws Exception {
-        super(logger);
+    public Classifiers(Logger log) throws Exception {
+        logger = log;
+        this.population = new ArrayList<>();
+        this.maxFitnessAchievable = 0;
     }
 
     /**
@@ -53,32 +55,36 @@ public class Classifiers extends Algorithm {
      * @param model the model of the population
      * @throws Exception exception
      */
-    @Override
-    public void generatePopulation(EvolvableModel model) throws Exception {
-        super.generatePopulation(model);
+    public void generatePopulation(ENNClassifier model) throws Exception {
+        this.generatePopulationAgent(model);
         this.maxFitnessAchievable = ((ReadConfig.Configurations.getAgentPopulationSize() + ReadConfig.Configurations.getAgentOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained()) * 2;
     }
 
-    /**
-     * Generate the population for the EA
-     * set the max fitness achievable by an classifier
-     * using the information loaded from file
-     * @param model the model of the population
-     * @param populationLoaded the popolation loaded from file
-     * @throws Exception exception
-     */
-    @Override
-    public void generatePopulation(EvolvableModel model, List<INDArray> populationLoaded) throws Exception {
-        super.generatePopulation(model, populationLoaded);
-        this.maxFitnessAchievable = ((ReadConfig.Configurations.getAgentPopulationSize() + ReadConfig.Configurations.getAgentOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained()) * 2;
+
+    private void generatePopulationAgent(ENNClassifier model)  throws Exception {
+        int size = ReadConfig.Configurations.getAgentPopulationSize();
+        IndividualStatus status = IndividualStatus.AGENT;
+        logger.log(Level.INFO, "Generating Agents Population...");
+        IntStream.range(0, size).forEach(i ->{
+            try {
+                IndividualClassifier newBorn = new IndividualClassifier(model.getArrayLength(), status);
+                //assign the model to the classifier
+                newBorn.setModel(model.deepCopy());
+                this.population.add(newBorn);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error with generating population");
+                e.printStackTrace();
+            }
+
+        });
     }
+
 
     /**
      * @implNote Implementation from Abstract class Algorithm
      * @param input the input of the model
      * @throws Exception if there are problems in reading the info
      */
-    @Override
     public void runIndividuals(List<TrainReal> input) throws Exception {
         throw new Exception("Method not usable for a Classifier");
     }
@@ -91,10 +97,9 @@ public class Classifiers extends Algorithm {
      * @return the output of the classifier
      * @throws Exception if the nn has problem an exception is raised
      */
-    @Override
-    public synchronized OutputsNetwork runIndividual(Individual individual, List<InputsNetwork> input) throws Exception {
+    public synchronized OutputsNetwork runIndividual(IndividualClassifier individual, List<InputsNetwork> input) throws Exception {
         //retrive model from the individual
-        EvolvableModel model = individual.getModel();
+        ENNClassifier model = individual.getModel();
         //set the weights
         model.setWeights(individual.getObjectiveParameters());
         //compute Output of the network
@@ -132,140 +137,6 @@ public class Classifiers extends Algorithm {
         return out;
     }
 
-
-    /**
-     * @implNote Implementation from Abstract class Algorithm
-     * @param opponent competing population
-     * @param transformation the class that will transform from one output to the new input
-     */
-    @Override
-    public void evaluateIndividuals(Algorithm opponent, Transformation transformation){
-        //The fitness of each classifier is obtained by using it to evaluate each model in the competing population
-        //For each correct judgement, the classifier’s fitness increases by one
-        //I can do this directly in the other method
-        throw new Error("Method not usable for a Classifier");
-    }
-
-    /**
-     * Train the network
-     * @param combineInputList where to find the input to train
-     */
-    @Override
-    public void trainNetwork(List<TrainReal> combineInputList) {
-        super.getPopulation().parallelStream().forEach(individual -> {
-            try {
-                individual.fitModel(this.createDataSet(combineInputList));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        throw new Error("Method not usable for a Classifier");
-    }
-
-
-    /**
-     * Create a Dataset instance of the data present in this object
-     * The Dataset instance let the network train on the data present in this object
-     *
-     * @param input list of {@link TrainReal} objects
-     * @return {@link DataSet} object
-     */
-    public DataSet createDataSet(List<TrainReal> input){
-        //need to compute maximum length of the trajectories
-        int maxLength = Integer.MIN_VALUE;
-        for(TrainReal element: input){
-            int size = element.getTotalList(true).size();
-            if(size > maxLength){
-                maxLength = size;
-            }
-        }
-
-        int vectorSize = tgcfs.Classifiers.InputNetwork.inputSize;
-
-        //Create data for training
-        //Here: we have input.size() examples of varying lengths with vectorSize features
-        INDArray features = Nd4j.create(new int[]{input.size(), vectorSize, maxLength}, 'f');
-        INDArray labels = Nd4j.create(new int[]{input.size(), 2, maxLength}, 'f');    //Two labels: real or fake
-        //Because we are dealing with trajectories of different lengths and only one output at the final time step: use padding arrays
-        //Mask arrays contain 1 if data is present at that time step for that example, or 0 if data is just padding
-        INDArray featuresMask = Nd4j.zeros(input.size(), maxLength);
-        INDArray labelsMask = Nd4j.zeros(input.size(), maxLength);
-
-
-        /**
-         * Class that helps to administrate the element
-         */
-        class Example{
-            private List<INDArray> array;
-            private boolean label;
-
-            /**
-             * Constructor of one example with two parameters
-             * @param array list of {@link INDArray} elements
-             * @param label label of the list (Boolean)
-             */
-            public Example(List<INDArray> array, Boolean label){
-                this.array = array;
-                this.label = label;
-            }
-
-            /**
-             * Getter for the array
-             * @return list of {@link INDArray} elements
-             */
-            public List<INDArray> getArray() {
-                return array;
-            }
-
-            /**
-             * Getter for the label
-             * @return label of the list (Boolean)
-             */
-            public Boolean getLabel() {
-                return label;
-            }
-        }
-
-        //generate the list of examples
-        List<Example> generalList = new ArrayList<>();
-        input.forEach(element -> {
-            List<INDArray> totalListFalse = new ArrayList<>();
-            element.getTrainingPoint().forEach(trainingPoint -> totalListFalse.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier()));
-            element.getOutputComputed().forEach(trainingPoint -> totalListFalse.add(((tgcfs.Agents.OutputNetwork)trainingPoint).serialiaseAsInputClassifier()));
-            generalList.add(new Example(totalListFalse, Boolean.FALSE));
-
-            List<INDArray> totalListTrue = new ArrayList<>();
-            element.getTrainingPoint().forEach(trainingPoint -> totalListTrue.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier()));
-            element.getFollowingPartTransformed().forEach(trainingPoint -> totalListTrue.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier()));
-            generalList.add(new Example(totalListTrue, Boolean.TRUE));
-        });
-
-        //shuffle list
-        Collections.shuffle(generalList);
-
-
-        //for every element into the input
-        int[] temp = new int[2];
-        for(int i = 0; i < generalList.size(); i++ ){
-            Example element = generalList.get(i);
-            temp[0] = i;
-
-            for(int j = 0; j < element.getArray().size() && j < maxLength; j++){
-                INDArray vector = element.getArray().get(j);
-                features.put(new INDArrayIndex[]{NDArrayIndex.point(i), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
-                temp[1] = j;
-                featuresMask.putScalar(temp, 1.0);  //Word is present (not padding) for this example + time step -> 1.0 in features mask
-            }
-            int idx = (element.getLabel() ? 0 : 1);
-            int lastIdx = Math.min(element.getArray().size(),maxLength);
-            labels.putScalar(new int[]{i,idx,lastIdx-1},1.0);   //Set label: [0,1] for false, [1,0] for true
-            labelsMask.putScalar(new int[]{i,lastIdx-1},1.0);   //Specify that an output exists at the final time step for this example
-        }
-
-
-        return new DataSet(features,labels,featuresMask,labelsMask);
-    }
-
     /**
      * Select parents for the next generation.
      *
@@ -274,60 +145,165 @@ public class Classifiers extends Algorithm {
      *
      * @throws Exception if there are problems in reading the info
      */
-    @Override
     public void survivalSelections() throws Exception {
-        if(ReadConfig.Configurations.getDifferentSelectionForClassifiers() == 0) {
-            super.survivalSelections();
-        }else{
-            //log the fitness of all the population
-            List<Double> fitn = new ArrayList<>();
-            super.getPopulation().forEach(p -> fitn.add(p.getFitness()));
+        //check which class is calling this method
+        int size = ReadConfig.Configurations.getClassifierPopulationSize();
 
-            logger.log(Level.INFO, "--Fitness population before selection--");
-            logger.log(Level.INFO, fitn.toString());
+        //sort the list
+        this.population.sort(Comparator.comparing(IndividualClassifier::getFitness));
 
-            List<Individual> nextGeneration = new ArrayList<>();
+        //log the fitness of all the population
+        List<Double> fitn = new ArrayList<>();
+        this.population.forEach(p -> fitn.add(p.getFitness()));
 
-            // lets find out who are all the sons
-            List<Individual> sons = super.getPopulation().stream().filter(Individual::isSon).collect(Collectors.toList());
-            List<Individual> parents = super.getPopulation().stream().filter(individual -> !individual.isSon()).collect(Collectors.toList());
-
-            // keep the best parents -> order the parents and keep the one with highest fitness
-            parents.sort(Comparator.comparing(Individual::getFitness));
-            nextGeneration.add(parents.get(parents.size() - 1).deepCopy());
-
-            int size = ReadConfig.Configurations.getClassifierPopulationSize();
-
-            sons.forEach(s -> nextGeneration.add(s.deepCopy()));
-
-            while(nextGeneration.size() > size){
-                nextGeneration.remove(nextGeneration.size() - 1);
-            }
-            nextGeneration.sort(Comparator.comparing(Individual::getFitness));
+        logger.log(Level.INFO, "--Fitness population before selection--");
+        logger.log(Level.INFO, fitn.toString());
 
 
-            List<Double> fitnd = new ArrayList<>();
-            nextGeneration.forEach(p -> fitnd.add(p.getFitness()));
-
-            logger.log(Level.INFO, "--Fitness population after selection--");
-            logger.log(Level.INFO, fitnd.toString());
-
-            super.setPopulation(nextGeneration);
-
-            //check who is parents and who is son
-            List<Integer> sonAndParent = new ArrayList<>();
-            super.getPopulation().forEach(p -> {
-                if(p.isSon()){
-                    // zero for offspring
-                    sonAndParent.add(0);
-                }else{
-                    // one for parent
-                    sonAndParent.add(1);
-                }
-            });
-            logger.log(Level.INFO, "--Parents vs Sons--");
-            logger.log(Level.INFO, sonAndParent.toString());
+        while(this.population.size() != size){
+            this.population.remove(0);
         }
+
+        List<IndividualClassifier> newList = new ArrayList<>();
+        this.population.forEach(p -> newList.add(p.deepCopy()));
+
+        List<Double> fitnd = new ArrayList<>();
+        newList.forEach(p -> fitnd.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population after selection--");
+        logger.log(Level.INFO, fitnd.toString());
+
+        this.population = new ArrayList<>();
+        this.population = newList;
+        //now the population is again under the maximum size allowed and containing only the element with highest fitness.
+
+        //check who is parents and who is son
+        List<Integer> sonAndParent = new ArrayList<>();
+        this.population.forEach(p -> {
+            if(p.isSon()){
+                // zero for offspring
+                sonAndParent.add(0);
+            }else{
+                // one for parent
+                sonAndParent.add(1);
+            }
+        });
+        logger.log(Level.INFO, "--Parents[1] vs Sons[0]--");
+        logger.log(Level.INFO, sonAndParent.toString());
+    }
+
+
+    /**
+     * Getter for the population
+     * @return list of individuals
+     */
+    public List<IndividualClassifier> getPopulation() {
+        return this.population;
+    }
+
+
+    public int getMaxFitnessAchievable() {
+        return maxFitnessAchievable;
+    }
+
+    /**
+     * Method to return the fitness of all the individuals
+     * @return list of integer values
+     */
+    public List<Double> retAllFitness(){
+        List<Double> list = new ArrayList<>();
+        this.population.forEach(individual -> list.add(individual.getFitness()));
+        return list;
+    }
+
+    /**
+     * Method that returns the best genome in the population
+     * @return list of doubles
+     */
+    public INDArray retBestGenome(){
+        //sort the list
+        this.population.sort(Comparator.comparing(IndividualClassifier::getFitness));
+        return this.population.get(0).getObjectiveParameters();
+    }
+
+    /**
+     * With neural networks I could suffer from COMPETING CONVENTION problem if I am using the crossover
+     * If I only use the mutation I am not suffering from it
+     * Every parents is randomly selected and an offspring is generated exactly as the father.
+     * Mutation is then applied to it
+     *
+     * @throws Exception if the parents have not the same length
+     */
+    public void generateOffspringOnlyWithMutation() throws Exception {
+        //check which class is calling this method
+        int size = ReadConfig.Configurations.getAgentOffspringSize();
+        int tournamentSize = ReadConfig.Configurations.getTournamentSizeAgents();
+        IndividualStatus status = IndividualStatus.AGENT;
+
+        //set everyone as a parent now
+        this.population.forEach(IndividualClassifier::isParent);
+
+        //create offspring_size offspring
+        for(int i = 0; i < size; i ++) {
+
+            //creating the tournament
+            List<IndividualClassifier> tournamentPop = new ArrayList<>();
+            IntStream.range(0, tournamentSize).forEach(j -> {
+                int idParent = RandomGenerator.getNextInt(0,this.population.size());
+                logger.log(Level.FINE, "idParent for tournament selection: " + idParent);
+                IndividualClassifier ind = this.population.get(idParent);
+                logger.log(Level.FINE,  idParent + ": " + ind.getObjectiveParameters().toString());
+                tournamentPop.add(ind);
+            });
+            //find the winner of the tournament -> the one with the highest fitness
+            tournamentPop.sort(Comparator.comparingDouble(IndividualClassifier::getFitness));
+
+
+            //log the fitness of all the tournament
+            List<Double> fitn = new ArrayList<>();
+            tournamentPop.forEach(p -> fitn.add(p.getFitness()));
+
+            logger.log(Level.FINE, "--Fitness population on the tournament--");
+            logger.log(Level.FINE, fitn.toString());
+
+
+            //last one has the better fitness
+            IndividualClassifier parent = tournamentPop.get(tournamentPop.size() - 1);
+            logger.log(Level.FINE, "Parent selected to mutate: \n" + parent.getObjectiveParameters());
+
+            //son has the same genome of the father
+            IndividualClassifier son = new IndividualClassifier(parent.getObjectiveParameters().dup(), status, true);
+
+            //now the son is mutated 10 times (hardcoded value)
+            //IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
+            son.mutate(son.getObjectiveParameters().columns());
+            logger.log(Level.FINE, "Son: \n" + son.getObjectiveParameters());
+            //set model to the son
+            son.setModel(parent.getModel().deepCopy());
+
+            //add the son to the population
+            this.population.add(son);
+        }
+
+        //resetting the fitness of everyone
+        this.resetFitness();
+    }
+
+    /**
+     * Reset the fitness of all the individual
+     */
+    public void resetFitness(){
+        this.population.forEach(IndividualClassifier::resetFitness);
+    }
+
+    /**
+     * Get the fittest individual of the population
+     * @return fittest {@link IndividualClassifier}
+     */
+    public IndividualClassifier getFittestIndividual(){
+        //sort the list
+        this.population.sort(Comparator.comparing(IndividualClassifier::getFitness));
+        return this.population.get(this.population.size() - 1);
     }
 
 

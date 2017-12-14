@@ -5,8 +5,9 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.primitives.AtomicDouble;
+import tgcfs.Agents.Models.LSTMAgent;
+import tgcfs.EA.Mutation.StepSize;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.RandomGenerator;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Alessandro Zonta on 29/05/2017.
+ * Created by Alessandro Zonta on 14/12/2017.
  * PhD Situational Analytics
  * <p>
  * Computational Intelligence Group
@@ -23,16 +24,15 @@ import java.util.List;
  * Faculty of Sciences - VU University Amsterdam
  * <p>
  * a.zonta@vu.nl
- *
- * This class implements an individual
  */
-public abstract class Individual {
+public class IndividualAgent {
     private INDArray objectiveParameters;
     private List<TrainReal> myInputandOutput;
     private AtomicDouble fitness;
-    private EvolvableModel model;
+    private LSTMAgent model;
     protected final IndividualStatus ind;
     private boolean isSon;
+
 
     /**
      * Getter fot the objective parameter
@@ -63,7 +63,7 @@ public abstract class Individual {
      * Zero parameter constructor
      * Everything goes to null
      */
-    public Individual(){
+    public IndividualAgent(){
         this.objectiveParameters = null;
         this.fitness = null;
         this.model = null;
@@ -77,7 +77,7 @@ public abstract class Individual {
      * @param objPar objectiveParameters list
      * @param ind kind of individual I am creating
      */
-    public Individual(INDArray objPar, IndividualStatus ind){
+    public IndividualAgent(INDArray objPar, IndividualStatus ind){
         this.objectiveParameters = objPar;
         this.fitness = new AtomicDouble(0);
         this.model = null;
@@ -92,7 +92,7 @@ public abstract class Individual {
      * @param ind kind of individual I am creating
      * @param isSon boolean variable if the individual is a son
      */
-    public Individual(INDArray objPar, IndividualStatus ind, boolean isSon){
+    public IndividualAgent(INDArray objPar, IndividualStatus ind, boolean isSon){
         this.objectiveParameters = objPar;
         this.fitness = new AtomicDouble(0);
         this.model = null;
@@ -108,7 +108,7 @@ public abstract class Individual {
      * @param size size of the objectiveParameter
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public Individual(int size) throws Exception {
+    public IndividualAgent(int size) throws Exception {
         //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
@@ -129,7 +129,7 @@ public abstract class Individual {
      * @param ind kind of individual I am creating
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public Individual(int size, IndividualStatus ind) throws Exception {
+    public IndividualAgent(int size, IndividualStatus ind) throws Exception {
         //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
@@ -151,7 +151,7 @@ public abstract class Individual {
      * @param ind kind of individual I am creating
      * @exception Exception if there are problems with the reading of the seed information
      */
-    public Individual(int size, EvolvableModel model, IndividualStatus ind) throws Exception {
+    public IndividualAgent(int size, LSTMAgent model, IndividualStatus ind) throws Exception {
         this.objectiveParameters = Nd4j.rand(1, size);
         for(int j = 0; j< size; j++){
             this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
@@ -172,7 +172,7 @@ public abstract class Individual {
      * @param ind kind of individual I am creating
      * @param isSon boolean variable if the individual is a son
      */
-    public Individual(INDArray objPar, AtomicDouble fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
+    public IndividualAgent(INDArray objPar, AtomicDouble fitness, LSTMAgent model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
         this.objectiveParameters = objPar;
         this.fitness = fitness;
         this.model = model.deepCopy();
@@ -182,16 +182,10 @@ public abstract class Individual {
     }
 
     /**
-     * Method to mutate the individual.
-     * @param n is the population size
-     */
-    public abstract void mutate(int n);
-
-    /**
      * Getter for the model of the individual
      * @return model
      */
-    public EvolvableModel getModel() {
+    public LSTMAgent getModel() {
         return this.model;
     }
 
@@ -199,7 +193,7 @@ public abstract class Individual {
      * Setter for the model of the individual
      * @param model model to assign
      */
-    public void setModel(EvolvableModel model) {
+    public void setModel(LSTMAgent model) {
         this.model = model;
     }
 
@@ -280,7 +274,9 @@ public abstract class Individual {
      * Deep copy function
      * @return Individual object
      */
-    public abstract Individual deepCopy();
+    public IndividualAgent deepCopy(){
+        return new IndividualAgent(this.getObjectiveParameters(), new AtomicDouble(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
+    }
 
     /**
      * getter for the property if the individual is a son
@@ -295,5 +291,38 @@ public abstract class Individual {
      */
     public void isParent() {
         this.isSon = false;
+    }
+
+    /**
+     * Implementation abstract method mutate from individual
+     *
+     * normal practice to apply this operator with probability one per gene
+     *
+     * It needs a mutation step size parameter
+     *
+     * @param n is the genome length
+     */
+    public void mutate(int n) {
+        double stepSize = 0d;
+        try {
+            if(this.ind == IndividualStatus.AGENT) {
+                stepSize = StepSize.getStepSizeAgents();
+            }else {
+                stepSize = StepSize.getStepSizeClassifiers();
+            }
+        } catch (Exception ignored) { }
+        for(int i = 0; i < this.objectiveParameters.columns(); i++){
+            double newValue = this.objectiveParameters.getDouble(i) + stepSize * RandomGenerator.getNextDouble();
+            //elastic bound
+            if(newValue > 4d){
+                double difference = newValue - 4d;
+                newValue = 4d - difference;
+            }
+            if(newValue < -4){
+                double difference = newValue - (-4d);
+                newValue = -4 - difference;
+            }
+            this.objectiveParameters.putScalar(i, newValue);
+        }
     }
 }

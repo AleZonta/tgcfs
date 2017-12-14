@@ -10,7 +10,6 @@ import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
 import tgcfs.Loader.Feeder;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ public class AgentsTest {
     public void generatePopulation() throws Exception {
         new ReadConfig.Configurations();
         //Random LSTM
-        EvolvableModel model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
+        LSTMAgent model = new LSTMAgent(InputNetwork.inputSize, 1, 5, OutputNetwork.outputSize);
         Logger log =  Logger.getLogger(AgentsTest.class.getName());
 
         Agents agentsCompeting = new Agents(log);
@@ -53,7 +52,7 @@ public class AgentsTest {
         new ReadConfig.Configurations();
         Logger log =  Logger.getLogger(AgentsTest.class.getName());
         Agents agents = new Agents(log);
-        EvolvableModel agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
+        LSTMAgent agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
         agents.generatePopulation(agentModel);
 
         Feeder feeder = new Feeder(log);
@@ -91,13 +90,13 @@ public class AgentsTest {
         Logger log =  Logger.getLogger(AgentsTest.class.getName());
         Agents agents = new Agents(log);
         Classifiers classifiers = new Classifiers(log);
-        EvolvableModel agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
-        EvolvableModel classifierModel = new ENNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+        LSTMAgent agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
+        ENNClassifier classifierModel = new ENNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
         agents.generatePopulation(agentModel);
         classifiers.generatePopulation(classifierModel);
 
-        List<Individual> agentPopulationSecond = new ArrayList<>();
-        List<Individual> agentPopulationFirst = agents.getPopulation();
+        List<IndividualAgent> agentPopulationSecond = new ArrayList<>();
+        List<IndividualAgent> agentPopulationFirst = agents.getPopulation();
         agentPopulationFirst.forEach(p -> agentPopulationSecond.add(p.deepCopy()));
 
         List<Double> fitnessFirst = new ArrayList<>();
@@ -128,8 +127,8 @@ public class AgentsTest {
 
 
 
-        List<Individual> classifierPopulationSecond = new ArrayList<>();
-        List<Individual> classifierPopulationFirst = classifiers.getPopulation();
+        List<IndividualClassifier> classifierPopulationSecond = new ArrayList<>();
+        List<IndividualClassifier> classifierPopulationFirst = classifiers.getPopulation();
         classifierPopulationFirst.forEach(p -> classifierPopulationSecond.add(p.deepCopy()));
 
         List<Double> fitnessFirstC = new ArrayList<>();

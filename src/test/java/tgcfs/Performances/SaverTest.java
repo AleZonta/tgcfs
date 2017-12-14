@@ -6,8 +6,6 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Config.ReadConfig;
-import tgcfs.EA.Individual;
-import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Utils.PointWithBearing;
@@ -72,32 +70,7 @@ public class SaverTest {
         SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(list,0,0);
     }
 
-    @Test
-    public void dumpPopulation() throws Exception {
-        new ReadConfig.Configurations();
 
-        List<Individual> list = new ArrayList<>();
-        list.add(new UncorrelatedMutation(5));
-        list.add(new UncorrelatedMutation(3));
-        list.add(new UncorrelatedMutation(7));
-        list.add(new UncorrelatedMutation(1));
-        try {
-            SaveToFile.Saver.dumpPopulation("a", list);
-        }catch (Exception e){
-            assertEquals("Cannot save, the class is not instantiate",e.getMessage());
-        }
-        Logger log =  Logger.getLogger(SaverTest.class.getName());
-        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1", log);
-        SaveToFile.Saver.dumpPopulation("a", list);
-        SaveToFile.Saver.dumpPopulation("a", list);
-        List<Individual> list3 = new ArrayList<>();
-        list3.add(new UncorrelatedMutation(50));
-        list3.add(new UncorrelatedMutation(30));
-        list3.add(new UncorrelatedMutation(70));
-        list3.add(new UncorrelatedMutation(10));
-        SaveToFile.Saver.dumpPopulation("a", list3);
-
-    }
 
     @Test
     public void saveFitness() throws Exception {

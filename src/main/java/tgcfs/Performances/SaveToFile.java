@@ -4,12 +4,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.PropertiesFileReader;
-import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.Utils.Scores;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
@@ -126,10 +124,10 @@ public class SaveToFile {
          * @param population individual of the population
          * @throws Exception  if the class is not instantiate
          */
-        public static void dumpPopulation(String name, List<Individual> population) throws Exception {
-            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
-            instance.dumpEverything(name, population);
-        }
+//        public static void dumpPopulation(String name, List<Individual> population) throws Exception {
+//            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+//            instance.dumpEverything(name, population);
+//        }
 
 
         /**
@@ -300,38 +298,38 @@ public class SaveToFile {
      * @param name name of the population
      * @param population individual of the population
      */
-    private void dumpEverything(String name, List<Individual> population){
-        String path = this.currentPath + name + "-population" + ".zip";
-        File f = new File(path);
-        if(f.exists() && !f.isDirectory()) {
-            try {
-                Files.delete(Paths.get(path));
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Error deleting file " + name + " CSV File " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        //check if file exist
-        try (FileOutputStream zipFile = new FileOutputStream(new File(path));
-             ZipOutputStream zos = new ZipOutputStream(zipFile);
-             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
-        ){
-            ZipEntry csvFile = new ZipEntry( name + "-population.csv");
-            zos.putNextEntry(csvFile);
-            writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
-            population.forEach(individual -> {
-                try {
-                    writer.write(individual.getObjectiveParameters().data().toString());
-                    writer.newLine();
-                } catch (IOException e) {
-                    logger.log(Level.WARNING, "Error appending line to " + name + " CSV File " + e.getMessage());
-                    e.printStackTrace();
-                }
-            });
-        }catch (Exception e){
-            logger.log(Level.WARNING, "Error with " + name + " Zip File " + e.getMessage());
-        }
-    }
+//    private void dumpEverything(String name, List<Individual> population){
+//        String path = this.currentPath + name + "-population" + ".zip";
+//        File f = new File(path);
+//        if(f.exists() && !f.isDirectory()) {
+//            try {
+//                Files.delete(Paths.get(path));
+//            } catch (IOException e) {
+//                logger.log(Level.WARNING, "Error deleting file " + name + " CSV File " + e.getMessage());
+//                e.printStackTrace();
+//            }
+//        }
+//        //check if file exist
+//        try (FileOutputStream zipFile = new FileOutputStream(new File(path));
+//             ZipOutputStream zos = new ZipOutputStream(zipFile);
+//             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
+//        ){
+//            ZipEntry csvFile = new ZipEntry( name + "-population.csv");
+//            zos.putNextEntry(csvFile);
+//            writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
+//            population.forEach(individual -> {
+//                try {
+//                    writer.write(individual.getObjectiveParameters().data().toString());
+//                    writer.newLine();
+//                } catch (IOException e) {
+//                    logger.log(Level.WARNING, "Error appending line to " + name + " CSV File " + e.getMessage());
+//                    e.printStackTrace();
+//                }
+//            });
+//        }catch (Exception e){
+//            logger.log(Level.WARNING, "Error with " + name + " Zip File " + e.getMessage());
+//        }
+//    }
 
 
     /**
