@@ -350,6 +350,7 @@ public class Agents extends Algorithm {
             });
         });
 
+        logger.log(Level.SEVERE, "Start real classification");
         //I need to evaluate the agent using the classifiers
         super.getPopulation().parallelStream().forEach(agent -> {
 //            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
@@ -469,16 +470,20 @@ public class Agents extends Algorithm {
             if(real) {
                 agent.increaseFitness(decision);
                 classifier.increaseFitness(1 - decision);
-                Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0d);
-                if (score) this.scores.addScore(sc);
+                if (score) {
+                    Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0d);
+                    this.scores.addScore(sc);
+                }
             }
         }else{
             //it is false
             classifier.increaseFitness(decision);
             if(real) {
                 agent.increaseFitness(1 - decision);
-                Scores sc = new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 1d);
-                if (score) this.scores.addScore(sc);
+                if (score) {
+                    Scores sc = new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 1d);
+                    this.scores.addScore(sc);
+                }
             }
         }
 
