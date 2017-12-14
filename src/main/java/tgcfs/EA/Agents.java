@@ -139,15 +139,26 @@ public class Agents{
             List<InputsNetwork> in = currentInputsNetwork.getTrainingPoint();
             int size = in.size();
             INDArray features = Nd4j.create(new int[]{1, InputNetwork.inputSize, size}, 'f');
+            List<INDArray> saveList = new ArrayList<>();
             for (int j = 0; j < size; j++) {
                 INDArray vector = in.get(j).serialise();
+                if(ReadConfig.debug) {
+                    saveList.add(vector);
+                }
                 features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
             }
             lastOutput = model.computeOutput(features);
-            if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
-
             int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
+
+            List<INDArray> saveList2 = new ArrayList<>();
+            for (int i = 0; i< timeSeriesLength; i++){
+                saveList2.add(lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(i)));
+            }
+            if(ReadConfig.debug) logger.log(Level.INFO, "Input LSTM ->"  + this.logINDArray(saveList) +  " // Output LSTM ->" + this.logINDArray(saveList2) + " // Model Weights" + this.printBetterRepresentation(model.getWeights()));
+
+
             INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
+            if(ReadConfig.debug) logger.log(Level.INFO, "Real Last Output -> " + realLastOut);
 
             OutputNetwork out = new OutputNetwork();
             out.deserialise(realLastOut);
@@ -165,7 +176,7 @@ public class Agents{
                 InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
                 lastOutput = model.computeOutput(inputLocal.serialise());
 
-                if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
+                logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
 
                 out = new OutputNetwork();
                 out.deserialise(lastOutput);
@@ -545,6 +556,32 @@ public class Agents{
      */
     public List<IndividualAgent> getPopulation() {
         return this.population;
+    }
+
+    /**
+     * Print an array of INDarray in a nice format
+     * @param list list of {@link INDArray}
+     * @return string
+     */
+    public String logINDArray(List<INDArray> list){
+        List<String> print = new ArrayList<>();
+        list.forEach(el -> {
+            List<Double> d = this.printBetterRepresentation(el);
+            print.add(d.toString());
+        });
+        return print.toString();
+    }
+    /**
+     * Print a better representation of the weights
+     * @param array {@link INDArray} array of weights
+     * @return array transformed in list of double
+     */
+    public List<Double> printBetterRepresentation(INDArray array){
+        List<Double> list = new ArrayList<>();
+        for(int i=0; i< array.columns(); i++){
+            list.add(array.getDouble(i));
+        }
+        return list;
     }
 }
 

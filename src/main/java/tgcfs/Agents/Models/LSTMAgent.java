@@ -18,6 +18,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.NN.InputsNetwork;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -133,9 +134,28 @@ public class LSTMAgent{
         if (weights.columns() != this.net.numParams()){
             throw new Exception("Length list weights is not correct.");
         }
-        this.net.setParameters(weights);
+
+        List<Double> list = new ArrayList<>();
+        for(int i=0; i< weights.columns(); i++){
+            list.add(weights.getDouble(i));
+        }
+
+        double[] v = list.stream().mapToDouble(Double::doubleValue).toArray();
+
+        this.net.setParameters(Nd4j.create(v));
+
+
+
+        List<Double> list2 = new ArrayList<>();
+        for(int i=0; i< this.net.params().columns(); i++){
+            list2.add(this.net.params().getDouble(i));
+        }
+
+
+        System.out.println("SetWeights function: " + weights.toString() + " \n model weights: " + this.net.params().toString() + " \n normal rapresentation: " + list.toString() + " \n" + list2.toString());
+
         //automatically clear the previous status
-        this.net.rnnClearPreviousState();
+        this.clearPreviousState();
     }
 
 
