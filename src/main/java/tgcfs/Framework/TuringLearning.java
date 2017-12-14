@@ -247,7 +247,7 @@ public class TuringLearning implements Framework{
                     logger.log(Level.INFO, "Dump agent generation and real");
 //                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
                     this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier, new FollowingTheGraph(this.feeder, logger));
-                    this.agents.saveScoresBattle(generationAgent, generationClassifier);
+                    if(ReadConfig.Configurations.getScore()) this.agents.saveScoresBattle(generationAgent, generationClassifier);
                 }
 
                 //countermeasures system against disengagement

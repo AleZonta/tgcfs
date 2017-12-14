@@ -23,7 +23,6 @@ import tgcfs.Networks.Convolutionary;
 import tgcfs.Performances.SaveToFile;
 import tgcfs.Utils.MultyScores;
 import tgcfs.Utils.PointWithBearing;
-import tgcfs.Utils.RandomGenerator;
 import tgcfs.Utils.Scores;
 
 import java.io.File;
@@ -46,7 +45,6 @@ import java.util.logging.Logger;
  */
 public class Agents extends Algorithm {
     private MultyScores scores;
-    private RandomGenerator randomGenerator;
 
     /**
      * Constructor zero parameter
@@ -57,7 +55,6 @@ public class Agents extends Algorithm {
     public Agents(Logger logger) throws Exception {
         super(logger);
         this.scores = new MultyScores();
-        this.randomGenerator = new RandomGenerator();
     }
 
     /**
@@ -334,6 +331,16 @@ public class Agents extends Algorithm {
      * @param transformation the class that will transform from one output to the new input
      */
     public void evaluateIndividuals(Algorithm model, Transformation transformation){
+
+        boolean score;
+        try {
+            score = ReadConfig.Configurations.getScore();
+        } catch (Exception e) {
+            score = false;
+        }
+
+        boolean finalScore = score;
+
         super.getPopulation().forEach(a -> {
             //transform trajectory in advance to prevent multiprocessing errors
             List<TrainReal> inputOutput = a.getMyInputandOutput();
@@ -370,7 +377,7 @@ public class Agents extends Algorithm {
 
                     //run the classifier for the Fake trajectory
                     try {
-                        this.runClassifier(model ,agent, classifier, inputFake, Boolean.TRUE);
+                        this.runClassifier(model ,agent, classifier, inputFake, Boolean.TRUE, finalScore);
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
                         e.printStackTrace();
@@ -380,7 +387,7 @@ public class Agents extends Algorithm {
                     List<InputsNetwork> inputReal = trainReal.getAllThePartTransformedReal();
 
                     try {
-                        this.runClassifier(model ,agent, classifier, inputReal, Boolean.FALSE);
+                        this.runClassifier(model ,agent, classifier, inputReal, Boolean.FALSE, finalScore);
                     } catch (Exception e) {
                         logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
                         e.printStackTrace();
@@ -450,7 +457,7 @@ public class Agents extends Algorithm {
      * @param input input for the classifier
      * @param real Boolean value. If it is false I do not need to increment the agent fitness since I am checking the real trajectory
      */
-    private synchronized void runClassifier(Algorithm model, Individual agent, Individual classifier, List<InputsNetwork> input, boolean real) throws Exception {
+    private synchronized void runClassifier(Algorithm model, Individual agent, Individual classifier, List<InputsNetwork> input, boolean real, boolean score) throws Exception {
         tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
 
 
@@ -463,7 +470,7 @@ public class Agents extends Algorithm {
                 agent.increaseFitness(decision);
                 classifier.increaseFitness(1 - decision);
                 Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 0d);
-                this.scores.addScore(sc);
+                if (score) this.scores.addScore(sc);
             }
         }else{
             //it is false
@@ -471,7 +478,7 @@ public class Agents extends Algorithm {
             if(real) {
                 agent.increaseFitness(1 - decision);
                 Scores sc = new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 1d);
-                this.scores.addScore(sc);
+                if (score) this.scores.addScore(sc);
             }
         }
 

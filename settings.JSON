@@ -22,17 +22,17 @@
   "TimestepsOfTheRealTrajectory": 10,
   "MaxSpeed": 3.0,
   "_____________________________Fourth Section": "Setting for the EA algorithm",
-  "AgentPopulationSize": 10,
-  "AgentOffspringSize": 10,
+  "AgentPopulationSize": 100,
+  "AgentOffspringSize": 100,
   "AgentAlphaIntermediateRecombination": 0.5,
   "AgentTimeStepsExplanation": "How many time-steps the agent is going to generate",
   "AgentTimeSteps": 1,
-  "ClassifierPopulationSize": 10,
-  "ClassifierOffspringSize": 10,
+  "ClassifierPopulationSize": 100,
+  "ClassifierOffspringSize": 100,
   "ClassifierAlphaIntermediateRecombination": 0.5,
   "ClassifierTimeStepsExplanation": "Not implemented now",
   "ClassifierTimeSteps": 1,
-  "MaxGenerations": 2,
+  "MaxGenerations": 20,
   "Seed": 1,
   "TournamentSizeAgents": 2,
   "TournamentSizeClassifiers": 2,
@@ -88,6 +88,7 @@
   "LSTMClassifier": false,
   "ENN": true,
   "_____________________________Debug Mode": "Enable Debug mode",
-  "Debug": false
+  "Debug": false,
+  "Score": false
 
 }

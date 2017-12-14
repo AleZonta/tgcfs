@@ -93,6 +93,7 @@ public class ReadConfig {
     private Integer differentSelectionForClassifiers;
     private Integer howManyAmIChangingBetweenGeneration;
     public static boolean debug;
+    private Boolean score;
 
     private Double maxSpeed;
 
@@ -172,6 +173,7 @@ public class ReadConfig {
 
         this.maxSpeed = null;
         this.conversionWithGraph = null;
+        this.score = null;
 
         debug = false;
     }
@@ -621,6 +623,12 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("MaxSpeed is wrong or missing.");
         }
+        try {
+            // AutomaticCalibration
+            this.score = ((Boolean) jsonObject.get("Score"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("Score is wrong or missing.");
+        }
 
         try {
             // debug
@@ -859,6 +867,7 @@ public class ReadConfig {
                 "DifferentSelectionForClassifiers=" + differentSelectionForClassifiers + ",\n" +
                 "MaxSpeed=" + maxSpeed + ",\n" +
                 "conversionWithGraph=" + conversionWithGraph + ",\n" +
+                "Score=" + score + ",\n" +
                 '}';
     }
 
@@ -1131,6 +1140,16 @@ public class ReadConfig {
     public boolean getConversionWithGraph() throws Exception {
         if(this.conversionWithGraph == null) throw new Exception("Try to access config file before reading it.");
         return this.conversionWithGraph;
+    }
+
+    /**
+     * Getter if I am using the score
+     * @return boolean value
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public boolean getScore() throws Exception {
+        if(this.score == null) throw new Exception("Try to access config file before reading it.");
+        return this.score;
     }
 
     /**
@@ -1630,6 +1649,15 @@ public class ReadConfig {
          */
         public static boolean getConversionWithGraph() throws Exception {
             return config.getConversionWithGraph();
+        }
+
+        /**
+         * Getter if I am using the score
+         * @return boolean value
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static boolean getScore() throws Exception {
+            return config.getScore();
         }
     }
 

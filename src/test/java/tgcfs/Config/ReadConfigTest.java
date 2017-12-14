@@ -16,6 +16,24 @@ import static junit.framework.TestCase.*;
  * a.zonta@vu.nl
  */
 public class ReadConfigTest {
+    @Test
+    public void getScore() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getScore();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getScore() == Boolean.TRUE || conf.getScore() == Boolean.FALSE);
+        new ReadConfig.Configurations();
+        assertEquals(conf.getScore(), ReadConfig.Configurations.getScore());
+    }
 
     @Test
     public void getConversionWithGraph() throws Exception {
