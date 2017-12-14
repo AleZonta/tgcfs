@@ -276,6 +276,14 @@ public class Agents extends Algorithm {
             out.deserialise(realLastOut);
             outputsNetworks.add(out);
 
+
+
+            List<INDArray> saveList2 = new ArrayList<>();
+            for (int i = 0; i< timeSeriesLength; i++){
+                saveList2.add(lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(i)));
+            }
+            System.out.println("Output LSTM -> \n" + this.logINDArray(saveList2) + "\n Model Weights \n" + this.printBetterRepresentation(model.getWeights()));
+
             //output has only two fields, input needs three
             //I am using the last direction present into input I am adding that one to the last output
 
@@ -568,6 +576,36 @@ public class Agents extends Algorithm {
     public void resetScore(){
         this.scores = new MultyScores();
     }
+
+
+    /**
+     * Print a better representation of the weights
+     * @param array {@link INDArray} array of weights
+     * @return array transformed in list of double
+     */
+    public List<Double> printBetterRepresentation(INDArray array){
+        List<Double> list = new ArrayList<>();
+        for(int i=0; i< array.columns(); i++){
+            list.add(array.getDouble(i));
+        }
+        return list;
+    }
+
+
+    /**
+     * Print an array of INDarray in a nice format
+     * @param list list of {@link INDArray}
+     * @return string
+     */
+    public String logINDArray(List<INDArray> list){
+        List<String> print = new ArrayList<>();
+        list.forEach(el -> {
+            List<Double> d = this.printBetterRepresentation(el);
+            print.add(d.toString());
+        });
+        return print.toString();
+    }
+
 
 }
 
