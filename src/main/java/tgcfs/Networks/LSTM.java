@@ -8,6 +8,7 @@ import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.GravesLSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -33,7 +34,7 @@ import java.util.stream.IntStream;
  * Class implementing the LSTM neural Networks
  */
 public class LSTM extends Models implements Network{
-    protected MultiLayerNetworkExtended net; //neural network, brain of the agent
+    protected MultiLayerNetwork net; //neural network, brain of the agent
     protected int inputSize;
     protected int hiddenLayers;
     protected int hiddenNeurons;
@@ -185,6 +186,7 @@ public class LSTM extends Models implements Network{
     public int getNumPar(){
         return this.net.numParams();
     }
+
 
     /**
      * fit the network

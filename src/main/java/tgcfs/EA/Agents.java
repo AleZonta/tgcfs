@@ -102,8 +102,8 @@ public class Agents extends Algorithm {
                 //retrieve model from the individual
                 EvolvableModel model = individual.getModel();
                 //set the weights
+                logger.log(Level.INFO, "Single individual -> " + this.printBetterRepresentation(individual.getObjectiveParameters()).toString());
                 model.setWeights(individual.getObjectiveParameters());
-                logger.log(Level.INFO, "Single individual -> " + this.printBetterRepresentation(individual.getObjectiveParameters()).toString() + "\nmodel weights -> " + this.printBetterRepresentation(model.getWeights()));
                 //select which model I am using
                 if(model.getClass().equals(LSTMAgent.class)){
                     this.runLSTM(input, model, individual);
