@@ -5,7 +5,6 @@ import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.Models.ENNClassifier;
-import tgcfs.Classifiers.Models.LSTMClassifier;
 import tgcfs.Config.PropertiesFileReader;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
@@ -18,7 +17,6 @@ import tgcfs.InputOutput.LoadExternalPopulation;
 import tgcfs.Loader.Feeder;
 import tgcfs.Loader.ReachedMaximumNumberException;
 import tgcfs.Loader.TrainReal;
-import tgcfs.NN.EvolvableModel;
 import tgcfs.Performances.SaveToFile;
 import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.LogSystem;
@@ -108,27 +106,9 @@ public class TuringLearning implements Framework{
         this.idsaLoader = new IdsaLoader(logger);
         this.idsaLoader.InitPotentialField(this.feeder.getTrajectories());
         //loading models
-        EvolvableModel agentModel;
-        //decide which model to implement here
-        switch (ReadConfig.Configurations.getValueModel()){
-            case 0:
-                agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
-                break;
-            default:
-                throw new NoSuchMethodError("Model not yet implemented");
-        }
-        EvolvableModel classifierModel;
-        //decide which model to implement here
-        switch (ReadConfig.Configurations.getValueClassifier()){
-            case 0:
-                classifierModel = new ENNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
-                break;
-            case 1:
-                classifierModel = new LSTMClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
-                break;
-            default:
-                throw new NoSuchMethodError("Model not yet implemented");
-        }
+        LSTMAgent agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
+        //decide  model to implement here
+        ENNClassifier classifierModel = new ENNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
         //generate population
         //INITIALISE population EA with random candidate solution
         //check if I am loading the population from file or not

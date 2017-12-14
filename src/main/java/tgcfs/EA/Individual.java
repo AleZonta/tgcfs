@@ -203,6 +203,7 @@ public abstract class Individual {
         this.model = model;
     }
 
+
     /**
      * Increase Fitness by one
      * @exception Exception if the individual is not initialised
