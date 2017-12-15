@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -318,66 +319,30 @@ public abstract class Algorithm {
 
 
     /**
-     * Select parents for the next generation following the idea used in
-     * Li, W., Gauci, M., & Gross, R. (2013). A Coevolutionary Approach to Learn Animal Behavior Through Controlled
-     * Interaction. In Gecco’13: Proceedings of the 2013 Genetic and Evolutionary Computation Conference (pp. 223–230).
-     * http://doi.org/10.1145/2463372.2465801
-     *
-     * the µ individuals with the highest fitness from the combined population (which contains µ + λ individuals),
-     * are selected as the parents to form the population of the next generation.
-     *
+     * Select parents for the next generation
      * @throws Exception if there are problems in reading the info
      */
     public void survivalSelections() throws Exception {
-        //check which class is calling this method
-        int size = 0;
-        if(this.getClass() == Agents.class){
-            size = ReadConfig.Configurations.getAgentPopulationSize();
-        }else{
-            size = ReadConfig.Configurations.getClassifierPopulationSize();
+        int value = 0;
+        if (this.getClass() == Agents.class) {
+            value = ReadConfig.Configurations.getDifferentSelectionForAgent();
+        } else {
+            value = ReadConfig.Configurations.getDifferentSelectionForClassifiers();
         }
-
-        //sort the list
-        this.population.sort(Comparator.comparing(Individual::getFitness));
-
-        //log the fitness of all the population
-        List<Double> fitn = new ArrayList<>();
-        this.population.forEach(p -> fitn.add(p.getFitness()));
-
-        logger.log(Level.INFO, "--Fitness population before selection--");
-        logger.log(Level.INFO, fitn.toString());
-
-
-        while(this.population.size() != size){
-            this.population.remove(0);
+        //0 means mu plus lambda, 1 means mu comma lambda, 2 means keep the best and throw away the others. combine them for agent and classifier.
+        switch (value){
+            case 0:
+                this.muPlusLambda();
+                break;
+            case 1:
+                this.muCommaLambda();
+                break;
+            case 2:
+                this.keepBestN();
+                break;
+            default:
+                throw new Exception("Survival selection selected not yet implemented.");
         }
-
-        List<Individual> newList = new ArrayList<>();
-        this.population.forEach(p -> newList.add(p.deepCopy()));
-
-        List<Double> fitnd = new ArrayList<>();
-        newList.forEach(p -> fitnd.add(p.getFitness()));
-
-        logger.log(Level.INFO, "--Fitness population after selection--");
-        logger.log(Level.INFO, fitnd.toString());
-
-        this.population = new ArrayList<>();
-        this.population = newList;
-        //now the population is again under the maximum size allowed and containing only the element with highest fitness.
-
-        //check who is parents and who is son
-        List<Integer> sonAndParent = new ArrayList<>();
-        this.population.forEach(p -> {
-            if(p.isSon()){
-                // zero for offspring
-                sonAndParent.add(0);
-            }else{
-                // one for parent
-                sonAndParent.add(1);
-            }
-        });
-        logger.log(Level.INFO, "--Parents[1] vs Sons[0]--");
-        logger.log(Level.INFO, sonAndParent.toString());
     }
 
     /**
@@ -467,6 +432,185 @@ public abstract class Algorithm {
      */
     public void setPopulation(List<Individual> population){
         this.population = population;
+    }
+
+
+    /**
+     * Select parents for the next generation following the idea used in
+     * Li, W., Gauci, M., & Gross, R. (2013). A Coevolutionary Approach to Learn Animal Behavior Through Controlled
+     * Interaction. In Gecco’13: Proceedings of the 2013 Genetic and Evolutionary Computation Conference (pp. 223–230).
+     * http://doi.org/10.1145/2463372.2465801
+     *
+     * the µ individuals with the highest fitness from the combined population (which contains µ + λ individuals),
+     * are selected as the parents to form the population of the next generation.
+     *
+     * @throws Exception if there are problems in reading the info
+     */
+    private void muPlusLambda() throws Exception {
+        //check which class is calling this method
+        int size = 0;
+        if (this.getClass() == Agents.class) {
+            size = ReadConfig.Configurations.getAgentPopulationSize();
+        } else {
+            size = ReadConfig.Configurations.getClassifierPopulationSize();
+        }
+
+        //sort the list
+        this.population.sort(Comparator.comparing(Individual::getFitness));
+
+        //log the fitness of all the population
+        List<Double> fitn = new ArrayList<>();
+        this.population.forEach(p -> fitn.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population before selection--");
+        logger.log(Level.INFO, fitn.toString());
+
+
+        while (this.population.size() != size) {
+            this.population.remove(0);
+        }
+
+        List<Individual> newList = new ArrayList<>();
+        this.population.forEach(p -> newList.add(p.deepCopy()));
+
+        List<Double> fitnd = new ArrayList<>();
+        newList.forEach(p -> fitnd.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population after selection--");
+        logger.log(Level.INFO, fitnd.toString());
+
+        this.population = new ArrayList<>();
+        this.population = newList;
+        //now the population is again under the maximum size allowed and containing only the element with highest fitness.
+
+        //check who is parents and who is son
+        List<Integer> sonAndParent = new ArrayList<>();
+        this.population.forEach(p -> {
+            if (p.isSon()) {
+                // zero for offspring
+                sonAndParent.add(0);
+            } else {
+                // one for parent
+                sonAndParent.add(1);
+            }
+        });
+        logger.log(Level.INFO, "--Parents[1] vs Sons[0]--");
+        logger.log(Level.INFO, sonAndParent.toString());
+    }
+
+    /**
+     * the (µ, λ)-ES, in which the selection takes place among the λ offspring
+     * only, whereas their parents are “forgotten” no matter how good or bad
+     * their fitness was compared to that of the new generation. Obviously, this
+     * strategy relies on a birth surplus, i.e., on λ>µ in a strict Darwinian
+     * sense of natural selection.
+     *
+     * @throws Exception if there are problems in reading the info
+     */
+    private void muCommaLambda() throws Exception {
+        //check which class is calling this method
+        int size = 0;
+        if (this.getClass() == Agents.class) {
+            size = ReadConfig.Configurations.getAgentPopulationSize();
+        } else {
+            size = ReadConfig.Configurations.getClassifierPopulationSize();
+        }
+
+        //remove all the parents
+        this.population.removeIf(individual -> !individual.isSon());
+
+        //sort the list
+        this.population.sort(Comparator.comparing(Individual::getFitness));
+
+        //log the fitness of all the population
+        List<Double> fitn = new ArrayList<>();
+        this.population.forEach(p -> fitn.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population before selection--");
+        logger.log(Level.INFO, fitn.toString());
+
+
+        while (this.population.size() != size) {
+            this.population.remove(0);
+        }
+
+        List<Individual> newList = new ArrayList<>();
+        this.population.forEach(p -> newList.add(p.deepCopy()));
+
+        List<Double> fitnd = new ArrayList<>();
+        newList.forEach(p -> fitnd.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population after selection--");
+        logger.log(Level.INFO, fitnd.toString());
+
+        this.population = new ArrayList<>();
+        this.population = newList;
+        //now the population is again under the maximum size allowed and containing only the element with highest fitness.
+    }
+
+
+    /**
+     * Keep the best N individual for the next generation
+     * @throws Exception if there are problems in reading the info
+     */
+    private void keepBestN() throws Exception {
+        //log the fitness of all the population
+        List<Double> fitn = new ArrayList<>();
+        this.population.forEach(p -> fitn.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population before selection--");
+        logger.log(Level.INFO, fitn.toString());
+
+        List<Individual> nextGeneration = new ArrayList<>();
+
+        // lets find out who are all the sons
+        List<Individual> sons = this.population.stream().filter(Individual::isSon).collect(Collectors.toList());
+        List<Individual> parents = this.population.stream().filter(individual -> !individual.isSon()).collect(Collectors.toList());
+
+        // keep the best parents -> order the parents and keep the one with highest fitness
+        parents.sort(Comparator.comparing(Individual::getFitness));
+
+        int howManyIwillKeep = ReadConfig.Configurations.getKeepBestNElement();
+        for (int i = 1; i < howManyIwillKeep + 1 ; i ++) {
+            nextGeneration.add(parents.get(parents.size() - i).deepCopy());
+        }
+
+        int size = 0;
+        if (this.getClass() == Agents.class) {
+            size = ReadConfig.Configurations.getAgentPopulationSize();
+        } else {
+            size = ReadConfig.Configurations.getClassifierPopulationSize();
+        }
+
+        sons.forEach(s -> nextGeneration.add(s.deepCopy()));
+
+        while(nextGeneration.size() > size){
+            nextGeneration.remove(nextGeneration.size() - 1);
+        }
+        nextGeneration.sort(Comparator.comparing(Individual::getFitness));
+
+
+        List<Double> fitnd = new ArrayList<>();
+        nextGeneration.forEach(p -> fitnd.add(p.getFitness()));
+
+        logger.log(Level.INFO, "--Fitness population after selection--");
+        logger.log(Level.INFO, fitnd.toString());
+
+        this.setPopulation(nextGeneration);
+
+        //check who is parents and who is son
+        List<Integer> sonAndParent = new ArrayList<>();
+        this.population.forEach(p -> {
+            if(p.isSon()){
+                // zero for offspring
+                sonAndParent.add(0);
+            }else{
+                // one for parent
+                sonAndParent.add(1);
+            }
+        });
+        logger.log(Level.INFO, "--Parents vs Sons--");
+        logger.log(Level.INFO, sonAndParent.toString());
     }
 
 }

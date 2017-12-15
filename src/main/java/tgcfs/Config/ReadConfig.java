@@ -91,6 +91,8 @@ public class ReadConfig {
     private Integer populationWillUseTheAutomaticDisengagementSystem;
 
     private Integer differentSelectionForClassifiers;
+    private Integer differentSelectionForAgent;
+    private Integer keepBestNElement;
     private Integer howManyAmIChangingBetweenGeneration;
     public static boolean debug;
     private Boolean score;
@@ -169,6 +171,8 @@ public class ReadConfig {
         this.populationWillUseTheAutomaticDisengagementSystem = null;
 
         this.differentSelectionForClassifiers = null;
+        this.differentSelectionForAgent = null;
+        this.keepBestNElement = null;
         this.howManyAmIChangingBetweenGeneration = null;
 
         this.maxSpeed = null;
@@ -601,11 +605,18 @@ public class ReadConfig {
             throw new Exception("PopulationWithAutomaticDisengagement is wrong or missing.");
         }try {
             // DifferentSelectionForClassifiers
-            this.differentSelectionForClassifiers = ((Long) jsonObject.get("DifferentSelectionForClassifiers")).intValue();
+            double value = (Double) jsonObject.get("DifferentSelectionForClassifiers");
+            double fractionalPart = value % 1;
+            double integralPart = value - fractionalPart;
+            fractionalPart *= 10 ;
+            fractionalPart += 0.1 ;
+
+            this.differentSelectionForClassifiers = (int) fractionalPart;
+            this.differentSelectionForAgent = (int) integralPart;
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("DifferentSelectionForClassifiers is wrong or missing.");
         }try {
-            // DifferentSelectionForClassifiers
+            // HowManyAmIChangingBetweenGeneration
             this.howManyAmIChangingBetweenGeneration = ((Long) jsonObject.get("HowManyAmIChangingBetweenGeneration")).intValue();
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("HowManyAmIChangingBetweenGeneration is wrong or missing.");
@@ -644,7 +655,14 @@ public class ReadConfig {
             this.conversionWithGraph = ((Boolean) jsonObject.get("ConversionOutputWithGraph"));
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("ConversionOutputWithGraph is wrong or missing.");
+        }try {
+            // KeepBestNElement
+            this.keepBestNElement = ((Long) jsonObject.get("KeepBestNElement")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("KeepBestNElement is wrong or missing.");
         }
+
+
     }
 
 
@@ -865,9 +883,11 @@ public class ReadConfig {
                 "MeasureUsedForAutomaticDisengagement=" + measureUsedForAutomaticDisengagement + ",\n" +
                 "PopulationWithAutomaticDisengagement=" + populationWillUseTheAutomaticDisengagementSystem + ",\n" +
                 "DifferentSelectionForClassifiers=" + differentSelectionForClassifiers + ",\n" +
+                "DifferentSelectionForAgent=" + differentSelectionForAgent + ",\n" +
                 "MaxSpeed=" + maxSpeed + ",\n" +
                 "conversionWithGraph=" + conversionWithGraph + ",\n" +
                 "Score=" + score + ",\n" +
+                "KeepBestNElement=" + keepBestNElement + ",\n" +
                 '}';
     }
 
@@ -1110,6 +1130,15 @@ public class ReadConfig {
         if(this.differentSelectionForClassifiers == null) throw new Exception("Try to access config file before reading it.");
         return differentSelectionForClassifiers;
     }
+    /**
+     * Getter for the property if the agent has a different selection method
+     * @return int
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getDifferentSelectionForAgent() throws Exception {
+        if(this.differentSelectionForAgent == null) throw new Exception("Try to access config file before reading it.");
+        return differentSelectionForAgent;
+    }
 
     /**
      * Getter for the percentage of trajectory kept between generations
@@ -1150,6 +1179,16 @@ public class ReadConfig {
     public boolean getScore() throws Exception {
         if(this.score == null) throw new Exception("Try to access config file before reading it.");
         return this.score;
+    }
+
+    /**
+     * Getter for how many I want to keep with specific survival selection
+     * @return int number
+     * @throws Exception  if I am trying to access it before reading it
+     */
+    public int getKeepBestNElement() throws Exception {
+        if(this.keepBestNElement == null) throw new Exception("Try to access config file before reading it.");
+        return this.keepBestNElement;
     }
 
     /**
@@ -1623,6 +1662,14 @@ public class ReadConfig {
         public static int getDifferentSelectionForClassifiers() throws Exception {
             return config.getDifferentSelectionForClassifiers();
         }
+        /**
+         * Getter for the property if the classifiers has a different selection method
+         * @return int
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getDifferentSelectionForAgent() throws Exception {
+            return config.getDifferentSelectionForAgent();
+        }
 
         /**
          * Getter for the percentage of trajectory kept between generations
@@ -1658,6 +1705,15 @@ public class ReadConfig {
          */
         public static boolean getScore() throws Exception {
             return config.getScore();
+        }
+
+        /**
+         * Getter for how many I want to keep with specific survival selection
+         * @return int number
+         * @throws Exception  if I am trying to access it before reading it
+         */
+        public static int getKeepBestNElement() throws Exception {
+            return config.getKeepBestNElement();
         }
     }
 

@@ -17,6 +17,25 @@ import static junit.framework.TestCase.*;
  */
 public class ReadConfigTest {
     @Test
+    public void getKeepBestNElement() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getKeepBestNElement();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getKeepBestNElement() > 0);
+        new ReadConfig.Configurations();
+        assertEquals(conf.getKeepBestNElement(), ReadConfig.Configurations.getKeepBestNElement());
+    }
+
+    @Test
     public void getScore() throws Exception {
         //test if I return a location -> that is not null
         ReadConfig conf = new ReadConfig();

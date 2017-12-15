@@ -6,6 +6,7 @@ import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.NN.EvolvableModel;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -24,6 +25,21 @@ import static junit.framework.TestCase.assertNotNull;
  * a.zonta@vu.nl
  */
 public class AlgorithmTest {
+    @Test
+    public void survivalSelections() throws Exception {
+        new ReadConfig.Configurations();
+        new RandomGenerator();
+        Logger log =  Logger.getLogger(AlgorithmTest.class.getName());
+
+        Algorithm algorithm = new Agents(log);
+        EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
+        algorithm.generatePopulation(evolvableModel);
+        Integer pop = algorithm.getPopulation().size();
+        algorithm.generateOffspring();
+        algorithm.survivalSelections();
+    }
+
+
 //    public void reduceVirulence() throws Exception {
 //        new ReadConfig.Configurations();
 //        Logger log =  Logger.getLogger(AlgorithmTest.class.getName());
@@ -183,17 +199,7 @@ public class AlgorithmTest {
 
     @Test
     public void selectParents() throws Exception {
-        new ReadConfig.Configurations();
-        Logger log =  Logger.getLogger(AlgorithmTest.class.getName());
 
-        Algorithm algorithm = new Agents(log);
-        EvolvableModel evolvableModel = new LSTMAgent(1,1,1,1);
-        algorithm.generatePopulation(evolvableModel);
-        Integer pop = algorithm.getPopulation().size();
-        algorithm.generateOffspring();
-        assertEquals(pop*2,algorithm.getPopulation().size());
-        algorithm.survivalSelections();
-        assertEquals(pop.intValue(), algorithm.getPopulation().size());
     }
 
     @Test
