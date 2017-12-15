@@ -6,9 +6,9 @@ import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Utils.IndividualStatus;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Alessandro Zonta on 13/10/2017.
@@ -90,7 +90,6 @@ public class NonUniformMutation extends Individual {
     @Override
     public void mutate(int n) {
         double stepSize = 0d;
-        Random rnd = new Random();
         try {
             if(this.ind == IndividualStatus.AGENT) {
                 stepSize = StepSize.getStepSizeAgents();
@@ -99,7 +98,7 @@ public class NonUniformMutation extends Individual {
             }
         } catch (Exception ignored) { }
         for(int i = 0; i < super.getObjectiveParameters().columns(); i++){
-            double newValue = super.getObjectiveParameters().getDouble(i) + stepSize * rnd.nextGaussian();
+            double newValue = super.getObjectiveParameters().getDouble(i) + stepSize * RandomGenerator.getNextDouble();
             //elastic bound
             if(newValue > 4d){
                 double difference = newValue - 4d;

@@ -109,11 +109,11 @@ public abstract class Individual {
      * @exception Exception if there are problems with the reading of the seed information
      */
     public Individual(int size) throws Exception {
-        //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
-        this.objectiveParameters = Nd4j.rand(1, size);
+        List<Double> random = new ArrayList<>();
         for(int j = 0; j< size; j++){
-            this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
+            random.add(RandomGenerator.getNextDouble(-4,4));
         }
+        this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
         this.fitness = new AtomicDouble(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
@@ -130,11 +130,11 @@ public abstract class Individual {
      * @exception Exception if there are problems with the reading of the seed information
      */
     public Individual(int size, IndividualStatus ind) throws Exception {
-        //this.objectiveParameters = ThreadLocalRandom.current().doubles(size, -4.0, 4.0).collect(ArrayList::new,ArrayList::add, ArrayList::addAll);
-        this.objectiveParameters = Nd4j.rand(1, size);
+        List<Double> random = new ArrayList<>();
         for(int j = 0; j< size; j++){
-            this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
+            random.add(RandomGenerator.getNextDouble(-4,4));
         }
+        this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
         this.fitness = new AtomicDouble(0);
         this.model = null;
         this.myInputandOutput = new ArrayList<>();
@@ -152,10 +152,11 @@ public abstract class Individual {
      * @exception Exception if there are problems with the reading of the seed information
      */
     public Individual(int size, EvolvableModel model, IndividualStatus ind) throws Exception {
-        this.objectiveParameters = Nd4j.rand(1, size);
+        List<Double> random = new ArrayList<>();
         for(int j = 0; j< size; j++){
-            this.objectiveParameters.putScalar(j, RandomGenerator.getNextDouble(-1,1));
+            random.add(RandomGenerator.getNextDouble(-4,4));
         }
+        this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
         this.fitness = new AtomicDouble(0);
         this.model = model;
         this.myInputandOutput = new ArrayList<>();
