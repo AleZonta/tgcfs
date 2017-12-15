@@ -1,7 +1,6 @@
 package tgcfs.EA;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Mutation.NonUniformMutation;
 import tgcfs.EA.Mutation.RandomResetting;
@@ -20,6 +19,7 @@ import tgcfs.Utils.RandomGenerator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -111,24 +111,28 @@ public abstract class Algorithm {
      */
     public void generatePopulation(EvolvableModel model, List<INDArray> populationLoaded) throws Exception {
         //check which class is calling this method
-        int size = 0;
+
         IndividualStatus status;
         if(this.getClass() == Agents.class){
-            size = ReadConfig.Configurations.getAgentPopulationSize();
             status = IndividualStatus.AGENT;
             logger.log(Level.INFO, "Generating Loaded Agents Population...");
         }else{
             status = IndividualStatus.CLASSIFIER;
-            size = ReadConfig.Configurations.getClassifierPopulationSize();
             logger.log(Level.INFO, "Generating Loaded Classifiers Population...");
         }
-        int finalSize = size;
+
+        int size = 0;
+        if(Objects.equals(ReadConfig.Configurations.getUncorrelatedMutationStep(), "1")){
+            size = 1;
+        }
+        final int[] finalSize = {size};
         populationLoaded.forEach(ind -> {
             Individual newBorn;
             try {
                 switch(ReadConfig.Configurations.getMutation()){
                     case 0:
-                        newBorn = new UncorrelatedMutation(ind, Nd4j.create(finalSize), status);
+                        if(finalSize[0] == 0) finalSize[0] = ind.columns();
+                        newBorn = new UncorrelatedMutation(ind, finalSize[0], status);
                         break;
                     case 1:
                         newBorn = new RandomResetting(ind, status);
@@ -291,7 +295,7 @@ public abstract class Algorithm {
             Individual son;
             switch(ReadConfig.Configurations.getMutation()){
                 case 0:
-                    son = new UncorrelatedMutation(parent.getObjectiveParameters().dup(), Nd4j.create(parent.getObjectiveParameters().columns()), status, true);
+                    son = new UncorrelatedMutation(parent.getObjectiveParameters().dup(), ((UncorrelatedMutation)parent).getMutationStrengths().dup(), status, true);
                     break;
                 case 1:
                     son = new RandomResetting(parent.getObjectiveParameters().dup(), status, true);

@@ -38,7 +38,7 @@ public class UncorrelatedMutationTest {
         INDArray realOriginal = original.dup();
 
 
-        IntStream.range(0, 2).forEach(i -> {
+        IntStream.range(0, 20).forEach(i -> {
             ind.mutate(10);
             INDArray mutw = ind.getObjectiveParameters();
             Integer d = 0;

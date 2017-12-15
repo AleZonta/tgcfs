@@ -100,6 +100,7 @@ public class ReadConfig {
     private Double maxSpeed;
 
     private Boolean conversionWithGraph;
+    private String uncorrelatedMutationStep;
 
 
     /**
@@ -178,6 +179,7 @@ public class ReadConfig {
         this.maxSpeed = null;
         this.conversionWithGraph = null;
         this.score = null;
+        this.uncorrelatedMutationStep = null;
 
         debug = false;
     }
@@ -662,7 +664,12 @@ public class ReadConfig {
             throw new Exception("KeepBestNElement is wrong or missing.");
         }
 
-
+        try {
+            // UncorrelatedMutationStep
+            this.uncorrelatedMutationStep = (String) jsonObject.get("UncorrelatedMutationStep");
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("UncorrelatedMutationStep is wrong or missing.");
+        }
     }
 
 
@@ -888,6 +895,7 @@ public class ReadConfig {
                 "conversionWithGraph=" + conversionWithGraph + ",\n" +
                 "Score=" + score + ",\n" +
                 "KeepBestNElement=" + keepBestNElement + ",\n" +
+                "UncorrelatedMutationStep=" + uncorrelatedMutationStep + ",\n" +
                 '}';
     }
 
@@ -1189,6 +1197,16 @@ public class ReadConfig {
     public int getKeepBestNElement() throws Exception {
         if(this.keepBestNElement == null) throw new Exception("Try to access config file before reading it.");
         return this.keepBestNElement;
+    }
+
+    /**
+     * Getter for how many timesteps the uncorrelated mutation has
+     * @return string value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public String getUncorrelatedMutationStep() throws Exception {
+        if(this.uncorrelatedMutationStep == null) throw new Exception("Try to access config file before reading it.");
+        return this.uncorrelatedMutationStep;
     }
 
     /**
@@ -1714,6 +1732,15 @@ public class ReadConfig {
          */
         public static int getKeepBestNElement() throws Exception {
             return config.getKeepBestNElement();
+        }
+
+        /**
+         * Getter for how many timesteps the uncorrelated mutation has
+         * @return string value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static String getUncorrelatedMutationStep() throws Exception {
+            return config.getUncorrelatedMutationStep();
         }
     }
 

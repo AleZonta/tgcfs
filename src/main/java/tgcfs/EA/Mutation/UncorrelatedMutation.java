@@ -9,6 +9,7 @@ import tgcfs.NN.EvolvableModel;
 import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.RandomGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -47,12 +48,16 @@ public class UncorrelatedMutation extends Individual {
     /**
      * three parameter constructor and set to 0 the fitness
      * @param objPar objectiveParameters list
-     * @param mutStr mutationStrengths list
+     * @param  size size of the objectiveParameter
      * @param ind kind of individual I am creating
      */
-    public UncorrelatedMutation(INDArray objPar,INDArray mutStr, IndividualStatus ind){
+    public UncorrelatedMutation(INDArray objPar, int size, IndividualStatus ind){
         super(objPar, ind);
-        this.mutationStrengths = mutStr;
+        List<Double> random = new ArrayList<>();
+        for(int j = 0; j < size; j++){
+            random.add(RandomGenerator.getNextDouble(-4,4));
+        }
+        this.mutationStrengths = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
     }
 
     /**
@@ -77,11 +82,15 @@ public class UncorrelatedMutation extends Individual {
      */
     public UncorrelatedMutation(int size) throws Exception {
         super(size);
-        this.mutationStrengths = Nd4j.ones(size);
+        List<Double> random = new ArrayList<>();
+        for(int j = 0; j < size; j++){
+            random.add(RandomGenerator.getNextDouble(-4,4));
+        }
+        this.mutationStrengths = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
     }
 
     /**
-     * One parameter constructor
+     * two parameter constructor
      * It is loading the objective parameters list with random number
      * and the mutation strengths list with 1.0
      * @param size size of the objectiveParameter
@@ -90,11 +99,15 @@ public class UncorrelatedMutation extends Individual {
      */
     public UncorrelatedMutation(int size, IndividualStatus ind) throws Exception {
         super(size, ind);
-        this.mutationStrengths = Nd4j.ones(size);
+        List<Double> random = new ArrayList<>();
+        for(int j = 0; j < size; j++){
+            random.add(RandomGenerator.getNextDouble(-4,4));
+        }
+        this.mutationStrengths = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
     }
 
     /**
-     * One parameter constructor
+     * three parameter constructor
      * It is loading the objective parameters list with random number
      * and the mutation strengths list with 1.0
      * @param size size of the objectiveParameter
@@ -104,11 +117,31 @@ public class UncorrelatedMutation extends Individual {
      */
     public UncorrelatedMutation(int size, EvolvableModel model, IndividualStatus ind) throws Exception {
         super(size, model, ind);
-        this.mutationStrengths = Nd4j.ones(size);
+        List<Double> random = new ArrayList<>();
+        for(int j = 0; j < size; j++){
+            random.add(RandomGenerator.getNextDouble(-4,4));
+        }
+        this.mutationStrengths = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
     }
 
     /**
-     * four parameters constructor
+     * six parameters constructor
+     * @param objPar objectiveParameters list
+     * @param fitness fitness
+     * @param model model to assign to the individual
+     * @param myInputandOutput input output last
+     * @param ind kind of individual I am creating
+     * @param isSon boolean variable if the individual is a son
+     * @param mutStr mutationStrengths list
+     */
+    public UncorrelatedMutation(INDArray objPar, AtomicDouble fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon, INDArray mutStr){
+        super(objPar, fitness, model, myInputandOutput, ind, isSon);
+        this.mutationStrengths = mutStr;
+    }
+
+    /**
+     * seven parameters constructor
+     * @param size size of the objectiveParameter
      * @param objPar objectiveParameters list
      * @param fitness fitness
      * @param model model to assign to the individual
@@ -116,8 +149,13 @@ public class UncorrelatedMutation extends Individual {
      * @param ind kind of individual I am creating
      * @param isSon boolean variable if the individual is a son
      */
-    public UncorrelatedMutation(INDArray objPar, AtomicDouble fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
+    public UncorrelatedMutation(int size, INDArray objPar, AtomicDouble fitness, EvolvableModel model, List<TrainReal> myInputandOutput, IndividualStatus ind, boolean isSon){
         super(objPar, fitness, model, myInputandOutput, ind, isSon);
+        List<Double> random = new ArrayList<>();
+        for(int j = 0; j < size; j++){
+            random.add(RandomGenerator.getNextDouble(-4,4));
+        }
+        this.mutationStrengths = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
     }
 
     /**
@@ -147,7 +185,12 @@ public class UncorrelatedMutation extends Individual {
             //random Double generated separately for each element within each individual
             double randw = RandomGenerator.getNextDouble();
             //obtain the new mutation value
-            double newMutation = this.mutationStrengths.getDouble(i) * Math.exp(p1 * rand1 + p2 * randw);
+            double newMutation = 0.0;
+            if(this.mutationStrengths.columns() == 1){
+                newMutation = this.mutationStrengths.getDouble(i) * Math.exp(p2 * rand1);
+            }else {
+                newMutation = this.mutationStrengths.getDouble(i) * Math.exp(p1 * rand1 + p2 * randw);
+            }
             //substitute the old one with the new one
             this.mutationStrengths.putScalar(i, newMutation);
         });
@@ -156,8 +199,22 @@ public class UncorrelatedMutation extends Individual {
         IntStream.range(0, super.getObjectiveParameters().columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
             double randw = RandomGenerator.getNextDouble();
-            double newObj = super.getObjectiveParameters().getDouble(i) + this.mutationStrengths.getDouble(i) * randw;
-            super.getObjectiveParameters().putScalar(i, newObj);
+            double mutStrenght = 0.0;
+            if(this.mutationStrengths.columns() == 1){
+                mutStrenght = this.mutationStrengths.getDouble(0);
+            }else {
+                mutStrenght = this.mutationStrengths.getDouble(i);
+            }
+            double newValue = super.getObjectiveParameters().getDouble(i) + mutStrenght * randw;
+            if(newValue > 4d){
+                double difference = newValue - 4d;
+                newValue = 4d - difference;
+            }
+            if(newValue < -4){
+                double difference = newValue - (-4d);
+                newValue = -4 - difference;
+            }
+            super.getObjectiveParameters().putScalar(i, newValue);
         });
     }
 
@@ -166,7 +223,7 @@ public class UncorrelatedMutation extends Individual {
      * @return UncorrelatedMutation object
      */
     public UncorrelatedMutation deepCopy(){
-        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicDouble(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon());
+        return new UncorrelatedMutation(this.getObjectiveParameters(), new AtomicDouble(this.getFitness()), this.getModel().deepCopy(), this.getMyInputandOutput(), this.ind, this.isSon(), this.mutationStrengths);
     }
 
 }
