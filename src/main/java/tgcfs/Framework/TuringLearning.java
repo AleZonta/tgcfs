@@ -27,7 +27,6 @@ import tgcfs.Utils.LogSystem;
 import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,7 +81,8 @@ public class TuringLearning implements Framework{
         logger.log(Level.INFO, PropertiesFileReader.getGitSha1());
 
         //back up for convolution, in java there are some problems
-        if(Objects.equals(ReadConfig.Configurations.getValueModel(), ReadConfig.Configurations.Convolution)) Nd4j.enableFallbackMode(Boolean.TRUE);
+        Nd4j.enableFallbackMode(Boolean.FALSE);
+        System.out.println("is fallbackmodeenabled? -> " + Nd4j.isFallbackModeEnabled());
 
         this.countingTime = 0;
         //load countermeasures

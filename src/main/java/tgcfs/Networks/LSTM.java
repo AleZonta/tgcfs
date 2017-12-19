@@ -100,6 +100,9 @@ public class LSTM extends Models implements Network{
         this.hiddenLayers = hiddenLayers;
         this.hiddenNeurons = hiddenNeurons;
         this.outputSize = outputSize;
+
+
+
     }
 
     /**
@@ -174,6 +177,7 @@ public class LSTM extends Models implements Network{
     public INDArray computeOutput(INDArray input) {
         //If this MultiLayerNetwork contains one or more RNN layers: conduct forward pass (prediction) but using
         // previous stored state for any RNN layers.
+        System.out.println("is fallbackmodeenabled? -> " + Nd4j.isFallbackModeEnabled());
         return this.net.rnnTimeStep(input);
     }
 
