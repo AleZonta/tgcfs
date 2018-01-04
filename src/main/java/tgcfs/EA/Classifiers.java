@@ -15,6 +15,7 @@ import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Performances.SaveToFile;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +57,7 @@ public class Classifiers extends Algorithm {
     public void generatePopulation(EvolvableModel model) throws Exception {
         super.generatePopulation(model);
         this.maxFitnessAchievable = ((ReadConfig.Configurations.getAgentPopulationSize() + ReadConfig.Configurations.getAgentOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained()) * 2;
+        SaveToFile.Saver.saveMaxFitnessAchievable(this.maxFitnessAchievable, this.getClass().getName());
     }
 
     /**
@@ -70,6 +72,7 @@ public class Classifiers extends Algorithm {
     public void generatePopulation(EvolvableModel model, List<INDArray> populationLoaded) throws Exception {
         super.generatePopulation(model, populationLoaded);
         this.maxFitnessAchievable = ((ReadConfig.Configurations.getAgentPopulationSize() + ReadConfig.Configurations.getAgentOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained()) * 2;
+        SaveToFile.Saver.saveMaxFitnessAchievable(this.maxFitnessAchievable, this.getClass().getName());
     }
 
     /**

@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -31,28 +32,44 @@ public class UncorrelatedMutationTest {
 
     @Test
     public void mutate() throws Exception {
+
         new ReadConfig.Configurations();
-        Individual ind = new UncorrelatedMutation(5);
+        new RandomGenerator();
 
-        INDArray original = ind.getObjectiveParameters();
-        INDArray realOriginal = original.dup();
+        IntStream.range(0,10).forEach(q -> {
+            Individual ind = null;
+            try {
+                ind = new UncorrelatedMutation(5);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            INDArray original = ind.getObjectiveParameters();
+            INDArray realOriginal = original.dup();
 
 
-        IntStream.range(0, 20).forEach(i -> {
-            ind.mutate(10);
-            INDArray mutw = ind.getObjectiveParameters();
-            Integer d = 0;
-            for(int z = 0; z < original.columns(); z++){
-                if(!Objects.equals(realOriginal.getDouble(z), mutw.getDouble(z))){
-                    d++;
+            Individual finalInd = ind;
+            IntStream.range(0, 10).forEach(i -> {
+                finalInd.mutate(10);
+                INDArray mutw = finalInd.getObjectiveParameters();
+                Integer d = 0;
+                for(int z = 0; z < original.columns(); z++){
+                    if(!Objects.equals(realOriginal.getDouble(z), mutw.getDouble(z))){
+                        d++;
+                    }
                 }
-            }
-            assertNotSame(0,d);
+                assertNotSame(0,d);
 
-            for(int j = 0; j < mutw.columns(); j++){
-                assertTrue(mutw.getDouble(j)>=-4 && mutw.getDouble(j)<=4);
-            }
+                System.out.println(mutw.toString());
+                for(int j = 0; j < mutw.columns(); j++){
+
+                    assertTrue(mutw.getDouble(j)>=-4 && mutw.getDouble(j)<=4);
+                }
+            });
+
+            System.out.println("-------------------");
         });
+
 
 
     }

@@ -155,6 +155,17 @@ public class SaveToFile {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveScoresBattle(scores,generationAgent,generationClassifier);
         }
+
+        /**
+         * Save the max fitness achievable by the agent and the classifier
+         * @param fitness value of the fitness
+         * @param name agent or classfier
+         * @throws Exception  if the class is not instantiate
+         */
+        public static void saveMaxFitnessAchievable(int fitness, String name) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.saveMaxFitnessAchievable(fitness,name);
+        }
     }
 
 
@@ -423,4 +434,35 @@ public class SaveToFile {
             logger.log(Level.WARNING, "Error with scores Zip File-" + generationAgent + "-" + generationClassifier + " " + e.getMessage());
         }
     }
+
+
+    /**
+     * Save the max fitness achievable by the agent and the classifier
+     * @param fitness value of the fitness
+     * @param name agent or classfier
+     */
+    private void saveMaxFitnessAchievable(int fitness, String name){
+        String data = name + " -> " + fitness + "; \n";
+        String path = this.currentPath + "maxFitnessAchievable.txt";
+        File file = new File(path);
+
+        try {
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            // true = append file
+            FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(data);
+            bw.close();
+
+            fw.close();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error in saving the max fitness achievable " + e.getMessage());
+        }
+
+
+    }
+
 }

@@ -31,6 +31,16 @@ import static junit.framework.TestCase.assertEquals;
  */
 public class SaverTest {
     @Test
+    public void saveMaxFitnessAchievable() throws Exception {
+        new ReadConfig.Configurations();
+        Logger log =  Logger.getLogger(SaverTest.class.getName());
+        SaveToFile.Saver saver = new SaveToFile.Saver("test", "1", log);
+        SaveToFile.Saver.saveMaxFitnessAchievable(12345, "test");
+        SaveToFile.Saver.saveMaxFitnessAchievable(12345, "test");
+
+    }
+
+    @Test
     public void dumpTrajectoryAndGeneratedPart() throws Exception {
         new ReadConfig.Configurations();
         List<InputsNetwork> input = new ArrayList<>();

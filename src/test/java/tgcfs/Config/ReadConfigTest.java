@@ -129,6 +129,9 @@ public class ReadConfigTest {
         assertTrue(conf.getDifferentSelectionForClassifiers() >= 0);
         new ReadConfig.Configurations();
         assertEquals(conf.getDifferentSelectionForClassifiers(), ReadConfig.Configurations.getDifferentSelectionForClassifiers());
+
+        System.out.println(conf.getDifferentSelectionForClassifiers());
+        System.out.println(conf.getDifferentSelectionForAgent());
     }
 
     @Test
