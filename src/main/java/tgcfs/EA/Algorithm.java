@@ -244,8 +244,9 @@ public abstract class Algorithm {
      * Mutation is then applied to it
      *
      * @throws Exception if the parents have not the same length
+     * @param generation generation we are now
      */
-    public void generateOffspringOnlyWithMutation() throws Exception {
+    public void generateOffspringOnlyWithMutation(int generation) throws Exception {
         //check which class is calling this method
         int size = 0;
         int tournamentSize = 0;
@@ -293,7 +294,8 @@ public abstract class Algorithm {
 
             //son has the same genome of the father
             Individual son;
-            switch(ReadConfig.Configurations.getMutation()){
+            int mutationType = ReadConfig.Configurations.getMutation();
+            switch(mutationType){
                 case 0:
                     son = new UncorrelatedMutation(parent.getObjectiveParameters().dup(), ((UncorrelatedMutation)parent).getMutationStrengths().dup(), status, true);
                     break;
@@ -308,7 +310,12 @@ public abstract class Algorithm {
             }
             //now the son is mutated 10 times (hardcoded value)
             //IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
-            son.mutate(son.getObjectiveParameters().columns());
+            if(mutationType == 2){
+                son.mutate(generation);
+
+            }else {
+                son.mutate(son.getObjectiveParameters().columns());
+            }
             logger.log(Level.FINE, "Son: \n" + son.getObjectiveParameters());
             //set model to the son
             son.setModel(parent.getModel().deepCopy());

@@ -2,6 +2,7 @@ package tgcfs.EA.Mutation;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.primitives.AtomicDouble;
+import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -87,8 +88,7 @@ public class NonUniformMutation extends Individual {
      *
      * @param n is the genome length
      */
-    @Override
-    public void mutate(int n) {
+    public void oldWrongMutate(int n) {
         double stepSize = 0d;
         try {
             if(this.ind == IndividualStatus.AGENT) {
@@ -111,6 +111,59 @@ public class NonUniformMutation extends Individual {
             super.getObjectiveParameters().putScalar(i, newValue);
         }
     }
+
+    /**
+     * Implementation abstract method mutate from individual
+     *
+     * @param n is current generation
+     */
+    @Override
+    public void mutate(int n) {
+        double stepSize = 0d;
+        try {
+            if(this.ind == IndividualStatus.AGENT) {
+                stepSize = StepSize.getStepSizeAgents();
+            }else {
+                stepSize = StepSize.getStepSizeClassifiers();
+            }
+        } catch (Exception ignored) { }
+        double a1 = RandomGenerator.getNextDouble();
+        // position to mutate
+        int position = RandomGenerator.getNextInt(0, super.getObjectiveParameters().columns());
+        double value = super.getObjectiveParameters().getDouble(position);
+        double newValue = 0.0;
+        if(a1 < 0.5) {
+            System.out.println(functionMutation((4d - value), n, stepSize));
+            newValue = value + functionMutation((4d - value), n, stepSize);
+        }else{
+            System.out.println(functionMutation((4d - value), n, stepSize));
+            newValue = value - functionMutation((value + 4d), n, stepSize);
+
+        }
+        //elastic bound
+        if(newValue > 4d){
+            double difference = newValue - 4d;
+            newValue = 4d - difference;
+        }
+        if(newValue < -4){
+            double difference = newValue - (-4d);
+            newValue = -4 - difference;
+        }
+        super.getObjectiveParameters().putScalar(position, newValue);
+    }
+
+
+    private double functionMutation(double y, int generation, double b){
+        double a2 = RandomGenerator.getNextDouble();
+        int maxGeneration = 500;
+        try {
+            maxGeneration = ReadConfig.Configurations.getMaxGenerations();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return y * (1 - a2 * Math.pow((generation / maxGeneration), b));
+    }
+
 
     /**
      * Deep copy function

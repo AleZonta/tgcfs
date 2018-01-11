@@ -38,7 +38,7 @@ public class ClassifiersTest {
         Classifiers classifiers = new Classifiers(log);
         classifiers.generatePopulation(model);
 
-        classifiers.generateOffspringOnlyWithMutation();
+        classifiers.generateOffspringOnlyWithMutation(0);
 
         classifiers.getPopulation().forEach(individual -> individual.setFitness(RandomGenerator.getNextInt(0, 160000)));
 

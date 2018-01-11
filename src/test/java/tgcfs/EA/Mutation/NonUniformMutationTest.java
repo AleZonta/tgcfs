@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,9 @@ public class NonUniformMutationTest {
     @Test
     public void mutate() throws Exception {
         new ReadConfig.Configurations();
+        new RandomGenerator();
+        new StepSize();
+
         Individual ind = new NonUniformMutation(10);
         INDArray original = ind.getObjectiveParameters();
 
@@ -39,7 +43,7 @@ public class NonUniformMutationTest {
         INDArray realOriginal = original.dup();
 
         IntStream.range(0, 1000).forEach(i -> {
-            ind.mutate(0);
+            ind.mutate(i);
             INDArray mutw = ind.getObjectiveParameters();
 
             List<Double> listt = new ArrayList<>();

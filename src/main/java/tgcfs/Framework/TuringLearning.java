@@ -225,8 +225,8 @@ public class TuringLearning implements Framework{
                 if(evolveAgent) this.agents.generateOffspring();
                 if(evolveClassifier) this.classifiers.generateOffspring();
             }else{
-                if(evolveAgent) this.agents.generateOffspringOnlyWithMutation();
-                if(evolveClassifier) this.classifiers.generateOffspringOnlyWithMutation();
+                if(evolveAgent) this.agents.generateOffspringOnlyWithMutation(generationAgent);
+                if(evolveClassifier) this.classifiers.generateOffspringOnlyWithMutation(generationClassifier);
             }
 
             logger.log(Level.INFO, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
@@ -327,7 +327,7 @@ public class TuringLearning implements Framework{
             if(ReadConfig.Configurations.isRecombination()) {
                 this.agents.generateOffspring();
             }else{
-                this.agents.generateOffspringOnlyWithMutation();
+                this.agents.generateOffspringOnlyWithMutation(0);
             }
         }
     }
