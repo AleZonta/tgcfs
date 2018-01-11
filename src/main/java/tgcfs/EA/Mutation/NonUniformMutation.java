@@ -133,12 +133,11 @@ public class NonUniformMutation extends Individual {
         double value = super.getObjectiveParameters().getDouble(position);
         double newValue = 0.0;
         if(a1 < 0.5) {
-            System.out.println(functionMutation((4d - value), n, stepSize));
-            newValue = value + functionMutation((4d - value), n, stepSize);
+            double res = functionMutation((4d - value), n, stepSize);
+            newValue = value + res;
         }else{
-            System.out.println(functionMutation((4d - value), n, stepSize));
-            newValue = value - functionMutation((value + 4d), n, stepSize);
-
+            double res = functionMutation((value + 4d), n, stepSize);
+            newValue = value - res;
         }
         //elastic bound
         if(newValue > 4d){
@@ -161,7 +160,12 @@ public class NonUniformMutation extends Individual {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return y * (1 - a2 * Math.pow((generation / maxGeneration), b));
+        double division = ((double)generation / maxGeneration);
+        double sub = (1 - division);
+        double pow = Math.pow(sub, b);
+        double molt = Math.pow(a2,pow);
+        double subb = 1 - molt;
+        return y * subb;
     }
 
 
