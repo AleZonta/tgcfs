@@ -58,4 +58,13 @@ public class RandomGeneratorTest {
         }
     }
 
+    @Test
+    public void getNextGaussian() throws Exception {
+        new ReadConfig.Configurations();
+        new RandomGenerator();
+        for (int i = 0; i < 100; i++){
+            double num = RandomGenerator.getNextGaussian();
+            System.out.println(num);
+        }
+    }
 }

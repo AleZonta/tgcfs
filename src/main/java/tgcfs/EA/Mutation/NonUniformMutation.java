@@ -2,7 +2,6 @@ package tgcfs.EA.Mutation;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.primitives.AtomicDouble;
-import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -88,7 +87,8 @@ public class NonUniformMutation extends Individual {
      *
      * @param n is the genome length
      */
-    public void oldWrongMutate(int n) {
+    @Override
+    public void mutate(int n) {
         double stepSize = 0d;
         try {
             if(this.ind == IndividualStatus.AGENT) {
@@ -98,7 +98,7 @@ public class NonUniformMutation extends Individual {
             }
         } catch (Exception ignored) { }
         for(int i = 0; i < super.getObjectiveParameters().columns(); i++){
-            double newValue = super.getObjectiveParameters().getDouble(i) + stepSize * RandomGenerator.getNextDouble();
+            double newValue = super.getObjectiveParameters().getDouble(i) + stepSize * RandomGenerator.getNextGaussian();
             //elastic bound
             if(newValue > 4d){
                 double difference = newValue - 4d;
@@ -115,58 +115,68 @@ public class NonUniformMutation extends Individual {
     /**
      * Implementation abstract method mutate from individual
      *
+     * Zhao, X., Gao, X., & Hu, Z. (2004). Evolutionary Programming Based on Non-Uniform Mutation 1), 1(23), 352–374.
+     *
      * @param n is current generation
      */
-    @Override
-    public void mutate(int n) {
-        double stepSize = 0d;
-        try {
-            if(this.ind == IndividualStatus.AGENT) {
-                stepSize = StepSize.getStepSizeAgents();
-            }else {
-                stepSize = StepSize.getStepSizeClassifiers();
-            }
-        } catch (Exception ignored) { }
-        double a1 = RandomGenerator.getNextDouble();
-        // position to mutate
-        int position = RandomGenerator.getNextInt(0, super.getObjectiveParameters().columns());
-        double value = super.getObjectiveParameters().getDouble(position);
-        double newValue = 0.0;
-        if(a1 < 0.5) {
-            double res = functionMutation((4d - value), n, stepSize);
-            newValue = value + res;
-        }else{
-            double res = functionMutation((value + 4d), n, stepSize);
-            newValue = value - res;
-        }
-        //elastic bound
-        if(newValue > 4d){
-            double difference = newValue - 4d;
-            newValue = 4d - difference;
-        }
-        if(newValue < -4){
-            double difference = newValue - (-4d);
-            newValue = -4 - difference;
-        }
-        super.getObjectiveParameters().putScalar(position, newValue);
-    }
+//    @Override
+//    public void mutate(int n) {
+//        double stepSize = 0d;
+//        try {
+//            if(this.ind == IndividualStatus.AGENT) {
+//                stepSize = StepSize.getStepSizeAgents();
+//            }else {
+//                stepSize = StepSize.getStepSizeClassifiers();
+//            }
+//        } catch (Exception ignored) { }
+//        double a1 = RandomGenerator.getNextDouble();
+//        // position to mutate
+//        int position = RandomGenerator.getNextInt(0, super.getObjectiveParameters().columns());
+//        double value = super.getObjectiveParameters().getDouble(position);
+//        double newValue = 0.0;
+//        if(a1 < 0.5) {
+//            double res = functionMutation((4d - value), n, stepSize);
+//            newValue = value + res;
+//        }else{
+//            double res = functionMutation((value + 4d), n, stepSize);
+//            newValue = value - res;
+//        }
+//        //elastic bound
+//        if(newValue > 4d){
+//            double difference = newValue - 4d;
+//            newValue = 4d - difference;
+//        }
+//        if(newValue < -4){
+//            double difference = newValue - (-4d);
+//            newValue = -4 - difference;
+//        }
+//        super.getObjectiveParameters().putScalar(position, newValue);
+//    }
 
-
-    private double functionMutation(double y, int generation, double b){
-        double a2 = RandomGenerator.getNextDouble();
-        int maxGeneration = 500;
-        try {
-            maxGeneration = ReadConfig.Configurations.getMaxGenerations();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        double division = ((double)generation / maxGeneration);
-        double sub = (1 - division);
-        double pow = Math.pow(sub, b);
-        double molt = Math.pow(a2,pow);
-        double subb = 1 - molt;
-        return y * subb;
-    }
+    /**
+     * The function ∆(t, y) returns a value in the range [0, y] such that ∆(t, y) approaches to zero as t increases.
+     * This property causes this operator to search the space uniformly initially (when t is small), and very locally
+     * at later stages. This strategy increases the probability of generating a new number close to its successor than a random choice.
+     * @param y value
+     * @param generation current generation
+     * @param b b is a system parameter determining the degree of dependency on the iteration number
+     * @return double value
+     */
+//    private double functionMutation(double y, int generation, double b){
+//        double a2 = RandomGenerator.getNextDouble();
+//        int maxGeneration = 500;
+//        try {
+//            maxGeneration = ReadConfig.Configurations.getMaxGenerations();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        double division = ((double)generation / maxGeneration);
+//        double sub = (1 - division);
+//        double pow = Math.pow(sub, b);
+//        double molt = Math.pow(a2,pow);
+//        double subb = 1 - molt;
+//        return y * subb;
+//    }
 
 
     /**

@@ -296,4 +296,12 @@ public abstract class Individual {
     public void isParent() {
         this.isSon = false;
     }
+
+    /**
+     * Return the status of the individual
+     * @return {@link IndividualStatus} status
+     */
+    public IndividualStatus getIndividualStatus() {
+        return this.ind;
+    }
 }

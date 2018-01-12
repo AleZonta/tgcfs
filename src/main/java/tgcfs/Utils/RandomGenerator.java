@@ -60,4 +60,14 @@ public class RandomGenerator {
     public static double getNextDouble(double lowerBound, double upperBound) {
         return  lowerBound + (upperBound - lowerBound) * rand.nextDouble();
     }
+
+    /**
+     * Return next gaussian generator
+     * @return double value
+     */
+    public static double getNextGaussian(){
+        return rand.nextGaussian();
+    }
+
+
 }
