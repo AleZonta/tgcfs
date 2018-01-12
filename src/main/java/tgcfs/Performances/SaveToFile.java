@@ -380,6 +380,8 @@ public class SaveToFile {
                 real.addAll(el.getFollowingPart());
                 obj.put("real", real);
 
+                obj.put("classification", el.getResultClassifier());
+
                 String name = "trajectory-" + i;
                 totalObj.put(name, obj);
             });

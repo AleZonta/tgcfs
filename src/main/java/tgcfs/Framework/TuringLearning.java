@@ -237,6 +237,7 @@ public class TuringLearning implements Framework{
                 //execution agents
                 logger.log(Level.INFO,"Run Agents...");
                 this.agents.runIndividuals(combineInputList);
+                this.agents.generateRealPoints(new FollowingTheGraph(this.feeder, logger));
                 logger.log(Level.INFO,"Run Classifiers...");
                 //classifier are executed and evaluated during agents evaluations
                 this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, logger));
@@ -246,7 +247,7 @@ public class TuringLearning implements Framework{
                 if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
                     logger.log(Level.INFO, "Dump agent generation and real");
 //                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
-                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier, new FollowingTheGraph(this.feeder, logger));
+                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier);
                     if(ReadConfig.Configurations.getScore()) this.agents.saveScoresBattle(generationAgent, generationClassifier);
                 }
 

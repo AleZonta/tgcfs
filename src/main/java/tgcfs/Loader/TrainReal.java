@@ -45,6 +45,7 @@ public class TrainReal {
     private List<PointWithBearing> realPointsOutputComputed;
     private IdsaLoader idsaLoader;
     private List<Point> totalPoints;
+    private boolean resultClassifier;
 
     /**
      * Constructor with two parameters
@@ -441,5 +442,20 @@ public class TrainReal {
         return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints);
     }
 
+    /**
+     * Return the classifier result from this input
+     * @return boolean value
+     */
+    public boolean getResultClassifier() {
+        return this.resultClassifier;
+    }
+
+    /**
+     * Set the result from the classifier to this input
+     * @param resultClassifier boolean value
+     */
+    public void setResultClassifier(boolean resultClassifier) {
+        this.resultClassifier = resultClassifier;
+    }
 }
 
