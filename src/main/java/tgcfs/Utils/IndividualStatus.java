@@ -12,5 +12,6 @@ package tgcfs.Utils;
  */
 public enum IndividualStatus {
     AGENT,
-    CLASSIFIER
+    CLASSIFIER,
+    RANDOM
 }

@@ -1,11 +1,12 @@
-package tgcfs.Utils;
+package tgcfs.EA;
 
 import tgcfs.Config.ReadConfig;
-import tgcfs.EA.Individual;
 import tgcfs.EA.Mutation.NonUniformMutation;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.NN.EvolvableModel;
+import tgcfs.Utils.IndividualStatus;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;

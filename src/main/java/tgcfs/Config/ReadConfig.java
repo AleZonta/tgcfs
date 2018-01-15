@@ -102,6 +102,10 @@ public class ReadConfig {
     private Boolean conversionWithGraph;
     private String uncorrelatedMutationStep;
 
+    private Boolean hallOfFame;
+    private Integer hallOfFameMemory;
+    private Integer hallOfFameSample;
+
 
     /**
      * Constructor with zero parameter
@@ -180,6 +184,10 @@ public class ReadConfig {
         this.conversionWithGraph = null;
         this.score = null;
         this.uncorrelatedMutationStep = null;
+
+        this.hallOfFame = null;
+        this.hallOfFameMemory = null;
+        this.hallOfFameSample = null;
 
         debug = false;
     }
@@ -670,6 +678,25 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("UncorrelatedMutationStep is wrong or missing.");
         }
+
+        try {
+            // this.hallOfFame
+            this.hallOfFame = ((Boolean) jsonObject.get("HallOfFame"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HallOfFame is wrong or missing.");
+        }
+        try {
+            // this.hallOfFameMemory
+            this.hallOfFameMemory = ((Long) jsonObject.get("HallOfFameMemory")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HallOfFameMemory is wrong or missing.");
+        }try {
+            // this.hallOfFameSample
+            this.hallOfFameSample = ((Long) jsonObject.get("HallOfFameSample")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HallOfFameSample is wrong or missing.");
+        }
+
     }
 
 
@@ -896,6 +923,9 @@ public class ReadConfig {
                 "Score=" + score + ",\n" +
                 "KeepBestNElement=" + keepBestNElement + ",\n" +
                 "UncorrelatedMutationStep=" + uncorrelatedMutationStep + ",\n" +
+                "HallOfFame=" + hallOfFame + ",\n" +
+                "HallOfFameMemory=" + hallOfFameMemory + ",\n" +
+                "HallOfFameSample=" + hallOfFameSample + ",\n" +
                 '}';
     }
 
@@ -1207,6 +1237,36 @@ public class ReadConfig {
     public String getUncorrelatedMutationStep() throws Exception {
         if(this.uncorrelatedMutationStep == null) throw new Exception("Try to access config file before reading it.");
         return this.uncorrelatedMutationStep;
+    }
+
+    /**
+     * Getter for the hall of fame, If I am using it
+     * @return boolean value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public boolean getHallOfFame() throws Exception {
+        if(this.uncorrelatedMutationStep == null) throw new Exception("Try to access config file before reading it.");
+        return hallOfFame;
+    }
+
+    /**
+     * Getter for the hall of fame memory
+     * @return int value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getHallOfFameMemory() throws Exception {
+        if(this.uncorrelatedMutationStep == null) throw new Exception("Try to access config file before reading it.");
+        return hallOfFameMemory;
+    }
+
+    /**
+     * Getter for the hall of fame sample size
+     * @return int value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getHallOfFameSample() throws Exception {
+        if(this.uncorrelatedMutationStep == null) throw new Exception("Try to access config file before reading it.");
+        return hallOfFameSample;
     }
 
     /**
@@ -1741,6 +1801,33 @@ public class ReadConfig {
          */
         public static String getUncorrelatedMutationStep() throws Exception {
             return config.getUncorrelatedMutationStep();
+        }
+
+        /**
+         * Getter for the hall of fame, If I am using it
+         * @return boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static boolean getHallOfFame() throws Exception {
+            return config.getHallOfFame();
+        }
+
+        /**
+         * Getter for the hall of fame memory
+         * @return int value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getHallOfFameMemory() throws Exception {
+            return config.getHallOfFameMemory();
+        }
+
+        /**
+         * Getter for the hall of fame sample size
+         * @return int value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getHallOfFameSample() throws Exception {
+            return config.getHallOfFameSample();
         }
     }
 

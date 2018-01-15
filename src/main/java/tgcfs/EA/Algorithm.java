@@ -43,7 +43,7 @@ public abstract class Algorithm {
     private List<Individual> population; //representation of the population
     protected int maxFitnessAchievable;
     protected static Logger logger;
-
+    protected HallOfFame hallOfFame;
 
     /**
      * Constructor zero parameter
@@ -55,6 +55,7 @@ public abstract class Algorithm {
         this.population = new ArrayList<>();
         this.maxFitnessAchievable = 0;
         logger = log;
+        this.hallOfFame = null;
     }
 
     /**
@@ -98,8 +99,9 @@ public abstract class Algorithm {
                 logger.log(Level.WARNING, "Error with generating population");
                 e.printStackTrace();
             }
-
         });
+        //initialising the hall of fame
+        if(ReadConfig.Configurations.getHallOfFame()) this.hallOfFame = new HallOfFame(model);
     }
 
     /**
@@ -151,19 +153,33 @@ public abstract class Algorithm {
                 e.printStackTrace();
             }
         });
+        //initialising the hall of fame
+        if(ReadConfig.Configurations.getHallOfFame()) this.hallOfFame = new HallOfFame(model);
     }
 
     /**
      * Getter for the population
-     * @return list of individuals
+     * @return list of {@link Individual}
      */
     public List<Individual> getPopulation() {
         return this.population;
     }
 
     /**
+     * Getter for the population with the hall of fame sample included if requested
+     * @return list of {@link Individual}
+     */
+    public List<Individual> getPopulationWithHallOfFame(){
+        List<Individual> allTheIndividuals = new ArrayList<>(this.population);
+        if(this.hallOfFame != null){
+            allTheIndividuals.addAll(this.hallOfFame.getSample());
+        }
+        return allTheIndividuals;
+    }
+
+    /**
      * Add one individual to the collection
-     * @param individual individual to be added
+     * @param individual {@link Individual} to be added
      */
     public void addIndividual(Individual individual){
         this.population.add(individual);
@@ -263,6 +279,10 @@ public abstract class Algorithm {
 
         //set everyone as a parent now
         this.population.forEach(Individual::isParent);
+        if(this.hallOfFame != null) {
+            this.hallOfFame.getHallOfFame().forEach(Individual::isParent);
+            this.hallOfFame.createSample();
+        }
 
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
@@ -270,11 +290,24 @@ public abstract class Algorithm {
             //creating the tournament
             List<Individual> tournamentPop = new ArrayList<>();
             IntStream.range(0, tournamentSize).forEach(j -> {
-                int idParent = RandomGenerator.getNextInt(0,this.population.size());
-                logger.log(Level.FINE, "idParent for tournament selection: " + idParent);
-                Individual ind = this.population.get(idParent);
-                logger.log(Level.FINE,  idParent + ": " + ind.getObjectiveParameters().toString());
-                tournamentPop.add(ind);
+
+                double val = RandomGenerator.getNextDouble();
+                boolean isHallOfFame = false;
+                if(val > 0.5 && this.hallOfFame != null) isHallOfFame = true;
+
+                if(!isHallOfFame) {
+                    //selection from the normal population
+                    int idParent = RandomGenerator.getNextInt(0, this.population.size());
+                    logger.log(Level.FINE, "idParent for tournament selection: " + idParent);
+                    Individual ind = this.population.get(idParent);
+                    logger.log(Level.FINE, idParent + ": " + ind.getObjectiveParameters().toString());
+                    tournamentPop.add(ind);
+                }else{
+                    //selection from the hall of fame
+                    int idParent = RandomGenerator.getNextInt(0, this.hallOfFame.getSample().size());
+                    Individual ind = this.hallOfFame.getSample().get(idParent);
+                    tournamentPop.add(ind);
+                }
             });
             //find the winner of the tournament -> the one with the highest fitness
             tournamentPop.sort(Comparator.comparingDouble(Individual::getFitness));
@@ -354,6 +387,9 @@ public abstract class Algorithm {
             default:
                 throw new Exception("Survival selection selected not yet implemented.");
         }
+
+        //save the best individual of the population for the hall of fame settings
+        if(this.hallOfFame != null) this.hallOfFame.addIndividual(this.population.get(this.population.size() - 1));
     }
 
     /**

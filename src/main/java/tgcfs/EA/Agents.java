@@ -93,10 +93,10 @@ public class Agents extends Algorithm {
     @Override
     public void runIndividuals(List<TrainReal> input) throws Exception {
         //reset input
-        super.getPopulation().forEach(Individual::resetInputOutput);
+        super.getPopulationWithHallOfFame().forEach(Individual::resetInputOutput);
 
         //every individual in parallel
-        super.getPopulation().parallelStream().forEach(individual -> {
+        super.getPopulationWithHallOfFame().parallelStream().forEach(individual -> {
             try {
                 //retrieve model from the individual
                 EvolvableModel model = individual.getModel();
@@ -345,7 +345,7 @@ public class Agents extends Algorithm {
 
         boolean finalScore = score;
 
-        super.getPopulation().forEach(a -> {
+        super.getPopulationWithHallOfFame().forEach(a -> {
             //transform trajectory in advance to prevent multiprocessing errors
             List<TrainReal> inputOutput = a.getMyInputandOutput();
             inputOutput.forEach(trainReal -> {
@@ -356,7 +356,7 @@ public class Agents extends Algorithm {
 
         logger.log(Level.SEVERE, "Start real classification");
         //I need to evaluate the agent using the classifiers
-        super.getPopulation().parallelStream().forEach(agent -> {
+        super.getPopulationWithHallOfFame().parallelStream().forEach(agent -> {
 //            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
             //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
             //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
@@ -371,7 +371,7 @@ public class Agents extends Algorithm {
 
 
             //for every example I need to run the classifier and check the result
-            model.getPopulation().parallelStream().forEach(classifier -> {
+            model.getPopulationWithHallOfFame().parallelStream().forEach(classifier -> {
 
                 //this is one agent
                 //I need to check for every output for every individual

@@ -1143,5 +1143,64 @@ public class ReadConfigTest {
 
     }
 
+    @Test
+    public void getHallOfFame() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getHallOfFame();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getHallOfFame() || !conf.getHallOfFame());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHallOfFame(), ReadConfig.Configurations.getHallOfFame());
+    }
+
+    @Test
+    public void getHallOfFameMemory() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getHallOfFameMemory();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getHallOfFameMemory() > 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHallOfFameMemory(), ReadConfig.Configurations.getHallOfFameMemory());
+    }
+
+    @Test
+    public void getHallOfFameSample() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getHallOfFameSample();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getHallOfFameSample() > 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getHallOfFameSample(), ReadConfig.Configurations.getHallOfFameSample());
+    }
 }
 
