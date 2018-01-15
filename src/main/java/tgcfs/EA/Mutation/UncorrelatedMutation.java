@@ -169,7 +169,7 @@ public class UncorrelatedMutation extends Individual {
      * firstly I generate the perturbed mutation strength from the original one according to a log-normal distribution.
      * secondly I mutate the objective parameter according to a normal distribution having the perturbed mutation strength as its variance.
      *
-     * @param n is the length of the genome
+     * @param n problem size (length genome)
      */
     @Override
     public void mutate(int n) {
@@ -179,12 +179,12 @@ public class UncorrelatedMutation extends Individual {
         double p2 = 1 / Math.sqrt( 2 * Math.sqrt(n));
 
         //random Double general per each individual
-        double rand1 = RandomGenerator.getNextDouble();
+        double rand1 = RandomGenerator.getNextGaussian();
 
         //first mutate the list of mutation strengths
         IntStream.range(0, this.mutationStrengths.columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
-            double randw = RandomGenerator.getNextDouble();
+            double randw = RandomGenerator.getNextGaussian();
             //obtain the new mutation value
             double newMutation = 0.0;
             if(this.mutationStrengths.columns() == 1){
@@ -192,8 +192,7 @@ public class UncorrelatedMutation extends Individual {
             }else {
                 newMutation = this.mutationStrengths.getDouble(i) * Math.exp(p1 * rand1 + p2 * randw);
             }
-            if(newMutation < 0.00001) newMutation = 0.00001;
-            if(newMutation > 0.5) newMutation = 0.5;
+            if(newMutation < 0.0001) newMutation = 0.0001;
             //substitute the old one with the new one
             this.mutationStrengths.putScalar(i, newMutation);
         });
@@ -201,8 +200,8 @@ public class UncorrelatedMutation extends Individual {
         //after having mutate all the mutation strengths it is time to mutate the actual objective parameters
         IntStream.range(0, super.getObjectiveParameters().columns()).forEach(i -> {
             //random Double generated separately for each element within each individual
-            double randw = RandomGenerator.getNextDouble();
-            double mutStrenght = 0.0;
+            double randw = RandomGenerator.getNextGaussian();
+            double mutStrenght;
             if(this.mutationStrengths.columns() == 1){
                 mutStrenght = this.mutationStrengths.getDouble(0);
             }else {
