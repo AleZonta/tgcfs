@@ -175,25 +175,6 @@ public class Classifiers extends Algorithm {
      */
     public void evaluateRealAgent(RealAgents agents, Transformation transformation){
         throw new NoSuchMethodError("Not needed anymore");
-//        super.getPopulation().parallelStream().forEach(individual -> {
-//            try {
-//                //evaluate classifier with real agents
-//                agents.getRealAgents().forEach(agent -> {
-//                    try {
-//                        ((FollowingTheGraph)transformation).setLastPoint(agent.getLastPoint());
-//                        OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) this.runIndividual(individual, transformation.transform(agent.realOutput(),agent.getRealFirstPart()));
-//                        //if the classifier is saying true -> it is correctly judging the agent
-//                        if(result.getReal()){
-//                            individual.increaseFitness();
-//                        }
-//                    } catch (Exception e) {
-//                        logger.log(Level.SEVERE, "Errors with the neural network" + e.getMessage() + " " + e.toString());
-//                    }
-//                });
-//            } catch (Exception e) {
-//                logger.log(Level.SEVERE, "Error with the file" + e.getMessage());
-//            }
-//        });
     }
 
 

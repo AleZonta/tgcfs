@@ -28,8 +28,7 @@ import java.util.stream.IntStream;
  */
 public class HallOfFame {
     private List<Individual> hallOfFame; //save the best individual per every generation
-    int memory; //how many individual do I remember
-    int samplingSize; //how many element of the hall of fame do I use
+    private int samplingSize; //how many element of the hall of fame do I use
     private List<Individual> sample;
 
     /**
@@ -41,10 +40,10 @@ public class HallOfFame {
      */
     public HallOfFame(EvolvableModel model) throws Exception {
         this.hallOfFame = new ArrayList<>();
-        this.memory = ReadConfig.Configurations.getHallOfFameMemory();
+        int memory = ReadConfig.Configurations.getHallOfFameMemory();
         this.samplingSize = ReadConfig.Configurations.getHallOfFameSample();
         //fill it up with random element
-        for(int i = 0; i < this.samplingSize; i++){
+        for(int i = 0; i < memory; i++){
             Individual newBorn;
             switch(ReadConfig.Configurations.getMutation()){
                 case 0:

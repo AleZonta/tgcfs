@@ -32,6 +32,56 @@ public class RoutesTest {
         Routes routes = new Routes(log);
         routes.readTrajectories();
         assertNotNull(routes.getTra());
+
+
+//        try (FileOutputStream zipFile = new FileOutputStream(new File("/Users/alessandrozonta/Desktop/tra.zip"));
+//             ZipOutputStream zos = new ZipOutputStream(zipFile);
+//             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
+//        ){
+//            ZipEntry csvFile = new ZipEntry(  "tra.json");
+//            zos.putNextEntry(csvFile);
+//
+//
+//            JSONObject totalObj = new JSONObject();
+//
+//            Trajectories tra = routes.getTra();
+//            List<Trajectory> allTra = tra.getTrajectories();
+//
+//            IntStream.range(0, allTra.size()).forEach(i -> {
+//
+//                Trajectory t = allTra.get(i);
+//
+//                JSONObject obj = new JSONObject();
+//                JSONArray trajectory = new JSONArray();
+//                //put the trajectory
+//
+//                List<Point> ppoints = new ArrayList<>();
+//                Point p = routes.getNextPosition(t);
+//                while (p != null){
+//                    ppoints.add(p);
+//                    p = routes.getNextPosition(t);
+//                }
+//
+//                trajectory.addAll(ppoints);
+//                obj.put("trajectory", trajectory);
+//
+//                String name = "trajectory-" + i;
+//                totalObj.put(name, obj);
+//            });
+//
+//            totalObj.put("size", allTra.size());
+//            try {
+//                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
+//                writer.write(totalObj.toJSONString());
+//                writer.newLine();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+
+
     }
 
     @Test
