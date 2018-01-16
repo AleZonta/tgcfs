@@ -66,7 +66,11 @@ public class Agents extends Algorithm {
     @Override
     public void generatePopulation(EvolvableModel model) throws Exception {
         super.generatePopulation(model);
-        this.maxFitnessAchievable = (ReadConfig.Configurations.getClassifierPopulationSize() + ReadConfig.Configurations.getClassifierOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained();
+        if(ReadConfig.Configurations.getHallOfFame()){
+            this.maxFitnessAchievable = (ReadConfig.Configurations.getClassifierPopulationSize() + ReadConfig.Configurations.getClassifierOffspringSize() + ReadConfig.Configurations.getHallOfFameSample()) * ReadConfig.Configurations.getTrajectoriesTrained();
+        }else{
+            this.maxFitnessAchievable = (ReadConfig.Configurations.getClassifierPopulationSize() + ReadConfig.Configurations.getClassifierOffspringSize()) * ReadConfig.Configurations.getTrajectoriesTrained();
+        }
         SaveToFile.Saver.saveMaxFitnessAchievable(this.maxFitnessAchievable, this.getClass().getName());
     }
 
