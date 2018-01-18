@@ -11,6 +11,7 @@ import tgcfs.Utils.PointWithBearing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -123,7 +124,7 @@ public class FollowingTheGraphTest {
         OutputNetwork o1 = new OutputNetwork(58.629199862480164, -77.28583574295044); //(52.04601038277607, 4.331313331041686)
         List<OutputsNetwork> outputNetworkList = new ArrayList<>();
         outputNetworkList.add(o1);
-        TrainReal t1 = new TrainReal(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null, realOutputNetworkList, new ArrayList<>(),new ArrayList<>(), null, null, outputNetworkList, new ArrayList<>(), null, new ArrayList<>());
+        TrainReal t1 = new TrainReal(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null, realOutputNetworkList, new ArrayList<>(),new ArrayList<>(), null, null, outputNetworkList, new ArrayList<>(), null, new ArrayList<>(), UUID.randomUUID());
         System.out.println(followingTheGraph.transform(t1));
         System.out.println("---------------");
 
@@ -131,7 +132,7 @@ public class FollowingTheGraphTest {
         OutputNetwork o2 = new OutputNetwork(126.95206701755524, -70.8203387260437); //((52.046062132845215, 4.331130130436895)
         outputNetworkList = new ArrayList<>();
         outputNetworkList.add(o2);
-        TrainReal t2 = new TrainReal(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null, realOutputNetworkList, new ArrayList<>(),new ArrayList<>(), null, null, outputNetworkList, new ArrayList<>(), null, new ArrayList<>());
+        TrainReal t2 = new TrainReal(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null, realOutputNetworkList, new ArrayList<>(),new ArrayList<>(), null, null, outputNetworkList, new ArrayList<>(), null, new ArrayList<>(), UUID.randomUUID());
         System.out.println(followingTheGraph.transform(t2));
         System.out.println("---------------");
 

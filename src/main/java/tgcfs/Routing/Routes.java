@@ -1,5 +1,6 @@
 package tgcfs.Routing;
 
+import lgds.load_track.LoadIDSAJson;
 import lgds.load_track.LoadIDSATrack;
 import lgds.load_track.LoadTrack;
 import lgds.load_track.Traces;
@@ -50,10 +51,23 @@ public class Routes {
      */
     public void readTrajectories() throws Exception{
         logger.log(Level.INFO, "Loading Trajectories...");
-        if (ReadConfig.Configurations.getTrajectoriesType() == 0){
-            this.storage = new LoadIDSATrack();
-        }else{
-            this.storage = new LoadTrack();
+        int type = ReadConfig.Configurations.getTrajectoriesType();
+        switch (type){
+            case 0:
+                this.storage = new LoadIDSATrack();
+                break;
+            case 1:
+                this.storage = new LoadTrack();
+                break;
+            case 2:
+                throw new Exception("Typology not yet implemented");
+            case 3:
+                this.storage = new LoadIDSAJson();
+                //set a different time step for IDSA
+                timeBetweenIDSATimesteps = 3.0;
+                break;
+            default:
+                throw new Exception("Typology not yet implemented");
         }
         //retrieve all the tracks from file
         this.tra = this.storage.loadTrajectories();

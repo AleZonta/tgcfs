@@ -25,6 +25,26 @@ public class RoutesTest {
 
     @Test
     public void getTra() throws Exception {
+
+
+
+//        class PointPrint extends Point {
+//
+//            public PointPrint(Double latitude, Double longitude, Double altitude, Double dated, String dates, String time) {
+//                super(latitude, longitude, altitude, dated, dates, time);
+//            }
+//
+//            public PointPrint(Double latitude, Double longitude) {
+//                super(latitude, longitude);
+//            }
+//
+//            @Override
+//            public String toString() {
+//                return "[" + super.getLatitude() + ", " + super.getLongitude() + "]";
+//            }
+//        }
+
+
         new ReadConfig.Configurations();
 
         Logger log =  Logger.getLogger(RoutesTest.class.getName());
@@ -36,7 +56,7 @@ public class RoutesTest {
 
 //        try (FileOutputStream zipFile = new FileOutputStream(new File("/Users/alessandrozonta/Desktop/tra.zip"));
 //             ZipOutputStream zos = new ZipOutputStream(zipFile);
-//             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
+//             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "ISO-8859-1"))
 //        ){
 //            ZipEntry csvFile = new ZipEntry(  "tra.json");
 //            zos.putNextEntry(csvFile);
@@ -55,11 +75,12 @@ public class RoutesTest {
 //                JSONArray trajectory = new JSONArray();
 //                //put the trajectory
 //
-//                List<Point> ppoints = new ArrayList<>();
-//                Point p = routes.getNextPosition(t);
-//                while (p != null){
+//                List<PointPrint> ppoints = new ArrayList<>();
+//                Point po = routes.getNextPosition(t);
+//                while (po != null){
+//                    PointPrint p = new PointPrint(po.getLatitude(), po.getLongitude());
 //                    ppoints.add(p);
-//                    p = routes.getNextPosition(t);
+//                    po = routes.getNextPosition(t);
 //                }
 //
 //                trajectory.addAll(ppoints);
@@ -71,7 +92,7 @@ public class RoutesTest {
 //
 //            totalObj.put("size", allTra.size());
 //            try {
-//                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
+////                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
 //                writer.write(totalObj.toJSONString());
 //                writer.newLine();
 //            } catch (IOException e) {

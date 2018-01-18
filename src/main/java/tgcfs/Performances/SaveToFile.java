@@ -382,6 +382,8 @@ public class SaveToFile {
 
                 obj.put("classification", el.getResultClassifier());
 
+                obj.put("id", el.getId().toString());
+
                 String name = "trajectory-" + i;
                 totalObj.put(name, obj);
             });

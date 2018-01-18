@@ -307,4 +307,24 @@ public class TrainRealTest {
         assertEquals(a, t.getNormalImage());
     }
 
+    @Test
+    public void getId() {
+        TrainReal t = new TrainReal(new ArrayList<>(), new ArrayList<>());
+        TrainReal t1 = new TrainReal(new ArrayList<>(), new ArrayList<>());
+        TrainReal t2 = new TrainReal(new ArrayList<>(), new ArrayList<>());
+        TrainReal t3 = new TrainReal(new ArrayList<>(), new ArrayList<>());
+        TrainReal t4 = new TrainReal(new ArrayList<>(), new ArrayList<>());
+        TrainReal t5 = new TrainReal(new ArrayList<>(), new ArrayList<>());
+        TrainReal t6 = new TrainReal(new ArrayList<>(), new ArrayList<>());
+
+        System.out.println(t.getId().toString());
+        System.out.println(t1.getId().toString());
+        System.out.println(t2.getId().toString());
+        System.out.println(t3.getId().toString());
+        System.out.println(t4.getId().toString());
+        System.out.println(t5.getId().toString());
+        System.out.println(t6.getId().toString());
+
+
+    }
 }

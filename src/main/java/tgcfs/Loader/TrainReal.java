@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 /**
@@ -32,6 +33,7 @@ import java.util.stream.IntStream;
  * This class will represent the match between part of the trajectory used as a train and the part of the trajectory used as a real part
  */
 public class TrainReal {
+    private UUID id;
     private final List<InputsNetwork> trainingPoint;
     private List<PointWithBearing> firstPart;
     private final List<PointWithBearing>  followingPart;
@@ -53,6 +55,7 @@ public class TrainReal {
      * @param followingPart list of points
      */
     public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> followingPart){
+        this.id = UUID.randomUUID();
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
         this.firstPart = null;
@@ -76,6 +79,7 @@ public class TrainReal {
      * @param conditionalImage path of the conditional image
      */
     public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing>  followingPart, String conditionalImage, String normalImage){
+        this.id = UUID.randomUUID();
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
         this.firstPart = null;
@@ -100,6 +104,7 @@ public class TrainReal {
      * @param idsaLoader idsa loader reference
      */
     public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing>  followingPart, IdsaLoader idsaLoader){
+        this.id = UUID.randomUUID();
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
         this.firstPart = null;
@@ -132,7 +137,8 @@ public class TrainReal {
      * @param idsaLoader
      * @param totalPoints
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints) {
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id) {
+        this.id = id;
         this.trainingPoint = trainingPoint;
         this.firstPart = firstPart;
         this.followingPart = followingPart;
@@ -439,7 +445,7 @@ public class TrainReal {
      * @return {@link TrainReal} object
      */
     public TrainReal deepCopy(){
-        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints);
+        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id);
     }
 
     /**
@@ -456,6 +462,14 @@ public class TrainReal {
      */
     public void setResultClassifier(boolean resultClassifier) {
         this.resultClassifier = resultClassifier;
+    }
+
+    /**
+     * return the ID of this class
+     * @return {@link UUID} id
+     */
+    public UUID getId() {
+        return this.id;
     }
 }
 
