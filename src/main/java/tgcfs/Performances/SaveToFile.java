@@ -118,7 +118,7 @@ public class SaveToFile {
          */
         public static void saveStepSize(String name, INDArray stepSize) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
-            instance.saveGenome(name, stepSize);
+            instance.saveStepSize(name, stepSize);
         }
 
         /**
