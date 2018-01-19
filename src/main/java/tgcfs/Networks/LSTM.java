@@ -18,7 +18,6 @@ import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.Models;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 08/08/2017.
@@ -70,13 +69,13 @@ public class LSTM extends Models implements Network{
         listBuilder.layer(0, inputLayerBuilder.build());
 
         // hidden Layers
-        IntStream.range(1, hiddenLayers).forEach(i -> {
+        for(int i = 1; i < hiddenLayers; i ++){
             GravesLSTM.Builder hiddenLayerBuilder = new GravesLSTM.Builder();
             hiddenLayerBuilder.nIn(hiddenNeurons);
             hiddenLayerBuilder.nOut(hiddenNeurons);
             hiddenLayerBuilder.activation(Activation.SOFTSIGN);
             listBuilder.layer(i, hiddenLayerBuilder.build());
-        });
+        }
 
         // we need to use RnnOutputLayer for our RNN
         RnnOutputLayer.Builder outputLayerBuilder = new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT);
@@ -133,13 +132,13 @@ public class LSTM extends Models implements Network{
         listBuilder.layer(0, inputLayerBuilder.build());
 
         // hidden Layers
-        IntStream.range(1, hiddenLayers).forEach(i -> {
+        for(int i = 1; i < hiddenLayers; i ++){
             GravesLSTM.Builder hiddenLayerBuilder = new GravesLSTM.Builder();
             hiddenLayerBuilder.nIn(hiddenNeurons);
             hiddenLayerBuilder.nOut(hiddenNeurons);
             hiddenLayerBuilder.activation(Activation.SOFTSIGN);
             listBuilder.layer(i, hiddenLayerBuilder.build());
-        });
+        }
 
         // we need to use RnnOutputLayer for our RNN
         RnnOutputLayer.Builder outputLayerBuilder = new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT);

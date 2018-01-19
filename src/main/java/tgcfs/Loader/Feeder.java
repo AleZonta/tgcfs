@@ -360,9 +360,13 @@ public class Feeder {
 
         //save points
         this.points = new ArrayList<>();
-        pointWithTime.forEach(point -> this.points.add(new PointWithBearing(point.deepCopy())));
+        for(Point point: pointWithTime){
+            this.points.add(new PointWithBearing(point.deepCopy()));
+        }
         //compute the potential field for the actualPoint
-        actualPoint.forEach(idsaLoader::compute);
+        for(Point point: actualPoint){
+            idsaLoader.compute(point);
+        }
 
         //check how many points I want to analise
         int timesteps = ReadConfig.Configurations.getNumberOfTimestepConsidered();
@@ -388,12 +392,12 @@ public class Feeder {
         //I have trajectory and I have current position.
         //I just need to retrieve next n position
         List<PointWithBearing> realPoint = new ArrayList<>();
-        IntStream.range(this.position, this.position + ReadConfig.Configurations.getAgentTimeSteps()).forEach(i -> {
+        for(int i = this.position; i < this.position + ReadConfig.Configurations.getAgentTimeSteps(); i++){
             Point nextPoint = this.getNextPoint(this.currentTrajectory);
             if (nextPoint != null){
                 realPoint.add(new PointWithBearing(nextPoint));
             }
-        });
+        }
 
         return realPoint;
     }
@@ -487,7 +491,9 @@ public class Feeder {
 
 
             List<InfoNode> finalList = list;
-            IntStream.range(1, list.size()).forEach(i -> dis[0] += this.graph.findDistanceBetweenNodesConnected(finalList.get(i-1), finalList.get(i)));
+            for(int i = 1; i < list.size(); i++){
+                dis[0] += this.graph.findDistanceBetweenNodesConnected(finalList.get(i-1), finalList.get(i));
+            }
 
             double dist = dis[0];
 
@@ -502,7 +508,9 @@ public class Feeder {
                 //check the distance
                 while (dist > distance){
                     final double[] dis2 = {0.0};
-                    IntStream.range(1, list.size() - val).forEach(i -> dis2[0] += this.graph.findDistanceBetweenNodesConnected(finalList.get(i-1), finalList.get(i)));
+                    for(int i = 1; i < list.size(); i++){
+                        dis2[0] += this.graph.findDistanceBetweenNodesConnected(finalList.get(i-1), finalList.get(i));
+                    }
                     dist = dis2[0];
                     val++;
                 }
@@ -664,17 +672,19 @@ public class Feeder {
         List<Double> angles = new ArrayList<>();
         Coord IamHere = new Coord(whereIam.getLatitude(),whereIam.getLongitude());
         //compute all the angles
-        endNodes.forEach(node -> angles.add(IamHere.angleWith(node.getCoord())));
+        for(InfoNode node: endNodes){
+            angles.add(IamHere.angleWith(node.getCoord()));
+        }
         //find id closest ending node
         final int[] index = {0};
         final double[] minDifference = {Double.MAX_VALUE};
-        IntStream.range(0, angles.size()).forEach(i -> {
+        for(int i = 0; i < angles.size(); i++){
             Double difference = Math.abs(Normalisation.fromHalfPItoTotalPI(direction) - Normalisation.fromHalfPItoTotalPI(angles.get(i)));
             if(difference < minDifference[0]){
                 minDifference[0] = difference;
                 index[0] = i;
             }
-        });
+        }
         //now I now index closest nodes
 //        if (Math.abs(Normalisation.fromHalfPItoTotalPI(direction) - Normalisation.fromHalfPItoTotalPI(angles.get(index[0]))) < 10){
 //            //if im am going in the direction suggested by the nn I will move there
@@ -714,7 +724,7 @@ public class Feeder {
             //now the old list contains only the one I want to be there
 
             //deep copy so i reset their status on the new list
-            oldList.forEach(trainReal -> {
+            for(TrainReal trainReal: oldList){
                 TrainReal newOne = trainReal.softCopy();
                 try {
                     newOne.setPoints(trainReal.getPoints());
@@ -722,12 +732,14 @@ public class Feeder {
                     e.printStackTrace();
                 }
                 totalList.add(newOne);
-            });
+            }
             start = totalList.size();
         }
 
 
-        IntStream.range(start, ReadConfig.Configurations.getTrajectoriesTrained()).forEach(i -> this.feedTheEater(idsaLoader,totalList));
+        for(int i = start; i < ReadConfig.Configurations.getTrajectoriesTrained(); i++){
+            this.feedTheEater(idsaLoader,totalList);
+        }
 
         //it is possible total list is not the right size. Check it
         while(totalList.size() < ReadConfig.Configurations.getTrajectoriesTrained()){

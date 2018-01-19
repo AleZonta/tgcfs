@@ -28,6 +28,9 @@ import tgcfs.Utils.Scores;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,31 +100,173 @@ public class Agents extends Algorithm {
     @Override
     public void runIndividuals(List<TrainReal> input) throws Exception {
         //reset input
-        super.getPopulationWithHallOfFame().forEach(Individual::resetInputOutput);
+        for(Individual ind: super.getPopulationWithHallOfFame()){
+            ind.resetInputOutput();
+        }
 
-        //every individual in parallel
-        super.getPopulationWithHallOfFame().parallelStream().forEach(individual -> {
-            try {
-                //retrieve model from the individual
-                EvolvableModel model = individual.getModel();
-                //set the weights
-                model.setWeights(individual.getObjectiveParameters());
-                //select which model I am using
-                if(model.getClass().equals(LSTMAgent.class)){
-                    this.runLSTM(input, model, individual);
-                }else if(model.getClass().equals(Clax.class)){
-                    this.runClax(input, model, individual);
-                }else if(model.getClass().equals(ConvAgent.class)){
-                    this.runConvol(input, model, individual);
-                }
+        /**
+         * Class for multithreading
+         * Run one agent against all the classifiers
+         */
+        class ComputeUnit implements Runnable {
+            private CountDownLatch latch;
+            private Individual agent;
 
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Errors with the neural network " + e.getMessage());
-                e.printStackTrace();
+            /**
+             * Constructor
+             * @param agent agent
+             */
+            private ComputeUnit(Individual agent) {
+                this.agent = agent;
             }
 
-        });
+            /**
+             * CountDownLatch is a java class in the java.util.concurrent package. It is a mechanism to safely handle
+             * counting the number of completed tasks. You should call latch.countDown() whenever the run method competes.
+             * @param latch {@link CountDownLatch}
+             */
+            private void setLatch(CountDownLatch latch) {
+                this.latch = latch;
+            }
 
+            /**
+             * Run the agent
+             */
+            @Override
+            public void run() {
+                try {
+                    //retrieve model from the individual
+                    EvolvableModel model = this.agent.getModel();
+                    //set the weights
+                    model.setWeights(this.agent.getObjectiveParameters());
+                    //select which model I am using
+                    if(model.getClass().equals(LSTMAgent.class)){
+                        this.runLSTM(input, model, this.agent);
+                    }else {
+                        throw new Exception("Not yet Implemented");
+                    }
+
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Errors with the neural network " + e.getMessage());
+                    e.printStackTrace();
+                }
+                latch.countDown();
+            }
+
+            /**
+             * Run the LSTM agent
+             * @param input the input of the model
+             * @param model the model LSTM used
+             * @param individual the individual under evaluation
+             * @throws Exception if something bad happened
+             */
+            private void runLSTM(List<TrainReal> input, EvolvableModel model, Individual individual) throws Exception {
+                //compute Output of the network
+                INDArray lastOutput = null;
+
+                int number;
+                try{
+                    number = ReadConfig.Configurations.getAgentTimeSteps();
+                }catch (Exception e){
+                    number = 1;
+                }
+
+                for (TrainReal inputsNetwork : input) {
+
+                    TrainReal currentInputsNetwork = inputsNetwork.deepCopy();
+
+                    //now for the number of time step that I want to check save the output
+                    List<OutputsNetwork> outputsNetworks = new ArrayList<>();
+
+                    List<InputsNetwork> in = currentInputsNetwork.getTrainingPoint();
+                    int size = in.size();
+                    INDArray features = Nd4j.create(new int[]{1, InputNetwork.inputSize, size}, 'f');
+                    for (int j = 0; j < size; j++) {
+                        INDArray vector = in.get(j).serialise();
+                        features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
+                    }
+                    lastOutput = model.computeOutput(features);
+
+                    int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
+                    INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
+                    if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + realLastOut.toString());
+
+
+                    OutputNetwork out = new OutputNetwork();
+                    out.deserialise(realLastOut);
+                    outputsNetworks.add(out);
+                    if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM transformed ->" + outputsNetworks.toString());
+
+                    //output has only two fields, input needs three
+                    //I am using the last direction present into input I am adding that one to the last output
+
+                    Double directionAPF = ((InputNetwork) currentInputsNetwork.getTrainingPoint().get(currentInputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
+                    for (int i = 0; i < number - 1; i++) {
+                        //transform output into input and add the direction
+                        OutputNetwork outLocal = new OutputNetwork();
+                        outLocal.deserialise(lastOutput);
+                        InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
+                        lastOutput = model.computeOutput(inputLocal.serialise());
+
+                        if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
+
+                        out = new OutputNetwork();
+                        out.deserialise(lastOutput);
+                        outputsNetworks.add(out);
+                    }
+                    //assign the output to this individual
+                    currentInputsNetwork.setOutputComputed(outputsNetworks);
+
+                    //create the output already computed
+                    currentInputsNetwork.createRealOutputConverted();
+                    individual.addMyInputandOutput(currentInputsNetwork);
+
+                    ((LSTMAgent)model).clearPreviousState();
+                }
+            }
+
+        }
+
+        ExecutorService exec = Executors.newFixedThreadPool(128);
+        CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
+        ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
+
+
+        for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
+            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i));
+        }
+        for(ComputeUnit r : runnables) {
+            r.setLatch(latch);
+            exec.execute(r);
+        }
+        try {
+            latch.await();
+            exec.shutdown();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+
+        //every individual in parallel
+//        super.getPopulationWithHallOfFame().parallelStream().forEach(individual -> {
+//            try {
+//                //retrieve model from the individual
+//                EvolvableModel model = individual.getModel();
+//                //set the weights
+//                model.setWeights(individual.getObjectiveParameters());
+//                //select which model I am using
+//                if (model.getClass().equals(LSTMAgent.class)) {
+//                    this.runLSTM(input, model, individual);
+//                } else if (model.getClass().equals(Clax.class)) {
+//                    this.runClax(input, model, individual);
+//                } else if (model.getClass().equals(ConvAgent.class)) {
+//                    this.runConvol(input, model, individual);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
 
     }
 
@@ -341,6 +486,117 @@ public class Agents extends Algorithm {
      */
     public void evaluateIndividuals(Algorithm model, Transformation transformation){
 
+        /**
+         * Class for multithreading
+         * Run one agent against all the classifiers
+         */
+        class ComputeUnit implements Runnable {
+            private CountDownLatch latch;
+            private Individual agent;
+            private List<Individual> adersarialPopulation;
+            private MultyScores scores;
+            private boolean score;
+
+            /**
+             * Constructor
+             * @param agent current agent
+             * @param adersarialPopulation adversarial population
+             * @param score do I want the score
+             * @param scores where to save the score
+             */
+            private ComputeUnit(Individual agent, List<Individual> adersarialPopulation, boolean score, MultyScores scores) {
+                this.agent = agent;
+                this.adersarialPopulation = adersarialPopulation;
+                this.scores = scores;
+                this.score = score;
+            }
+
+            /**
+             * CountDownLatch is a java class in the java.util.concurrent package. It is a mechanism to safely handle
+             * counting the number of completed tasks. You should call latch.countDown() whenever the run method competes.
+             * @param latch {@link CountDownLatch}
+             */
+            private void setLatch(CountDownLatch latch) {
+                this.latch = latch;
+            }
+
+            /**
+             * Override method run
+             * run the classifier over the agent
+             */
+            @Override
+            public void run() {
+                List<TrainReal> inputOutput = agent.getMyInputandOutput();
+                for(Individual opponent: this.adersarialPopulation){
+                    for(TrainReal example: inputOutput){
+                        //run the classifier for the Fake trajectory
+                        try {
+                            this.runClassifier(model ,agent, opponent, example, true);
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
+                            e.printStackTrace();
+                        }
+
+                        //run the classifier for the Real trajectory
+                        try {
+                            this.runClassifier(model ,agent, opponent, example, false);
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+                latch.countDown();
+            }
+
+            /**
+             * Run the classifier
+             * @param model model of the classifier
+             * @param agent agent individual
+             * @param classifier agent classifier
+             * @param totalInput TrainReal
+             * @param real Boolean value. If it is false I do not need to increment the agent fitness since I am checking the real trajectory
+             */
+            private synchronized void runClassifier(Algorithm model, Individual agent, Individual classifier, TrainReal totalInput, boolean real) throws Exception {
+                List<InputsNetwork> input;
+                if(real){
+                    input = totalInput.getAllThePartTransformedFake();
+                }else{
+                    input = totalInput.getAllThePartTransformedReal();
+                }
+                tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
+
+                double decision = result.getRealValue01();
+
+                if( decision>0.5 ) {
+                    totalInput.setResultClassifier(true);
+                    //it is saying it is true
+                    //counting this only if the fake trajectory
+                    if(real) {
+                        agent.increaseFitness(decision);
+                        classifier.increaseFitness(1 - decision);
+                        if (this.score) {
+                            Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1d);
+                            this.scores.addScore(sc);
+                        }
+                    }
+                }else{
+                    //it is false
+                    totalInput.setResultClassifier(false);
+                    classifier.increaseFitness(decision);
+                    if(real) {
+                        agent.increaseFitness(1 - decision);
+                        if (this.score) {
+                            Scores sc = new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 0d);
+                            this.scores.addScore(sc);
+                        }
+                    }
+                }
+
+            }
+        }
+
         boolean score;
         try {
             score = ReadConfig.Configurations.getScore();
@@ -348,106 +604,36 @@ public class Agents extends Algorithm {
             score = false;
         }
 
-        boolean finalScore = score;
-
-        super.getPopulationWithHallOfFame().forEach(a -> {
+        for(Individual ind : super.getPopulationWithHallOfFame()){
             //transform trajectory in advance to prevent multiprocessing errors
-            List<TrainReal> inputOutput = a.getMyInputandOutput();
+            List<TrainReal> inputOutput = ind.getMyInputandOutput();
             inputOutput.forEach(trainReal -> {
                 ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
                 transformation.transform(trainReal);
             });
-        });
+        }
+
 
         logger.log(Level.SEVERE, "Start real classification");
-        //I need to evaluate the agent using the classifiers
-        super.getPopulationWithHallOfFame().parallelStream().forEach(agent -> {
-//            System.out.println(LocalDateTime.now().toString()  + "  Evaluation individual--------------");
-            //The fitness of each model is obtained by evaluating it with each of the classifiers in the competing population
-            //For every classifier that wrongly judges the model as being the real agent, the model’s fitness increases by one.
 
-//            //transform trajectory in advance to prevent multiprocessing errors
-            List<TrainReal> inputOutput = agent.getMyInputandOutput();
-//            inputOutput.forEach(trainReal -> {
-//                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
-//                transformation.transform(trainReal);
-//            });
+        ExecutorService exec = Executors.newFixedThreadPool(128);
+        CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
+        ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
 
 
-
-            //for every example I need to run the classifier and check the result
-            model.getPopulationWithHallOfFame().parallelStream().forEach(classifier -> {
-
-                //this is one agent
-                //I need to check for every output for every individual
-                inputOutput.parallelStream().forEach(trainReal -> {
-
-                    //run the classifier for the Fake trajectory
-                    try {
-                        this.runClassifier(model ,agent, classifier, trainReal, true, finalScore);
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
-                        e.printStackTrace();
-                    }
-
-                    //run the classifier for the Real trajectory
-                    try {
-                        this.runClassifier(model ,agent, classifier, trainReal, false, finalScore);
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
-                        e.printStackTrace();
-                    }
-
-
-                });
-            });
-        });
-    }
-
-    /**
-     * Run the classifier
-     * @param model model of the classifier
-     * @param agent agent individual
-     * @param classifier agent classifier
-     * @param totalInput TrainReal
-     * @param real Boolean value. If it is false I do not need to increment the agent fitness since I am checking the real trajectory
-     */
-    private synchronized void runClassifier(Algorithm model, Individual agent, Individual classifier, TrainReal totalInput, boolean real, boolean score) throws Exception {
-        List<InputsNetwork> input;
-        if(real){
-            input = totalInput.getAllThePartTransformedFake();
-        }else{
-            input = totalInput.getAllThePartTransformedReal();
+        for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
+            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), model.getPopulationWithHallOfFame(), score, this.scores);
         }
-        tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
-
-        double decision = result.getRealValue01();
-
-        if( decision>0.5 ) {
-            totalInput.setResultClassifier(true);
-            //it is saying it is true
-            //counting this only if the fake trajectory
-            if(real) {
-                agent.increaseFitness(decision);
-                classifier.increaseFitness(1 - decision);
-                if (score) {
-                    Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1d);
-                    this.scores.addScore(sc);
-                }
-            }
-        }else{
-            //it is false
-            totalInput.setResultClassifier(false);
-            classifier.increaseFitness(decision);
-            if(real) {
-                agent.increaseFitness(1 - decision);
-                if (score) {
-                    Scores sc = new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 0d);
-                    this.scores.addScore(sc);
-                }
-            }
+        for(ComputeUnit r : runnables) {
+            r.setLatch(latch);
+            exec.execute(r);
         }
-
+        try {
+            latch.await();
+            exec.shutdown();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -460,19 +646,6 @@ public class Agents extends Algorithm {
         try {
             if(ReadConfig.Configurations.getTrain()) {
                 throw new Exception("How should i train a LSTM without bad examples???");
-//                combineInputList.forEach(trainReal -> {
-//                    List<InputsNetwork> inputsNetworks = trainReal.getTrainingPoint();
-//                    List<Point> points = trainReal.getPoints();
-//                    //I have to train all the population with the same inputs
-//                    super.getPopulation().parallelStream().forEach(individual -> {
-//                        //train the model
-//                        try {
-//                            individual.fitModel(inputsNetworks, points);
-//                        } catch (Exception e) {
-//                            throw new Error("Error in training the model" + e.getMessage());
-//                        }
-//                    });
-//                });
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error " + e.getMessage());
@@ -489,7 +662,12 @@ public class Agents extends Algorithm {
      */
     public void saveTrajectoriesAndPointGenerated(int generationAgent, int generationClassifier) throws Exception {
         List<TrainReal> totalList = new ArrayList<>();
-        super.getPopulation().forEach(individual -> individual.getMyInputandOutput().forEach(tra -> totalList.add(tra.deepCopy())));
+
+        for(Individual ind: super.getPopulation()){
+            for(TrainReal train: ind.getMyInputandOutput()){
+                totalList.add(train.deepCopy());
+            }
+        }
 
         SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(totalList, generationAgent, generationClassifier);
     }
@@ -516,14 +694,19 @@ public class Agents extends Algorithm {
      * @param transformation {@link FollowingTheGraph} transformation reference to transform the output in real point //TODO generalise this
      */
     public void generateRealPoints(FollowingTheGraph transformation){
-        super.getPopulation().forEach(individual -> individual.getMyInputandOutput().forEach(trainReal -> {
-            if(trainReal.getRealPointsOutputComputed() == null) {
-                List<PointWithBearing> generatedPoint = new ArrayList<>();
-                transformation.setLastPoint(trainReal.getLastPoint());
-                trainReal.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork))));
-                trainReal.setRealPointsOutputComputed(generatedPoint);
+        for(Individual ind: super.getPopulation()) {
+            for (TrainReal train : ind.getMyInputandOutput()) {
+                if(train.getRealPointsOutputComputed() == null) {
+                    List<PointWithBearing> generatedPoint = new ArrayList<>();
+                    transformation.setLastPoint(train.getLastPoint());
+                    for(OutputsNetwork outputsNetwork: train.getOutputComputed()){
+                        generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork)));
+                    }
+                    train.setRealPointsOutputComputed(generatedPoint);
+                }
             }
-        }));
+        }
+
     }
 
 }

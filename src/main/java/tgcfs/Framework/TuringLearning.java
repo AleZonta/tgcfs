@@ -203,7 +203,9 @@ public class TuringLearning implements Framework{
         SaveToFile.Saver.saveFitness(this.agents.getClass().getName(),this.agents.retAllFitness());
         SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(),this.classifiers.retAllFitness());
         SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
+        if(ReadConfig.Configurations.getMutation() == 0) SaveToFile.Saver.saveStepSize(this.agents.getClass().getName(), this.agents.retStepSizeBestGenome());
         SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
+        if(ReadConfig.Configurations.getMutation() == 0) SaveToFile.Saver.saveStepSize(this.classifiers.getClass().getName(), this.classifiers.retStepSizeBestGenome());
 
 
         /* { REPEAT until TERMINAL CONDITION } */
@@ -268,8 +270,14 @@ public class TuringLearning implements Framework{
                 logger.log(Level.INFO,"Saving Statistics...");
                 SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
                 SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(), this.classifiers.retAllFitness());
-                if(evolveAgent) SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
-                if(evolveClassifier) SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
+                if(evolveAgent) {
+                    SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
+                    if(ReadConfig.Configurations.getMutation() == 0) SaveToFile.Saver.saveStepSize(this.agents.getClass().getName(), this.agents.retStepSizeBestGenome());
+                }
+                if(evolveClassifier){
+                    SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
+                    if(ReadConfig.Configurations.getMutation() == 0) SaveToFile.Saver.saveStepSize(this.classifiers.getClass().getName(), this.classifiers.retStepSizeBestGenome());
+                }
                 if(ReadConfig.Configurations.getDumpPop()) {
                     logger.log(Level.INFO,"Dump Population...");
                     if(evolveAgent) SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());

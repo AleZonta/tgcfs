@@ -170,11 +170,11 @@ public class TrainReal {
      */
     public List<InputsNetwork> getTrainingPointSettedForTheClassifier(){
         List<InputsNetwork> newlist = new ArrayList<>();
-        this.trainingPoint.forEach(tr -> {
+        for(InputsNetwork tr: this.trainingPoint){
             INDArray ind = ((tgcfs.Agents.InputNetwork)tr).serialiaseAsInputClassifier();
             InputNetwork in = new InputNetwork(ind.getDouble(0), ind.getDouble(1), false);
             newlist.add(in);
-        });
+        }
         return newlist;
     }
 
@@ -200,7 +200,9 @@ public class TrainReal {
      */
     public void setOutputComputed(List<OutputsNetwork> outputComputed) {
         this.outputComputed = new ArrayList<>();
-        outputComputed.forEach(outputsNetwork -> this.outputComputed.add(outputsNetwork.deepCopy()));
+        for(OutputsNetwork outputsNetwork: outputComputed){
+            this.outputComputed.add(outputsNetwork.deepCopy());
+        }
     }
 
     /**
@@ -307,7 +309,9 @@ public class TrainReal {
             if (real) {
                 //check size real output computed
                 int size = this.realPointsOutputComputed.size();
-                IntStream.range(0, size).forEach(i -> this.totalPoints.add(this.followingPart.get(i)));
+                for(int i = 0; i< size; i ++){
+                    this.totalPoints.add(this.followingPart.get(i));
+                }
             } else {
                 this.totalPoints.addAll(this.realPointsOutputComputed);
             }
@@ -405,6 +409,7 @@ public class TrainReal {
 //            totalList.add(new OutputNetwork(speed, angularSpeed, space));
 //            previousBearing = bearing;
 //        }
+
 
         IntStream.range(1, herePoint.size()).forEach(i -> {
 

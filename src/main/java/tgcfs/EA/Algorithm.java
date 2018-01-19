@@ -16,14 +16,10 @@ import tgcfs.NN.OutputsNetwork;
 import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.RandomGenerator;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -76,7 +72,7 @@ public abstract class Algorithm {
             size = ReadConfig.Configurations.getClassifierPopulationSize();
             logger.log(Level.INFO, "Generating Classifiers Population...");
         }
-        IntStream.range(0, size).forEach(i ->{
+        for(int i = 0; i < size; i ++){
             Individual newBorn;
             try {
                 switch(ReadConfig.Configurations.getMutation()){
@@ -99,7 +95,7 @@ public abstract class Algorithm {
                 logger.log(Level.WARNING, "Error with generating population");
                 e.printStackTrace();
             }
-        });
+        }
         //initialising the hall of fame
         if(ReadConfig.Configurations.getHallOfFame()) this.hallOfFame = new HallOfFame(model);
     }
@@ -128,7 +124,7 @@ public abstract class Algorithm {
             size = 1;
         }
         final int[] finalSize = {size};
-        populationLoaded.forEach(ind -> {
+        for(INDArray ind: populationLoaded){
             Individual newBorn;
             try {
                 switch(ReadConfig.Configurations.getMutation()){
@@ -152,7 +148,7 @@ public abstract class Algorithm {
                 logger.log(Level.WARNING, "Error with generating population");
                 e.printStackTrace();
             }
-        });
+        }
         //initialising the hall of fame
         if(ReadConfig.Configurations.getHallOfFame()) this.hallOfFame = new HallOfFame(model);
     }
@@ -278,9 +274,13 @@ public abstract class Algorithm {
         }
 
         //set everyone as a parent now
-        this.population.forEach(Individual::isParent);
+        for(Individual ind: this.population){
+            ind.isParent();
+        }
         if(this.hallOfFame != null) {
-            this.hallOfFame.getHallOfFame().forEach(Individual::isParent);
+            for(Individual ind: this.hallOfFame.getHallOfFame()){
+                ind.isParent();
+            }
             this.hallOfFame.createSample();
         }
 
@@ -289,8 +289,7 @@ public abstract class Algorithm {
 
             //creating the tournament
             List<Individual> tournamentPop = new ArrayList<>();
-            IntStream.range(0, tournamentSize).forEach(j -> {
-
+            for(int j = 0; j < tournamentSize; j++){
                 double val = RandomGenerator.getNextDouble();
                 boolean isHallOfFame = false;
                 if(val > 0.5 && this.hallOfFame != null) isHallOfFame = true;
@@ -308,14 +307,16 @@ public abstract class Algorithm {
                     Individual ind = this.hallOfFame.getSample().get(idParent);
                     tournamentPop.add(ind);
                 }
-            });
+            }
             //find the winner of the tournament -> the one with the highest fitness
             tournamentPop.sort(Comparator.comparingDouble(Individual::getFitness));
 
 
             //log the fitness of all the tournament
             List<Double> fitn = new ArrayList<>();
-            tournamentPop.forEach(p -> fitn.add(p.getFitness()));
+            for(Individual ind: tournamentPop){
+                fitn.add(ind.getFitness());
+            }
 
             logger.log(Level.FINE, "--Fitness population on the tournament--");
             logger.log(Level.FINE, fitn.toString());
@@ -439,6 +440,15 @@ public abstract class Algorithm {
     }
 
     /**
+     * Methods that returns the step size of the best genome in the population
+     * @return double/ list of double
+     */
+    public INDArray retStepSizeBestGenome(){
+        this.population.sort(Comparator.comparing(Individual::getFitness));
+        return ((UncorrelatedMutation)this.population.get(0)).getMutationStrengths();
+    }
+
+    /**
      * Method to train the network with the input selected
      * @param combineInputList where to find the input to train
      */
@@ -449,7 +459,9 @@ public abstract class Algorithm {
      * Reset the fitness of all the individual
      */
     public void resetFitness(){
-        this.population.forEach(Individual::resetFitness);
+        for(Individual ind: this.population){
+            ind.resetFitness();
+        }
     }
 
 
@@ -505,9 +517,12 @@ public abstract class Algorithm {
         //sort the list
         this.population.sort(Comparator.comparing(Individual::getFitness));
 
+
         //log the fitness of all the population
         List<Double> fitn = new ArrayList<>();
-        this.population.forEach(p -> fitn.add(p.getFitness()));
+        for(Individual ind : this.population){
+            fitn.add(ind.getFitness());
+        }
 
         logger.log(Level.INFO, "--Fitness population before selection--");
         logger.log(Level.INFO, fitn.toString());
@@ -518,10 +533,14 @@ public abstract class Algorithm {
         }
 
         List<Individual> newList = new ArrayList<>();
-        this.population.forEach(p -> newList.add(p.deepCopy()));
+        for(Individual ind : this.population){
+            newList.add(ind.deepCopy());
+        }
 
         List<Double> fitnd = new ArrayList<>();
-        newList.forEach(p -> fitnd.add(p.getFitness()));
+        for(Individual ind : newList){
+            fitnd.add(ind.getFitness());
+        }
 
         logger.log(Level.INFO, "--Fitness population after selection--");
         logger.log(Level.INFO, fitnd.toString());
@@ -532,15 +551,15 @@ public abstract class Algorithm {
 
         //check who is parents and who is son
         List<Integer> sonAndParent = new ArrayList<>();
-        this.population.forEach(p -> {
-            if (p.isSon()) {
+        for(Individual ind : this.population){
+            if (ind.isSon()) {
                 // zero for offspring
                 sonAndParent.add(0);
             } else {
                 // one for parent
                 sonAndParent.add(1);
             }
-        });
+        }
         logger.log(Level.INFO, "--Parents[1] vs Sons[0]--");
         logger.log(Level.INFO, sonAndParent.toString());
     }
@@ -571,7 +590,9 @@ public abstract class Algorithm {
 
         //log the fitness of all the population
         List<Double> fitn = new ArrayList<>();
-        this.population.forEach(p -> fitn.add(p.getFitness()));
+        for(Individual ind : this.population){
+            fitn.add(ind.getFitness());
+        }
 
         logger.log(Level.INFO, "--Fitness population before selection--");
         logger.log(Level.INFO, fitn.toString());
@@ -582,10 +603,14 @@ public abstract class Algorithm {
         }
 
         List<Individual> newList = new ArrayList<>();
-        this.population.forEach(p -> newList.add(p.deepCopy()));
+        for(Individual ind : this.population){
+            newList.add(ind.deepCopy());
+        }
 
         List<Double> fitnd = new ArrayList<>();
-        newList.forEach(p -> fitnd.add(p.getFitness()));
+        for(Individual ind : newList){
+            fitnd.add(ind.getFitness());
+        }
 
         logger.log(Level.INFO, "--Fitness population after selection--");
         logger.log(Level.INFO, fitnd.toString());
@@ -603,7 +628,9 @@ public abstract class Algorithm {
     private void keepBestN() throws Exception {
         //log the fitness of all the population
         List<Double> fitn = new ArrayList<>();
-        this.population.forEach(p -> fitn.add(p.getFitness()));
+        for(Individual ind : this.population){
+            fitn.add(ind.getFitness());
+        }
 
         logger.log(Level.INFO, "--Fitness population before selection--");
         logger.log(Level.INFO, fitn.toString());
@@ -629,7 +656,9 @@ public abstract class Algorithm {
             size = ReadConfig.Configurations.getClassifierPopulationSize();
         }
 
-        sons.forEach(s -> nextGeneration.add(s.deepCopy()));
+        for(Individual ind: sons){
+            nextGeneration.add(ind.deepCopy());
+        }
 
         while(nextGeneration.size() > size){
             nextGeneration.remove(nextGeneration.size() - 1);
@@ -638,7 +667,9 @@ public abstract class Algorithm {
 
 
         List<Double> fitnd = new ArrayList<>();
-        nextGeneration.forEach(p -> fitnd.add(p.getFitness()));
+        for(Individual ind : nextGeneration){
+            fitnd.add(ind.getFitness());
+        }
 
         logger.log(Level.INFO, "--Fitness population after selection--");
         logger.log(Level.INFO, fitnd.toString());
@@ -647,15 +678,15 @@ public abstract class Algorithm {
 
         //check who is parents and who is son
         List<Integer> sonAndParent = new ArrayList<>();
-        this.population.forEach(p -> {
-            if(p.isSon()){
+        for(Individual ind : this.population){
+            if (ind.isSon()) {
                 // zero for offspring
                 sonAndParent.add(0);
-            }else{
+            } else {
                 // one for parent
                 sonAndParent.add(1);
             }
-        });
+        }
         logger.log(Level.INFO, "--Parents vs Sons--");
         logger.log(Level.INFO, sonAndParent.toString());
     }

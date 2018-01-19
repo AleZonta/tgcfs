@@ -243,17 +243,26 @@ public class Classifiers extends Algorithm {
 
         //generate the list of examples
         List<Example> generalList = new ArrayList<>();
-        input.forEach(element -> {
+        for(TrainReal element: input){
             List<INDArray> totalListFalse = new ArrayList<>();
-            element.getTrainingPoint().forEach(trainingPoint -> totalListFalse.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier()));
-            element.getOutputComputed().forEach(trainingPoint -> totalListFalse.add(((tgcfs.Agents.OutputNetwork)trainingPoint).serialiaseAsInputClassifier()));
+            for(InputsNetwork trainingPoint: element.getTrainingPoint()){
+                totalListFalse.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier());
+            }
+            for(OutputsNetwork trainingPoint: element.getOutputComputed()){
+                totalListFalse.add(((tgcfs.Agents.OutputNetwork)trainingPoint).serialiaseAsInputClassifier());
+            }
             generalList.add(new Example(totalListFalse, Boolean.FALSE));
 
             List<INDArray> totalListTrue = new ArrayList<>();
-            element.getTrainingPoint().forEach(trainingPoint -> totalListTrue.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier()));
-            element.getFollowingPartTransformed().forEach(trainingPoint -> totalListTrue.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier()));
+            for(InputsNetwork trainingPoint: element.getTrainingPoint()){
+                totalListTrue.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier());
+            }
+            for(OutputsNetwork trainingPoint: element.getOutputComputed()){
+                totalListTrue.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier());
+            }
+
             generalList.add(new Example(totalListTrue, Boolean.TRUE));
-        });
+        }
 
         //shuffle list
         Collections.shuffle(generalList);

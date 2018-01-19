@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -108,6 +107,18 @@ public class SaveToFile {
         public static void saveBestGenoma(String name, INDArray genoma) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveGenome(name, genoma);
+        }
+
+        /**
+         * Append  line to the file saving the stepSize of the best element
+         * It calls the private method to do that of the SaveToFile class
+         * @param name name of the class/file I am saving
+         * @param stepSize list with the double value of the stepSize
+         * @throws Exception  if the class is not instantiate
+         */
+        public static void saveStepSize(String name, INDArray stepSize) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.saveGenome(name, stepSize);
         }
 
         /**
@@ -304,6 +315,25 @@ public class SaveToFile {
         }
     }
 
+    /**
+     * Save the stepsize of the best individual
+     * @param name name of the class/file I am saving
+     * @param stepSize list with the double value of the stepsizes
+     */
+    private void saveStepSize(String name, INDArray stepSize){
+        try {
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-stepsize.csv", true));
+            outputWriter.write(stepSize.data().toString());
+            outputWriter.newLine();
+            logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+
+            outputWriter.flush();
+            outputWriter.close();
+        }catch (Exception e){
+            logger.log(Level.WARNING, "Error with " + name + " CSV File " + e.getMessage());
+        }
+    }
+
 
     /**
      * Save the entire population in a csv file inside a zip file to save space
@@ -362,7 +392,7 @@ public class SaveToFile {
 
             JSONObject totalObj = new JSONObject();
 
-            IntStream.range(0, combineInputList.size()).forEach(i -> {
+            for(int i = 0; i < combineInputList.size(); i ++){
 
                 TrainReal el = combineInputList.get(i);
 
@@ -386,7 +416,7 @@ public class SaveToFile {
 
                 String name = "trajectory-" + i;
                 totalObj.put(name, obj);
-            });
+            }
 
             totalObj.put("size", combineInputList.size());
             try {
@@ -422,7 +452,9 @@ public class SaveToFile {
             JSONObject obj = new JSONObject();
 
             JSONArray allTheScores = new JSONArray();
-            scores.forEach(s -> allTheScores.add(s.toString()));
+            for(Scores s: scores){
+                allTheScores.add(s.toString());
+            }
             obj.put("scores", allTheScores);
 
             try {

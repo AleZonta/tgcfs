@@ -11,7 +11,6 @@ import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 26/06/2017.
@@ -182,7 +181,7 @@ public class UncorrelatedMutation extends Individual {
         double rand1 = RandomGenerator.getNextGaussian();
 
         //first mutate the list of mutation strengths
-        IntStream.range(0, this.mutationStrengths.columns()).forEach(i -> {
+        for(int i = 0; i < this.mutationStrengths.columns(); i++){
             //random Double generated separately for each element within each individual
             double randw = RandomGenerator.getNextGaussian();
             //obtain the new mutation value
@@ -195,10 +194,10 @@ public class UncorrelatedMutation extends Individual {
             if(newMutation < 0.0001) newMutation = 0.0001;
             //substitute the old one with the new one
             this.mutationStrengths.putScalar(i, newMutation);
-        });
+        }
 
         //after having mutate all the mutation strengths it is time to mutate the actual objective parameters
-        IntStream.range(0, super.getObjectiveParameters().columns()).forEach(i -> {
+        for(int i = 0; i < super.getObjectiveParameters().columns(); i++){
             //random Double generated separately for each element within each individual
             double randw = RandomGenerator.getNextGaussian();
             double mutStrenght;
@@ -217,7 +216,7 @@ public class UncorrelatedMutation extends Individual {
                 newValue = -4 - difference;
             }
             super.getObjectiveParameters().putScalar(i, newValue);
-        });
+        }
     }
 
     /**

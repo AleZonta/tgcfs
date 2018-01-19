@@ -39,7 +39,6 @@ public class MultyScores {
             Scores f = found.get(found.size() - 1);
             this.score.add(new Scores(f.getIdAgent(), f.getTrajectory() + 1, f.getIdClassifier(), f.getScore()));
         }
-
     }
 
     /**
