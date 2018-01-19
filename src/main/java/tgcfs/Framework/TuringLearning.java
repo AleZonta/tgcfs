@@ -214,7 +214,7 @@ public class TuringLearning implements Framework{
         boolean evolveAgent = Boolean.TRUE;
         boolean evolveClassifier = Boolean.TRUE;
         Integer maxGeneration = ReadConfig.Configurations.getMaxGenerations();
-        while(!reachedEndTrajectory && !randomError && (generationAgent <= maxGeneration || generationClassifier <= maxGeneration)) {
+        while(!reachedEndTrajectory && !randomError && generationAgent <= maxGeneration && generationClassifier <= maxGeneration) {
             if(evolveAgent) generationAgent++;
             if(evolveClassifier) generationClassifier++;
             this.agents.resetScore();
@@ -255,8 +255,6 @@ public class TuringLearning implements Framework{
 
                 //countermeasures system against disengagement
                 this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);
-                evolveAgent = this.countermeasures.isEvolveAgent();
-                evolveClassifier = this.countermeasures.isEvolveClassifier();
                 this.countermeasures.executeCountermeasuresAgainstDisengagement(this.agents.getPopulation(), IndividualStatus.AGENT);
                 this.countermeasures.executeCountermeasuresAgainstDisengagement(this.classifiers.getPopulation(), IndividualStatus.CLASSIFIER);
 
@@ -265,6 +263,9 @@ public class TuringLearning implements Framework{
                 logger.log(Level.INFO,"Parent Selection...");
                 if(evolveAgent) this.agents.survivalSelections();
                 if(evolveClassifier) this.classifiers.survivalSelections();
+
+                evolveAgent = this.countermeasures.isEvolveAgent();
+                evolveClassifier = this.countermeasures.isEvolveClassifier();
 
                 //save the fitness of all the population and best genome
                 logger.log(Level.INFO,"Saving Statistics...");
