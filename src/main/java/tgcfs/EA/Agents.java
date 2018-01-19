@@ -577,7 +577,7 @@ public class Agents extends Algorithm {
                         agent.increaseFitness(decision);
                         classifier.increaseFitness(1 - decision);
                         if (this.score) {
-                            Scores sc = new Scores(agent.getModel().getId(),0, classifier.getModel().getId(), 1d);
+                            Scores sc = new Scores(agent.getModel().getId(),totalInput.getId(), classifier.getModel().getId(), 1d);
                             this.scores.addScore(sc);
                         }
                     }
@@ -588,7 +588,7 @@ public class Agents extends Algorithm {
                     if(real) {
                         agent.increaseFitness(1 - decision);
                         if (this.score) {
-                            Scores sc = new Scores(agent.getModel().getId(), 0, classifier.getModel().getId(), 0d);
+                            Scores sc = new Scores(agent.getModel().getId(), totalInput.getId(), classifier.getModel().getId(), 0d);
                             this.scores.addScore(sc);
                         }
                     }

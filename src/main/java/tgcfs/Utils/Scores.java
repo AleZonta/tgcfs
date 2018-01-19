@@ -1,5 +1,7 @@
 package tgcfs.Utils;
 
+import java.util.UUID;
+
 /**
  * Created by Alessandro Zonta on 10/11/2017.
  * PhD Situational Analytics
@@ -17,7 +19,7 @@ public class Scores {
     private int idAgent;
     private int idClassifier;
     private double score;
-    private int trajectory;
+    private UUID trajectory;
 
     /**
      * Constructor all the parameters
@@ -26,7 +28,7 @@ public class Scores {
      * @param idClassifier id classifiers
      * @param score score of the battle -> 0 wins the agent, 1 wins the classifier
      */
-    public Scores(int idAgent, int trajectory, int idClassifier, double score) {
+    public Scores(int idAgent, UUID trajectory, int idClassifier, double score) {
         this.idAgent = idAgent;
         this.trajectory = trajectory;
         this.idClassifier = idClassifier;
@@ -61,7 +63,7 @@ public class Scores {
      * Get trajectory number
      * @return int trajectory number
      */
-    public int getTrajectory() {
+    public UUID getTrajectory() {
         return trajectory;
     }
 

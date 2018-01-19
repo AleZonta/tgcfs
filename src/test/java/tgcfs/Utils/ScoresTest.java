@@ -2,6 +2,8 @@ package tgcfs.Utils;
 
 import org.junit.Test;
 
+import java.util.UUID;
+
 /**
  * Created by Alessandro Zonta on 10/11/2017.
  * PhD Situational Analytics
@@ -15,7 +17,7 @@ import org.junit.Test;
 public class ScoresTest {
     @Test
     public void test() throws Exception {
-        Scores s = new Scores(5,0,8,0);
+        Scores s = new Scores(5, UUID.randomUUID(),8,0);
         System.out.println(s.toString());
     }
 

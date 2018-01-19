@@ -1,9 +1,7 @@
 package tgcfs.Utils;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by Alessandro Zonta on 10/11/2017.
@@ -31,14 +29,7 @@ public class MultyScores {
      * @param scores score to add
      */
     public synchronized void addScore(Scores scores){
-        List<Scores> found = this.score.stream().filter(s -> s.getIdAgent() == scores.getIdAgent() & s.getIdClassifier() == scores.getIdClassifier()).collect(Collectors.toList());
-        if(found.isEmpty()){
-            this.score.add(scores);
-        }else{
-            found.sort(Comparator.comparingInt(Scores::getTrajectory));
-            Scores f = found.get(found.size() - 1);
-            this.score.add(new Scores(f.getIdAgent(), f.getTrajectory() + 1, f.getIdClassifier(), f.getScore()));
-        }
+        this.score.add(scores);
     }
 
     /**
