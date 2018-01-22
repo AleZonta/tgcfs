@@ -81,7 +81,7 @@ public class LSTM extends Models implements Network{
         RnnOutputLayer.Builder outputLayerBuilder = new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT);
         outputLayerBuilder.nIn(hiddenNeurons);
         outputLayerBuilder.nOut(outputSize);
-        outputLayerBuilder.activation(Activation.SOFTSIGN);
+        outputLayerBuilder.activation(Activation.IDENTITY);
         outputLayerBuilder.lossFunction(LossFunctions.LossFunction.MSE);
         listBuilder.layer(hiddenLayers, outputLayerBuilder.build());
 

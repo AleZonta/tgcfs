@@ -14,6 +14,7 @@ import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.PointToSpeedBearing;
+import tgcfs.InputOutput.PointToSpeedSpeed;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Routing.Routes;
 import tgcfs.Utils.PointWithBearing;
@@ -244,8 +245,8 @@ public class Feeder {
             double speed = conversion.obtainSpeed(previousPoint, actualPoint);
             double space = conversion.obtainDistance(previousPoint, actualPoint);
 
-            double time = Routes.timeBetweenIDSATimesteps;
-            double angularSpeed =((previousBearing - bearing) / time);
+            PointToSpeedSpeed convertitor = new PointToSpeedSpeed();
+            double angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing);
 
             InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, space);
             inputNetwork.setTargetPoint(possibleTarget);

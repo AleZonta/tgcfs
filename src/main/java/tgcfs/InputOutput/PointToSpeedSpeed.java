@@ -23,7 +23,20 @@ public class PointToSpeedSpeed {
      */
     public double obtainAngularSpeed(PointWithBearing previousPoint, double actualBearing){
         double previousBearing = previousPoint.getBearing();
+        return this.obtainAngularSpeed(previousBearing,actualBearing);
+    }
+
+    /**
+     * Obtain angular speed current second point
+     * @param previousBearing previous bearing
+     * @param actualBearing bearing just computed of last point
+     * @return double value with speed
+     */
+    public double obtainAngularSpeed(double previousBearing, double actualBearing){
         double time = Routes.timeBetweenIDSATimesteps;
-        return (previousBearing - actualBearing) / time;
+
+        double angle = 180 - Math.abs(Math.abs(previousBearing - actualBearing) - 180);
+
+        return Math.toRadians(angle) / time;
     }
 }

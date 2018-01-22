@@ -110,7 +110,8 @@ public class Normalisation {
      * @return normalised speed between ±1
      */
     public static double convertSpeed(double toBeConverted) throws Exception {
-        return convertToSomething(ReadConfig.Configurations.getMaxSpeed(), min_speed, 1.0,-1.0, toBeConverted);
+        return convertToSomething(ReadConfig.Configurations.getMaxSpeed(), -ReadConfig.Configurations.getMaxSpeed(), 1.0,-1.0, toBeConverted);
+//        return toBeConverted; //linear conversion
     }
 
     /**
@@ -119,7 +120,8 @@ public class Normalisation {
      * @return double real value
      */
     public static double decodeSpeed(double toBeConverted) throws Exception {
-        return convertToSomething(1.0, -1.0, ReadConfig.Configurations.getMaxSpeed(), min_speed, toBeConverted);
+        return toBeConverted; //linear conversion
+//        return convertToSomething(1.0, -1.0, ReadConfig.Configurations.getMaxSpeed(), min_speed, toBeConverted);
     }
 
     /**
@@ -128,7 +130,30 @@ public class Normalisation {
      * @return double real value
      */
     public static double decodeDirectionData(double toBeConverted){
-        return convertToSomething(1.0, -1.0, 360.0,0.0, toBeConverted);
+        //lets keep it round (with linear activation)
+        //whatever output I will obtain, it is always transformed into 0-360
+        double realTobeconverted = toBeConverted;
+        if(realTobeconverted > 1){
+            while(realTobeconverted >= 3){
+                realTobeconverted -= 4;
+            }
+            if(realTobeconverted >= -1 && realTobeconverted <=1){
+                return convertToSomething(1.0, -1.0, 360.0,0.0, realTobeconverted);
+            }else{
+                return convertToSomething(3.0, 1.0, 0.0,360.0, realTobeconverted);
+            }
+        }else{
+            while(realTobeconverted <= -3){
+                realTobeconverted += 4;
+            }
+            if(realTobeconverted >= -1 && realTobeconverted <=1){
+                return convertToSomething(1.0, -1.0, 360.0,0.0, realTobeconverted);
+            }else{
+                return convertToSomething(-1.0, -3.0, 360.0,0.0, realTobeconverted);
+            }
+        }
+
+
     }
 
     /**

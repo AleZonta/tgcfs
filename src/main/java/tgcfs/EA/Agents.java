@@ -185,6 +185,7 @@ public class Agents extends Algorithm {
                         INDArray vector = in.get(j).serialise();
                         features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
                     }
+                    if(ReadConfig.debug) logger.log(Level.INFO, "Input LSTM ->" + features.toString());
                     lastOutput = model.computeOutput(features);
 
                     int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
@@ -227,7 +228,7 @@ public class Agents extends Algorithm {
 
         }
 
-        ExecutorService exec = Executors.newFixedThreadPool(128);
+        ExecutorService exec = Executors.newFixedThreadPool(16);
         CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
         ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
 
@@ -565,7 +566,8 @@ public class Agents extends Algorithm {
                 }else{
                     input = totalInput.getAllThePartTransformedReal();
                 }
-                tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
+                 tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
+
 
                 double decision = result.getRealValue01();
 
@@ -616,7 +618,7 @@ public class Agents extends Algorithm {
 
         logger.log(Level.SEVERE, "Start real classification");
 
-        ExecutorService exec = Executors.newFixedThreadPool(128);
+        ExecutorService exec = Executors.newFixedThreadPool(16);
         CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
         ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
 

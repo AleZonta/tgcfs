@@ -125,10 +125,22 @@ public class NormalisationTest {
 
     @Test
     public void decodeDirectionData() throws Exception {
-        Double data = 30.4;
-        Double ret = Normalisation.convertDirectionData(data);
-        Double redata = Normalisation.decodeDirectionData(ret);
-        assertEquals(data,redata,0.00001);
+//        Double data = 30.4;
+//        Double ret = Normalisation.convertDirectionData(data);
+//        Double redata = Normalisation.decodeDirectionData(ret);
+//        assertEquals(data,redata,0.00001);
+
+        System.out.println(Normalisation.decodeDirectionData(-1.0));
+        System.out.println(Normalisation.decodeDirectionData(-2.0));
+        System.out.println(Normalisation.decodeDirectionData(-3.0));
+        System.out.println(Normalisation.decodeDirectionData(-4.0));
+        System.out.println(Normalisation.decodeDirectionData(-5.0));
+        System.out.println(Normalisation.decodeDirectionData(-6.0));
+        System.out.println(Normalisation.decodeDirectionData(-7.0));
+        System.out.println(Normalisation.decodeDirectionData(-8.0));
+        System.out.println(Normalisation.decodeDirectionData(-9.0));
+
+
     }
 
     @Test

@@ -75,6 +75,7 @@ public class OutputNetwork implements OutputsNetwork {
         InputNetwork net = (InputNetwork)out;
         try {
             this.speed = Normalisation.decodeSpeed(net.getSpeed());
+//            this.speed = net.getSpeed();
         } catch (Exception e) {
             throw new Error("Erro with speed.");
         }
@@ -123,6 +124,9 @@ public class OutputNetwork implements OutputsNetwork {
         }
         if(out.columns() == outputSize) {
             try {
+//                this.speed = out.getDouble(0);
+                //linear activation lets keep the speed as normal
+                //this.speed = Normalisation.decodeSpeed(out.getDouble(0));
                 this.speed = Normalisation.decodeSpeed(out.getDouble(0));
             } catch (Exception e) {
                 throw new Error("Erro with speed.");
@@ -132,7 +136,7 @@ public class OutputNetwork implements OutputsNetwork {
 //            this.distance = Normalisation.decodeDistance(out.getDouble(2));
         }else{
             try {
-                this.speed = Normalisation.decodeSpeed(out.getRow(0).getDouble(0));
+                this.speed = Normalisation.decodeSpeed(out.getDouble(0));
             } catch (Exception e) {
                 throw new Error("Erro with speed.");
             }

@@ -59,7 +59,7 @@ public class HallOfFame {
                     newBorn = new NonUniformMutation(model.getArrayLength(), IndividualStatus.RANDOM);
                     break;
             }
-            newBorn.setModel(model);
+            newBorn.setModel(model.deepCopy());
             this.hallOfFame.add(newBorn);
         }
         this.sample = new ArrayList<>();

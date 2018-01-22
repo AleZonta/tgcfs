@@ -49,6 +49,17 @@ public class PointToSpeedBearingTest {
         // https://www.sunearthtools.com/tools/distance.php
         // tested with this website
         System.out.println(result);
+
+        start = new Point(52.320961, 4.869281, 10.0, 123425.6, "1234256", "14:25:00");
+        end = new Point(52.325662, 4.871667, 10.0, 123245.6, "1223456", "14:20:10");
+        result = convertitor.obtainBearing(start, end);
+        System.out.println(result);
+
+
+
+
+
+
     }
 
 }

@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 30/06/2017.
@@ -391,47 +390,16 @@ public class TrainReal {
         herePoint.add(this.firstPart.get(this.firstPart.size() - 1));
         herePoint.addAll(this.followingPart);
 
-//        double previousBearing = 0.0;
-//        for(int i = 1; i <  herePoint.size(); i++){
-//            //bearing from this point to next point
-//            Point previousPoint = herePoint.get(i - 1);
-//            Point actualPoint = herePoint.get(i);
-//
-//            double bearing = conversion.obtainBearing(previousPoint, actualPoint);
-//
-//            //speed is the speed I arrived here from previous point
-//            double speed = Normalisation.convertSpeed(conversion.obtainSpeed(previousPoint, actualPoint));
-//            double space = Normalisation.convertDistance(conversion.obtainDistance(previousPoint, actualPoint));
-//
-//            double time = 0.2D;
-//            double angularSpeed = Normalisation.convertAngularSpeed(((previousBearing - bearing) / time));
-//
-//            totalList.add(new OutputNetwork(speed, angularSpeed, space));
-//            previousBearing = bearing;
-//        }
-
-
-        IntStream.range(1, herePoint.size()).forEach(i -> {
+        for(int i=1; i<herePoint.size(); i++){
 
             Point previousPoint = herePoint.get(i - 1);
             Point actualPoint = herePoint.get(i);
             Double bearing = conversion.obtainBearing(previousPoint,actualPoint);
-
-
-            Double speed;
-            Double dist;
-            if(i > 0){
-                speed = conversion.obtainSpeed(previousPoint, actualPoint);
-
-               /// dist = conversion.obtainDistance(previousPoint,actualPoint);
-            }else {
-                speed = 0.0;
-                ///dist = 0.0;
-            }
+            Double speed = conversion.obtainSpeed(previousPoint, actualPoint);
 
             totalList.add(new OutputNetwork(speed, bearing));
 
-        });
+        }
 
         this.realOutput = new ArrayList<>();
         this.realOutput.addAll(totalList);

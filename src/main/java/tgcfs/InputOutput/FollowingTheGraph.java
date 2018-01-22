@@ -93,7 +93,6 @@ public class FollowingTheGraph implements Transformation {
         List<InputsNetwork> convertedInput = new ArrayList<>();
         List<InputsNetwork> convertedInputReal = new ArrayList<>();
 
-        PointToSpeedBearing converterPointSB = new PointToSpeedBearing();
         PointToSpeedSpeed convertToAgularSpeed = new PointToSpeedSpeed();
 
         //If I am also checking the first part I am adding that to the result to compute

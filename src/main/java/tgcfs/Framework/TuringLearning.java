@@ -227,8 +227,18 @@ public class TuringLearning implements Framework{
                 if(evolveAgent) this.agents.generateOffspring();
                 if(evolveClassifier) this.classifiers.generateOffspring();
             }else{
-                if(evolveAgent) this.agents.generateOffspringOnlyWithMutation(generationAgent);
-                if(evolveClassifier) this.classifiers.generateOffspringOnlyWithMutation(generationClassifier);
+                if(evolveAgent) {
+                    this.agents.generateOffspringOnlyWithMutation(generationAgent);
+                }else{
+                    //If I am not evolving the classifier I still have to reset their fitness
+                    this.classifiers.resetFitness();
+                }
+                if(evolveClassifier) {
+                    this.classifiers.generateOffspringOnlyWithMutation(generationClassifier);
+                }else{
+                    //If I am not evolving the classifier I still have to reset their fitness
+                    this.classifiers.resetFitness();
+                }
             }
 
             logger.log(Level.INFO, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
