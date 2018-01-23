@@ -292,7 +292,7 @@ public abstract class Algorithm {
             for(int j = 0; j < tournamentSize; j++){
                 double val = RandomGenerator.getNextDouble();
                 boolean isHallOfFame = false;
-                if(val > 0.5 && this.hallOfFame != null) isHallOfFame = true;
+                if(val > 0.1 && this.hallOfFame != null) isHallOfFame = true;
 
                 if(!isHallOfFame) {
                     //selection from the normal population

@@ -110,6 +110,12 @@ public class Normalisation {
      * @return normalised speed between ±1
      */
     public static double convertSpeed(double toBeConverted) throws Exception {
+        if(toBeConverted > ReadConfig.Configurations.getMaxSpeed()){
+            toBeConverted = ReadConfig.Configurations.getMaxSpeed();
+        }
+        if(toBeConverted < ReadConfig.Configurations.getMaxSpeed()){
+            toBeConverted = -ReadConfig.Configurations.getMaxSpeed();
+        }
         return convertToSomething(ReadConfig.Configurations.getMaxSpeed(), -ReadConfig.Configurations.getMaxSpeed(), 1.0,-1.0, toBeConverted);
 //        return toBeConverted; //linear conversion
     }

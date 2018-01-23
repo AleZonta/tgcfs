@@ -220,7 +220,7 @@ public class Agents extends Algorithm {
 
                     //create the output already computed
                     currentInputsNetwork.createRealOutputConverted();
-                    individual.addMyInputandOutput(currentInputsNetwork);
+                    individual.addMyInputandOutput(currentInputsNetwork.deepCopy());
 
                     ((LSTMAgent)model).clearPreviousState();
                 }

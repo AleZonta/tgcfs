@@ -81,7 +81,7 @@ public class HallOfFame {
         }else {
             i = RandomGenerator.getNextInt(0, this.hallOfFame.size());
         }
-        this.hallOfFame.set(i, individual);
+        this.hallOfFame.set(i, individual.deepCopy());
     }
 
     /**

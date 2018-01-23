@@ -231,7 +231,7 @@ public class TuringLearning implements Framework{
                     this.agents.generateOffspringOnlyWithMutation(generationAgent);
                 }else{
                     //If I am not evolving the classifier I still have to reset their fitness
-                    this.classifiers.resetFitness();
+                    this.agents.resetFitness();
                 }
                 if(evolveClassifier) {
                     this.classifiers.generateOffspringOnlyWithMutation(generationClassifier);
@@ -269,13 +269,14 @@ public class TuringLearning implements Framework{
                 this.countermeasures.executeCountermeasuresAgainstDisengagement(this.classifiers.getPopulation(), IndividualStatus.CLASSIFIER);
 
 
+                evolveAgent = this.countermeasures.isEvolveAgent();
+                evolveClassifier = this.countermeasures.isEvolveClassifier();
+
             /* { SELECT individuals next generation } */
                 logger.log(Level.INFO,"Parent Selection...");
                 if(evolveAgent) this.agents.survivalSelections();
                 if(evolveClassifier) this.classifiers.survivalSelections();
 
-                evolveAgent = this.countermeasures.isEvolveAgent();
-                evolveClassifier = this.countermeasures.isEvolveClassifier();
 
                 //save the fitness of all the population and best genome
                 logger.log(Level.INFO,"Saving Statistics...");

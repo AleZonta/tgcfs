@@ -28,6 +28,10 @@ public class PointToSpeedSpeed {
 
     /**
      * Obtain angular speed current second point
+     *
+     * https://gamedev.stackexchange.com/questions/4467/comparing-angles-and-working-out-the-difference
+     *
+     *
      * @param previousBearing previous bearing
      * @param actualBearing bearing just computed of last point
      * @return double value with speed
