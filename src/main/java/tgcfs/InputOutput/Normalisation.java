@@ -20,8 +20,8 @@ import tgcfs.NN.InputsNetwork;
  */
 public class Normalisation {
     private static double min_speed = 0.0;
-    private static double max_angular_speed = 500.0; //radiant per second
-    private static double min_angular_speed = -500.0;
+    private static double max_angular_speed = 1.5; //radiant per second
+    private static double min_angular_speed = 0.0;
     private static double max_distance = 555.0;
     private static double min_distance = 0.0;
 
@@ -113,7 +113,7 @@ public class Normalisation {
         if(toBeConverted > ReadConfig.Configurations.getMaxSpeed()){
             toBeConverted = ReadConfig.Configurations.getMaxSpeed();
         }
-        if(toBeConverted < ReadConfig.Configurations.getMaxSpeed()){
+        if(toBeConverted < -ReadConfig.Configurations.getMaxSpeed()){
             toBeConverted = -ReadConfig.Configurations.getMaxSpeed();
         }
         return convertToSomething(ReadConfig.Configurations.getMaxSpeed(), -ReadConfig.Configurations.getMaxSpeed(), 1.0,-1.0, toBeConverted);

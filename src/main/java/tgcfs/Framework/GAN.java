@@ -5,7 +5,7 @@ import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
-import tgcfs.Agents.Models.RealAgents;
+import tgcfs.Agents.Models.RealAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.Models.LSTMClassifier;
@@ -45,7 +45,7 @@ public class GAN implements Framework{
     private EvolvableModel classifier;
     private Feeder feeder;
     private IdsaLoader idsaLoader;
-    private RealAgents realAgent;
+    private RealAgent realAgent;
     private static final Logger logger = Logger.getLogger(GAN.class.getName()); //logger for this class
 
 

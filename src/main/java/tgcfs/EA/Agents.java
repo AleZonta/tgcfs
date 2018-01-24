@@ -27,6 +27,7 @@ import tgcfs.Utils.Scores;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -482,14 +483,19 @@ public class Agents extends Algorithm {
      *
      * It is evaluating the false trajectory and also the real one
      *
-     * @param model competing population
+     * @param competingPopulation competing population
      * @param transformation the class that will transform from one output to the new input
      */
-    public void evaluateIndividuals(Algorithm model, Transformation transformation){
+    public void evaluateIndividuals(Algorithm competingPopulation, Transformation transformation){
 
         /**
          * Class for multithreading
          * Run one agent against all the classifiers
+         * Compute the fitness function in this way:
+         * Now if the classifier (ENN) is returning the value x (>=0.5 -> true) as output, the fitness is computed in this way:
+         * - agent fitness is x, classifier is (1-x)
+         * In the other case, output x (<0.5 -> false), the fitness is:
+         * - classifier is x, agent is (1-x)
          */
         class ComputeUnit implements Runnable {
             private CountDownLatch latch;
@@ -532,7 +538,7 @@ public class Agents extends Algorithm {
                     for(TrainReal example: inputOutput){
                         //run the classifier for the Fake trajectory
                         try {
-                            this.runClassifier(model ,agent, opponent, example, true);
+                            this.runClassifier(competingPopulation ,agent, opponent, example, true);
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
                             e.printStackTrace();
@@ -540,7 +546,7 @@ public class Agents extends Algorithm {
 
                         //run the classifier for the Real trajectory
                         try {
-                            this.runClassifier(model ,agent, opponent, example, false);
+                            this.runClassifier(competingPopulation ,agent, opponent, example, false);
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
                             e.printStackTrace();
@@ -599,6 +605,8 @@ public class Agents extends Algorithm {
             }
         }
 
+
+
         boolean score;
         try {
             score = ReadConfig.Configurations.getScore();
@@ -606,6 +614,7 @@ public class Agents extends Algorithm {
             score = false;
         }
 
+        //transform the outputs into the input for the classifiers
         for(Individual ind : super.getPopulationWithHallOfFame()){
             //transform trajectory in advance to prevent multiprocessing errors
             List<TrainReal> inputOutput = ind.getMyInputandOutput();
@@ -618,24 +627,243 @@ public class Agents extends Algorithm {
 
         logger.log(Level.SEVERE, "Start real classification");
 
-        ExecutorService exec = Executors.newFixedThreadPool(16);
-        CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
-        ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
+        // launch my way to compute the fitness
+//        ExecutorService exec = Executors.newFixedThreadPool(16);
+//        CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
+//        ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
+//
+//
+//        for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
+//            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), model.getPopulationWithHallOfFame(), score, this.scores);
+//        }
+//        for(ComputeUnit r : runnables) {
+//            r.setLatch(latch);
+//            exec.execute(r);
+//        }
+//        try {
+//            latch.await();
+//            exec.shutdown();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
-
-        for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
-            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), model.getPopulationWithHallOfFame(), score, this.scores);
+        // number real trajectories = total number of trajectories said as real = # trajectories trained * # individuals
+        int numTraTra;
+        try{
+            numTraTra = ReadConfig.Configurations.getTrajectoriesTrained();
+        } catch (Exception e){
+            numTraTra = 1;
         }
-        for(ComputeUnit r : runnables) {
+        int R = numTraTra * super.getPopulationWithHallOfFame().size();
+
+        /**
+         * Class for multithreading
+         * Run one agent against all the classifiers
+         * Compute the fitness function in this way:
+         *
+         * R =  #real
+         * T_j = sum_i( classifier_j(agent_i))   <- in this module
+         * Y_ij = R * classifier_j(agent_i) / T_j
+         * E_ij = { i = real : 1 - Y_ij, i = fake: Y_ij }
+         *
+         * FitnessAgent = sum_j( E_ij )
+         * FitnessClassifier = sum_i( 1 - E_ij)
+         *
+         */
+        class ComputeSelmarFitnessUnit implements Runnable{
+            private CountDownLatch latch;
+            private Individual classifier;
+            private List<Individual> adersarialPopulation;
+            private HashMap<Integer, Double> classifierResultAgentI;
+
+
+            /**
+             * Constructor
+             * @param classifier current classifier
+             * @param adersarialPopulation adversarial population
+
+             */
+            private ComputeSelmarFitnessUnit(Individual classifier, List<Individual> adersarialPopulation) {
+                this.classifier = classifier;
+                this.adersarialPopulation = adersarialPopulation;
+                this.classifierResultAgentI = new HashMap<>();
+            }
+
+            /**
+             * CountDownLatch is a java class in the java.util.concurrent package. It is a mechanism to safely handle
+             * counting the number of completed tasks. You should call latch.countDown() whenever the run method competes.
+             * @param latch {@link CountDownLatch}
+             */
+            private void setLatch(CountDownLatch latch) {
+                this.latch = latch;
+            }
+
+
+            /**
+             * Getter for the results from the classification
+             * @return HashMap<Integer, Double> containing id agent and his classification
+             */
+            private HashMap<Integer, Double> getResults(){
+                return this.classifierResultAgentI;
+            }
+
+            /**
+             * Getter for the classifier's model ID
+             * @return int id
+             */
+            private int getClassifierID(){
+                return this.classifier.getModel().getId();
+            }
+
+            /**
+             * Override method run
+             * run the classifier over the agent
+             *
+             * classifierResultAgentI = classifier_j(agent_i)
+             * classifierResultAgentI = agent_i classification using classifier j
+             */
+            @Override
+            public void run() {
+                for(Individual agent: this.adersarialPopulation){
+                    List<TrainReal> inputOutput = agent.getMyInputandOutput();
+                    for(TrainReal example: inputOutput){
+                        //run the classifier for the Fake trajectory
+                        int agentId = agent.getModel().getId();
+                        try {
+                            tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedFake());
+                            if (ReadConfig.debug) logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue01());
+                            //save all the results
+                            this.classifierResultAgentI.put(agentId, result.getRealValue01());
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
+                            e.printStackTrace();
+                        }
+
+                        int realAgentId = example.getIdRealPoint().getId();
+                        //run the classifier for the Real trajectory
+                        try {
+                            tgcfs.Classifiers.OutputNetwork resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedReal());
+                            if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue01());
+                            //save all the results
+                            this.classifierResultAgentI.put(realAgentId, resultReal.getRealValue01());
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                latch.countDown();
+            }
+
+        }
+
+        HashMap<Integer, HashMap<Integer, Double>> results = new HashMap<>();
+
+        ExecutorService exec = Executors.newFixedThreadPool(16);
+        CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
+        ComputeSelmarFitnessUnit[] runnables = new ComputeSelmarFitnessUnit[competingPopulation.getPopulationWithHallOfFame().size()];
+
+        for(int i = 0; i < competingPopulation.getPopulationWithHallOfFame().size(); i ++){
+            runnables[i] = new ComputeSelmarFitnessUnit(competingPopulation.getPopulationWithHallOfFame().get(i), super.getPopulationWithHallOfFame());
+        }
+        for(ComputeSelmarFitnessUnit r : runnables) {
             r.setLatch(latch);
             exec.execute(r);
         }
         try {
             latch.await();
             exec.shutdown();
+
+            //collecting the results
+            for (ComputeSelmarFitnessUnit runnable : runnables) {
+                //all the i, j fixed -> classifier_j(agent_i))
+                results.put(runnable.getClassifierID(), runnable.getResults());
+            }
+
+            //creation all the Tj
+            //T_j = sum_i( classifier_j(agent_i))
+            HashMap<Integer, Double> T = new HashMap<>();
+            for(int key: results.keySet()){
+                //key is the classifier id -> i
+                HashMap<Integer, Double> classifierResultAgentI = results.get(key);
+                double singleTj = classifierResultAgentI.values().stream().mapToDouble(i->i).sum();
+                T.put(key, singleTj);
+            }
+
+            //Creation matrix Yij
+            //Y_ij = R * classifier_j(agent_i) / T_j
+            //E_ji = { i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2
+//        HashMap<String, Double> E = new HashMap<>();
+//            HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
+            HashMap<Integer, HashMap<Integer, Double>> E = new HashMap<>();
+            //Classifier Id
+            for(int classifierID: results.keySet()){
+                HashMap<Integer, Double> classifierResultAgentI = results.get(classifierID);
+
+                //now I have all the Agent ID with their values
+                //Creation id agent,classifier
+                HashMap<Integer, Double> subE = new HashMap<>();
+                //for debug, remove this hashmap, it is redundant //TODO
+//                HashMap<Integer, Double> subY = new HashMap<>();
+                for(int agentID: classifierResultAgentI.keySet()){
+
+                    //now I have classifier j and looping over agent i
+
+//                String ij = agentID.toString() + "/" + classifierID.toString();
+                    double y = (R * classifierResultAgentI.get(agentID) / T.get(classifierID));
+                    if(Double.isNaN(y)){
+                        y = 0.0;
+                    }
+                    if(y > 1.0) y = 1.0;
+                    if(y < 0.0) y = 0.0;
+                    //for debug, remove this hashmap, it is redundant //TODO
+//                    subY.put(agentID, y);
+                    if(classifierResultAgentI.get(agentID) > 0.5){
+                        //if TRUE=real
+                        subE.put(agentID, Math.pow(1 - y, 2));
+                    }else{
+                        //if False=False
+                        subE.put(agentID, Math.pow(y, 2));
+                    }
+                }
+                E.put(classifierID, subE);
+                //for debug, remove this hashmap, it is redundant //TODO
+//                Y.put(classifierID, subY);
+            }
+
+
+            //FitnessAgent = sum_j( E_ij )
+
+            //fitness agents
+            for(Individual agent : super.getPopulationWithHallOfFame()){
+                int id = agent.getModel().getId();
+                double fitness = 0;
+                //need to find all the values with that id
+                for(int classifierID: E.keySet()){
+                    fitness += E.get(classifierID).get(id);
+                }
+                agent.setFitness(fitness);
+            }
+
+
+            //FitnessClassifier = sum_i( 1 - E_ij)
+            for(Individual classifier: competingPopulation.getPopulationWithHallOfFame()){
+                int id = classifier.getModel().getId();
+                HashMap<Integer, Double> allTheI = E.get(id);
+                double fitness = 0;
+                for(int agentId: allTheI.keySet()){
+                    fitness += (1 - allTheI.get(agentId));
+                }
+                classifier.setFitness(fitness);
+            }
+
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+
     }
 
     /**

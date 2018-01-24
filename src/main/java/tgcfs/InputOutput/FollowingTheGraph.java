@@ -139,6 +139,7 @@ public class FollowingTheGraph implements Transformation {
         }
         //save the entire trajectory for future works
         trainReal.setAllThePartTransformedFake(convertedInput);
+        logger.log(Level.INFO, "fake ->" + trainReal.getAllThePartTransformedFake().get(trainReal.getAllThePartTransformedFake().size() -1).toString());
 
 
         //this is for the real part

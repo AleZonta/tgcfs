@@ -142,4 +142,9 @@ public class ENNClassifier extends ENN implements EvolvableModel {
     }
 
 
+    public void resetStatus(){
+        this.net.getLayer(1).clear();
+    }
+
+
 }

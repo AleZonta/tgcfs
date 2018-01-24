@@ -85,7 +85,7 @@ public class OutputNetwork implements OutputsNetwork{
         //enn
         if(this.kindOfClassifier == 0){
             this.realValue = out.getDouble(0);
-            if(out.getDouble(0) >= 0.0){
+            if(out.getDouble(0) >= 0.5){
                 this.real = Boolean.TRUE;
             }else{
                 this.real = Boolean.FALSE;
@@ -123,6 +123,14 @@ public class OutputNetwork implements OutputsNetwork{
      * @return doubel value
      */
     public double getRealValue01() {
-        return Normalisation.convertToSomething(1,-1,1,0,this.realValue);
+        return Normalisation.convertToSomething(1,-1,1,0, this.realValue);
+    }
+
+    @Override
+    public String toString() {
+        return "OutputNetwork{" + " " +
+                "real=" + this.real + ", " +
+                "realValue=" + this.realValue + " " +
+                '}';
     }
 }

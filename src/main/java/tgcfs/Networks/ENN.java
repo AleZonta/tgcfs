@@ -100,8 +100,8 @@ public class ENN extends Models implements Network {
             IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,pastInput.getDouble(i-this.input)));
         }
 
-        return this.net.rnnTimeStep(total);
-        //return this.net.output(total);
+//        return this.net.rnnTimeStep(total);
+        return this.net.output(total);
     }
 
     /**

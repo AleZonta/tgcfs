@@ -3,8 +3,11 @@ package tgcfs.Classifiers.Models;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import tgcfs.Config.ReadConfig;
 import tgcfs.Utils.RandomGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static junit.framework.TestCase.*;
@@ -62,8 +65,11 @@ public class ENNClassifierTest {
 
     @Test
     public void computeOutput() throws Exception {
-        for(int w=0; w<15; w++) {
-            ENNClassifier test = new ENNClassifier(3, 4, 1);
+        new ReadConfig.Configurations();
+
+        new RandomGenerator();
+        for(int w=0; w<1; w++) {
+            ENNClassifier test = new ENNClassifier(2, 4, 1);
 
             INDArray array = Nd4j.rand(1, test.getArrayLength());
             for (int j = 0; j < test.getArrayLength(); j++) {
@@ -73,25 +79,62 @@ public class ENNClassifierTest {
 
 
             test.setWeights(array);
-            final INDArray[] out = {null};
+
+
+
             IntStream.range(0, 1000).forEach(i -> {
-                INDArray arrayy = Nd4j.rand(1, 3);
-                for (int j = 0; j < 3; j++) {
+                INDArray arrayy = Nd4j.rand(1, 2);
+                for (int j = 0; j < 2; j++) {
                     arrayy.putScalar(j, RandomGenerator.getNextDouble(-1,1));
                 }
 
 
-                out[0] = test.computeOutput(arrayy);
-                assertNotNull(out[0]);
+                INDArray out = test.computeOutput(arrayy);
+                assertNotNull(out);
+                System.out.println(out.getDouble(0));
 
 
 
-                assertEquals(1, out[0].columns());
-                assertTrue((out[0].getDouble(0) >= -1.0) && (out[0].getDouble(0) <= 1.0));
+
+                assertEquals(1, out.columns());
+                assertTrue((out.getDouble(0) >= -1.0) && (out.getDouble(0) <= 1.0));
 
             });
-            System.out.println(out[0].getDouble(0));
+//            System.out.println(out[0].getDouble(0));
             System.out.println("----");
+
+
+            List<INDArray> arrays = new ArrayList<>();
+            for(int i = 0; i < 10; i++){
+                INDArray arrayy = Nd4j.rand(1, 2);
+                for (int j = 0; j < 2; j++) {
+                    arrayy.putScalar(j, RandomGenerator.getNextDouble(-1,1));
+                }
+                arrays.add(arrayy);
+            }
+
+            for(int i = 0; i < 1000; i++){
+                List<INDArray> appo = new ArrayList<>(arrays);
+                INDArray arrayy = Nd4j.rand(1, 2);
+                for (int j = 0; j < 2; j++) {
+                    arrayy.putScalar(j, RandomGenerator.getNextDouble(-1,1));
+                }
+                appo.add(arrayy);
+                INDArray out = null;
+                System.out.println(appo);
+                for(INDArray arr: appo){
+                    out = test.computeOutput(arr);
+
+                }
+                System.out.println(out.getDouble(0));
+                System.out.println("----");
+
+            }
+
+
+
+
+
         }
     }
 

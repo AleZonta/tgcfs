@@ -3,6 +3,7 @@ package tgcfs.Loader;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import tgcfs.Agents.Models.RealAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
@@ -47,6 +48,7 @@ public class TrainReal {
     private IdsaLoader idsaLoader;
     private List<Point> totalPoints;
     private boolean resultClassifier;
+    private RealAgent idRealPoint;
 
     /**
      * Constructor with two parameters
@@ -69,6 +71,7 @@ public class TrainReal {
         this.allThePartTransformedFake = null;
         this.allThePartTransformedReal = null;
         this.realOutput = null;
+        this.idRealPoint = null;
     }
 
     /**
@@ -92,7 +95,7 @@ public class TrainReal {
         this.allThePartTransformedFake = null;
         this.allThePartTransformedReal = null;
         this.realOutput = null;
-
+        this.idRealPoint = null;
     }
 
 
@@ -117,6 +120,7 @@ public class TrainReal {
         this.allThePartTransformedFake = null;
         this.allThePartTransformedReal = null;
         this.realOutput = null;
+        this.idRealPoint = null;
     }
 
 
@@ -135,8 +139,9 @@ public class TrainReal {
      * @param realPointsOutputComputed
      * @param idsaLoader
      * @param totalPoints
+     * @param idRealPoint
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id) {
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id, RealAgent idRealPoint) {
         this.id = id;
         this.trainingPoint = trainingPoint;
         this.firstPart = firstPart;
@@ -151,6 +156,7 @@ public class TrainReal {
         this.realPointsOutputComputed = realPointsOutputComputed;
         this.idsaLoader = idsaLoader;
         this.totalPoints = totalPoints;
+        this.idRealPoint = idRealPoint;
     }
 
 
@@ -365,6 +371,8 @@ public class TrainReal {
      * @param allThePartTransformedFake List of {@link InputsNetwork}
      */
     public void setAllThePartTransformedReal(List<InputsNetwork> allThePartTransformedFake) {
+        //need to set a new ID for this real element
+        this.idRealPoint = new RealAgent();
         this.allThePartTransformedReal = allThePartTransformedFake;
     }
 
@@ -418,7 +426,7 @@ public class TrainReal {
      * @return {@link TrainReal} object
      */
     public TrainReal deepCopy(){
-        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id);
+        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id, this.idRealPoint);
     }
 
     /**
@@ -443,6 +451,14 @@ public class TrainReal {
      */
     public UUID getId() {
         return this.id;
+    }
+
+    /**
+     * Return real agent corresponding to this trajectory
+     * @return {@link RealAgent}
+     */
+    public RealAgent getIdRealPoint() {
+        return idRealPoint;
     }
 }
 

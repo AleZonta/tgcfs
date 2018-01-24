@@ -6,7 +6,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.Models.RealAgents;
+import tgcfs.Agents.Models.RealAgent;
 import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
@@ -20,7 +20,6 @@ import tgcfs.Performances.SaveToFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -126,14 +125,12 @@ public class Classifiers extends Algorithm {
                 features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
             }
             lastOutput = model.computeOutput(features);
-            logger.log(Level.INFO, lastOutput.toString());
             int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
             INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
+
             //I am interested only in the last output of this network
             out.deserialise(realLastOut);
         }
-
-
 
         return out;
     }
@@ -173,7 +170,7 @@ public class Classifiers extends Algorithm {
      * Each classifier is evaluated on the real agent oer "agent_population" times
      * @param agents the real agent
      */
-    public void evaluateRealAgent(RealAgents agents, Transformation transformation){
+    public void evaluateRealAgent(RealAgent agents, Transformation transformation){
         throw new NoSuchMethodError("Not needed anymore");
     }
 
