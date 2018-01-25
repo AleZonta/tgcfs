@@ -10,6 +10,8 @@ import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 /**
@@ -29,16 +31,22 @@ import java.util.stream.IntStream;
 public class HallOfFame {
     private List<Individual> hallOfFame; //save the best individual per every generation
     private int samplingSize; //how many element of the hall of fame do I use
+    private static Logger logger;
     private List<Individual> sample;
+    private Algorithm caller;
 
     /**
      * Constructor
      * Reads max number of individual allowed from config file
      * Reads also sampling size
      * @param model {@link EvolvableModel} to use in initialisation random individual
+     * @param log logger
+     * @param caller {@link Algorithm} that calls the Hall Of Fame
      * @exception Exception if there are problem in reading the file
      */
-    public HallOfFame(EvolvableModel model) throws Exception {
+    public HallOfFame(EvolvableModel model, Logger log, Algorithm caller) throws Exception {
+        logger = log;
+        this.caller = caller;
         this.hallOfFame = new ArrayList<>();
         int memory = ReadConfig.Configurations.getHallOfFameMemory();
         this.samplingSize = ReadConfig.Configurations.getHallOfFameSample();
@@ -63,6 +71,45 @@ public class HallOfFame {
             this.hallOfFame.add(newBorn);
         }
         this.sample = new ArrayList<>();
+        if(ReadConfig.debug) logger.log(Level.INFO, "--- Creation Hall of Fame (" + this.caller.toString() + ") ---");
+    }
+
+    /**
+     * Constructor
+     * Reads max number of individual allowed from config file
+     * Reads also sampling size
+     * @param model {@link EvolvableModel} to use in initialisation random individual
+     * @param log logger
+     * @exception Exception if there are problem in reading the file
+     */
+    public HallOfFame(EvolvableModel model, Logger log) throws Exception {
+        logger = log;
+        this.caller = caller;
+        this.hallOfFame = new ArrayList<>();
+        int memory = ReadConfig.Configurations.getHallOfFameMemory();
+        this.samplingSize = ReadConfig.Configurations.getHallOfFameSample();
+        //fill it up with random element
+        for(int i = 0; i < memory; i++){
+            Individual newBorn;
+            switch(ReadConfig.Configurations.getMutation()){
+                case 0:
+                    newBorn = new UncorrelatedMutation(model.getArrayLength(), IndividualStatus.RANDOM);
+                    break;
+                case 1:
+                    newBorn = new RandomResetting(model.getArrayLength(), IndividualStatus.RANDOM);
+                    break;
+                case 2:
+                    newBorn = new NonUniformMutation(model.getArrayLength(), IndividualStatus.RANDOM);
+                    break;
+                default:
+                    newBorn = new NonUniformMutation(model.getArrayLength(), IndividualStatus.RANDOM);
+                    break;
+            }
+            newBorn.setModel(model.deepCopy());
+            this.hallOfFame.add(newBorn);
+        }
+        this.sample = new ArrayList<>();
+        if(ReadConfig.debug) logger.log(Level.INFO, "--- Creation Hall of Fame (" + this.caller.toString() + ") ---");
     }
 
     /**
@@ -82,6 +129,7 @@ public class HallOfFame {
             i = RandomGenerator.getNextInt(0, this.hallOfFame.size());
         }
         this.hallOfFame.set(i, individual.deepCopy());
+        if(ReadConfig.debug) logger.log(Level.INFO, "--- Individual added to the Hall of Fame (" + this.caller.toString() + ") ---");
     }
 
     /**
@@ -113,6 +161,8 @@ public class HallOfFame {
         List<Individual> returnList = new ArrayList<>();
         id.forEach(integer -> returnList.add(this.hallOfFame.get(integer)));
         this.sample = new ArrayList<>(returnList);
+        if(ReadConfig.debug) logger.log(Level.INFO, "--- Hall of Fame sample created (" + this.caller.toString() + ") ---");
+
     }
 
     /**
@@ -128,6 +178,7 @@ public class HallOfFame {
      * @return  list of {@link Individual}
      */
     public List<Individual> getSample() {
+        if(ReadConfig.debug) logger.log(Level.INFO, "--- Hall of Fame sample requested (" + this.caller.toString() + ") ---");
         if(this.sample.isEmpty()){
             this.createSample();
         }
