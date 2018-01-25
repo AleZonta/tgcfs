@@ -3,6 +3,7 @@ package tgcfs.EA;
 import org.junit.Test;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Config.ReadConfig;
+import tgcfs.EA.Helpers.HallOfFame;
 import tgcfs.EA.Mutation.NonUniformMutation;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Utils.IndividualStatus;

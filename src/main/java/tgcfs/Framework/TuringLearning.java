@@ -12,7 +12,7 @@ import tgcfs.Config.PropertiesFileReader;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
 import tgcfs.EA.Classifiers;
-import tgcfs.EA.EngagementPopulation;
+import tgcfs.EA.Helpers.EngagementPopulation;
 import tgcfs.EA.Mutation.StepSize;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
@@ -246,6 +246,8 @@ public class TuringLearning implements Framework{
             try {
                 logger.log(Level.INFO,"Loading new trajectories...");
                 combineInputList = this.feeder.multiFeeder(this.idsaLoader, combineInputList);
+                this.agents.requestSampleHoF();
+                this.classifiers.requestSampleHoF();
                 //execution agents
                 logger.log(Level.INFO,"Run Agents...");
                 this.agents.runIndividuals(combineInputList);

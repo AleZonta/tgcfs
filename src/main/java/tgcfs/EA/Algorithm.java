@@ -2,6 +2,7 @@ package tgcfs.EA;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.ReadConfig;
+import tgcfs.EA.Helpers.HallOfFame;
 import tgcfs.EA.Mutation.NonUniformMutation;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
@@ -281,7 +282,6 @@ public abstract class Algorithm {
             for(Individual ind: this.hallOfFame.getHallOfFame()){
                 ind.isParent();
             }
-            this.hallOfFame.createSample();
         }
 
         //create offspring_size offspring
@@ -689,6 +689,13 @@ public abstract class Algorithm {
         }
         logger.log(Level.INFO, "--Parents vs Sons--");
         logger.log(Level.INFO, sonAndParent.toString());
+    }
+
+    /**
+     * If I am using the hall of fame system, create the new sample
+     */
+    public void requestSampleHoF(){
+        if(this.hallOfFame != null) this.hallOfFame.createSample();
     }
 
 }

@@ -1,6 +1,8 @@
-package tgcfs.EA;
+package tgcfs.EA.Helpers;
 
 import tgcfs.Config.ReadConfig;
+import tgcfs.EA.Algorithm;
+import tgcfs.EA.Individual;
 import tgcfs.EA.Mutation.NonUniformMutation;
 import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;

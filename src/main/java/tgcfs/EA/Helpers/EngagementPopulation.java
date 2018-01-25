@@ -1,4 +1,4 @@
-package tgcfs.EA;
+package tgcfs.EA.Helpers;
 
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;

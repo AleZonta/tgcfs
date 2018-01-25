@@ -940,7 +940,6 @@ public class Agents extends Algorithm {
                 }
             }
         }
-
     }
 
 }
