@@ -115,6 +115,9 @@ public class FeederTest {
         Point result = system.getNextLocationNoGraph(myLocation,speed,bearing);
         System.out.println(result);
 
+        result = system.getNextLocationNoGraph(myLocation, -10.0,bearing);
+        System.out.println(result);
+
 
 
 //        OutputNetwork{ speed=100.58245211839676, bearing=-37.51176595687866, } -> (52.0461027, 4.3312338)
