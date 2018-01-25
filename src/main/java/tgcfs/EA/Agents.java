@@ -487,6 +487,7 @@ public class Agents extends Algorithm {
      * @param transformation the class that will transform from one output to the new input
      */
     public void evaluateIndividuals(Algorithm competingPopulation, Transformation transformation){
+        long startTime = System.nanoTime();
 
         /**
          * Class for multithreading
@@ -758,7 +759,7 @@ public class Agents extends Algorithm {
 
         HashMap<Integer, HashMap<Integer, Double>> results = new HashMap<>();
 
-        ExecutorService exec = Executors.newFixedThreadPool(16);
+        ExecutorService exec = Executors.newFixedThreadPool(48);
         CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
         ComputeSelmarFitnessUnit[] runnables = new ComputeSelmarFitnessUnit[competingPopulation.getPopulationWithHallOfFame().size()];
 
@@ -866,8 +867,9 @@ public class Agents extends Algorithm {
             e.printStackTrace();
         }
 
-
-
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime)/ 1000000;  //divide by 1000000 to get milliseconds.
+        System.out.println("totalTime " + duration);
     }
 
     /**

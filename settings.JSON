@@ -32,7 +32,7 @@
   "ClassifierAlphaIntermediateRecombination": 0.5,
   "ClassifierTimeStepsExplanation": "Not implemented now",
   "ClassifierTimeSteps": 1,
-  "MaxGenerations": 50,
+  "MaxGenerations": 10,
   "Seed": 1,
   "TournamentSizeAgents": 2,
   "TournamentSizeClassifiers": 2,
@@ -62,8 +62,8 @@
   "KeepBestNElement" : 1,
   "ConversionOutputWithGraph": false,
   "HallOfFame": true,
-  "HallOfFameMemory": 200,
-  "HallOfFameSample": 50,
+  "HallOfFameMemory": 10,
+  "HallOfFameSample": 5,
   "_____________________________Fifth section": "Settings for the models",
   "HiddenLayersAgent": 1,
   "HiddenNeuronsAgent": 5,
@@ -75,7 +75,7 @@
   "PictureSize": 64,
   "_____________________________Sixth section": "Settings for where to save the performances",
   "Name": "dddd",
-  "Experiment": "0",
+  "Experiment": "9",
   "Path": "/Users/alessandrozonta/Desktop",
   "DumpPopulationExplanation": "Save the entire population on file.",
   "DumpPopulation" : false,
@@ -95,7 +95,7 @@
   "LSTMClassifier": false,
   "ENN": true,
   "_____________________________Debug Mode": "Enable Debug mode",
-  "Debug": true,
+  "Debug": false,
   "Score": true
 
 }
