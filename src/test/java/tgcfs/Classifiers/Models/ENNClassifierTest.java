@@ -113,7 +113,7 @@ public class ENNClassifierTest {
                 arrays.add(arrayy);
             }
 
-            for(int i = 0; i < 1000; i++){
+            for(int i = 0; i < 10000; i++){
                 List<INDArray> appo = new ArrayList<>(arrays);
                 INDArray arrayy = Nd4j.rand(1, 2);
                 for (int j = 0; j < 2; j++) {
@@ -121,7 +121,7 @@ public class ENNClassifierTest {
                 }
                 appo.add(arrayy);
                 INDArray out = null;
-                System.out.println(appo);
+//                System.out.println(appo);
                 for(INDArray arr: appo){
                     out = test.computeOutput(arr);
 

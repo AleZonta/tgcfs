@@ -58,7 +58,7 @@ public class ENN extends Models implements Network {
                         .activation(Activation.TANH)
                         .build())
                 .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).nIn(HiddenNeurons).nOut(output)
-                        .activation(Activation.TANH)
+                        .activation(Activation.SIGMOID)
                         .build())
                 .pretrain(false).backprop(true)
                 .build();

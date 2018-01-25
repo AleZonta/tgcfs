@@ -573,9 +573,10 @@ public class Agents extends Algorithm {
                     input = totalInput.getAllThePartTransformedReal();
                 }
                  tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
+                if (ReadConfig.debug) logger.log(Level.INFO, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + real);
 
 
-                double decision = result.getRealValue01();
+                double decision = result.getRealValue();
 
                 if( decision>0.5 ) {
                     totalInput.setResultClassifier(true);
@@ -627,14 +628,14 @@ public class Agents extends Algorithm {
 
         logger.log(Level.SEVERE, "Start real classification");
 
-        // launch my way to compute the fitness
+//         launch my way to compute the fitness
 //        ExecutorService exec = Executors.newFixedThreadPool(16);
 //        CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
 //        ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
 //
 //
 //        for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
-//            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), model.getPopulationWithHallOfFame(), score, this.scores);
+//            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), competingPopulation.getPopulationWithHallOfFame(), score, this.scores);
 //        }
 //        for(ComputeUnit r : runnables) {
 //            r.setLatch(latch);
@@ -731,9 +732,9 @@ public class Agents extends Algorithm {
                         int agentId = agent.getModel().getId();
                         try {
                             tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedFake());
-                            if (ReadConfig.debug) logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue01());
+                            if (ReadConfig.debug) logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
                             //save all the results
-                            this.classifierResultAgentI.put(agentId, result.getRealValue01());
+                            this.classifierResultAgentI.put(agentId, result.getRealValue());
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
                             e.printStackTrace();
@@ -743,9 +744,9 @@ public class Agents extends Algorithm {
                         //run the classifier for the Real trajectory
                         try {
                             tgcfs.Classifiers.OutputNetwork resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedReal());
-                            if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue01());
+                            if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue());
                             //save all the results
-                            this.classifierResultAgentI.put(realAgentId, resultReal.getRealValue01());
+                            this.classifierResultAgentI.put(realAgentId, resultReal.getRealValue());
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
                             e.printStackTrace();
