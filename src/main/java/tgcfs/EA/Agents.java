@@ -579,7 +579,6 @@ public class Agents extends Algorithm {
                 double decision = result.getRealValue();
 
                 if( decision>0.5 ) {
-                    totalInput.setResultClassifier(true);
                     //it is saying it is true
                     //counting this only if the fake trajectory
                     if(real) {
@@ -592,7 +591,6 @@ public class Agents extends Algorithm {
                     }
                 }else{
                     //it is false
-                    totalInput.setResultClassifier(false);
                     classifier.increaseFitness(decision);
                     if(real) {
                         agent.increaseFitness(1 - decision);
@@ -844,6 +842,11 @@ public class Agents extends Algorithm {
                     fitness += E.get(classifierID).get(id);
                 }
                 agent.setFitness(fitness);
+                //setting the fitness for the examples of this agent
+                for(TrainReal example: agent.getMyInputandOutput()){
+                    example.setFitnessGivenByTheClassifier(fitness);
+                }
+
             }
 
 

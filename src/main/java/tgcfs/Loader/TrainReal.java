@@ -47,7 +47,7 @@ public class TrainReal {
     private List<PointWithBearing> realPointsOutputComputed;
     private IdsaLoader idsaLoader;
     private List<Point> totalPoints;
-    private boolean resultClassifier;
+    private double fitnessGivenByTheClassifier;
     private RealAgent idRealPoint;
 
     /**
@@ -72,6 +72,7 @@ public class TrainReal {
         this.allThePartTransformedReal = null;
         this.realOutput = null;
         this.idRealPoint = null;
+        this.fitnessGivenByTheClassifier = 0;
     }
 
     /**
@@ -96,6 +97,7 @@ public class TrainReal {
         this.allThePartTransformedReal = null;
         this.realOutput = null;
         this.idRealPoint = null;
+        this.fitnessGivenByTheClassifier = 0;
     }
 
 
@@ -121,6 +123,7 @@ public class TrainReal {
         this.allThePartTransformedReal = null;
         this.realOutput = null;
         this.idRealPoint = null;
+        this.fitnessGivenByTheClassifier = 0;
     }
 
 
@@ -141,7 +144,7 @@ public class TrainReal {
      * @param totalPoints
      * @param idRealPoint
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id, RealAgent idRealPoint) {
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id, RealAgent idRealPoint, double fitnessGivenByTheClassifier) {
         this.id = id;
         this.trainingPoint = trainingPoint;
         this.firstPart = firstPart;
@@ -157,6 +160,7 @@ public class TrainReal {
         this.idsaLoader = idsaLoader;
         this.totalPoints = totalPoints;
         this.idRealPoint = idRealPoint;
+        this.fitnessGivenByTheClassifier = fitnessGivenByTheClassifier;
     }
 
 
@@ -426,23 +430,23 @@ public class TrainReal {
      * @return {@link TrainReal} object
      */
     public TrainReal deepCopy(){
-        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id, this.idRealPoint);
+        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id, this.idRealPoint, this.fitnessGivenByTheClassifier);
     }
 
     /**
-     * Return the classifier result from this input
+     * Return the fitnessGivenByTheClassifier result from this input
      * @return boolean value
      */
-    public boolean getResultClassifier() {
-        return this.resultClassifier;
+    public double getFitnessGivenByTheClassifier() {
+        return this.fitnessGivenByTheClassifier;
     }
 
     /**
-     * Set the result from the classifier to this input
-     * @param resultClassifier boolean value
+     * Set the fitnessGivenByTheClassifier from the classifier to this input
+     * @param getFitnessGivenByTheClassifier double value
      */
-    public void setResultClassifier(boolean resultClassifier) {
-        this.resultClassifier = resultClassifier;
+    public void setFitnessGivenByTheClassifier(double getFitnessGivenByTheClassifier) {
+        this.fitnessGivenByTheClassifier = getFitnessGivenByTheClassifier;
     }
 
     /**

@@ -410,7 +410,7 @@ public class SaveToFile {
                 real.addAll(el.getFollowingPart());
                 obj.put("real", real);
 
-                obj.put("classification", el.getResultClassifier());
+                obj.put("classification", el.getFitnessGivenByTheClassifier());
 
                 obj.put("id", el.getId().toString());
 
