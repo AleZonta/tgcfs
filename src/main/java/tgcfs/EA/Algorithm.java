@@ -256,10 +256,11 @@ public abstract class Algorithm {
      * Every parents is randomly selected and an offspring is generated exactly as the father.
      * Mutation is then applied to it
      *
-     * @throws Exception if the parents have not the same length
      * @param generation generation we are now
+     * @param hallOfFame is it the turn for the hall of fame
+     * @throws Exception if the parents have not the same length
      */
-    public void generateOffspringOnlyWithMutation(int generation) throws Exception {
+    public void generateOffspringOnlyWithMutation(int generation, boolean hallOfFame) throws Exception {
         //check which class is calling this method
         int size = 0;
         int tournamentSize = 0;
@@ -290,10 +291,8 @@ public abstract class Algorithm {
             //creating the tournament
             List<Individual> tournamentPop = new ArrayList<>();
             for(int j = 0; j < tournamentSize; j++){
-                double val = RandomGenerator.getNextDouble();
                 boolean isHallOfFame = false;
-                if(val < 0.1 && this.hallOfFame != null) isHallOfFame = true;
-
+                if(hallOfFame && this.hallOfFame != null) isHallOfFame = true;
                 if(!isHallOfFame) {
                     //selection from the normal population
                     int idParent = RandomGenerator.getNextInt(0, this.population.size());
@@ -303,8 +302,7 @@ public abstract class Algorithm {
                     tournamentPop.add(ind);
                 }else{
                     //selection from the hall of fame
-                    int idParent = RandomGenerator.getNextInt(0, this.hallOfFame.getSample().size());
-                    Individual ind = this.hallOfFame.getSample().get(idParent);
+                    Individual ind = this.hallOfFame.getRandomIndividualFromSample();
                     tournamentPop.add(ind);
                 }
             }

@@ -190,4 +190,14 @@ public class HallOfFame {
         }
         return this.sample;
     }
+
+    /**
+     * Getter for an {@link Individual} random chosen from the sample
+     * @return {@link Individual} random chosen
+     */
+    public Individual getRandomIndividualFromSample(){
+        int value = this.rand.nextInt(samplingSize);
+        return this.sample.get(value);
+    }
+
 }

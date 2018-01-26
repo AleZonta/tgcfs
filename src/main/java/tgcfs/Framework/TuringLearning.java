@@ -227,14 +227,16 @@ public class TuringLearning implements Framework{
                 if(evolveAgent) this.agents.generateOffspring();
                 if(evolveClassifier) this.classifiers.generateOffspring();
             }else{
+                //lets start checking If I am going to use the Hall Of Fame
+                boolean hallOfFame = this.isTimeForHallOfFame();
                 if(evolveAgent) {
-                    this.agents.generateOffspringOnlyWithMutation(generationAgent);
+                    this.agents.generateOffspringOnlyWithMutation(generationAgent, hallOfFame);
                 }else{
                     //If I am not evolving the classifier I still have to reset their fitness
                     this.agents.resetFitness();
                 }
                 if(evolveClassifier) {
-                    this.classifiers.generateOffspringOnlyWithMutation(generationClassifier);
+                    this.classifiers.generateOffspringOnlyWithMutation(generationClassifier, hallOfFame);
                 }else{
                     //If I am not evolving the classifier I still have to reset their fitness
                     this.classifiers.resetFitness();
@@ -350,7 +352,7 @@ public class TuringLearning implements Framework{
             if(ReadConfig.Configurations.isRecombination()) {
                 this.agents.generateOffspring();
             }else{
-                this.agents.generateOffspringOnlyWithMutation(0);
+                this.agents.generateOffspringOnlyWithMutation(0, false);
             }
         }
     }
@@ -399,5 +401,14 @@ public class TuringLearning implements Framework{
      */
     public int getCountingTime() {
         return this.countingTime;
+    }
+
+
+    /**
+     * Return if it is time to use the Hall Of Fame
+     * @return boolean value
+     */
+    public boolean isTimeForHallOfFame(){
+        return RandomGenerator.getNextDouble() < 0.1;
     }
 }
