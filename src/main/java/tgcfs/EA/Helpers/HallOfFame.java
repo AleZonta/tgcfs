@@ -1,5 +1,6 @@
 package tgcfs.EA.Helpers;
 
+import org.apache.commons.math3.random.MersenneTwister;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Algorithm;
 import tgcfs.EA.Individual;
@@ -8,7 +9,6 @@ import tgcfs.EA.Mutation.RandomResetting;
 import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.Utils.IndividualStatus;
-import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,7 @@ public class HallOfFame {
     private static Logger logger;
     private List<Individual> sample;
     private Algorithm caller;
+    private MersenneTwister rand;
 
     /**
      * Constructor
@@ -44,10 +45,12 @@ public class HallOfFame {
      * @param model {@link EvolvableModel} to use in initialisation random individual
      * @param log logger
      * @param caller {@link Algorithm} that calls the Hall Of Fame
+     * @param seedRnd seed for the random generator for the HoF
      * @exception Exception if there are problem in reading the file
      */
-    public HallOfFame(EvolvableModel model, Logger log, Algorithm caller) throws Exception {
+    public HallOfFame(EvolvableModel model, Logger log, Algorithm caller, int seedRnd) throws Exception {
         logger = log;
+        this.rand = new MersenneTwister(seedRnd);
         this.caller = caller;
         this.hallOfFame = new ArrayList<>();
         int memory = ReadConfig.Configurations.getHallOfFameMemory();
@@ -128,7 +131,7 @@ public class HallOfFame {
                 i++;
             }
         }else {
-            i = RandomGenerator.getNextInt(0, this.hallOfFame.size());
+            i = this.rand.nextInt(this.hallOfFame.size());
         }
         this.hallOfFame.set(i, individual.deepCopy());
         if(ReadConfig.debug) logger.log(Level.INFO, "--- Individual added to the Hall of Fame (" + this.caller.toString() + ") ---");
@@ -143,7 +146,7 @@ public class HallOfFame {
         //if the sampling size is smaller than half of the size, just create different random position
         if (this.samplingSize <= this.hallOfFame.size() / 2) {
             while (id.size() < this.samplingSize) {
-                int value = RandomGenerator.getNextInt(0, this.hallOfFame.size());
+                int value = this.rand.nextInt(this.hallOfFame.size());
                 if (id.stream().noneMatch(integer -> integer.equals(value))) {
                     id.add(value);
                 }
@@ -153,13 +156,14 @@ public class HallOfFame {
             if (this.hallOfFame.size() / 2 < this.samplingSize && this.samplingSize <= this.hallOfFame.size()) {
                 IntStream.range(0, this.hallOfFame.size()).forEach(id::add);
                 while (id.size() > this.samplingSize) {
-                    int value = RandomGenerator.getNextInt(0, this.hallOfFame.size());
+                    int value = this.rand.nextInt(this.hallOfFame.size());
                     if (id.stream().anyMatch(t -> t == value)) {
                         id.remove(value);
                     }
                 }
             }
         }
+        System.out.println(id.toString());
         List<Individual> returnList = new ArrayList<>();
         id.forEach(integer -> returnList.add(this.hallOfFame.get(integer)));
         this.sample = new ArrayList<>(returnList);

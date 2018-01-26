@@ -103,4 +103,38 @@ public class HallOfFameTest {
         assertNotNull(hallOfFame.getHallOfFame());
 
     }
+
+    @Test
+    public void TestRandom() throws Exception {
+        new ReadConfig.Configurations();
+        new RandomGenerator();
+        EvolvableModel m = new LSTMAgent(1,1,1,1);
+        Logger log =  Logger.getLogger(HallOfFameTest.class.getName());
+        HallOfFame hallOfFameOne = new HallOfFame(m,log, new Agents(log), 5);
+        HallOfFame hallOfFameTwo = new HallOfFame(m,log, new Agents(log), 5);
+        for(int i = 0; i < 10; i++) {
+            Individual individual = new NonUniformMutation(5, IndividualStatus.AGENT);
+            individual.setModel(m);
+            hallOfFameOne.addIndividual(individual);
+            Individual individual2 = new NonUniformMutation(5, IndividualStatus.AGENT);
+            individual2.setModel(m);
+            hallOfFameTwo.addIndividual(individual2);
+            System.out.println("------- One -------");
+            hallOfFameOne.getHallOfFame().forEach(individual1 -> System.out.println(individual1.getIndividualStatus().toString() + " " + individual1.getModel().getId()));
+            System.out.println("------- Two -------");
+            hallOfFameTwo.getHallOfFame().forEach(individual1 -> System.out.println(individual1.getIndividualStatus().toString() + " " + individual1.getModel().getId()));
+        }
+
+        hallOfFameOne.createSample();
+        System.out.println("---------sample-----------");
+        hallOfFameOne.getSample().forEach(individual1 -> System.out.println(individual1.getIndividualStatus().toString() + " " + individual1.getModel().getId()));
+        System.out.println("--------------------------");
+
+
+        hallOfFameTwo.createSample();
+        System.out.println("---------sample-----------");
+        hallOfFameTwo.getSample().forEach(individual1 -> System.out.println(individual1.getIndividualStatus().toString() + " " + individual1.getModel().getId()));
+        System.out.println("--------------------------");
+    }
+
 }

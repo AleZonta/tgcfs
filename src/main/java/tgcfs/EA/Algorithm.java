@@ -98,7 +98,7 @@ public abstract class Algorithm {
             }
         }
         //initialising the hall of fame
-        if(ReadConfig.Configurations.getHallOfFame()) this.hallOfFame = new HallOfFame(model, logger, this);
+        if(ReadConfig.Configurations.getHallOfFame()) this.hallOfFame = new HallOfFame(model, logger, this, ReadConfig.Configurations.getSeed() * 5);
     }
 
     /**
@@ -151,7 +151,7 @@ public abstract class Algorithm {
             }
         }
         //initialising the hall of fame
-        if(ReadConfig.Configurations.getHallOfFame()) this.hallOfFame = new HallOfFame(model, logger, this);
+        if(ReadConfig.Configurations.getHallOfFame()) this.hallOfFame = new HallOfFame(model, logger, this, ReadConfig.Configurations.getSeed() * 5);
     }
 
     /**
