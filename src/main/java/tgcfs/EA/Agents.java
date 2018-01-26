@@ -759,7 +759,7 @@ public class Agents extends Algorithm {
 
         HashMap<Integer, HashMap<Integer, Double>> results = new HashMap<>();
 
-        ExecutorService exec = Executors.newFixedThreadPool(48);
+        ExecutorService exec = Executors.newFixedThreadPool(96);
         CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
         ComputeSelmarFitnessUnit[] runnables = new ComputeSelmarFitnessUnit[competingPopulation.getPopulationWithHallOfFame().size()];
 
