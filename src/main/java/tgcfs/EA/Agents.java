@@ -1,5 +1,7 @@
 package tgcfs.EA;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import lgds.trajectories.Point;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -487,7 +489,6 @@ public class Agents extends Algorithm {
      * @param transformation the class that will transform from one output to the new input
      */
     public void evaluateIndividuals(Algorithm competingPopulation, Transformation transformation){
-        long startTime = System.nanoTime();
 
         /**
          * Class for multithreading
@@ -607,12 +608,12 @@ public class Agents extends Algorithm {
 
 
 
-        boolean score;
-        try {
-            score = ReadConfig.Configurations.getScore();
-        } catch (Exception e) {
-            score = false;
-        }
+//        boolean score;
+//        try {
+//            score = ReadConfig.Configurations.getScore();
+//        } catch (Exception e) {
+//            score = false;
+//        }
 
         //transform the outputs into the input for the classifiers
         for(Individual ind : super.getPopulationWithHallOfFame()){
@@ -674,7 +675,7 @@ public class Agents extends Algorithm {
             private CountDownLatch latch;
             private Individual classifier;
             private List<Individual> adersarialPopulation;
-            private HashMap<Integer, Double> classifierResultAgentI;
+            private ListMultimap<Integer, Double> classifierResultAgentI; //agent id and the classifier result for it
 
 
             /**
@@ -686,7 +687,7 @@ public class Agents extends Algorithm {
             private ComputeSelmarFitnessUnit(Individual classifier, List<Individual> adersarialPopulation) {
                 this.classifier = classifier;
                 this.adersarialPopulation = adersarialPopulation;
-                this.classifierResultAgentI = new HashMap<>();
+                this.classifierResultAgentI = ArrayListMultimap.create();
             }
 
             /**
@@ -703,7 +704,7 @@ public class Agents extends Algorithm {
              * Getter for the results from the classification
              * @return HashMap<Integer, Double> containing id agent and his classification
              */
-            private HashMap<Integer, Double> getResults(){
+            private ListMultimap<Integer, Double> getResults(){
                 return this.classifierResultAgentI;
             }
 
@@ -757,15 +758,18 @@ public class Agents extends Algorithm {
 
         }
 
-        HashMap<Integer, HashMap<Integer, Double>> results = new HashMap<>();
+        //classifier id, agent id and comparison result
+        HashMap<Integer, ListMultimap<Integer, Double>> results = new HashMap<>();
 
         ExecutorService exec = Executors.newFixedThreadPool(96);
         CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
         ComputeSelmarFitnessUnit[] runnables = new ComputeSelmarFitnessUnit[competingPopulation.getPopulationWithHallOfFame().size()];
 
+        //create all the runnables
         for(int i = 0; i < competingPopulation.getPopulationWithHallOfFame().size(); i ++){
             runnables[i] = new ComputeSelmarFitnessUnit(competingPopulation.getPopulationWithHallOfFame().get(i), super.getPopulationWithHallOfFame());
         }
+        //execute them and wait them till they have finished
         for(ComputeSelmarFitnessUnit r : runnables) {
             r.setLatch(latch);
             exec.execute(r);
@@ -785,7 +789,8 @@ public class Agents extends Algorithm {
             HashMap<Integer, Double> T = new HashMap<>();
             for(int key: results.keySet()){
                 //key is the classifier id -> i
-                HashMap<Integer, Double> classifierResultAgentI = results.get(key);
+                ListMultimap<Integer, Double> classifierResultAgentI = results.get(key);
+                //also with the multimap it is fine -> more values same key, don't care. Sum them all!
                 double singleTj = classifierResultAgentI.values().stream().mapToDouble(i->i).sum();
                 T.put(key, singleTj);
             }
@@ -793,32 +798,36 @@ public class Agents extends Algorithm {
             //Creation matrix Yij
             //Y_ij = R * classifier_j(agent_i) / T_j
             //E_ji = { i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2
-//        HashMap<String, Double> E = new HashMap<>();
-//            HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
+            // HashMap<String, Double> E = new HashMap<>();
+            //HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
             HashMap<Integer, HashMap<Integer, Double>> E = new HashMap<>();
             //Classifier Id
             for(int classifierID: results.keySet()){
-                HashMap<Integer, Double> classifierResultAgentI = results.get(classifierID);
+                ListMultimap<Integer, Double> classifierResultAgentI = results.get(classifierID);
 
                 //now I have all the Agent ID with their values
                 //Creation id agent,classifier
                 HashMap<Integer, Double> subE = new HashMap<>();
                 //for debug, remove this hashmap, it is redundant //TODO
-//                HashMap<Integer, Double> subY = new HashMap<>();
+                // HashMap<Integer, Double> subY = new HashMap<>();
                 for(int agentID: classifierResultAgentI.keySet()){
-
                     //now I have classifier j and looping over agent i
 
-//                String ij = agentID.toString() + "/" + classifierID.toString();
-                    double y = (R * classifierResultAgentI.get(agentID) / T.get(classifierID));
+                    //using a multimap. Since a key can have more values, need to obtain only one value with them
+                    List<Double> values = classifierResultAgentI.get(agentID);
+                    double singleValue = values.stream().mapToDouble(i->i).sum();
+                    double average = singleValue / values.size();
+
+                    //String ij = agentID.toString() + "/" + classifierID.toString();
+                    double y = singleValue / T.get(classifierID);
                     if(Double.isNaN(y)){
                         y = 0.0;
                     }
                     if(y > 1.0) y = 1.0;
                     if(y < 0.0) y = 0.0;
                     //for debug, remove this hashmap, it is redundant //TODO
-//                    subY.put(agentID, y);
-                    if(classifierResultAgentI.get(agentID) > 0.5){
+                    //subY.put(agentID, y);
+                    if(average > 0.5){
                         //if TRUE=real
                         subE.put(agentID, Math.pow(1 - y, 2));
                     }else{
@@ -828,7 +837,7 @@ public class Agents extends Algorithm {
                 }
                 E.put(classifierID, subE);
                 //for debug, remove this hashmap, it is redundant //TODO
-//                Y.put(classifierID, subY);
+                //Y.put(classifierID, subY);
             }
 
 
@@ -867,9 +876,6 @@ public class Agents extends Algorithm {
             e.printStackTrace();
         }
 
-        long endTime = System.nanoTime();
-        long duration = (endTime - startTime)/ 1000000;  //divide by 1000000 to get milliseconds.
-        System.out.println("totalTime " + duration);
     }
 
     /**

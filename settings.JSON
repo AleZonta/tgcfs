@@ -68,7 +68,7 @@
   "HiddenLayersAgent": 1,
   "HiddenNeuronsAgent": 5,
   "HiddenNeuronsClassifier": 3,
-  "TrajectoriesTrained": 1,
+  "TrajectoriesTrained": 10,
   "HowManyAmIChangingBetweenGenerationExplanation" : "Number is expressed in %",
   "HowManyAmIChangingBetweenGeneration": 0,
   "Train": false,

@@ -27,7 +27,7 @@ import java.util.stream.IntStream;
  * a.zonta@vu.nl
  *
  *
- * Class dealing with the hall of fame system
+ * Class dealing with the hall of fame §
  * Rosin, C.D. and Belew, R.K. (1997). New methods for competitive coevolution, Evolutionary Computation 5(1): 1–29.
  */
 public class HallOfFame {
@@ -163,7 +163,6 @@ public class HallOfFame {
                 }
             }
         }
-        System.out.println(id.toString());
         List<Individual> returnList = new ArrayList<>();
         id.forEach(integer -> returnList.add(this.hallOfFame.get(integer)));
         this.sample = new ArrayList<>(returnList);
