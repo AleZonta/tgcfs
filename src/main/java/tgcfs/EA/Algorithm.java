@@ -522,8 +522,7 @@ public abstract class Algorithm {
             fitn.add(ind.getFitness());
         }
 
-        logger.log(Level.INFO, "--Fitness population before selection--");
-        logger.log(Level.INFO, fitn.toString());
+        logger.log(Level.INFO, "--Fitness population [" + this.getClass().getName() + "] before selection--\n" + fitn.toString());
 
 
         while (this.population.size() != size) {
@@ -540,8 +539,7 @@ public abstract class Algorithm {
             fitnd.add(ind.getFitness());
         }
 
-        logger.log(Level.INFO, "--Fitness population after selection--");
-        logger.log(Level.INFO, fitnd.toString());
+        logger.log(Level.INFO, "--Fitness population [" + this.getClass().getName() + "] after selection--\n" + fitnd.toString());
 
         this.population = new ArrayList<>();
         this.population = newList;
@@ -558,8 +556,7 @@ public abstract class Algorithm {
                 sonAndParent.add(1);
             }
         }
-        logger.log(Level.INFO, "--Parents[1] vs Sons[0]--");
-        logger.log(Level.INFO, sonAndParent.toString());
+        logger.log(Level.INFO, "--[" + this.getClass().getName() + "] Parents[1] vs Sons[0]--\n" + sonAndParent.toString());
     }
 
     /**
@@ -592,8 +589,7 @@ public abstract class Algorithm {
             fitn.add(ind.getFitness());
         }
 
-        logger.log(Level.INFO, "--Fitness population before selection--");
-        logger.log(Level.INFO, fitn.toString());
+        logger.log(Level.INFO, "--Fitness population [" + this.getClass().getName() + "] before selection--\n" + fitn.toString());
 
 
         while (this.population.size() != size) {
@@ -610,8 +606,7 @@ public abstract class Algorithm {
             fitnd.add(ind.getFitness());
         }
 
-        logger.log(Level.INFO, "--Fitness population after selection--");
-        logger.log(Level.INFO, fitnd.toString());
+        logger.log(Level.INFO, "--Fitness population [" + this.getClass().getName() + "] after selection--\n" + fitnd.toString());
 
         this.population = new ArrayList<>();
         this.population = newList;
@@ -630,8 +625,7 @@ public abstract class Algorithm {
             fitn.add(ind.getFitness());
         }
 
-        logger.log(Level.INFO, "--Fitness population before selection--");
-        logger.log(Level.INFO, fitn.toString());
+        logger.log(Level.INFO, "--Fitness population [" + this.getClass().getName() + "] before selection--\n" + fitn.toString());
 
         List<Individual> nextGeneration = new ArrayList<>();
 
@@ -669,8 +663,7 @@ public abstract class Algorithm {
             fitnd.add(ind.getFitness());
         }
 
-        logger.log(Level.INFO, "--Fitness population after selection--");
-        logger.log(Level.INFO, fitnd.toString());
+        logger.log(Level.INFO, "--Fitness population [" + this.getClass().getName() + "] after selection--\n" + fitnd.toString());
 
         this.setPopulation(nextGeneration);
 
@@ -685,8 +678,8 @@ public abstract class Algorithm {
                 sonAndParent.add(1);
             }
         }
-        logger.log(Level.INFO, "--Parents vs Sons--");
-        logger.log(Level.INFO, sonAndParent.toString());
+        logger.log(Level.INFO, "--[" + this.getClass().getName() + "] Parents[1] vs Sons[0]--\n" + sonAndParent.toString());
+
     }
 
     /**

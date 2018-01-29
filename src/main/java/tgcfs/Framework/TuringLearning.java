@@ -11,6 +11,7 @@ import tgcfs.Classifiers.Models.LSTMClassifier;
 import tgcfs.Config.PropertiesFileReader;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
+import tgcfs.EA.Algorithm;
 import tgcfs.EA.Classifiers;
 import tgcfs.EA.Helpers.EngagementPopulation;
 import tgcfs.EA.Mutation.StepSize;
@@ -28,6 +29,9 @@ import tgcfs.Utils.RandomGenerator;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -221,27 +225,80 @@ public class TuringLearning implements Framework{
             /* { SELECT parent }
                { RECOMBINE parents }
                { MUTATE offspring } */
-            logger.log(Level.INFO,"Generating Offspring...");
 
-            if(ReadConfig.Configurations.isRecombination()) {
-                if(evolveAgent) this.agents.generateOffspring();
-                if(evolveClassifier) this.classifiers.generateOffspring();
-            }else{
-                //lets start checking If I am going to use the Hall Of Fame
-                boolean hallOfFame = this.isTimeForHallOfFame();
-                if(evolveAgent) {
-                    this.agents.generateOffspringOnlyWithMutation(generationAgent, hallOfFame);
-                }else{
-                    //If I am not evolving the classifier I still have to reset their fitness
-                    this.agents.resetFitness();
+
+            class ComputeGenerationOffspring implements Runnable {
+                private CountDownLatch latch;
+                private Algorithm population;
+                private boolean evolve;
+                private int gen;
+
+                private ComputeGenerationOffspring(Algorithm population, boolean evolve, int gen){
+                    this.population = population;
+                    this.evolve = evolve;
+                    this.gen = gen;
                 }
-                if(evolveClassifier) {
-                    this.classifiers.generateOffspringOnlyWithMutation(generationClassifier, hallOfFame);
-                }else{
-                    //If I am not evolving the classifier I still have to reset their fitness
-                    this.classifiers.resetFitness();
+
+                /**
+                 * CountDownLatch is a java class in the java.util.concurrent package. It is a mechanism to safely handle
+                 * counting the number of completed tasks. You should call latch.countDown() whenever the run method competes.
+                 * @param latch {@link CountDownLatch}
+                 */
+                private void setLatch(CountDownLatch latch) {
+                    this.latch = latch;
+                }
+
+                @Override
+                public void run() {
+                    logger.log(Level.INFO,"[" + this.population.getClass().getName() + "] Generating Offspring...");
+                    try {
+                        if (ReadConfig.Configurations.isRecombination()) {
+                            if (this.evolve) this.population.generateOffspring();
+                        } else {
+                            //lets start checking If I am going to use the Hall Of Fame
+                            boolean hallOfFame = this.isTimeForHallOfFame();
+                            if (this.evolve) {
+                                this.population.generateOffspringOnlyWithMutation(this.gen, hallOfFame);
+                            } else {
+                                //If I am not evolving the classifier I still have to reset their fitness
+                                this.population.resetFitness();
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.log(Level.WARNING, "Error in generation offspring -> " + e.getMessage());
+                    }
+                    latch.countDown();
+                }
+
+                /**
+                 * Return if it is time to use the Hall Of Fame
+                 * @return boolean value
+                 */
+                private boolean isTimeForHallOfFame(){
+                    return RandomGenerator.getNextDouble() < 0.1;
                 }
             }
+
+            ExecutorService execOffspring = Executors.newFixedThreadPool(2);
+            CountDownLatch latchOffspring = new CountDownLatch(2);
+
+            ComputeGenerationOffspring[] runnablesOffspring = new ComputeGenerationOffspring[2];
+            //create all the runnables
+            runnablesOffspring[0] = new ComputeGenerationOffspring(this.agents, evolveAgent, generationAgent);
+            runnablesOffspring[1] = new ComputeGenerationOffspring(this.classifiers, evolveClassifier, generationClassifier);
+
+            //execute them and wait them till they have finished
+            for(ComputeGenerationOffspring r : runnablesOffspring) {
+                r.setLatch(latchOffspring);
+                execOffspring.execute(r);
+            }
+            try {
+                latchOffspring.await();
+                execOffspring.shutdown();
+            }catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
 
             logger.log(Level.INFO, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
             /* { EVALUATE new candidate } */
@@ -269,38 +326,99 @@ public class TuringLearning implements Framework{
 
                 //countermeasures system against disengagement
                 this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);
-                this.countermeasures.executeCountermeasuresAgainstDisengagement(this.agents.getPopulation(), IndividualStatus.AGENT);
-                this.countermeasures.executeCountermeasuresAgainstDisengagement(this.classifiers.getPopulation(), IndividualStatus.CLASSIFIER);
+
+                /**
+                 * Run the last part of the evolution in a parallel way
+                 * - checking for enable countermeasures
+                 * - checking and returning if population is evolving in this generation
+                 * - survival selection
+                 * - save statistics
+                 * - dump population
+                 */
+                class ComputeSurvivalSelection implements Runnable{
+                    private CountDownLatch latch;
+                    private Algorithm population;
+                    private EngagementPopulation countermeasures;
+                    private boolean evolve;
+
+                    private ComputeSurvivalSelection(Algorithm population, EngagementPopulation contermeasures){
+                        this.population = population;
+                        this.countermeasures = contermeasures;
+                    }
+
+                    private boolean getEvolve(){
+                        return this.evolve;
+                    }
+
+                    /**
+                     * CountDownLatch is a java class in the java.util.concurrent package. It is a mechanism to safely handle
+                     * counting the number of completed tasks. You should call latch.countDown() whenever the run method competes.
+                     * @param latch {@link CountDownLatch}
+                     */
+                    private void setLatch(CountDownLatch latch) {
+                        this.latch = latch;
+                    }
+
+                    /**
+                     * Run
+                     */
+                    @Override
+                    public void run() {
+                        try {
+
+                            if(this.population.getClass().equals(Agents.class)){
+                                this.countermeasures.executeCountermeasuresAgainstDisengagement(this.population.getPopulation(), IndividualStatus.AGENT);
+                                this.evolve = this.countermeasures.isEvolveAgent();
+                            }else{
+                                this.countermeasures.executeCountermeasuresAgainstDisengagement(this.population.getPopulation(), IndividualStatus.CLASSIFIER);
+                                this.evolve = this.countermeasures.isEvolveClassifier();
+                            }
+                            logger.log(Level.INFO,"[" + this.population.getClass().getName() + "] Parent Selection...");
+                            /* { SELECT individuals next generation } */
+                            if (this.evolve) this.population.survivalSelections();
+                            //save the fitness of all the population and best genome
+                            logger.log(Level.INFO,"[" + this.population.getClass().getName() + "] Saving Statistics...");
+                            SaveToFile.Saver.saveFitness(this.population.getClass().getName(), this.population.retAllFitness());
+                            if (this.evolve) {
+                                SaveToFile.Saver.saveBestGenoma(this.population.getClass().getName(),this.population.retBestGenome());
+                                if(ReadConfig.Configurations.getMutation() == 0) SaveToFile.Saver.saveStepSize(this.population.getClass().getName(), this.population.retStepSizeBestGenome());
+                            }
+                            if(ReadConfig.Configurations.getDumpPop()) {
+                                logger.log(Level.INFO,"[" + this.population.getClass().getName() + "] Dump Population...");
+                                if(this.evolve) SaveToFile.Saver.dumpPopulation(this.population.getClass().getName(), this.population.getPopulation());
+                            }
 
 
-                evolveAgent = this.countermeasures.isEvolveAgent();
-                evolveClassifier = this.countermeasures.isEvolveClassifier();
+                        } catch (Exception e) {
+                            logger.log(Level.WARNING, "Error in survival selection -> " + e.getMessage());
+                        }
 
-            /* { SELECT individuals next generation } */
-                logger.log(Level.INFO,"Parent Selection...");
-                if(evolveAgent) this.agents.survivalSelections();
-                if(evolveClassifier) this.classifiers.survivalSelections();
-
-
-                //save the fitness of all the population and best genome
-                logger.log(Level.INFO,"Saving Statistics...");
-                SaveToFile.Saver.saveFitness(this.agents.getClass().getName(), this.agents.retAllFitness());
-                SaveToFile.Saver.saveFitness(this.classifiers.getClass().getName(), this.classifiers.retAllFitness());
-                if(evolveAgent) {
-                    SaveToFile.Saver.saveBestGenoma(this.agents.getClass().getName(),this.agents.retBestGenome());
-                    if(ReadConfig.Configurations.getMutation() == 0) SaveToFile.Saver.saveStepSize(this.agents.getClass().getName(), this.agents.retStepSizeBestGenome());
+                        latch.countDown();
+                    }
                 }
-                if(evolveClassifier){
-                    SaveToFile.Saver.saveBestGenoma(this.classifiers.getClass().getName(),this.classifiers.retBestGenome());
-                    if(ReadConfig.Configurations.getMutation() == 0) SaveToFile.Saver.saveStepSize(this.classifiers.getClass().getName(), this.classifiers.retStepSizeBestGenome());
-                }
-                if(ReadConfig.Configurations.getDumpPop()) {
-                    logger.log(Level.INFO,"Dump Population...");
-                    if(evolveAgent) SaveToFile.Saver.dumpPopulation(this.agents.getClass().getName(), this.agents.getPopulation());
-                    if(evolveClassifier) SaveToFile.Saver.dumpPopulation(this.classifiers.getClass().getName(), this.classifiers.getPopulation());
-                }
 
+                ExecutorService execSelection = Executors.newFixedThreadPool(2);
+                CountDownLatch latchSelection = new CountDownLatch(2);
+                ComputeSurvivalSelection[] runnablesSelection = new ComputeSurvivalSelection[2];
+                //create all the runnables
+                runnablesSelection[0] = new ComputeSurvivalSelection(this.agents, this.countermeasures);
+                runnablesSelection[1] = new ComputeSurvivalSelection(this.classifiers, this.countermeasures);
 
+                //execute them and wait them till they have finished
+                for(ComputeSurvivalSelection r : runnablesSelection) {
+                    r.setLatch(latchSelection);
+                    execSelection.execute(r);
+                }
+                try {
+                    latchSelection.await();
+                    execSelection.shutdown();
+
+                    //collecting the results
+                    evolveAgent = runnablesSelection[0].getEvolve();
+                    evolveClassifier = runnablesSelection[1].getEvolve();
+                }catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
             } catch (ReachedMaximumNumberException e) {
                 logger.log(Level.INFO, e.getMessage());
@@ -357,26 +475,6 @@ public class TuringLearning implements Framework{
         }
     }
 
-    /**
-     * From the list of {@link TrainReal} element, it computes the real point/points in the map that follow/s the trajectory
-     * @param combineInputList all the input used in this session
-     * @param transformation {@link FollowingTheGraph} transformation reference to transform the output in real point //TODO generalise this
-     * @param generationAgent number of generation for the agent population
-     * @param generationClassifier number of generation for the classifier population
-     * @throws Exception If something goes wrong
-     */
-//    private void saveTrajectoryAndGeneratedPoints(List<TrainReal> combineInputList, FollowingTheGraph transformation, int generationAgent, int generationClassifier) throws Exception {
-//        //compute the real point.
-//        combineInputList.forEach(trainReal -> {
-//            if(trainReal.getRealPointsOutputComputed() == null) {
-//                List<PointWithBearing> generatedPoint = new ArrayList<>();
-//                transformation.setLastPoint(trainReal.getLastPoint());
-//                trainReal.getOutputComputed().forEach(outputsNetwork -> generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork))));
-//                trainReal.setRealPointsOutputComputed(generatedPoint);
-//            }
-//        });
-//        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(combineInputList, generationAgent, generationClassifier);
-//    }
 
 
     /**

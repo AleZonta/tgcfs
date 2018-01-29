@@ -11,6 +11,7 @@ import tgcfs.Utils.Scores;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -304,7 +305,12 @@ public class SaveToFile {
     private void saveGenome(String name, INDArray genome){
         try {
             BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-genome.csv", true));
-            outputWriter.write(genome.data().toString());
+            //print all the value of the double
+            List<Double> list = new ArrayList<>();
+            for(int i=0; i< genome.columns(); i++){
+                list.add(genome.getDouble(i));
+            }
+            outputWriter.write(list.toString());
             outputWriter.newLine();
             logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
 
@@ -323,7 +329,12 @@ public class SaveToFile {
     private void saveStepSize(String name, INDArray stepSize){
         try {
             BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-stepsize.csv", true));
-            outputWriter.write(stepSize.data().toString());
+            //print all the value of the double
+            List<Double> list = new ArrayList<>();
+            for(int i=0; i< stepSize.columns(); i++){
+                list.add(stepSize.getDouble(i));
+            }
+            outputWriter.write(list.toString());
             outputWriter.newLine();
             logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
 
@@ -361,8 +372,16 @@ public class SaveToFile {
             zos.putNextEntry(csvFile);
             writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
             population.forEach(individual -> {
+
+                //print all the value of the double
+                INDArray data = individual.getObjectiveParameters();
+                List<Double> list = new ArrayList<>();
+                for(int i=0; i< data.columns(); i++){
+                    list.add(data.getDouble(i));
+                }
+
                 try {
-                    writer.write(individual.getObjectiveParameters().data().toString());
+                    writer.write(list.toString());
                     writer.newLine();
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Error appending line to " + name + " CSV File " + e.getMessage());

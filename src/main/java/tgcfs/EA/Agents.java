@@ -808,7 +808,7 @@ public class Agents extends Algorithm {
                 //now I have all the Agent ID with their values
                 //Creation id agent,classifier
                 HashMap<Integer, Double> subE = new HashMap<>();
-                //for debug, remove this hashmap, it is redundant //TODO
+                //for debug, remove this hashmap, it is redundant
                 // HashMap<Integer, Double> subY = new HashMap<>();
                 for(int agentID: classifierResultAgentI.keySet()){
                     //now I have classifier j and looping over agent i
@@ -825,7 +825,7 @@ public class Agents extends Algorithm {
                     }
                     if(y > 1.0) y = 1.0;
                     if(y < 0.0) y = 0.0;
-                    //for debug, remove this hashmap, it is redundant //TODO
+                    //for debug, remove this hashmap, it is redundant
                     //subY.put(agentID, y);
                     if(average > 0.5){
                         //if TRUE=real
@@ -836,7 +836,7 @@ public class Agents extends Algorithm {
                     }
                 }
                 E.put(classifierID, subE);
-                //for debug, remove this hashmap, it is redundant //TODO
+                //for debug, remove this hashmap, it is redundant 
                 //Y.put(classifierID, subY);
             }
 
