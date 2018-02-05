@@ -615,6 +615,7 @@ public class Agents extends Algorithm {
 //            score = false;
 //        }
 
+        List<Integer> realAgentsId = new ArrayList<>();
         //transform the outputs into the input for the classifiers
         for(Individual ind : super.getPopulationWithHallOfFame()){
             //transform trajectory in advance to prevent multiprocessing errors
@@ -622,6 +623,7 @@ public class Agents extends Algorithm {
             inputOutput.forEach(trainReal -> {
                 ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
                 transformation.transform(trainReal);
+                realAgentsId.add(trainReal.getIdRealPoint().getId());
             });
         }
 
@@ -816,7 +818,6 @@ public class Agents extends Algorithm {
                     //using a multimap. Since a key can have more values, need to obtain only one value with them
                     List<Double> values = classifierResultAgentI.get(agentID);
                     double singleValue = values.stream().mapToDouble(i->i).sum();
-                    double average = singleValue / values.size();
 
                     //String ij = agentID.toString() + "/" + classifierID.toString();
                     double y = singleValue / T.get(classifierID);
@@ -827,7 +828,8 @@ public class Agents extends Algorithm {
                     if(y < 0.0) y = 0.0;
                     //for debug, remove this hashmap, it is redundant
                     //subY.put(agentID, y);
-                    if(average > 0.5){
+
+                    if(realAgentsId.stream().anyMatch(t -> t == agentID)){
                         //if TRUE=real
                         subE.put(agentID, Math.pow(1 - y, 2));
                     }else{
@@ -836,7 +838,7 @@ public class Agents extends Algorithm {
                     }
                 }
                 E.put(classifierID, subE);
-                //for debug, remove this hashmap, it is redundant 
+                //for debug, remove this hashmap, it is redundant
                 //Y.put(classifierID, subY);
             }
 

@@ -166,7 +166,10 @@ public class HallOfFame {
         List<Individual> returnList = new ArrayList<>();
         id.forEach(integer -> returnList.add(this.hallOfFame.get(integer)));
         this.sample = new ArrayList<>(returnList);
-        if(ReadConfig.debug) logger.log(Level.INFO, "--- Hall of Fame sample created (" + this.caller.toString() + ") ---");
+
+        List<Integer> ids = new ArrayList<>();
+        returnList.forEach(individual -> ids.add(individual.getModel().getId()));
+        if(ReadConfig.debug) logger.log(Level.INFO, "--- Hall of Fame sample created (" + this.caller.toString() + ") ---" + "\n" + ids.toString());
 
     }
 

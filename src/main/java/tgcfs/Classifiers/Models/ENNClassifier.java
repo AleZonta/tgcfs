@@ -2,11 +2,12 @@ package tgcfs.Classifiers.Models;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
-import tgcfs.Networks.ENN;
+import tgcfs.Networks.ElmanNeuralNetwork;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ import java.util.List;
  *
  * The Classier is offering the methods to evolve the NN using an evolutionary algorithm
  */
-public class ENNClassifier extends ENN implements EvolvableModel {
+public class ENNClassifier extends ElmanNeuralNetwork implements EvolvableModel {
     /**
      * Default constructor
      */
@@ -61,7 +62,8 @@ public class ENNClassifier extends ENN implements EvolvableModel {
         //ouble[] weightsVector = weights.stream().mapToDouble(d -> d).toArray();
         //set the weights
         //this.elmanNetwork.decodeFromArray(weightsVector);
-        this.net.setParameters(weights);
+//        this.net.setParameters(weights);
+        this.setParameters(weights);
     }
 
     /**
@@ -69,7 +71,8 @@ public class ENNClassifier extends ENN implements EvolvableModel {
      */
     @Override
     public INDArray getWeights(){
-        return this.net.params();
+//        return this.net.params();
+        return this.getParameters();
     }
 
 
@@ -101,6 +104,11 @@ public class ENNClassifier extends ENN implements EvolvableModel {
         for(int i = 0; i < input.size(); i++){
             this.fit(Nd4j.toFlattened(array.getColumn(i)),Nd4j.toFlattened(outputs.getColumn(i)));
         }
+    }
+
+    @Override
+    public void fit(DataSet dataSet) {
+        throw new Error("Not Implemented");
     }
 
 
@@ -139,11 +147,6 @@ public class ENNClassifier extends ENN implements EvolvableModel {
             result = this.computeOutput(Nd4j.toFlattened(array.getColumn(i)));
         }
         return result;
-    }
-
-
-    public void resetStatus(){
-        this.net.getLayer(1).clear();
     }
 
 

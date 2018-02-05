@@ -20,6 +20,7 @@ import tgcfs.Performances.SaveToFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -101,9 +102,21 @@ public class Classifiers extends Algorithm {
         //retrive model from the individual
         EvolvableModel model = individual.getModel();
         //set the weights
+
+        List<Double> a = new ArrayList<>();
+        for (int i = 0; i < individual.getObjectiveParameters().columns(); i++){
+            a.add(individual.getObjectiveParameters().getDouble(i));
+        }
+
         model.setWeights(individual.getObjectiveParameters());
         //compute Output of the network
 
+        List<Double> b = new ArrayList<>();
+        for (int i = 0; i < model.getWeights().columns(); i++){
+            b.add(model.getWeights().getDouble(i));
+        }
+        if(ReadConfig.debug) logger.log(Level.INFO, "Weights ---------- \n" + a.toString() + "\n" + b.toString());
+        if(ReadConfig.debug) logger.log(Level.INFO, "model ID ---------- " + model.getId());
 
         INDArray lastOutput = null;
         OutputNetwork out = new OutputNetwork();

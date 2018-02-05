@@ -48,6 +48,7 @@ public class ENNClassifierTest {
 
     @Test
     public void deepCopy() throws Exception {
+        new ReadConfig.Configurations();
         ENNClassifier test = new ENNClassifier(2,5,1);
         ENNClassifier secondAgent = (ENNClassifier) test.deepCopy();
         assertFalse(test.equals(secondAgent));
@@ -107,13 +108,13 @@ public class ENNClassifierTest {
             List<INDArray> arrays = new ArrayList<>();
             for(int i = 0; i < 10; i++){
                 INDArray arrayy = Nd4j.rand(1, 2);
-                for (int j = 0; j < 2; j++) {
+                for (int j = 0; j < 3; j++) {
                     arrayy.putScalar(j, RandomGenerator.getNextDouble(-1,1));
                 }
                 arrays.add(arrayy);
             }
 
-            for(int i = 0; i < 10000; i++){
+            for(int i = 0; i < 100; i++){
                 List<INDArray> appo = new ArrayList<>(arrays);
                 INDArray arrayy = Nd4j.rand(1, 2);
                 for (int j = 0; j < 2; j++) {
@@ -121,7 +122,7 @@ public class ENNClassifierTest {
                 }
                 appo.add(arrayy);
                 INDArray out = null;
-//                System.out.println(appo);
+                System.out.println(appo);
                 for(INDArray arr: appo){
                     out = test.computeOutput(arr);
 

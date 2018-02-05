@@ -12,9 +12,15 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import tgcfs.Config.ReadConfig;
 import tgcfs.NN.Models;
 import tgcfs.Networks.DeepLearning4j.MultiLayerNetworkBis;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.*;
 import java.util.stream.IntStream;
 
 /**
@@ -36,10 +42,14 @@ public class ENN extends Models implements Network {
     protected int hiddenNeurons;
     protected int output;
 
+    private final Logger logger = Logger.getLogger(ENN.class.getName()); //logger for this class
+
     /**
      * Default constructor
      */
-    public ENN(){ }
+    public ENN(){
+
+    }
 
     /**
      * Constructor of the classifier. It generates the ElmanNetwork.
@@ -48,11 +58,42 @@ public class ENN extends Models implements Network {
      * @param output number of nodes used as output
      */
     public ENN(int input, int HiddenNeurons, int output){
+        Handler consoleHandler = new ConsoleHandler();
+
+        String finalPath = null;
+        try {
+            finalPath = ReadConfig.Configurations.getPath() + "/Experiment-" + ReadConfig.Configurations.getName();
+
+            new File(finalPath).mkdirs();
+            finalPath += "/" + ReadConfig.Configurations.getExperiment();
+            new File(finalPath).mkdirs();
+            finalPath += "/classifierENN.log";
+            Handler fileHandler  = null;
+            try {
+                fileHandler = new FileHandler(finalPath);
+                // Setting formatter to the handler
+                // Creating SimpleFormatter
+                Formatter simpleFormatter = new SimpleFormatter();
+                fileHandler.setFormatter(simpleFormatter);
+                this.logger.addHandler(consoleHandler);
+                this.logger.addHandler(fileHandler);
+
+                this.logger.removeHandler(consoleHandler);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(12345)
                 .weightInit(WeightInit.XAVIER)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .learningRate(0.01)
+                .biasInit(0.0)
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(input + HiddenNeurons).nOut(HiddenNeurons)
                         .activation(Activation.TANH)
@@ -83,22 +124,48 @@ public class ENN extends Models implements Network {
     @Override
     public INDArray computeOutput(INDArray in) {
         //check if the input is in the correct range
-        for(int i = 0; i < in.columns(); i++){
-            if(in.getDouble(i) < -1.0 || in.getDouble(i) > 1.0){
+        for (int i = 0; i < in.columns(); i++) {
+            if (in.getDouble(i) < -1.0 || in.getDouble(i) > 1.0) {
                 throw new Error("Generator input is not normalised correctly");
             }
         }
 
+        List<Double> a = new ArrayList<>();
+        for (int i = 0; i < in.columns(); i++) {
+            a.add(in.getDouble(i));
+        }
+        logger.log(Level.INFO, "Input\n" + a.toString());
+
         INDArray pastInput = this.net.getLayer(1).input();
 
-        //load the context value of the hidden layer
-        INDArray total = Nd4j.create(1,this.input + this.hiddenNeurons);
-        IntStream.range(0, this.input).forEach(i -> total.putScalar(i, in.getDouble(i)));
-        if(pastInput == null) {
-            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,0.5));
-        }else{
-            IntStream.range(this.input, this.input + this.hiddenNeurons).forEach(i -> total.putScalar(i,pastInput.getDouble(i-this.input)));
+
+        a = new ArrayList<>();
+        if (pastInput != null) {
+            for (int i = 0; i < pastInput.columns(); i++) {
+                a.add(pastInput.getDouble(i));
+            }
+            logger.log(Level.INFO, "Past Input\n" + a.toString());
         }
+
+
+        //load the context value of the hidden layer
+        INDArray total = Nd4j.create(1, this.input + this.hiddenNeurons);
+        IntStream.range(0, this.input).forEach(i -> total.putScalar(i, in.getDouble(i)));
+        int j = 0;
+        for (int i = this.input; i < this.input + this.hiddenNeurons; i++) {
+            if (pastInput == null) {
+                total.putScalar(i, 0.5);
+            }else{
+                total.putScalar(i, pastInput.getDouble(j));
+                j++;
+            }
+        }
+
+        a = new ArrayList<>();
+        for (int i = 0; i < total.columns(); i++) {
+            a.add(total.getDouble(i));
+        }
+        logger.log(Level.INFO, "Total Input\n" + a.toString());
 
 //        return this.net.rnnTimeStep(total);
         return this.net.output(total);

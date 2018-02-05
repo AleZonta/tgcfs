@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 public class ENNTest {
     @Test
     public void computeOutput() throws Exception {
-        ENN agent = new ENN(2,1,1);
+        ENN agent = new ENN(2,3,1);
 
         INDArray array = Nd4j.rand(1, 2);
         array.putScalar(0,5.0);
@@ -30,7 +30,10 @@ public class ENNTest {
             assertEquals("Generator input is not normalised correctly", e.getMessage());
         }
         INDArray real = Nd4j.rand(1, 2);
-        out = agent.computeOutput(real);
+        array.putScalar(0,0.05);
+        array.putScalar(1,0.05);
+        out = agent.computeOutput(array);
+        System.out.println(out);
         assertNotNull(out);
         assertFalse(real.equals(out));
         assertTrue(out.columns() == 1);
@@ -53,7 +56,7 @@ public class ENNTest {
 
     @Test
     public void getSummary() throws Exception {
-        ENN agent = new ENN(2,1,1);
+        ENN agent = new ENN(2,3,1);
         assertNotNull(agent.getSummary());
         System.out.println(agent.getSummary());
     }
