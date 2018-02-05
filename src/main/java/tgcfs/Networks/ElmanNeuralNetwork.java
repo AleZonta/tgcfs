@@ -5,8 +5,6 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.NN.Models;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.IntStream;
 
 /**
@@ -113,14 +111,6 @@ public class ElmanNeuralNetwork  extends Models implements Network {
         }
         //save the hidden values
         this.oldInput = hiddenInput.dup();
-
-        List<Double> a = new ArrayList<>();
-        for (int i = 0; i < this.oldInput.columns(); i++) {
-            a.add(this.oldInput.getDouble(i));
-        }
-        System.out.println(a);
-
-
 
         //compute the output
         INDArray outputLayer = Nd4j.create(1, this.output);
