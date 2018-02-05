@@ -1,5 +1,6 @@
 package tgcfs.Framework;
 
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.Clax;
@@ -55,6 +56,8 @@ public class GAN implements Framework{
      * @throws Exception if there are problems with the reading procedure
      */
     public GAN() throws Exception {
+        Nd4j.setDataType(DataBuffer.Type.DOUBLE);
+
         //initialising the config file class
         new ReadConfig.Configurations();
 

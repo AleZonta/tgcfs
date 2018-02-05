@@ -82,20 +82,6 @@ public class ElmanNeuralNetwork  extends Models implements Network {
      */
     @Override
     public INDArray computeOutput(INDArray input) {
-
-        List<Double> a = new ArrayList<>();
-        for (int i = 0; i < input.columns(); i++) {
-            a.add(input.getDouble(i));
-        }
-
-
-        a = new ArrayList<>();
-        if (oldInput != null) {
-            for (int i = 0; i < oldInput.columns(); i++) {
-                a.add(oldInput.getDouble(i));
-            }
-        }
-
         //create real input
         INDArray realInput = Nd4j.create(1, this.input + this.hiddenNeurons);
         IntStream.range(0, this.input).forEach(i -> realInput.putScalar(i, input.getDouble(i)));
@@ -107,12 +93,6 @@ public class ElmanNeuralNetwork  extends Models implements Network {
                 realInput.putScalar(i, oldInput.getDouble(j));
                 j++;
             }
-        }
-
-
-        a = new ArrayList<>();
-        for (int i = 0; i < realInput.columns(); i++) {
-            a.add(realInput.getDouble(i));
         }
 
         //compute the hidden input
@@ -133,6 +113,13 @@ public class ElmanNeuralNetwork  extends Models implements Network {
         }
         //save the hidden values
         this.oldInput = hiddenInput.dup();
+
+        List<Double> a = new ArrayList<>();
+        for (int i = 0; i < this.oldInput.columns(); i++) {
+            a.add(this.oldInput.getDouble(i));
+        }
+        System.out.println(a);
+
 
 
         //compute the output
