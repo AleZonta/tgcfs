@@ -2,6 +2,7 @@ package tgcfs.InputOutput;
 
 import lgds.trajectories.Point;
 import tgcfs.Agents.OutputNetwork;
+import tgcfs.Agents.OutputNetworkTime;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Loader.Feeder;
@@ -106,31 +107,53 @@ public class FollowingTheGraph implements Transformation {
         //remember the last point
         PointWithBearing lastp = this.lastPoint.deepCopy();
 
+        boolean time = false;
+        try {
+            time= ReadConfig.Configurations.getTimeAsInput();
+        } catch (Exception ignored) { }
+
         int i = 0;
         //this is for the fake part
         for(OutputsNetwork outputsNetwork: outputs){
 
-            OutputNetwork output = (OutputNetwork) outputsNetwork;
             //Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
             Point position = null;
             try {
                 if(ReadConfig.Configurations.getConversionWithGraph()){
-                    position = this.feeder.getNextLocationDifferentMethod(this.lastPoint, output.getSpeed(), output.getBearing());
+                    if(!time){
+                        OutputNetwork output = (OutputNetwork) outputsNetwork;
+                        position = this.feeder.getNextLocationDifferentMethod(this.lastPoint, output.getSpeed(), output.getBearing());
+                    }else{
+                        OutputNetworkTime output = (OutputNetworkTime) outputsNetwork;
+                        throw new Exception("Conversion following the graph and using the time is not yet impelemented");
+                    }
                 }else{
-                    position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
+                    if(!time){
+                        OutputNetwork output = (OutputNetwork) outputsNetwork;
+                        position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
+                    }else{
+                        OutputNetworkTime output = (OutputNetworkTime) outputsNetwork;
+                        position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing(), output.getDistance());
+                    }
                 }
             } catch (Exception e) {
                  logger.log(Level.INFO, " -> " + e.getMessage() );
             }
-            if(ReadConfig.debug) logger.log(Level.INFO,output.toString() + " -> " + position );
+            if(ReadConfig.debug) logger.log(Level.INFO,outputsNetwork.toString() + " -> " + position );
             //this input network has speed and bearing
             //InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
             //the new one has velocity and angular speed
 
 
 //            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position)));
-            InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, output.getBearing()));
-
+            double angularSpeed;
+            if(!time){
+                angularSpeed = convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, outputsNetwork.getBearing());
+            }else {
+                OutputNetworkTime output = (OutputNetworkTime) outputsNetwork;
+                angularSpeed = convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), output.getDistance());
+            }
+            InputNetwork inputNetwork = new InputNetwork(outputsNetwork.getSpeed(), angularSpeed);
             convertedInput.add(inputNetwork);
 
             //upgrade position
@@ -147,15 +170,22 @@ public class FollowingTheGraph implements Transformation {
         List<OutputsNetwork> out = trainReal.getRealOutput();
 
         for(int j = 0; j<i; j++){
-            OutputNetwork output = (OutputNetwork) out.get(j);
-            //Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
-            Point position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
+            OutputsNetwork output = out.get(j);
+            Point position;
+            if(!time) {
+                //Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+                position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
 //            InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, converterPointSB.obtainBearing(this.lastPoint, position)));
-            InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, output.getBearing()));
+                InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, output.getBearing()));
 
+                convertedInputReal.add(inputNetwork);
+            }else{
+                OutputNetworkTime outputTime = (OutputNetworkTime) output;
+                position = this.feeder.getNextLocationNoGraph(this.lastPoint, outputTime.getSpeed(), outputTime.getBearing(), outputTime.getDistance());
+                InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), outputTime.getDistance()));
 
-            convertedInputReal.add(inputNetwork);
-
+                convertedInputReal.add(inputNetwork);
+            }
             //upgrade position
             this.lastPoint = new PointWithBearing(position);
         }

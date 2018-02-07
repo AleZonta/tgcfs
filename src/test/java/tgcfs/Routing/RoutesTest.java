@@ -1,13 +1,21 @@
 package tgcfs.Routing;
 
 import lgds.trajectories.Point;
+import lgds.trajectories.Trajectories;
 import lgds.trajectories.Trajectory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import tgcfs.Config.ReadConfig;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static junit.framework.TestCase.assertNotNull;
 
@@ -28,21 +36,21 @@ public class RoutesTest {
 
 
 
-//        class PointPrint extends Point {
-//
-//            public PointPrint(Double latitude, Double longitude, Double altitude, Double dated, String dates, String time) {
-//                super(latitude, longitude, altitude, dated, dates, time);
-//            }
-//
-//            public PointPrint(Double latitude, Double longitude) {
-//                super(latitude, longitude);
-//            }
-//
-//            @Override
-//            public String toString() {
-//                return "[" + super.getLatitude() + ", " + super.getLongitude() + "]";
-//            }
-//        }
+        class PointPrint extends Point {
+
+            public PointPrint(Double latitude, Double longitude, Double altitude, Double dated, String dates, String time) {
+                super(latitude, longitude, altitude, dated, dates, time);
+            }
+
+            public PointPrint(Double latitude, Double longitude) {
+                super(latitude, longitude);
+            }
+
+            @Override
+            public String toString() {
+                return "[" + super.getLatitude() + ", " + super.getLongitude() + ", " + super.getAltitude() + ", " + super.getDated() + ", \"" + super.getDates() + "\", \"" + super.getTime() + "\"]";
+            }
+        }
 
 
         new ReadConfig.Configurations();
@@ -54,53 +62,53 @@ public class RoutesTest {
         assertNotNull(routes.getTra());
 
 
-//        try (FileOutputStream zipFile = new FileOutputStream(new File("/Users/alessandrozonta/Desktop/tra.zip"));
-//             ZipOutputStream zos = new ZipOutputStream(zipFile);
-//             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "ISO-8859-1"))
-//        ){
-//            ZipEntry csvFile = new ZipEntry(  "tra.json");
-//            zos.putNextEntry(csvFile);
-//
-//
-//            JSONObject totalObj = new JSONObject();
-//
-//            Trajectories tra = routes.getTra();
-//            List<Trajectory> allTra = tra.getTrajectories();
-//
-//            IntStream.range(0, allTra.size()).forEach(i -> {
-//
-//                Trajectory t = allTra.get(i);
-//
-//                JSONObject obj = new JSONObject();
-//                JSONArray trajectory = new JSONArray();
-//                //put the trajectory
-//
-//                List<PointPrint> ppoints = new ArrayList<>();
-//                Point po = routes.getNextPosition(t);
-//                while (po != null){
-//                    PointPrint p = new PointPrint(po.getLatitude(), po.getLongitude());
-//                    ppoints.add(p);
-//                    po = routes.getNextPosition(t);
-//                }
-//
-//                trajectory.addAll(ppoints);
-//                obj.put("trajectory", trajectory);
-//
-//                String name = "trajectory-" + i;
-//                totalObj.put(name, obj);
-//            });
-//
-//            totalObj.put("size", allTra.size());
-//            try {
-////                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
-//                writer.write(totalObj.toJSONString());
-//                writer.newLine();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
+        try (FileOutputStream zipFile = new FileOutputStream(new File("/Users/alessandrozonta/Desktop/traGeolife.zip"));
+             ZipOutputStream zos = new ZipOutputStream(zipFile);
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "ISO-8859-1"))
+        ){
+            ZipEntry csvFile = new ZipEntry(  "traGeolife.json");
+            zos.putNextEntry(csvFile);
+
+
+            JSONObject totalObj = new JSONObject();
+
+            Trajectories tra = routes.getTra();
+            List<Trajectory> allTra = tra.getTrajectories();
+
+            IntStream.range(0, allTra.size()).forEach(i -> {
+                System.out.println("Saving " + i + " over " + allTra.size());
+                Trajectory t = allTra.get(i);
+
+                JSONObject obj = new JSONObject();
+                JSONArray trajectory = new JSONArray();
+                //put the trajectory
+
+                List<PointPrint> ppoints = new ArrayList<>();
+                Point po = routes.getNextPosition(t);
+                while (po != null){
+                    PointPrint p = new PointPrint(po.getLatitude(), po.getLongitude(), po.getAltitude(), po.getDated(), po.getDates(), po.getTime());
+                    ppoints.add(p);
+                    po = routes.getNextPosition(t);
+                }
+
+                trajectory.addAll(ppoints);
+                obj.put("trajectory", trajectory);
+
+                String name = "trajectory-" + i;
+                totalObj.put(name, obj);
+            });
+
+            totalObj.put("size", allTra.size());
+            try {
+//                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
+                writer.write(totalObj.toJSONString());
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
 
     }

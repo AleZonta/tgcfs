@@ -5,6 +5,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Agents.Models.RealAgent;
 import tgcfs.Agents.OutputNetwork;
+import tgcfs.Agents.OutputNetworkTime;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
@@ -224,7 +225,7 @@ public class TrainReal {
         if(p.getTime() == null){
             ret = new PointWithBearing(p.getLatitude(), p.getLongitude(), 0.0, 0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")),p.getBearing());
         }else{
-            ret = new PointWithBearing(p.getLatitude(), p.getLongitude(), 0.0, p.getDated(), p.getTime(), p.getDates(),p.getBearing());
+            ret = new PointWithBearing(p.getLatitude(), p.getLongitude(), 0.0, p.getDated(),p.getDates(), p.getTime(),p.getBearing());
         }
         return ret;
     }
@@ -392,7 +393,7 @@ public class TrainReal {
     /**
      * Transform the real point given as real output into an {@link OutputNetwork} for the classifier
      */
-    public void createRealOutputConverted(){
+    public void createRealOutputConverted(boolean isTime){
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
         List<OutputsNetwork> totalList = new ArrayList<>();
@@ -406,11 +407,18 @@ public class TrainReal {
 
             Point previousPoint = herePoint.get(i - 1);
             Point actualPoint = herePoint.get(i);
-            Double bearing = conversion.obtainBearing(previousPoint,actualPoint);
-            Double speed = conversion.obtainSpeed(previousPoint, actualPoint);
 
-            totalList.add(new OutputNetwork(speed, bearing));
+            if(!isTime) {
+                double bearing = conversion.obtainBearing(previousPoint, actualPoint);
+                double speed = conversion.obtainSpeed(previousPoint, actualPoint);
 
+                totalList.add(new OutputNetwork(speed, bearing));
+            }else {
+                double time = conversion.obtainTime(previousPoint, actualPoint);
+                double bearing = conversion.obtainBearing(previousPoint, actualPoint);
+                double speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
+                totalList.add(new OutputNetworkTime(speed, bearing, time));
+            }
         }
 
         this.realOutput = new ArrayList<>();

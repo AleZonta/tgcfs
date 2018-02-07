@@ -27,4 +27,24 @@ public interface OutputsNetwork {
      * @return OutputsNetwork object
      */
     OutputsNetwork deepCopy();
+
+    /**
+     * To string method
+     * @return string
+     */
+    String toString();
+
+
+    /**
+     * Return the speed value
+     * @return double value
+     */
+    double getSpeed();
+
+
+    /**
+     * Return the bearing
+     * @return double value
+     */
+    double getBearing();
 }

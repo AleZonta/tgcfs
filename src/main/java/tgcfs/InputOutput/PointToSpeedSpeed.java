@@ -23,7 +23,40 @@ public class PointToSpeedSpeed {
      */
     public double obtainAngularSpeed(PointWithBearing previousPoint, double actualBearing){
         double previousBearing = previousPoint.getBearing();
-        return this.obtainAngularSpeed(previousBearing,actualBearing);
+        double time = Routes.timeBetweenIDSATimesteps;
+        return this.obtainAngularSpeed(previousBearing,actualBearing, time);
+    }
+
+
+    /**
+     * Obtain angular speed current second point
+     * @param previousPoint previousPoint
+     * @param actualBearing bearing just computed of last point
+     * @param time time just computed
+     * @return double value with speed
+     */
+    public double obtainAngularSpeedTime(PointWithBearing previousPoint, double actualBearing, double time){
+        double previousBearing = previousPoint.getBearing();
+        return this.obtainAngularSpeed(previousBearing,actualBearing, time);
+    }
+
+
+    /**
+     * Obtain angular speed current second point
+     *
+     * https://gamedev.stackexchange.com/questions/4467/comparing-angles-and-working-out-the-difference
+     *
+     *
+     * @param previousBearing previous bearing
+     * @param actualBearing bearing just computed of last point
+     * @param time time value
+     * @return double value with speed
+     */
+    public double obtainAngularSpeed(double previousBearing, double actualBearing, double time){
+
+        double angle = 180 - Math.abs(Math.abs(previousBearing - actualBearing) - 180);
+
+        return Math.toRadians(angle) / time;
     }
 
     /**
@@ -38,9 +71,7 @@ public class PointToSpeedSpeed {
      */
     public double obtainAngularSpeed(double previousBearing, double actualBearing){
         double time = Routes.timeBetweenIDSATimesteps;
+        return this.obtainAngularSpeed(previousBearing,actualBearing, time);
 
-        double angle = 180 - Math.abs(Math.abs(previousBearing - actualBearing) - 180);
-
-        return Math.toRadians(angle) / time;
     }
 }

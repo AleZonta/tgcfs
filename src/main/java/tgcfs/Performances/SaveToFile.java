@@ -117,7 +117,7 @@ public class SaveToFile {
          * @param stepSize list with the double value of the stepSize
          * @throws Exception  if the class is not instantiate
          */
-        public static void saveStepSize(String name, INDArray stepSize) throws Exception {
+        public static void saveStepSize(String name, List<INDArray> stepSize) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveStepSize(name, stepSize);
         }
@@ -326,14 +326,18 @@ public class SaveToFile {
      * @param name name of the class/file I am saving
      * @param stepSize list with the double value of the stepsizes
      */
-    private void saveStepSize(String name, INDArray stepSize){
+    private void saveStepSize(String name, List<INDArray> stepSize){
         try {
             BufferedWriter outputWriter = new BufferedWriter(new FileWriter(this.currentPath + name + "-stepsize.csv", true));
             //print all the value of the double
             List<Double> list = new ArrayList<>();
-            for(int i=0; i< stepSize.columns(); i++){
-                list.add(stepSize.getDouble(i));
+            for(INDArray array: stepSize){
+                List<Double> ss = new ArrayList<>();
+                for(int i=0; i< array.columns(); i++){
+                    list.add(array.getDouble(i));
+                }
             }
+
             outputWriter.write(list.toString());
             outputWriter.newLine();
             logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");

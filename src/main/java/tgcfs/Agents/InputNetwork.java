@@ -49,7 +49,6 @@ public class InputNetwork implements InputsNetwork {
         if (allFields.length != inputSize + 3){
             throw new Error("Number of fields and variable expressing that do not correspond.");
         }
-
     }
 
     /**
@@ -75,7 +74,6 @@ public class InputNetwork implements InputsNetwork {
         if (allFields.length != inputSize + 3){
             throw new Error("Number of fields and variable expressing that do not correspond.");
         }
-
     }
 
     /**

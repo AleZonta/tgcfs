@@ -1,9 +1,6 @@
 package tgcfs.Routing;
 
-import lgds.load_track.LoadIDSAJson;
-import lgds.load_track.LoadIDSATrack;
-import lgds.load_track.LoadTrack;
-import lgds.load_track.Traces;
+import lgds.load_track.*;
 import lgds.trajectories.Point;
 import lgds.trajectories.Trajectories;
 import lgds.trajectories.Trajectory;
@@ -58,6 +55,8 @@ public class Routes {
                 break;
             case 1:
                 this.storage = new LoadTrack();
+                if(!ReadConfig.Configurations.getTimeAsInput())
+                    throw new Exception("Trying to use the GeoLife dataset without taking into account the time");
                 break;
             case 2:
                 throw new Exception("Typology not yet implemented");
@@ -65,6 +64,12 @@ public class Routes {
                 this.storage = new LoadIDSAJson();
                 //set a different time step for IDSA
                 timeBetweenIDSATimesteps = 3.0;
+                break;
+            case 4:
+                this.storage = new LoadTrackJson();
+                //in this case I need to have the generator set to use the time
+                if(!ReadConfig.Configurations.getTimeAsInput())
+                    throw new Exception("Trying to use the GeoLife dataset without taking into account the time");
                 break;
             default:
                 throw new Exception("Typology not yet implemented");

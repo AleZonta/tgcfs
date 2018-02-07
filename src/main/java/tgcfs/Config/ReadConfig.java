@@ -106,6 +106,8 @@ public class ReadConfig {
     private Integer hallOfFameMemory;
     private Integer hallOfFameSample;
 
+    private Integer fitnessFunction;
+    private Boolean timeAsInput;
 
     /**
      * Constructor with zero parameter
@@ -189,6 +191,8 @@ public class ReadConfig {
         this.hallOfFameMemory = null;
         this.hallOfFameSample = null;
 
+        this.fitnessFunction = null;
+        this.timeAsInput = null;
         debug = false;
     }
 
@@ -697,6 +701,18 @@ public class ReadConfig {
             throw new Exception("HallOfFameSample is wrong or missing.");
         }
 
+        try {
+            // this.fitnessFunction
+            this.fitnessFunction = ((Long) jsonObject.get("FitnessFunction")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("FitnessFunction is wrong or missing.");
+        }try {
+            // this.timeAsInput
+            this.timeAsInput = ((Boolean) jsonObject.get("TimeAsInput"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("TimeAsInput is wrong or missing.");
+        }
+
     }
 
 
@@ -926,6 +942,8 @@ public class ReadConfig {
                 "HallOfFame=" + hallOfFame + ",\n" +
                 "HallOfFameMemory=" + hallOfFameMemory + ",\n" +
                 "HallOfFameSample=" + hallOfFameSample + ",\n" +
+                "FitnessFunction=" + fitnessFunction + ",\n" +
+                "TimeAsInput=" + timeAsInput + ",\n" +
                 '}';
     }
 
@@ -1267,6 +1285,26 @@ public class ReadConfig {
     public int getHallOfFameSample() throws Exception {
         if(this.uncorrelatedMutationStep == null) throw new Exception("Try to access config file before reading it.");
         return hallOfFameSample;
+    }
+
+    /**
+     * Getter for the type of Fitness Function I am using
+     * @return int value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getFitnessFunction() throws Exception {
+        if(this.fitnessFunction == null) throw new Exception("Try to access config file before reading it.");
+        return this.fitnessFunction;
+    }
+
+    /**
+     * Getter if I am using the time as Input for the generator
+     * @return boolean value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public boolean getTimeAsInput() throws Exception {
+        if(this.timeAsInput == null) throw new Exception("Try to access config file before reading it.");
+        return this.timeAsInput;
     }
 
     /**
@@ -1828,6 +1866,24 @@ public class ReadConfig {
          */
         public static int getHallOfFameSample() throws Exception {
             return config.getHallOfFameSample();
+        }
+
+        /**
+         * Getter for the type of Fitness Function I am using
+         * @return int value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getFitnessFunction() throws Exception {
+            return config.getFitnessFunction();
+        }
+
+        /**
+         * Getter if I am using the time as Input for the generator
+         * @return boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static boolean getTimeAsInput() throws Exception {
+            return config.getTimeAsInput();
         }
     }
 

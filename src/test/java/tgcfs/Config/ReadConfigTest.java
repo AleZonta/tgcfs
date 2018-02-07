@@ -1202,5 +1202,45 @@ public class ReadConfigTest {
         new ReadConfig.Configurations();
         assertEquals(conf.getHallOfFameSample(), ReadConfig.Configurations.getHallOfFameSample());
     }
+
+    @Test
+    public void getFitnessFunction() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getFitnessFunction();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getFitnessFunction() > 0);
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getFitnessFunction(), ReadConfig.Configurations.getFitnessFunction());
+    }
+
+    @Test
+    public void getTimeAsInput() throws Exception {
+        //test if I return a location -> that is not null
+        ReadConfig conf = new ReadConfig();
+        try {
+            conf.getTimeAsInput();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals("Try to access config file before reading it.") );
+        }
+        try {
+            conf.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(conf.getTimeAsInput() || !conf.getTimeAsInput());
+
+        new ReadConfig.Configurations();
+        assertEquals(conf.getTimeAsInput(), ReadConfig.Configurations.getTimeAsInput());
+    }
 }
 

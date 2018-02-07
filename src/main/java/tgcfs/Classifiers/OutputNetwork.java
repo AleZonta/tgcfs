@@ -133,4 +133,14 @@ public class OutputNetwork implements OutputsNetwork{
                 "realValue=" + this.realValue + " " +
                 '}';
     }
+
+    @Override
+    public double getSpeed() {
+        return 0;
+    }
+
+    @Override
+    public double getBearing() {
+        return 0;
+    }
 }

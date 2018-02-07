@@ -9,10 +9,12 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
+import tgcfs.Agents.InputNetworkTime;
 import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
+import tgcfs.Agents.OutputNetworkTime;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
@@ -114,13 +116,15 @@ public class Agents extends Algorithm {
         class ComputeUnit implements Runnable {
             private CountDownLatch latch;
             private Individual agent;
+            private boolean time;
 
             /**
              * Constructor
              * @param agent agent
              */
-            private ComputeUnit(Individual agent) {
+            private ComputeUnit(Individual agent, boolean time) {
                 this.agent = agent;
+                this.time = time;
             }
 
             /**
@@ -183,7 +187,15 @@ public class Agents extends Algorithm {
 
                     List<InputsNetwork> in = currentInputsNetwork.getTrainingPoint();
                     int size = in.size();
-                    INDArray features = Nd4j.create(new int[]{1, InputNetwork.inputSize, size}, 'f');
+
+                    int inputSize;
+                    if(!this.time){
+                        inputSize = InputNetwork.inputSize;
+                    }else{
+                        inputSize = InputNetworkTime.inputSize;
+                    }
+
+                    INDArray features = Nd4j.create(new int[]{1, inputSize, size}, 'f');
                     for (int j = 0; j < size; j++) {
                         INDArray vector = in.get(j).serialise();
                         features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
@@ -193,12 +205,10 @@ public class Agents extends Algorithm {
 
                     int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
                     INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
+
                     if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + realLastOut.toString());
+                    this.addOutput(realLastOut, outputsNetworks);
 
-
-                    OutputNetwork out = new OutputNetwork();
-                    out.deserialise(realLastOut);
-                    outputsNetworks.add(out);
                     if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM transformed ->" + outputsNetworks.toString());
 
                     //output has only two fields, input needs three
@@ -213,19 +223,33 @@ public class Agents extends Algorithm {
                         lastOutput = model.computeOutput(inputLocal.serialise());
 
                         if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
-
-                        out = new OutputNetwork();
-                        out.deserialise(lastOutput);
-                        outputsNetworks.add(out);
+                        this.addOutput(realLastOut, outputsNetworks);
                     }
                     //assign the output to this individual
                     currentInputsNetwork.setOutputComputed(outputsNetworks);
 
                     //create the output already computed
-                    currentInputsNetwork.createRealOutputConverted();
+                    currentInputsNetwork.createRealOutputConverted(this.time);
                     individual.addMyInputandOutput(currentInputsNetwork.deepCopy());
 
                     ((LSTMAgent)model).clearPreviousState();
+                }
+            }
+
+            /**
+             * if I am considerind the time I need to de-serialise the output considering also the time, otherwise not
+             * @param realLastOut output generator
+             * @param outputsNetworks collection of outputs
+             */
+            private void addOutput(INDArray realLastOut, List<OutputsNetwork> outputsNetworks){
+                if(!this.time){
+                    OutputNetwork out = new OutputNetwork();
+                    out.deserialise(realLastOut);
+                    outputsNetworks.add(out);
+                }else{
+                    OutputNetworkTime out = new OutputNetworkTime();
+                    out.deserialise(realLastOut);
+                    outputsNetworks.add(out);
                 }
             }
 
@@ -234,10 +258,10 @@ public class Agents extends Algorithm {
         ExecutorService exec = Executors.newFixedThreadPool(16);
         CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
         ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
-
+        boolean time = ReadConfig.Configurations.getTimeAsInput();
 
         for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
-            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i));
+            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), time);
         }
         for(ComputeUnit r : runnables) {
             r.setLatch(latch);
@@ -249,28 +273,6 @@ public class Agents extends Algorithm {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
-
-        //every individual in parallel
-//        super.getPopulationWithHallOfFame().parallelStream().forEach(individual -> {
-//            try {
-//                //retrieve model from the individual
-//                EvolvableModel model = individual.getModel();
-//                //set the weights
-//                model.setWeights(individual.getObjectiveParameters());
-//                //select which model I am using
-//                if (model.getClass().equals(LSTMAgent.class)) {
-//                    this.runLSTM(input, model, individual);
-//                } else if (model.getClass().equals(Clax.class)) {
-//                    this.runClax(input, model, individual);
-//                } else if (model.getClass().equals(ConvAgent.class)) {
-//                    this.runConvol(input, model, individual);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        });
 
     }
 
@@ -453,7 +455,7 @@ public class Agents extends Algorithm {
             currentInputsNetwork.setOutputComputed(outputsNetworks);
 
             //create the output already computed
-            currentInputsNetwork.createRealOutputConverted();
+            currentInputsNetwork.createRealOutputConverted(false);
             individual.addMyInputandOutput(currentInputsNetwork);
 
             ((LSTMAgent)model).clearPreviousState();
@@ -580,7 +582,7 @@ public class Agents extends Algorithm {
 
                 double decision = result.getRealValue();
 
-                if( decision>0.5 ) {
+                if( decision > 0.5 ) {
                     //it is saying it is true
                     //counting this only if the fake trajectory
                     if(real) {
@@ -605,59 +607,6 @@ public class Agents extends Algorithm {
 
             }
         }
-
-
-
-//        boolean score;
-//        try {
-//            score = ReadConfig.Configurations.getScore();
-//        } catch (Exception e) {
-//            score = false;
-//        }
-
-        List<Integer> realAgentsId = new ArrayList<>();
-        //transform the outputs into the input for the classifiers
-        for(Individual ind : super.getPopulationWithHallOfFame()){
-            //transform trajectory in advance to prevent multiprocessing errors
-            List<TrainReal> inputOutput = ind.getMyInputandOutput();
-            inputOutput.forEach(trainReal -> {
-                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
-                transformation.transform(trainReal);
-                realAgentsId.add(trainReal.getIdRealPoint().getId());
-            });
-        }
-
-
-        logger.log(Level.SEVERE, "Start real classification");
-
-//         launch my way to compute the fitness
-//        ExecutorService exec = Executors.newFixedThreadPool(16);
-//        CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
-//        ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
-//
-//
-//        for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
-//            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), competingPopulation.getPopulationWithHallOfFame(), score, this.scores);
-//        }
-//        for(ComputeUnit r : runnables) {
-//            r.setLatch(latch);
-//            exec.execute(r);
-//        }
-//        try {
-//            latch.await();
-//            exec.shutdown();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
-        // number real trajectories = total number of trajectories said as real = # trajectories trained * # individuals
-        int numTraTra;
-        try{
-            numTraTra = ReadConfig.Configurations.getTrajectoriesTrained();
-        } catch (Exception e){
-            numTraTra = 1;
-        }
-        int R = numTraTra * super.getPopulationWithHallOfFame().size();
 
         /**
          * Class for multithreading
@@ -760,124 +709,194 @@ public class Agents extends Algorithm {
 
         }
 
-        //classifier id, agent id and comparison result
-        HashMap<Integer, ListMultimap<Integer, Double>> results = new HashMap<>();
 
-        ExecutorService exec = Executors.newFixedThreadPool(96);
-        CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
-        ComputeSelmarFitnessUnit[] runnables = new ComputeSelmarFitnessUnit[competingPopulation.getPopulationWithHallOfFame().size()];
+        //Need this with both fitness functions
+        List<Integer> realAgentsId = new ArrayList<>();
+        //transform the outputs into the input for the classifiers
+        for(Individual ind : super.getPopulationWithHallOfFame()){
+            //transform trajectory in advance to prevent multiprocessing errors
+            List<TrainReal> inputOutput = ind.getMyInputandOutput();
+            inputOutput.forEach(trainReal -> {
+                ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
+                transformation.transform(trainReal);
+                realAgentsId.add(trainReal.getIdRealPoint().getId());
+            });
+        }
 
-        //create all the runnables
-        for(int i = 0; i < competingPopulation.getPopulationWithHallOfFame().size(); i ++){
-            runnables[i] = new ComputeSelmarFitnessUnit(competingPopulation.getPopulationWithHallOfFame().get(i), super.getPopulationWithHallOfFame());
-        }
-        //execute them and wait them till they have finished
-        for(ComputeSelmarFitnessUnit r : runnables) {
-            r.setLatch(latch);
-            exec.execute(r);
-        }
+
+        logger.log(Level.SEVERE, "Start real classification");
+
+        //set the default fitness as the normal fitness
+        int fitnessTypology = 0;
         try {
-            latch.await();
-            exec.shutdown();
+            fitnessTypology = ReadConfig.Configurations.getFitnessFunction();
+        } catch (Exception ignored) { }
 
-            //collecting the results
-            for (ComputeSelmarFitnessUnit runnable : runnables) {
-                //all the i, j fixed -> classifier_j(agent_i))
-                results.put(runnable.getClassifierID(), runnable.getResults());
-            }
 
-            //creation all the Tj
-            //T_j = sum_i( classifier_j(agent_i))
-            HashMap<Integer, Double> T = new HashMap<>();
-            for(int key: results.keySet()){
-                //key is the classifier id -> i
-                ListMultimap<Integer, Double> classifierResultAgentI = results.get(key);
-                //also with the multimap it is fine -> more values same key, don't care. Sum them all!
-                double singleTj = classifierResultAgentI.values().stream().mapToDouble(i->i).sum();
-                T.put(key, singleTj);
-            }
+        switch (fitnessTypology){
+            case 0:
 
-            //Creation matrix Yij
-            //Y_ij = R * classifier_j(agent_i) / T_j
-            //E_ji = { i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2
-            // HashMap<String, Double> E = new HashMap<>();
-            //HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
-            HashMap<Integer, HashMap<Integer, Double>> E = new HashMap<>();
-            //Classifier Id
-            for(int classifierID: results.keySet()){
-                ListMultimap<Integer, Double> classifierResultAgentI = results.get(classifierID);
+                // original fitness function implemented
+                boolean score = false;
+                try {
+                    score = ReadConfig.Configurations.getScore();
+                } catch (Exception ignored) { }
 
-                //now I have all the Agent ID with their values
-                //Creation id agent,classifier
-                HashMap<Integer, Double> subE = new HashMap<>();
-                //for debug, remove this hashmap, it is redundant
-                // HashMap<Integer, Double> subY = new HashMap<>();
-                for(int agentID: classifierResultAgentI.keySet()){
-                    //now I have classifier j and looping over agent i
+                //launch my way to compute the fitness
+                ExecutorService execOriginal = Executors.newFixedThreadPool(16);
+                CountDownLatch latchOriginal = new CountDownLatch(super.getPopulationWithHallOfFame().size());
+                ComputeUnit[] runnablesOriginal = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
 
-                    //using a multimap. Since a key can have more values, need to obtain only one value with them
-                    List<Double> values = classifierResultAgentI.get(agentID);
-                    double singleValue = values.stream().mapToDouble(i->i).sum();
 
-                    //String ij = agentID.toString() + "/" + classifierID.toString();
-                    double y = singleValue / T.get(classifierID);
-                    if(Double.isNaN(y)){
-                        y = 0.0;
+                for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
+                    runnablesOriginal[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), competingPopulation.getPopulationWithHallOfFame(), score, this.scores);
+                }
+                for(ComputeUnit r : runnablesOriginal) {
+                    r.setLatch(latchOriginal);
+                    execOriginal.execute(r);
+                }
+                try {
+                    latchOriginal.await();
+                    execOriginal.shutdown();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+            case 1:
+                // selmar fitness function
+                // number real trajectories = total number of trajectories said as real = # trajectories trained * # individuals
+                int numTraTra;
+                try{
+                    numTraTra = ReadConfig.Configurations.getTrajectoriesTrained();
+                } catch (Exception e){
+                    numTraTra = 1;
+                }
+                int R = numTraTra * super.getPopulationWithHallOfFame().size();
+
+
+
+                //classifier id, agent id and comparison result
+                HashMap<Integer, ListMultimap<Integer, Double>> results = new HashMap<>();
+
+                ExecutorService exec = Executors.newFixedThreadPool(96);
+                CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
+                ComputeSelmarFitnessUnit[] runnables = new ComputeSelmarFitnessUnit[competingPopulation.getPopulationWithHallOfFame().size()];
+
+                //create all the runnables
+                for(int i = 0; i < competingPopulation.getPopulationWithHallOfFame().size(); i ++){
+                    runnables[i] = new ComputeSelmarFitnessUnit(competingPopulation.getPopulationWithHallOfFame().get(i), super.getPopulationWithHallOfFame());
+                }
+                //execute them and wait them till they have finished
+                for(ComputeSelmarFitnessUnit r : runnables) {
+                    r.setLatch(latch);
+                    exec.execute(r);
+                }
+                try {
+                    latch.await();
+                    exec.shutdown();
+
+                    //collecting the results
+                    for (ComputeSelmarFitnessUnit runnable : runnables) {
+                        //all the i, j fixed -> classifier_j(agent_i))
+                        results.put(runnable.getClassifierID(), runnable.getResults());
                     }
-                    if(y > 1.0) y = 1.0;
-                    if(y < 0.0) y = 0.0;
-                    //for debug, remove this hashmap, it is redundant
-                    //subY.put(agentID, y);
 
-                    if(realAgentsId.stream().anyMatch(t -> t == agentID)){
-                        //if TRUE=real
-                        subE.put(agentID, Math.pow(1 - y, 2));
-                    }else{
-                        //if False=False
-                        subE.put(agentID, Math.pow(y, 2));
+                    //creation all the Tj
+                    //T_j = sum_i( classifier_j(agent_i))
+                    HashMap<Integer, Double> T = new HashMap<>();
+                    for(int key: results.keySet()){
+                        //key is the classifier id -> i
+                        ListMultimap<Integer, Double> classifierResultAgentI = results.get(key);
+                        //also with the multimap it is fine -> more values same key, don't care. Sum them all!
+                        double singleTj = classifierResultAgentI.values().stream().mapToDouble(i->i).sum();
+                        T.put(key, singleTj);
                     }
+
+                    //Creation matrix Yij
+                    //Y_ij = R * classifier_j(agent_i) / T_j
+                    //E_ji = { i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2
+                    // HashMap<String, Double> E = new HashMap<>();
+                    //HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
+                    HashMap<Integer, HashMap<Integer, Double>> E = new HashMap<>();
+                    //Classifier Id
+                    for(int classifierID: results.keySet()){
+                        ListMultimap<Integer, Double> classifierResultAgentI = results.get(classifierID);
+
+                        //now I have all the Agent ID with their values
+                        //Creation id agent,classifier
+                        HashMap<Integer, Double> subE = new HashMap<>();
+                        //for debug, remove this hashmap, it is redundant
+                        // HashMap<Integer, Double> subY = new HashMap<>();
+                        for(int agentID: classifierResultAgentI.keySet()){
+                            //now I have classifier j and looping over agent i
+
+                            //using a multimap. Since a key can have more values, need to obtain only one value with them
+                            List<Double> values = classifierResultAgentI.get(agentID);
+                            double singleValue = values.stream().mapToDouble(i->i).sum();
+
+                            //String ij = agentID.toString() + "/" + classifierID.toString();
+                            double y = R * singleValue / T.get(classifierID);
+                            if(Double.isNaN(y)){
+                                y = 0.0;
+                            }
+                            if(y > 1.0) y = 1.0;
+                            if(y < 0.0) y = 0.0;
+                            //for debug, remove this hashmap, it is redundant
+                            //subY.put(agentID, y);
+
+                            if(realAgentsId.stream().anyMatch(t -> t == agentID)){
+                                //if TRUE=real
+                                subE.put(agentID, Math.pow(1 - y, 2));
+                            }else{
+                                //if False=False
+                                subE.put(agentID, Math.pow(y, 2));
+                            }
+                        }
+                        E.put(classifierID, subE);
+                        //for debug, remove this hashmap, it is redundant
+                        //Y.put(classifierID, subY);
+                    }
+
+
+                    //FitnessAgent = sum_j( E_ij )
+                    for(Individual agent : super.getPopulationWithHallOfFame()){
+                        int id = agent.getModel().getId();
+                        double fitness = 0;
+                        //need to find all the values with that id
+                        for(int classifierID: E.keySet()){
+                            fitness += E.get(classifierID).get(id);
+                        }
+                        agent.setFitness(fitness);
+                        //setting the fitness for the examples of this agent
+                        for(TrainReal example: agent.getMyInputandOutput()){
+                            example.setFitnessGivenByTheClassifier(fitness);
+                        }
+
+                    }
+
+
+                    //FitnessClassifier = sum_i( 1 - E_ij)
+                    for(Individual classifier: competingPopulation.getPopulationWithHallOfFame()){
+                        int id = classifier.getModel().getId();
+                        HashMap<Integer, Double> allTheI = E.get(id);
+                        double fitness = 0;
+                        for(int agentId: allTheI.keySet()){
+                            fitness += (1 - allTheI.get(agentId));
+                        }
+                        classifier.setFitness(fitness);
+                    }
+
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                E.put(classifierID, subE);
-                //for debug, remove this hashmap, it is redundant
-                //Y.put(classifierID, subY);
-            }
 
+                break;
 
-            //FitnessAgent = sum_j( E_ij )
-
-            //fitness agents
-            for(Individual agent : super.getPopulationWithHallOfFame()){
-                int id = agent.getModel().getId();
-                double fitness = 0;
-                //need to find all the values with that id
-                for(int classifierID: E.keySet()){
-                    fitness += E.get(classifierID).get(id);
-                }
-                agent.setFitness(fitness);
-                //setting the fitness for the examples of this agent
-                for(TrainReal example: agent.getMyInputandOutput()){
-                    example.setFitnessGivenByTheClassifier(fitness);
-                }
-
-            }
-
-
-            //FitnessClassifier = sum_i( 1 - E_ij)
-            for(Individual classifier: competingPopulation.getPopulationWithHallOfFame()){
-                int id = classifier.getModel().getId();
-                HashMap<Integer, Double> allTheI = E.get(id);
-                double fitness = 0;
-                for(int agentId: allTheI.keySet()){
-                    fitness += (1 - allTheI.get(agentId));
-                }
-                classifier.setFitness(fitness);
-            }
-
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            default:
+                throw new Error("Fitness type not implemented");
         }
-
     }
 
     /**

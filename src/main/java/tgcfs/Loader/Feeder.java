@@ -10,6 +10,7 @@ import lgds.trajectories.Point;
 import lgds.trajectories.Trajectories;
 import lgds.trajectories.Trajectory;
 import tgcfs.Agents.InputNetwork;
+import tgcfs.Agents.InputNetworkTime;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.Normalisation;
@@ -28,7 +29,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.IntStream;
 
 /**
  * Created by Alessandro Zonta on 16/05/2017.
@@ -220,6 +220,13 @@ public class Feeder {
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
 
+        //Am I using the time in the generator?
+        boolean usingTime = false;
+        try {
+            usingTime = ReadConfig.Configurations.getTimeAsInput();
+        } catch (Exception ignored) { }
+
+
         //total refactor of the method
         //this list has all the velocity and angular speed of the points
         List<InputsNetwork> totalList = new ArrayList<>();
@@ -227,9 +234,15 @@ public class Feeder {
         List<PointWithBearing> updatedPoints = new ArrayList<>();
 
         //add the first point. No speed, no bearing and no space since it was still
-        InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d, 0d);
-        firstInputNetwork.setTargetPoint(possibleTarget);
-        totalList.add(firstInputNetwork);
+        if(!usingTime){
+            InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d, 0d);
+            firstInputNetwork.setTargetPoint(possibleTarget);
+            totalList.add(firstInputNetwork);
+        }else {
+            InputNetworkTime firstInputNetwork = new InputNetworkTime(attraction, 0d, 0d, 0d);
+            firstInputNetwork.setTargetPoint(possibleTarget);
+            totalList.add(firstInputNetwork);
+        }
         updatedPoints.add(new PointWithBearing(points.get(0), 0.0));
 
         double previousBearing = 0.0;
@@ -241,16 +254,32 @@ public class Feeder {
             double bearing = conversion.obtainBearing(previousPoint, actualPoint);
             updatedPoints.add(new PointWithBearing(points.get(i), bearing));
 
+            double time = 0.0;
             //speed is the speed I arrived here from previous point
-            double speed = conversion.obtainSpeed(previousPoint, actualPoint);
+            double speed;
+            double angularSpeed;
+            PointToSpeedSpeed convertitor = new PointToSpeedSpeed();
+
+            if(!usingTime) {
+                speed = conversion.obtainSpeed(previousPoint, actualPoint);
+                angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing);
+
+            }else {
+                time = conversion.obtainTime(previousPoint,actualPoint);
+                speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
+                angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
+            }
             double space = conversion.obtainDistance(previousPoint, actualPoint);
 
-            PointToSpeedSpeed convertitor = new PointToSpeedSpeed();
-            double angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing);
-
-            InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, space);
-            inputNetwork.setTargetPoint(possibleTarget);
-            totalList.add(inputNetwork);
+            if(!usingTime) {
+                InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, space);
+                inputNetwork.setTargetPoint(possibleTarget);
+                totalList.add(inputNetwork);
+            }else{
+                InputNetworkTime firstInputNetwork = new InputNetworkTime(attraction, speed, angularSpeed, time);
+                firstInputNetwork.setTargetPoint(possibleTarget);
+                totalList.add(firstInputNetwork);
+            }
             previousBearing = bearing;
         }
         //update the points
@@ -275,7 +304,7 @@ public class Feeder {
 //            this.finished = Boolean.TRUE;
 //            this.position = 0;
 //        }
-        IntStream.range(this.position, this.position + count).forEach(i -> {
+        for(int i = this.position; i < this.position + count; i++){
             Point p = this.getNextPoint(trajectory);
             //If it not null I add the element to the list
             if(p != null){
@@ -284,7 +313,7 @@ public class Feeder {
                 //if it is null I have finished the trajectory
                 this.finished = Boolean.TRUE;
             }
-        });
+        }
         if(this.finished){
             this.position = 0;
         }else {
@@ -381,6 +410,7 @@ public class Feeder {
         }
 
         //return the list of input network
+        //obtain input transforms the points into inputnetworks
         return this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)), idsaLoader.retPossibleTarget());
     }
 
@@ -636,6 +666,25 @@ public class Feeder {
         //find position where I am going using speed and direction
         //time fixed for idsa
         double time = Routes.timeBetweenIDSATimesteps;
+        return this.getNextLocation(whereIam, speed, direction, time);
+    }
+
+    /**
+     * Find the next location given actual position, speed and direction but not using the graph
+     * @param whereIam position where I am
+     * @param speed speed I am moving
+     * @param direction direction I am moving
+     * @param time time given by output
+     * @return next point
+     */
+    public Point getNextLocationNoGraph(Point whereIam, Double speed, Double direction, double time){
+        //I know where I am
+        //find position where I am going using speed and direction
+        return this.getNextLocation(whereIam, speed, direction, time);
+    }
+
+
+    private Point getNextLocation(Point whereIam, Double speed, Double direction, double time){
         double distance = speed * time;
 
         //distance in kilometers
@@ -761,13 +810,16 @@ public class Feeder {
      */
     private void feedTheEater(IdsaLoader idsaLoader, List<TrainReal> totalList){
         try {
+            //this.feeder
+            //It obtains the section of the trajectory that I need right now
+            // It translate the trajectory' points into the input format for the framework
             TrainReal tr = new TrainReal(this.feeder(idsaLoader),this.obtainRealAgentSectionTrajectory());
             tr.setPoints(this.points);
             //last splitting does not have the realsection, I am not adding it to the total list
             if(!tr.getFollowingPart().isEmpty()) totalList.add(tr);
             if(Objects.equals(ReadConfig.Configurations.getValueModel(), ReadConfig.Configurations.Convolution)) tr.setIdsaLoader(idsaLoader);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Error in loading the trajectories" + e.getMessage());
+            logger.log(Level.WARNING, "Error in loading the trajectories :" + e.getMessage());
         }
     }
 

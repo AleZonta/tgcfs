@@ -5,6 +5,9 @@ import lgds.trajectories.Point;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Routing.Routes;
 
+import java.time.Duration;
+import java.time.LocalTime;
+
 /**
  * Created by Alessandro Zonta on 31/05/2017.
  * PhD Situational Analytics
@@ -43,6 +46,46 @@ public class PointToSpeedBearing {
 
         return distance / time;
     }
+
+    /**
+     * Compute speed between two points using the Time in the two points
+     * @param firstPoint first position
+     * @param secondPoint second position
+     * @param time time between the two points
+     * @return speed of the movement between the two points
+     */
+    public double obtainSpeed(Point firstPoint, Point secondPoint, double time){
+        //speed = distance / time
+        Distance dis = new Distance();
+        double distance = dis.compute(firstPoint, secondPoint);
+        try {
+            if (ReadConfig.Configurations.getTrajectoriesType() != 0) {
+                try {
+                    time = new Double(secondPoint.differenceInTime(firstPoint));
+                } catch (Exception e) {
+                    //I do not have time, so time will be the one I set before. I do not print the stack trace
+                    //e.printStackTrace();
+                }
+            }
+        }catch (Exception e) {
+            //e.printStackTrace();
+        }
+
+        return distance / time;
+    }
+
+    /**
+     * Compute the time between the two points
+     * @param firstPoint first position
+     * @param secondPoint second position
+     * @return double value containing the seconds between the two points
+     */
+    public double obtainTime(Point firstPoint, Point secondPoint){
+        LocalTime pTime = LocalTime.parse(firstPoint.getTime());
+        LocalTime p1Time = LocalTime.parse(secondPoint.getTime());
+        return Duration.between(pTime, p1Time).toMillis() / 1000;
+    }
+
 
     /**
      * Compute the bearing between two points

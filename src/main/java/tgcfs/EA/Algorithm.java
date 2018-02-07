@@ -438,12 +438,16 @@ public abstract class Algorithm {
     }
 
     /**
-     * Methods that returns the step size of the best genome in the population
+     * Methods that returns the step size of all the population, ordered by fitness
      * @return double/ list of double
      */
-    public INDArray retStepSizeBestGenome(){
+    public List<INDArray> retStepSizeBestGenome(){
         this.population.sort(Comparator.comparing(Individual::getFitness));
-        return ((UncorrelatedMutation)this.population.get(0)).getMutationStrengths();
+        List<INDArray> allTheStepSizes = new ArrayList<>();
+        for(Individual ind: this.population){
+            allTheStepSizes.add(((UncorrelatedMutation)ind).getMutationStrengths());
+        }
+        return allTheStepSizes;
     }
 
     /**
