@@ -716,11 +716,11 @@ public class Agents extends Algorithm {
         for(Individual ind : super.getPopulationWithHallOfFame()){
             //transform trajectory in advance to prevent multiprocessing errors
             List<TrainReal> inputOutput = ind.getMyInputandOutput();
-            inputOutput.forEach(trainReal -> {
+            for(TrainReal trainReal: inputOutput){
                 ((FollowingTheGraph)transformation).setLastPoint(trainReal.getLastPoint());
                 transformation.transform(trainReal);
                 realAgentsId.add(trainReal.getIdRealPoint().getId());
-            });
+            }
         }
 
 

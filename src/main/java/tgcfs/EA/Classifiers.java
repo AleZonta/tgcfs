@@ -256,7 +256,7 @@ public class Classifiers extends Algorithm {
         for(TrainReal element: input){
             List<INDArray> totalListFalse = new ArrayList<>();
             for(InputsNetwork trainingPoint: element.getTrainingPoint()){
-                totalListFalse.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier());
+                totalListFalse.add(((InputNetwork)trainingPoint).serialiseAsInputClassifier());
             }
             for(OutputsNetwork trainingPoint: element.getOutputComputed()){
                 totalListFalse.add(((tgcfs.Agents.OutputNetwork)trainingPoint).serialiaseAsInputClassifier());
@@ -265,10 +265,10 @@ public class Classifiers extends Algorithm {
 
             List<INDArray> totalListTrue = new ArrayList<>();
             for(InputsNetwork trainingPoint: element.getTrainingPoint()){
-                totalListTrue.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier());
+                totalListTrue.add(((InputNetwork)trainingPoint).serialiseAsInputClassifier());
             }
             for(OutputsNetwork trainingPoint: element.getOutputComputed()){
-                totalListTrue.add(((InputNetwork)trainingPoint).serialiaseAsInputClassifier());
+                totalListTrue.add(((InputNetwork)trainingPoint).serialiseAsInputClassifier());
             }
 
             generalList.add(new Example(totalListTrue, Boolean.TRUE));

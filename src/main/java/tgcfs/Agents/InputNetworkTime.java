@@ -2,6 +2,7 @@ package tgcfs.Agents;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import tgcfs.InputOutput.Normalisation;
 
 /**
  * Created by Alessandro Zonta on 07/02/2018.
@@ -14,7 +15,8 @@ import org.nd4j.linalg.factory.Nd4j;
  * a.zonta@vu.nl
  */
 public class InputNetworkTime extends InputNetwork {
-    public static final int inputSize = 3; //the size of the input corresponding to the four fields
+    public static final int inputSize = 4; //the size of the input corresponding to the four fields
+    private double time;
 
     /**
      * Constructor with three parameters. all the inputs
@@ -25,6 +27,7 @@ public class InputNetworkTime extends InputNetwork {
      */
     public InputNetworkTime(double directionAPF, double speed, double bearing) {
         super(directionAPF, speed, bearing);
+        time = 0.0;
     }
 
     /**
@@ -36,7 +39,8 @@ public class InputNetworkTime extends InputNetwork {
      * @param time time between two points
      */
     public InputNetworkTime(double directionAPF, double speed, double bearing, double time) {
-        super(directionAPF, speed, bearing, time);
+        super(directionAPF, speed, bearing);
+        this.time = Normalisation.convertTime(time);
     }
 
     /**
@@ -49,20 +53,21 @@ public class InputNetworkTime extends InputNetwork {
         array.putScalar(0, this.getSpeed());
         array.putScalar(1, this.getBearing());
         array.putScalar(2, this.getDirectionAPF());
-        array.putScalar(2, this.getSpace());
+        array.putScalar(3, this.time);
         return array;
     }
+
 
     /**
      * Return the time
      * @return double value
      */
     public double getTime() {
-        return super.getSpace();
+        return this.time;
     }
 
     @Override
     public String toString() {
-        return "{" + this.getSpeed() + ", " + this.getBearing() + ", " + this.getSpace() + "}";
+        return "{" + this.getSpeed() + ", " + this.getBearing() + ", " + this.time + "}";
     }
 }

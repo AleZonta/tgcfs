@@ -24,6 +24,9 @@ public class Normalisation {
     private static double min_angular_speed = 0.0;
     private static double max_distance = 555.0;
     private static double min_distance = 0.0;
+    private static double max_time = 21.0;
+    private static double min_time = 0;
+
 
     /**
      * Normalisation of the number
@@ -245,6 +248,31 @@ public class Normalisation {
             return 360 - (angle - 90);
         }
         return angle;
+    }
+
+
+    /**
+     * Convert the time to the range ±1
+     * max time is hard coded
+     * @param toBeConverted time that has to be converted
+     * @return double value
+     */
+    public static double convertTime(double toBeConverted){
+        if(toBeConverted > max_time) toBeConverted = max_time;
+        if(toBeConverted < min_time) toBeConverted = min_time;
+        return convertToSomething(max_time, min_time, 1.0, -1.0, toBeConverted);
+    }
+
+
+    /**
+     * decode the time
+     * if it is smaller than 0 return 0
+     * @param toBeConverted  time that has to be decoded
+     * @return double value
+     */
+    public static double decodeTime(double toBeConverted){
+        if(toBeConverted < 0) return 0;
+        return toBeConverted;
     }
 
 }

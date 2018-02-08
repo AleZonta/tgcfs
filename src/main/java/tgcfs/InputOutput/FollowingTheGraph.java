@@ -133,7 +133,7 @@ public class FollowingTheGraph implements Transformation {
                         position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
                     }else{
                         OutputNetworkTime output = (OutputNetworkTime) outputsNetwork;
-                        position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing(), output.getDistance());
+                        position = this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing(), output.getTime());
                     }
                 }
             } catch (Exception e) {
@@ -151,7 +151,7 @@ public class FollowingTheGraph implements Transformation {
                 angularSpeed = convertToAgularSpeed.obtainAngularSpeed(this.lastPoint, outputsNetwork.getBearing());
             }else {
                 OutputNetworkTime output = (OutputNetworkTime) outputsNetwork;
-                angularSpeed = convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), output.getDistance());
+                angularSpeed = convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), output.getTime());
             }
             InputNetwork inputNetwork = new InputNetwork(outputsNetwork.getSpeed(), angularSpeed);
             convertedInput.add(inputNetwork);
@@ -181,8 +181,8 @@ public class FollowingTheGraph implements Transformation {
                 convertedInputReal.add(inputNetwork);
             }else{
                 OutputNetworkTime outputTime = (OutputNetworkTime) output;
-                position = this.feeder.getNextLocationNoGraph(this.lastPoint, outputTime.getSpeed(), outputTime.getBearing(), outputTime.getDistance());
-                InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), outputTime.getDistance()));
+                position = this.feeder.getNextLocationNoGraph(this.lastPoint, outputTime.getSpeed(), outputTime.getBearing(), outputTime.getTime());
+                InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), outputTime.getTime()));
 
                 convertedInputReal.add(inputNetwork);
             }
@@ -219,8 +219,13 @@ public class FollowingTheGraph implements Transformation {
     public Point singlePointConversion(OutputsNetwork outputsNetwork){
         if (this.feeder == null) throw new NullPointerException("System with the graph not instantiate");
         if (this.lastPoint == null) throw new NullPointerException("Last Point not instantiate");
-        OutputNetwork output = (OutputNetwork) outputsNetwork;
-        return this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
+        if(outputsNetwork.getClass().equals(OutputNetwork.class)) {
+            OutputNetwork output = (OutputNetwork) outputsNetwork;
+            return this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing());
+        }else{
+            OutputNetworkTime output = (OutputNetworkTime) outputsNetwork;
+            return this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing(), output.getTime());
+        }
 //        return this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
     }
 }

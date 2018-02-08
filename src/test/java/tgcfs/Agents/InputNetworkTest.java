@@ -34,15 +34,9 @@ public class InputNetworkTest {
     }
 
     @Test
-    public void getSpace() throws Exception {
-        InputNetwork inputNetwork = new InputNetwork(5.0,10.0,30.0, 80d);
-        assertTrue(Normalisation.convertDistance(80d) == inputNetwork.getSpace());
-    }
-
-    @Test
     public void serialiaseAsInputClassifier() throws Exception {
-        InputNetwork inputNetwork = new InputNetwork(5.0,10.0,30.0, 80d);
-        INDArray result = inputNetwork.serialiaseAsInputClassifier();
+        InputNetwork inputNetwork = new InputNetwork(5.0,10.0,30.0);
+        INDArray result = inputNetwork.serialiseAsInputClassifier();
         assertEquals(Normalisation.convertSpeed(10.0), result.getDouble(0), 0.000001);
         assertEquals(Normalisation.convertAngularSpeed(30.0), result.getDouble(1), 0.000001);
     }

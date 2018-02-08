@@ -1,13 +1,14 @@
 {
   "_____________________________First Section": "Setting used for lgds",
   "IDSATraces": "./tra.json",
+  "translateExplanation": "in case of JSON file, it means if I load all the timestep or 1 every 15 nad following the file given",
   "translate": 1,
   "GeoLifeTrace": "./traGeolife.json",
   "GraphHopperPath": "/Users/alessandrozonta/Documents/lgds/",
   "GoogleAPIKey": "AIzaSyDL8Wc8VXGYPTiFMSTAtj7mKQZukTRawac",
   "GraphHopperName" : "china-latest.osm.pbf",
   "Radio": 40,
-  "MaxLength": 1500.0,
+  "MaxLength": 999999.0,
   "_____________________________Second Section": "Setting used for gms",
   "fileName": ["Rijswijk2Small.graphml"],
   "fileLocation": "/Users/alessandrozonta/PycharmProjects/roadNetwork/data",
@@ -79,7 +80,7 @@
   "TimeAsInput": true,
   "_____________________________Sixth section": "Settings for where to save the performances",
   "Name": "trial",
-  "Experiment": "0",
+  "Experiment": "5",
   "Path": "/Users/alessandrozonta/Desktop",
   "DumpPopulationExplanation": "Save the entire population on file.",
   "DumpPopulation" : false,
@@ -99,7 +100,7 @@
   "LSTMClassifier": false,
   "ENN": true,
   "_____________________________Debug Mode": "Enable Debug mode",
-  "Debug": false,
+  "Debug": true,
   "Score": false
 
 }

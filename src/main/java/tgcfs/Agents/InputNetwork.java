@@ -1,12 +1,10 @@
 package tgcfs.Agents;
 
-import lgds.trajectories.*;
+import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.InputsNetwork;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by Alessandro Zonta on 29/05/2017.
@@ -25,7 +23,6 @@ public class InputNetwork implements InputsNetwork {
     private double speed;
     private double bearing;
     private Point targetPoint;
-    private double space;
     public static final int inputSize = 3; //the size of the input corresponding to the three fields here
 
     /**
@@ -44,37 +41,8 @@ public class InputNetwork implements InputsNetwork {
         }
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.targetPoint = null;
-
-        Field[] allFields = InputNetwork.class.getDeclaredFields();
-        if (allFields.length != inputSize + 3){
-            throw new Error("Number of fields and variable expressing that do not correspond.");
-        }
     }
 
-    /**
-     * Constructor with three parameters. all the inputs
-     * It is also normalising the input in the range ±1 for the NN
-     * @param directionAPF Double number corresponding to the direction retrieved form the apf
-     * @param speed Double number corresponding to the speed
-     * @param bearing Double number corresponding to the bearing
-     * @param space distance between the two points
-     */
-    public InputNetwork(double directionAPF, double speed, double bearing, double space){
-        this.bearing = Normalisation.convertAngularSpeed(bearing);
-        try {
-            this.speed = Normalisation.convertSpeed(speed);
-        } catch (Exception e) {
-            throw new Error("Error with speed.");
-        }
-        this.directionAPF = Normalisation.convertDirectionData(directionAPF);
-        this.space = Normalisation.convertDistance(space);
-        this.targetPoint = null;
-
-        Field[] allFields = InputNetwork.class.getDeclaredFields();
-        if (allFields.length != inputSize + 3){
-            throw new Error("Number of fields and variable expressing that do not correspond.");
-        }
-    }
 
     /**
      * Getter for the direction of the APF
@@ -131,19 +99,10 @@ public class InputNetwork implements InputsNetwork {
     }
 
     /**
-     * Getter for the distance between points
-     * @return Double value
-     */
-    public double getSpace() {
-        return space;
-    }
-
-
-    /**
      * Serialise object ready for the classifier
      * @return {@link INDArray} vector
      */
-    public INDArray serialiaseAsInputClassifier(){
+    public INDArray serialiseAsInputClassifier(){
         INDArray array = Nd4j.zeros(2);
         array.putScalar(0, this.speed);
         array.putScalar(1, this.bearing);

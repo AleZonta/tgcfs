@@ -52,6 +52,8 @@ public class Routes {
         switch (type){
             case 0:
                 this.storage = new LoadIDSATrack();
+                if(ReadConfig.Configurations.getTimeAsInput())
+                    throw new Exception("Trying to use the IDSA dataset with taking into account the time");
                 break;
             case 1:
                 this.storage = new LoadTrack();
@@ -64,6 +66,8 @@ public class Routes {
                 this.storage = new LoadIDSAJson();
                 //set a different time step for IDSA
                 timeBetweenIDSATimesteps = 3.0;
+                if(ReadConfig.Configurations.getTimeAsInput())
+                    throw new Exception("Trying to use the IDSA dataset with taking into account the time");
                 break;
             case 4:
                 this.storage = new LoadTrackJson();

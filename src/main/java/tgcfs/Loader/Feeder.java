@@ -235,7 +235,7 @@ public class Feeder {
 
         //add the first point. No speed, no bearing and no space since it was still
         if(!usingTime){
-            InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d, 0d);
+            InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d);
             firstInputNetwork.setTargetPoint(possibleTarget);
             totalList.add(firstInputNetwork);
         }else {
@@ -269,10 +269,10 @@ public class Feeder {
                 speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
                 angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
             }
-            double space = conversion.obtainDistance(previousPoint, actualPoint);
+//            double space = conversion.obtainDistance(previousPoint, actualPoint);
 
             if(!usingTime) {
-                InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, space);
+                InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed);
                 inputNetwork.setTargetPoint(possibleTarget);
                 totalList.add(inputNetwork);
             }else{
@@ -364,18 +364,24 @@ public class Feeder {
             this.isNewTrajectory = Boolean.TRUE;
             this.lastTimeUsed = null;
         }
+        //TODO check this part for the point and the timing
         //retrieve section form the trajectory
         List<Point> actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
         List<Point> pointWithTime = new ArrayList<>();
         for(int i = 0; i< actualPoint.size(); i++){
             Point actualSinglePoint = actualPoint.get(i);
-            Point toAdd = null;
-            if(i == 0 && this.isNewTrajectory){
-                toAdd = new Point(actualSinglePoint.getLatitude(), actualSinglePoint.getLongitude(), actualSinglePoint.getAltitude(),0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+            Point toAdd;
+            if(ReadConfig.Configurations.getTrajectoriesType() == 1 || ReadConfig.Configurations.getTrajectoriesType() == 4){
+                toAdd = new Point(actualSinglePoint.getLatitude(), actualSinglePoint.getLongitude(), actualSinglePoint.getAltitude(),actualSinglePoint.getDated(), actualSinglePoint.getDates(), actualSinglePoint.getTime());
                 this.lastTimeUsed = toAdd;
             }else{
-                toAdd = new Point(actualSinglePoint.getLatitude(), actualSinglePoint.getLongitude(), actualSinglePoint.getAltitude(),0d, this.lastTimeUsed.addTimeToPoint(0.2), this.lastTimeUsed.addTimeToPoint(0.2));
-                this.lastTimeUsed = toAdd;
+                if(i == 0 && this.isNewTrajectory){
+                    toAdd = new Point(actualSinglePoint.getLatitude(), actualSinglePoint.getLongitude(), actualSinglePoint.getAltitude(),0d, LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")), LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                    this.lastTimeUsed = toAdd;
+                }else{
+                    toAdd = new Point(actualSinglePoint.getLatitude(), actualSinglePoint.getLongitude(), actualSinglePoint.getAltitude(),0d, this.lastTimeUsed.addTimeToPoint(0.2), this.lastTimeUsed.addTimeToPoint(0.2));
+                    this.lastTimeUsed = toAdd;
+                }
             }
             pointWithTime.add(toAdd);
         }

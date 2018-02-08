@@ -181,9 +181,15 @@ public class TrainReal {
     public List<InputsNetwork> getTrainingPointSettedForTheClassifier(){
         List<InputsNetwork> newlist = new ArrayList<>();
         for(InputsNetwork tr: this.trainingPoint){
-            INDArray ind = ((tgcfs.Agents.InputNetwork)tr).serialiaseAsInputClassifier();
-            InputNetwork in = new InputNetwork(ind.getDouble(0), ind.getDouble(1), false);
-            newlist.add(in);
+            if(tr.getClass().equals(tgcfs.Agents.InputNetwork.class)) {
+                INDArray ind = ((tgcfs.Agents.InputNetwork) tr).serialiseAsInputClassifier();
+                InputNetwork in = new InputNetwork(ind.getDouble(0), ind.getDouble(1), false);
+                newlist.add(in);
+            }else{
+                INDArray ind = ((tgcfs.Agents.InputNetworkTime) tr).serialiseAsInputClassifier();
+                InputNetwork in = new InputNetwork(ind.getDouble(0), ind.getDouble(1), false);
+                newlist.add(in);
+            }
         }
         return newlist;
     }

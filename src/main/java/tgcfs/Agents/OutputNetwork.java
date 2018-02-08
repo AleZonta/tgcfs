@@ -21,8 +21,7 @@ import java.lang.reflect.Field;
 public class OutputNetwork implements OutputsNetwork {
     protected double speed;
     protected double bearing;
-    protected double distance;
-    public static final int outputSize = 3; //the size of the output corresponding to the two fields here
+    public static final int outputSize = 2; //the size of the output corresponding to the two fields here
 
     /**
      * Constructor zero parameter
@@ -44,7 +43,6 @@ public class OutputNetwork implements OutputsNetwork {
     public OutputNetwork(double speed, double bearing, double distance){
         this.speed = speed;
         this.bearing = bearing;
-        this.distance = distance;
         Field[] allFields = OutputNetwork.class.getDeclaredFields();
         if (allFields.length != outputSize + 1){
             throw new Error("Number of fields and variable expressing that do not correspond.");
@@ -99,20 +97,6 @@ public class OutputNetwork implements OutputsNetwork {
      */
     public double getBearing() {
         return bearing;
-    }
-
-    /**
-     * Getter for distance
-     * @return Double value of distance
-     */
-    public double getDistance() { return this.distance;}
-
-    /**
-     * Setter for distance
-     * @param distance Double value
-     */
-    public void setDistance(double distance) {
-        this.distance = distance;
     }
 
     /**

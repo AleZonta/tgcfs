@@ -16,6 +16,7 @@ import tgcfs.NN.InputsNetwork;
  */
 public class OutputNetworkTime extends OutputNetwork {
     public static final int outputSize = 3; //the size of the output corresponding to the two fields here
+    private double time;
 
     /**
      * Constructor zero parameter
@@ -33,7 +34,8 @@ public class OutputNetworkTime extends OutputNetwork {
      * @param time time parameter
      */
     public OutputNetworkTime(double speed, double bearing, double time){
-        super(speed, bearing, time);
+        super(speed, bearing);
+        this.time = time;
     }
 
 
@@ -53,7 +55,7 @@ public class OutputNetworkTime extends OutputNetwork {
     public OutputNetworkTime(InputsNetwork out){
         super(out);
         if(out.getClass().equals(InputNetworkTime.class)){
-            this.distance = (((InputNetworkTime)out).getTime());
+            this.time = Normalisation.decodeTime(((InputNetworkTime)out).getTime());
         }
     }
 
@@ -80,7 +82,7 @@ public class OutputNetworkTime extends OutputNetwork {
                 throw new Error("Erro with speed.");
             }
             this.bearing = Normalisation.decodeDirectionData(out.getDouble(1));
-            this.distance = out.getDouble(2);
+            this.time = Normalisation.decodeTime(out.getDouble(2));
 
         }else{
             try {
@@ -90,7 +92,7 @@ public class OutputNetworkTime extends OutputNetwork {
             }
 
             this.bearing = Normalisation.decodeDirectionData(out.getRow(1).getDouble(0));
-            this.distance = out.getRow(2).getDouble(0);
+            this.time = Normalisation.decodeTime(out.getRow(2).getDouble(0));
         }
     }
 
@@ -100,7 +102,7 @@ public class OutputNetworkTime extends OutputNetwork {
      */
     @Override
     public OutputNetworkTime deepCopy() {
-        return new OutputNetworkTime(this.speed, this.bearing, this.distance);
+        return new OutputNetworkTime(this.speed, this.bearing, this.time);
     }
 
     /**
@@ -112,9 +114,15 @@ public class OutputNetworkTime extends OutputNetwork {
         return "OutputNetwork{" + " " +
                 "speed=" + this.speed + ", " +
                 "bearing=" + this.bearing + ", " +
-                "time=" + this.distance + ", " +
+                "time=" + this.time + ", " +
                 '}';
     }
 
-
+    /**
+     * Getter for the time
+     * @return double value of time
+     */
+    public double getTime() {
+        return this.time;
+    }
 }
