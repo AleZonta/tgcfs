@@ -709,6 +709,13 @@ public class ReadConfig {
         }try {
             // this.timeAsInput
             this.timeAsInput = ((Boolean) jsonObject.get("TimeAsInput"));
+
+            if(this.trajectoriesType == 1 || this.trajectoriesType == 4){
+                this.timeAsInput = true;
+            }else{
+                this.timeAsInput = false;
+            }
+
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("TimeAsInput is wrong or missing.");
         }
