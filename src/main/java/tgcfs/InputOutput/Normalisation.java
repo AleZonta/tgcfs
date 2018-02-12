@@ -269,30 +269,30 @@ public class Normalisation {
      * @return double value
      */
     public static double decodeTime(double toBeConverted){
-        double realTobeconverted = toBeConverted;
-        if(realTobeconverted > 1){
-            while(realTobeconverted >= 3){
-                realTobeconverted -= 4;
-            }
-            if(realTobeconverted >= -1 && realTobeconverted <=1){
-                return convertToSomething(1.0, -1.0, 21.0,0.0, realTobeconverted);
-            }else{
-                return convertToSomething(3.0, 1.0, 0.0,21.0, realTobeconverted);
-            }
-        }else{
-            while(realTobeconverted <= -3){
-                realTobeconverted += 4;
-            }
-            if(realTobeconverted >= -1 && realTobeconverted <=1){
-                return convertToSomething(1.0, -1.0, 21.0,0.0, realTobeconverted);
-            }else{
-                return convertToSomething(-1.0, -3.0, 21.0,0.0, realTobeconverted);
-            }
-        }
+//        double realTobeconverted = toBeConverted;
+//        if(realTobeconverted > 1){
+//            while(realTobeconverted >= 3){
+//                realTobeconverted -= 4;
+//            }
+//            if(realTobeconverted >= -1 && realTobeconverted <=1){
+//                return convertToSomething(1.0, -1.0, 21.0,0.0, realTobeconverted);
+//            }else{
+//                return convertToSomething(3.0, 1.0, 0.0,21.0, realTobeconverted);
+//            }
+//        }else{
+//            while(realTobeconverted <= -3){
+//                realTobeconverted += 4;
+//            }
+//            if(realTobeconverted >= -1 && realTobeconverted <=1){
+//                return convertToSomething(1.0, -1.0, 21.0,0.0, realTobeconverted);
+//            }else{
+//                return convertToSomething(-1.0, -3.0, 21.0,0.0, realTobeconverted);
+//            }
+//        }
 
 
-//        if(toBeConverted < 0) return 0;
-//        return toBeConverted;
+        if(toBeConverted < 0) return 0;
+        return toBeConverted;
     }
 
 }
