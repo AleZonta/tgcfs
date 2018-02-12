@@ -8,7 +8,6 @@ import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
-import tgcfs.Agents.OutputNetworkTime;
 import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.Models.LSTMClassifier;
 import tgcfs.Config.PropertiesFileReader;
@@ -124,7 +123,7 @@ public class TuringLearning implements Framework{
         switch (ReadConfig.Configurations.getValueModel()){
             case 0:
                 if(ReadConfig.Configurations.getTimeAsInput()) {
-                    agentModel = new LSTMAgent(InputNetworkTime.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetworkTime.outputSize);
+                    agentModel = new LSTMAgent(InputNetworkTime.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
                 }else{
                     agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
                 }

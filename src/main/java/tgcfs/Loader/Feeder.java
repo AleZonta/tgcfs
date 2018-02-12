@@ -53,6 +53,7 @@ public class Feeder {
     private Boolean isNewTrajectory;
     private Point lastTimeUsed;
     private static Logger logger; //logger for this class
+    private double lastTime;
 
     /**
      * Constructor with zero parameter
@@ -214,9 +215,10 @@ public class Feeder {
      * @param points points to transform
      * @param attraction attraction of the potential field
      * @param possibleTarget possible target of this trajectory -> highest point charged
+     * @param realPoints list real points
      * @return list of speeddirection objects
      */
-    public List<InputsNetwork> obtainInput(List<Point> points, double attraction, Point possibleTarget){
+    public List<InputsNetwork> obtainInput(List<Point> points, double attraction, Point possibleTarget, List<PointWithBearing> realPoints){
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
 
@@ -230,6 +232,9 @@ public class Feeder {
         //total refactor of the method
         //this list has all the velocity and angular speed of the points
         List<InputsNetwork> totalList = new ArrayList<>();
+
+        List<Double> allTheTimes = new ArrayList<>();
+
         //points updated with bearing
         List<PointWithBearing> updatedPoints = new ArrayList<>();
 
@@ -266,6 +271,7 @@ public class Feeder {
 
             }else {
                 time = conversion.obtainTime(previousPoint,actualPoint);
+                allTheTimes.add(time);
                 speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
                 angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
             }
@@ -286,6 +292,23 @@ public class Feeder {
         this.points.clear();
         this.points.addAll(updatedPoints);
 
+        //If I am using the time I am going to shift all the time in the networks
+        if(usingTime) {
+            //TODO manage to add all the other times if I am going to use more than 1 timestep after the target
+            this.lastTime = conversion.obtainTime(points.get(points.size() - 1), realPoints.get(0));
+            allTheTimes.add(lastTime);
+            java.lang.System.out.println(allTheTimes.toString());
+
+            List<InputsNetwork> hereNetwork = new ArrayList<>();
+            int i = 0;
+            for(InputsNetwork inputsNetwork: totalList){
+                hereNetwork.add(new InputNetworkTime(inputsNetwork.serialise().getDouble(2), inputsNetwork.serialise().getDouble(0), inputsNetwork.serialise().getDouble(1), allTheTimes.get(i)));
+                i+=1;
+            }
+
+            totalList.clear();
+            totalList = hereNetwork;
+        }
         return totalList;
     }
 
@@ -336,10 +359,10 @@ public class Feeder {
      * It obtains the section of the trajectory that I need right now
      * It translate the trajectory' points into the input format for the framework
      * @param idsaLoader reference IDSA system
-     * @return list of input formats
+     * @return {@link TrainReal} object with list of input formats
      * @throws Exception if there are problems with the config file or we reached the maximum number of trajectories usable
      */
-    public List<InputsNetwork> feeder(IdsaLoader idsaLoader) throws Exception {
+    public TrainReal feeder(IdsaLoader idsaLoader) throws Exception {
         //set info for the time
         this.isNewTrajectory = Boolean.FALSE;
         //retrieve trajectory
@@ -415,9 +438,22 @@ public class Feeder {
             }
         }
 
+        //I have trajectory and I have current position.
+        //I just need to retrieve next n position
+        List<PointWithBearing> realPoint = new ArrayList<>();
+        for(int i = this.position; i < this.position + ReadConfig.Configurations.getAgentTimeSteps(); i++){
+            Point nextPoint = this.getNextPoint(this.currentTrajectory);
+            if (nextPoint != null){
+                realPoint.add(new PointWithBearing(nextPoint));
+            }
+        }
+
+
         //return the list of input network
         //obtain input transforms the points into inputnetworks
-        return this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)), idsaLoader.retPossibleTarget());
+        List<InputsNetwork> inputsNetworks = this.obtainInput(actualPoint, idsaLoader.returnAttraction(actualPoint.get(actualPoint.size() - 1)), idsaLoader.retPossibleTarget(), realPoint);
+
+        return new TrainReal(inputsNetworks, realPoint, this.lastTime);
     }
 
     /**
@@ -819,7 +855,7 @@ public class Feeder {
             //this.feeder
             //It obtains the section of the trajectory that I need right now
             // It translate the trajectory' points into the input format for the framework
-            TrainReal tr = new TrainReal(this.feeder(idsaLoader),this.obtainRealAgentSectionTrajectory());
+            TrainReal tr = this.feeder(idsaLoader);
             tr.setPoints(this.points);
             //last splitting does not have the realsection, I am not adding it to the total list
             if(!tr.getFollowingPart().isEmpty()) totalList.add(tr);

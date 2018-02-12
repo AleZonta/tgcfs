@@ -14,7 +14,6 @@ import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
-import tgcfs.Agents.OutputNetworkTime;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
@@ -242,15 +241,15 @@ public class Agents extends Algorithm {
              * @param outputsNetworks collection of outputs
              */
             private void addOutput(INDArray realLastOut, List<OutputsNetwork> outputsNetworks){
-                if(!this.time){
+//                if(!this.time){
                     OutputNetwork out = new OutputNetwork();
                     out.deserialise(realLastOut);
                     outputsNetworks.add(out);
-                }else{
-                    OutputNetworkTime out = new OutputNetworkTime();
-                    out.deserialise(realLastOut);
-                    outputsNetworks.add(out);
-                }
+//                }else{
+//                    OutputNetworkTime out = new OutputNetworkTime();
+//                    out.deserialise(realLastOut);
+//                    outputsNetworks.add(out);
+//                }
             }
 
         }
@@ -837,7 +836,7 @@ public class Agents extends Algorithm {
                     //Y_ji = R * classifier_j(agent_i) / T_j
                     //E_ji = { i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2
                     // HashMap<String, Double> E = new HashMap<>();
-                    //HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
+                    HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
                     HashMap<Integer, HashMap<Integer, Double>> E = new HashMap<>();
                     //Classifier Id
                     for(int classifierID: results.keySet()){
@@ -847,7 +846,7 @@ public class Agents extends Algorithm {
                         //Creation id agent,classifier
                         HashMap<Integer, Double> subE = new HashMap<>();
                         //for debug, remove this hashmap, it is redundant
-                        // HashMap<Integer, Double> subY = new HashMap<>();
+                        HashMap<Integer, Double> subY = new HashMap<>();
                         for(int agentID: classifierResultAgentI.keySet()){
                             //now I have classifier j and looping over agent i
 
@@ -857,14 +856,13 @@ public class Agents extends Algorithm {
 
                             //String ij = agentID.toString() + "/" + classifierID.toString();
                             double y = R * singleValue / T.get(classifierID);
-                            System.out.println(y);
                             if(Double.isNaN(y)){
                                 y = 0.0;
                             }
                             if(y > 1.0) y = 1.0;
                             if(y < 0.0) y = 0.0;
                             //for debug, remove this hashmap, it is redundant
-                            //subY.put(agentID, y);
+                            subY.put(agentID, y);
 
                             if(realAgentsId.stream().anyMatch(t -> t == agentID)){
                                 //if TRUE=real
@@ -878,7 +876,7 @@ public class Agents extends Algorithm {
                         }
                         E.put(classifierID, subE);
                         //for debug, remove this hashmap, it is redundant
-                        //Y.put(classifierID, subY);
+                        Y.put(classifierID, subY);
                     }
 
 
@@ -889,6 +887,9 @@ public class Agents extends Algorithm {
                         //need to find all the values with that id
                         for(int classifierID: E.keySet()){
                             fitness += E.get(classifierID).get(id);
+                        }
+                        if(fitness == 6.0){
+                            System.out.println("What?");
                         }
                         agent.setFitness(fitness);
                         //setting the fitness for the examples of this agent

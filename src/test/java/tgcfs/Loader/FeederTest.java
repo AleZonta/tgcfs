@@ -157,14 +157,14 @@ public class FeederTest {
         idsaLoader.InitPotentialField(system.getTrajectories());
 
 
-        IntStream.range(0,1000).forEach(i -> {
-            try {
-                List<InputsNetwork> res = system.feeder(idsaLoader);
-                assertNotNull(res);
-            }catch (Exception e){
-                System.out.println(e.getMessage());
-            }
-        });
+//        IntStream.range(0,1000).forEach(i -> {
+//            try {
+//                List<InputsNetwork> res = system.feeder(idsaLoader);
+//                assertNotNull(res);
+//            }catch (Exception e){
+//                System.out.println(e.getMessage());
+//            }
+//        });
 
 
     }
@@ -270,7 +270,7 @@ public class FeederTest {
         for(int i = 0; i < 10; i++){
             po.add(system.getNextPoint(a));
         }
-        List<InputsNetwork> res = system.obtainInput(po, 10.0, null);
+        List<InputsNetwork> res = system.obtainInput(po, 10.0, null, null);
         assertNotNull(res);
     }
 

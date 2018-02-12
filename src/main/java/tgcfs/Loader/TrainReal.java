@@ -5,7 +5,6 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Agents.Models.RealAgent;
 import tgcfs.Agents.OutputNetwork;
-import tgcfs.Agents.OutputNetworkTime;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
@@ -50,6 +49,7 @@ public class TrainReal {
     private List<Point> totalPoints;
     private double fitnessGivenByTheClassifier;
     private RealAgent idRealPoint;
+    private double lastTime;
 
     /**
      * Constructor with two parameters
@@ -74,6 +74,32 @@ public class TrainReal {
         this.realOutput = null;
         this.idRealPoint = null;
         this.fitnessGivenByTheClassifier = 0;
+    }
+
+    /**
+     * Constructor with three parameters
+     * @param trainingPoint list of inputNetwork
+     * @param followingPart list of points
+     */
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> followingPart, double lastTime){
+        this.id = UUID.randomUUID();
+        this.trainingPoint = trainingPoint;
+        this.followingPart = followingPart;
+        this.firstPart = null;
+        //the conditional image path is hardcoded -> has to be in the same directory of the program
+        this.conditionalImage = null;
+        this.normalImage = null;
+        this.idsaLoader = null;
+        this.outputComputed = null;
+        this.realPointsOutputComputed = null;
+        this.totalPoints = null;
+        this.followingPartTransformed = null;
+        this.allThePartTransformedFake = null;
+        this.allThePartTransformedReal = null;
+        this.realOutput = null;
+        this.idRealPoint = null;
+        this.fitnessGivenByTheClassifier = 0;
+        this.lastTime = lastTime;
     }
 
     /**
@@ -420,10 +446,11 @@ public class TrainReal {
 
                 totalList.add(new OutputNetwork(speed, bearing));
             }else {
-                double time = conversion.obtainTime(previousPoint, actualPoint);
                 double bearing = conversion.obtainBearing(previousPoint, actualPoint);
-                double speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
-                totalList.add(new OutputNetworkTime(speed, bearing, time));
+                double speed = conversion.obtainSpeed(previousPoint, actualPoint, this.lastTime);
+
+                totalList.add(new OutputNetwork(speed, bearing));
+//                totalList.add(new OutputNetworkTime(speed, bearing, time));
             }
         }
 
@@ -477,6 +504,14 @@ public class TrainReal {
      */
     public RealAgent getIdRealPoint() {
         return idRealPoint;
+    }
+
+    /**
+     * Getter for the last time computed (the one that I am requesting to the network)
+     * @return double value
+     */
+    public double getLastTime() {
+        return lastTime;
     }
 }
 
