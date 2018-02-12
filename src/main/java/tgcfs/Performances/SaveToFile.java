@@ -1,5 +1,6 @@
 package tgcfs.Performances;
 
+import com.google.common.collect.ListMultimap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -12,6 +13,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -177,6 +179,15 @@ public class SaveToFile {
         public static void saveMaxFitnessAchievable(int fitness, String name) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveMaxFitnessAchievable(fitness,name);
+        }
+
+        /**
+         * Save what the classifiers does with the real trajectories
+         * @param resultsRealTrajectories real trajectories results
+         */
+        public static void saveResultRealClassifier(HashMap<Integer, ListMultimap<Integer, Double>> resultsRealTrajectories) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.saveResultRealClassifier(resultsRealTrajectories);
         }
     }
 
@@ -520,8 +531,33 @@ public class SaveToFile {
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error in saving the max fitness achievable " + e.getMessage());
         }
+    }
 
 
+    /**
+     * Save what the classifiers does with the real trajectories
+     * @param resultsRealTrajectories real trajectories results
+     */
+    private void saveResultRealClassifier(HashMap<Integer, ListMultimap<Integer, Double>> resultsRealTrajectories){
+        String path = this.currentPath + "classificationRealTrajectories.txt";
+        File file = new File(path);
+
+        try {
+            // if file doesnt exists, then create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            // true = append file
+            FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(resultsRealTrajectories.toString());
+            bw.write("\n");
+            bw.close();
+
+            fw.close();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error in saving the classificationRealTrajectories " + e.getMessage());
+        }
     }
 
 }

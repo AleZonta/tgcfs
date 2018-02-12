@@ -11,6 +11,7 @@ import tgcfs.EA.Mutation.UncorrelatedMutation;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Utils.IndividualStatus;
+import tgcfs.Utils.RandomGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -237,6 +238,7 @@ public class IndividualTest {
     @Test
     public void mutate() throws Exception {
         new ReadConfig.Configurations();
+        new RandomGenerator();
 //        Individual individual = new UncorrelatedMutation();
 //        assertNotNull(individual);
 //        assertNull(individual.getFitness());
@@ -271,12 +273,10 @@ public class IndividualTest {
 
         Individual individual = new RandomResetting();
         assertNotNull(individual);
-        assertNull(individual.getFitness());
         assertNull(individual.getObjectiveParameters());
 
         individual = new UncorrelatedMutation(10);
         assertNotNull(individual);
-        assertNotNull(individual.getFitness());
         assertNotNull(individual.getObjectiveParameters());
 
         System.out.println(individual.getObjectiveParameters());
@@ -292,11 +292,16 @@ public class IndividualTest {
 
         IntStream.range(0,1000).forEach(i -> {
             individual3.mutate(100);
+            List<Double> list = new ArrayList<>();
+            for(int j = 0; j < individual3.getObjectiveParameters().columns(); j++){
+                list.add(individual3.getObjectiveParameters().getDouble(j));
+            }
+            System.out.println(list.toString());
         });
 
 
         for(int i = 0; i < individual3.getObjectiveParameters().columns(); i++){
-            System.out.println(individual3.getObjectiveParameters().getDouble(i));
+//            System.out.println(individual3.getObjectiveParameters().getDouble(i));
             assertTrue(individual3.getObjectiveParameters().getDouble(i) >= -4.0 && individual3.getObjectiveParameters().getDouble(i) <= 4.0);
         }
 
@@ -307,7 +312,7 @@ public class IndividualTest {
                 count[0]++;
             }
         });
-        System.out.println(count[0]);
+//        System.out.println(count[0]);
         assertTrue(count[0]!=individual3.getObjectiveParameters().columns());
 
     }

@@ -627,6 +627,8 @@ public class Agents extends Algorithm {
             private Individual classifier;
             private List<Individual> adersarialPopulation;
             private ListMultimap<Integer, Double> classifierResultAgentI; //agent id and the classifier result for it
+            private ListMultimap<Integer, Double> classifierResultAgentIrealTraj; //agent id and the classifier result for it
+
 
 
             /**
@@ -639,6 +641,7 @@ public class Agents extends Algorithm {
                 this.classifier = classifier;
                 this.adersarialPopulation = adersarialPopulation;
                 this.classifierResultAgentI = ArrayListMultimap.create();
+                this.classifierResultAgentIrealTraj = ArrayListMultimap.create();
             }
 
             /**
@@ -660,6 +663,14 @@ public class Agents extends Algorithm {
             }
 
             /**
+             * Getter for the results from the classification
+             * @return HashMap<Integer, Double> containing id agent and his classification
+             */
+            private ListMultimap<Integer, Double> getResultsRealTrajectories(){
+                return this.classifierResultAgentIrealTraj;
+            }
+
+            /**
              * Getter for the classifier's model ID
              * @return int id
              */
@@ -676,11 +687,18 @@ public class Agents extends Algorithm {
              */
             @Override
             public void run() {
+
                 for(Individual agent: this.adersarialPopulation){
                     List<TrainReal> inputOutput = agent.getMyInputandOutput();
+
+                    //agent id is always the same for all the trajectories
+                    int agentId = agent.getModel().getId();
+
+                    //also this one is going to be always the same. Lets use only the first real one
+                    int realAgentId = inputOutput.get(0).getIdRealPoint().getId();
+
                     for(TrainReal example: inputOutput){
                         //run the classifier for the Fake trajectory
-                        int agentId = agent.getModel().getId();
                         try {
                             tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedFake());
                             if (ReadConfig.debug) logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
@@ -691,13 +709,13 @@ public class Agents extends Algorithm {
                             e.printStackTrace();
                         }
 
-                        int realAgentId = example.getIdRealPoint().getId();
                         //run the classifier for the Real trajectory
                         try {
                             tgcfs.Classifiers.OutputNetwork resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedReal());
                             if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue());
                             //save all the results
                             this.classifierResultAgentI.put(realAgentId, resultReal.getRealValue());
+                            this.classifierResultAgentIrealTraj.put(realAgentId, resultReal.getRealValue());
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
                             e.printStackTrace();
@@ -778,6 +796,7 @@ public class Agents extends Algorithm {
 
                 //classifier id, agent id and comparison result
                 HashMap<Integer, ListMultimap<Integer, Double>> results = new HashMap<>();
+                HashMap<Integer, ListMultimap<Integer, Double>> resultsRealTrajectories = new HashMap<>();
 
                 ExecutorService exec = Executors.newFixedThreadPool(96);
                 CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
@@ -800,6 +819,7 @@ public class Agents extends Algorithm {
                     for (ComputeSelmarFitnessUnit runnable : runnables) {
                         //all the i, j fixed -> classifier_j(agent_i))
                         results.put(runnable.getClassifierID(), runnable.getResults());
+                        resultsRealTrajectories.put(runnable.getClassifierID(), runnable.getResultsRealTrajectories());
                     }
 
                     //creation all the Tj
@@ -814,7 +834,7 @@ public class Agents extends Algorithm {
                     }
 
                     //Creation matrix Yij
-                    //Y_ij = R * classifier_j(agent_i) / T_j
+                    //Y_ji = R * classifier_j(agent_i) / T_j
                     //E_ji = { i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2
                     // HashMap<String, Double> E = new HashMap<>();
                     //HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
@@ -837,6 +857,7 @@ public class Agents extends Algorithm {
 
                             //String ij = agentID.toString() + "/" + classifierID.toString();
                             double y = R * singleValue / T.get(classifierID);
+                            System.out.println(y);
                             if(Double.isNaN(y)){
                                 y = 0.0;
                             }
@@ -861,7 +882,7 @@ public class Agents extends Algorithm {
                     }
 
 
-                    //FitnessAgent = sum_j( E_ij )
+                    //FitnessAgent = sum_j( E_ji )
                     for(Individual agent : super.getPopulationWithHallOfFame()){
                         int id = agent.getModel().getId();
                         double fitness = 0;
@@ -878,7 +899,7 @@ public class Agents extends Algorithm {
                     }
 
 
-                    //FitnessClassifier = sum_i( 1 - E_ij)
+                    //FitnessClassifier = sum_i( 1 - E_ji)
                     for(Individual classifier: competingPopulation.getPopulationWithHallOfFame()){
                         int id = classifier.getModel().getId();
                         HashMap<Integer, Double> allTheI = E.get(id);
@@ -894,6 +915,12 @@ public class Agents extends Algorithm {
                     e.printStackTrace();
                 }
 
+
+                try {
+                    SaveToFile.Saver.saveResultRealClassifier(resultsRealTrajectories);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
 
             default:
