@@ -19,6 +19,11 @@ public class InputNetworkTime extends InputNetwork {
     private double time;
 
     /**
+     * Constructor zero parameter
+     */
+    public InputNetworkTime(){ }
+
+    /**
      * Constructor with three parameters. all the inputs
      * Matches the super constructor
      * @param directionAPF  Double number corresponding to the direction retrieved form the apf
@@ -50,9 +55,9 @@ public class InputNetworkTime extends InputNetwork {
     @Override
     public INDArray serialise(){
         INDArray array = Nd4j.zeros(inputSize);
-        array.putScalar(0, this.getSpeed());
-        array.putScalar(1, this.getBearing());
-        array.putScalar(2, this.getDirectionAPF());
+        array.putScalar(0, this.speed);
+        array.putScalar(1, this.bearing);
+        array.putScalar(2, this.directionAPF);
         array.putScalar(3, this.time);
         return array;
     }
@@ -69,5 +74,18 @@ public class InputNetworkTime extends InputNetwork {
     @Override
     public String toString() {
         return "{" + this.getSpeed() + ", " + this.getBearing() + ", " + this.time + "}";
+    }
+
+
+    /**
+     * Compy raw value from input network with the addition of the time
+     * @param indArray {@link INDArray} network form input serialised
+     * @param time time
+     */
+    public void deserialiseFromNormalInput(INDArray indArray, double time){
+        this.speed = indArray.getDouble(0);
+        this.bearing = indArray.getDouble(1);
+        this.directionAPF = indArray.getDouble(2);
+        this.time = Normalisation.convertTime(time);
     }
 }

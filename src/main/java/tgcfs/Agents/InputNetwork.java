@@ -19,11 +19,16 @@ import tgcfs.NN.InputsNetwork;
  * This class Implements the input of the agents
  */
 public class InputNetwork implements InputsNetwork {
-    private double directionAPF;
-    private double speed;
-    private double bearing;
+    protected double directionAPF;
+    protected double speed;
+    protected double bearing;
     private Point targetPoint;
     public static final int inputSize = 3; //the size of the input corresponding to the three fields here
+
+    /**
+     * Constructor zero parameter
+     */
+    public InputNetwork(){}
 
     /**
      * Constructor with three parameters. all the inputs

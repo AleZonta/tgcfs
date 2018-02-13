@@ -1,7 +1,5 @@
 package tgcfs.EA;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import lgds.trajectories.Point;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -29,9 +27,7 @@ import tgcfs.Utils.PointWithBearing;
 import tgcfs.Utils.Scores;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -613,21 +609,25 @@ public class Agents extends Algorithm {
          * Compute the fitness function in this way:
          *
          * R =  #real
-         * T_j = sum_i( classifier_j(agent_i))   <- in this module
-         * Y_ij = R * classifier_j(agent_i) / T_j
-         * E_ij = { i = real : 1 - Y_ij, i = fake: Y_ij }
+         * T_jk = (sum_i( classifier_j(agent_i)))k   <- in this module
+         * Y_ijk = (R * classifier_j(agent_i) / T_j)k
+         * E_ijk = ({ i = real : 1 - Y_ij, i = fake: Y_ij })k
          *
-         * FitnessAgent = sum_j( E_ij )
-         * FitnessClassifier = sum_i( 1 - E_ij)
+         * FitnessAgent = sum_k sum_j( E_ijk )
+         * FitnessClassifier = sum_k sum_i( 1 - E_ijk)
+         *
+         *
+         *
+         *
+         *
          *
          */
         class ComputeSelmarFitnessUnit implements Runnable{
             private CountDownLatch latch;
             private Individual classifier;
             private List<Individual> adersarialPopulation;
-            private ListMultimap<Integer, Double> classifierResultAgentI; //agent id and the classifier result for it
-            private ListMultimap<Integer, Double> classifierResultAgentIrealTraj; //agent id and the classifier result for it
-
+            private Map<Integer, Map<UUID, Double>> Tik;
+            private Map<UUID, Map<Integer, Double>> realTik;
 
 
             /**
@@ -639,8 +639,7 @@ public class Agents extends Algorithm {
             private ComputeSelmarFitnessUnit(Individual classifier, List<Individual> adersarialPopulation) {
                 this.classifier = classifier;
                 this.adersarialPopulation = adersarialPopulation;
-                this.classifierResultAgentI = ArrayListMultimap.create();
-                this.classifierResultAgentIrealTraj = ArrayListMultimap.create();
+                this.Tik = new HashMap<>();
             }
 
             /**
@@ -652,29 +651,21 @@ public class Agents extends Algorithm {
                 this.latch = latch;
             }
 
-
-            /**
-             * Getter for the results from the classification
-             * @return HashMap<Integer, Double> containing id agent and his classification
-             */
-            private ListMultimap<Integer, Double> getResults(){
-                return this.classifierResultAgentI;
-            }
-
-            /**
-             * Getter for the results from the classification
-             * @return HashMap<Integer, Double> containing id agent and his classification
-             */
-            private ListMultimap<Integer, Double> getResultsRealTrajectories(){
-                return this.classifierResultAgentIrealTraj;
-            }
-
             /**
              * Getter for the classifier's model ID
              * @return int id
              */
             private int getClassifierID(){
                 return this.classifier.getModel().getId();
+            }
+
+
+            /**
+             * Getter for the results from the classification
+             * @return Map<Integer, Map<UUID, Double>> containing id agent and his classification
+             */
+            private Map<Integer, Map<UUID, Double>> getResults(){
+                return this.Tik;
             }
 
             /**
@@ -686,40 +677,50 @@ public class Agents extends Algorithm {
              */
             @Override
             public void run() {
-
                 for(Individual agent: this.adersarialPopulation){
                     List<TrainReal> inputOutput = agent.getMyInputandOutput();
 
                     //agent id is always the same for all the trajectories
                     int agentId = agent.getModel().getId();
 
-                    //also this one is going to be always the same. Lets use only the first real one
-                    int realAgentId = inputOutput.get(0).getIdRealPoint().getId();
+                    // trajectory result
+                    Map<UUID, Double> Tj = new HashMap<>();
 
-                    for(TrainReal example: inputOutput){
+                    for(TrainReal example: inputOutput) {
                         //run the classifier for the Fake trajectory
                         try {
                             tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedFake());
                             if (ReadConfig.debug) logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
                             //save all the results
-                            this.classifierResultAgentI.put(agentId, result.getRealValue());
+                            Tj.put(example.getId(), result.getRealValue());
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
                             e.printStackTrace();
                         }
+                    }
+                    //update the main result with the agent id
+                    this.Tik.put(agentId, Tj);
 
+                    //also this one is going to be always the same. Lets use only the first real one
+                    int realAgentId = inputOutput.get(0).getIdRealPoint().getId();
+                    // trajectory result
+                    Tj = new HashMap<>();
+
+                    for(TrainReal example: inputOutput){
                         //run the classifier for the Real trajectory
                         try {
                             tgcfs.Classifiers.OutputNetwork resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedReal());
                             if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue());
                             //save all the results
-                            this.classifierResultAgentI.put(realAgentId, resultReal.getRealValue());
-                            this.classifierResultAgentIrealTraj.put(realAgentId, resultReal.getRealValue());
+                            Tj.put(example.getId(), resultReal.getRealValue());
+
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
                             e.printStackTrace();
                         }
                     }
+                    //update the main result with the agent id
+                    this.Tik.put(realAgentId, Tj);
                 }
                 latch.countDown();
             }
@@ -740,8 +741,8 @@ public class Agents extends Algorithm {
             }
         }
 
-
         logger.log(Level.SEVERE, "Start real classification");
+
 
         //set the default fitness as the normal fitness
         int fitnessTypology = 0;
@@ -783,20 +784,12 @@ public class Agents extends Algorithm {
             case 1:
                 // selmar fitness function
                 // number real trajectories = total number of trajectories said as real = # trajectories trained * # individuals
-                int numTraTra;
-                try{
-                    numTraTra = ReadConfig.Configurations.getTrajectoriesTrained();
-                } catch (Exception e){
-                    numTraTra = 1;
-                }
-                int R = numTraTra * super.getPopulationWithHallOfFame().size();
+                int R = super.getPopulationWithHallOfFame().size();
 
+                //classifier id, agent id, trajectory id, result
+                HashMap<Integer, Map<Integer, Map<UUID, Double>>> results = new HashMap<>();
 
-
-                //classifier id, agent id and comparison result
-                HashMap<Integer, ListMultimap<Integer, Double>> results = new HashMap<>();
-                HashMap<Integer, ListMultimap<Integer, Double>> resultsRealTrajectories = new HashMap<>();
-
+                //launch the threads for the computations
                 ExecutorService exec = Executors.newFixedThreadPool(96);
                 CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
                 ComputeSelmarFitnessUnit[] runnables = new ComputeSelmarFitnessUnit[competingPopulation.getPopulationWithHallOfFame().size()];
@@ -818,97 +811,132 @@ public class Agents extends Algorithm {
                     for (ComputeSelmarFitnessUnit runnable : runnables) {
                         //all the i, j fixed -> classifier_j(agent_i))
                         results.put(runnable.getClassifierID(), runnable.getResults());
-                        resultsRealTrajectories.put(runnable.getClassifierID(), runnable.getResultsRealTrajectories());
                     }
 
-                    //creation all the Tj
-                    //T_j = sum_i( classifier_j(agent_i))
-                    HashMap<Integer, Double> T = new HashMap<>();
-                    for(int key: results.keySet()){
-                        //key is the classifier id -> i
-                        ListMultimap<Integer, Double> classifierResultAgentI = results.get(key);
-                        //also with the multimap it is fine -> more values same key, don't care. Sum them all!
-                        double singleTj = classifierResultAgentI.values().stream().mapToDouble(i->i).sum();
-                        T.put(key, singleTj);
+
+                    //find list of trajectories id
+                    Map<Integer, Map<UUID, Double>> a = results.get(results.keySet().toArray()[0]);
+                    Map<UUID, Double> b = a.get(a.keySet().toArray()[0]);
+                    List<UUID> trajectoriesID = new ArrayList<>(b.keySet());
+
+
+
+                    //creation all the Tjk
+                    //T_j_k = (sum_i( classifier_j(agent_i)))_k
+                    //trajectory ID, classifier ID, sum Tjk
+                    HashMap<UUID, HashMap<Integer, Double>> Tjk = new HashMap<>();
+
+                    //classifier id, agent id, trajectory id, result
+                    for(UUID traID: trajectoriesID){
+                        HashMap<Integer, Double> Tj = new HashMap<>();
+                        for(int classifierID: results.keySet()){
+                            //classifierID is the classifier id -> i
+                            Map<Integer, Map<UUID, Double>> classifierResults = results.get(classifierID);
+
+                            double classifierTotal = 0.0;
+
+                            for(Integer agentId: classifierResults.keySet()){
+                                Map<UUID, Double> traMap = classifierResults.get(agentId);
+
+                                classifierTotal += traMap.get(traID);
+
+                            }
+                            Tj.put(classifierID, classifierTotal);
+                        }
+                        Tjk.put(traID, Tj);
                     }
 
                     //Creation matrix Yij
-                    //Y_ji = R * classifier_j(agent_i) / T_j
-                    //E_ji = { i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2
-                    // HashMap<String, Double> E = new HashMap<>();
-                    HashMap<Integer, HashMap<Integer, Double>> Y = new HashMap<>();
-                    HashMap<Integer, HashMap<Integer, Double>> E = new HashMap<>();
-                    //Classifier Id
-                    for(int classifierID: results.keySet()){
-                        ListMultimap<Integer, Double> classifierResultAgentI = results.get(classifierID);
+                    //Y_jik = (R * classifier_j(agent_i) / T_j)k
+                    //E_jik = ({ i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2)k
 
-                        //now I have all the Agent ID with their values
-                        //Creation id agent,classifier
-                        HashMap<Integer, Double> subE = new HashMap<>();
-                        //for debug, remove this hashmap, it is redundant
-                        HashMap<Integer, Double> subY = new HashMap<>();
-                        for(int agentID: classifierResultAgentI.keySet()){
-                            //now I have classifier j and looping over agent i
+                    HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Yijk = new HashMap<>();
+                    HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Eijk = new HashMap<>();
 
-                            //using a multimap. Since a key can have more values, need to obtain only one value with them
-                            List<Double> values = classifierResultAgentI.get(agentID);
-                            double singleValue = values.stream().mapToDouble(i->i).sum();
+                    for(UUID traID: trajectoriesID){
+                        HashMap<Integer, HashMap<Integer, Double>> Yij = new HashMap<>();
+                        HashMap<Integer, HashMap<Integer, Double>> Eij = new HashMap<>();
+                        for(int classifierID: results.keySet()){
+                            //classifierID is the classifier id -> i
+                            Map<Integer, Map<UUID, Double>> classifierResults = results.get(classifierID);
 
-                            //String ij = agentID.toString() + "/" + classifierID.toString();
-                            double y = R * singleValue / T.get(classifierID);
-                            if(Double.isNaN(y)){
-                                y = 0.0;
-                            }
-                            if(y > 1.0) y = 1.0;
-                            if(y < 0.0) y = 0.0;
+
+                            //Creation id agent,classifier
+                            HashMap<Integer, Double> subE = new HashMap<>();
                             //for debug, remove this hashmap, it is redundant
-                            subY.put(agentID, y);
+                            HashMap<Integer, Double> subY = new HashMap<>();
 
-                            if(realAgentsId.stream().anyMatch(t -> t == agentID)){
-                                //if TRUE=real
-                                subE.put(agentID, Math.pow(1 - y, 2));
-                                //TODO * 100
-//                                subE.put(agentID, Math.pow(1 - y, 2) * 100);
-                            }else{
-                                //if False=False
-                                subE.put(agentID, Math.pow(y, 2));
+
+                            for(int agentId: classifierResults.keySet()){
+                                Map<UUID, Double> traMap = classifierResults.get(agentId);
+                                //now I have classifier j and looping over agent i
+
+
+                                double singleValue = traMap.get(traID);
+                                double y = R * singleValue / Tjk.get(traID).get(classifierID);
+
+                                if(Double.isNaN(y)){
+                                    y = 0.0;
+                                }
+                                if(y > 1.0) y = 1.0;
+                                if(y < 0.0) y = 0.0;
+
+                                subY.put(agentId, y);
+
+
+                                if(realAgentsId.stream().anyMatch(t -> t == agentId)){
+                                    //if TRUE=real
+                                    subE.put(agentId, Math.pow(1 - y, 2));
+                                    //TODO * 100
+                                }else{
+                                    //if False=False
+                                    subE.put(agentId, Math.pow(y, 2));
+                                }
+
                             }
+
+                            Eij.put(classifierID, subE);
+                            //for debug, remove this hashmap, it is redundant
+                            Yij.put(classifierID, subY);
                         }
-                        E.put(classifierID, subE);
-                        //for debug, remove this hashmap, it is redundant
-                        Y.put(classifierID, subY);
+                        Yijk.put(traID, Yij);
+                        Eijk.put(traID, Eij);
                     }
 
-
-                    //FitnessAgent = sum_j( E_ji )
+                    //FitnessAgent = sum_k(sum_j( E_jik ))
                     for(Individual agent : super.getPopulationWithHallOfFame()){
                         int id = agent.getModel().getId();
                         double fitness = 0;
-                        //need to find all the values with that id
-                        for(int classifierID: E.keySet()){
-                            fitness += E.get(classifierID).get(id);
-                        }
-                        if(fitness == 6.0){
-                            System.out.println("What?");
+                        //need to find all the values with that id and with all the trajectories
+                        for(UUID uuid: Eijk.keySet()){
+                            HashMap<Integer, HashMap<Integer, Double>> Eij = Eijk.get(uuid);
+                            //need to find all the values with that id
+                            for(int classifierID: Eij.keySet()){
+                                fitness += Eij.get(classifierID).get(id);
+                            }
                         }
                         agent.setFitness(fitness);
                         //setting the fitness for the examples of this agent
                         for(TrainReal example: agent.getMyInputandOutput()){
                             example.setFitnessGivenByTheClassifier(fitness);
                         }
-
                     }
 
 
-                    //FitnessClassifier = sum_i( 1 - E_ji)
                     for(Individual classifier: competingPopulation.getPopulationWithHallOfFame()){
                         int id = classifier.getModel().getId();
-                        HashMap<Integer, Double> allTheI = E.get(id);
+
                         double fitness = 0;
-                        for(int agentId: allTheI.keySet()){
-                            fitness += (1 - allTheI.get(agentId));
+                        for(UUID uuid: Eijk.keySet()){
+                            HashMap<Integer, HashMap<Integer, Double>> Eij = Eijk.get(uuid);
+                            HashMap<Integer, Double> allTheI = Eij.get(id);
+
+                            for(int agentId: allTheI.keySet()){
+                                fitness += (1 - allTheI.get(agentId));
+                            }
                         }
                         classifier.setFitness(fitness);
+
                     }
 
 
@@ -916,12 +944,6 @@ public class Agents extends Algorithm {
                     e.printStackTrace();
                 }
 
-
-                try {
-                    SaveToFile.Saver.saveResultRealClassifier(resultsRealTrajectories);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 break;
 
             default:

@@ -297,12 +297,15 @@ public class Feeder {
             //TODO manage to add all the other times if I am going to use more than 1 timestep after the target
             this.lastTime = conversion.obtainTime(points.get(points.size() - 1), realPoints.get(0));
             allTheTimes.add(lastTime);
-            java.lang.System.out.println(allTheTimes.toString());
+            logger.log(Level.INFO, allTheTimes.toString());
 
             List<InputsNetwork> hereNetwork = new ArrayList<>();
             int i = 0;
             for(InputsNetwork inputsNetwork: totalList){
-                hereNetwork.add(new InputNetworkTime(inputsNetwork.serialise().getDouble(2), inputsNetwork.serialise().getDouble(0), inputsNetwork.serialise().getDouble(1), allTheTimes.get(i)));
+                InputNetworkTime inputNetworkTime = new InputNetworkTime();
+                inputNetworkTime.deserialiseFromNormalInput(inputsNetwork.serialise(), allTheTimes.get(i));
+
+                hereNetwork.add(inputNetworkTime);
                 i+=1;
             }
 

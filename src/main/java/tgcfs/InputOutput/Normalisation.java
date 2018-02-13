@@ -128,7 +128,7 @@ public class Normalisation {
      * @param toBeConverted speed that has to be de normalised
      * @return double real value
      */
-    public static double decodeSpeed(double toBeConverted) throws Exception {
+    public static double decodeSpeed(double toBeConverted) {
         return toBeConverted; //linear conversion
 //        return convertToSomething(1.0, -1.0, ReadConfig.Configurations.getMaxSpeed(), min_speed, toBeConverted);
     }
