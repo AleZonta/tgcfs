@@ -1,6 +1,5 @@
 package tgcfs.Performances;
 
-import com.google.common.collect.ListMultimap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -12,9 +11,7 @@ import tgcfs.Utils.Scores;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -185,7 +182,7 @@ public class SaveToFile {
          * Save what the classifiers does with the real trajectories
          * @param resultsRealTrajectories real trajectories results
          */
-        public static void saveResultRealClassifier(HashMap<Integer, ListMultimap<Integer, Double>> resultsRealTrajectories) throws Exception {
+        public static void saveResultRealClassifier(HashMap<Integer, Map<Integer, Map<UUID, Double>>> resultsRealTrajectories) throws Exception {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveResultRealClassifier(resultsRealTrajectories);
         }
@@ -538,7 +535,7 @@ public class SaveToFile {
      * Save what the classifiers does with the real trajectories
      * @param resultsRealTrajectories real trajectories results
      */
-    private void saveResultRealClassifier(HashMap<Integer, ListMultimap<Integer, Double>> resultsRealTrajectories){
+    private void saveResultRealClassifier(HashMap<Integer, Map<Integer, Map<UUID, Double>>> resultsRealTrajectories){
         String path = this.currentPath + "classificationRealTrajectories.txt";
         File file = new File(path);
 
