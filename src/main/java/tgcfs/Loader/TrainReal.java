@@ -171,7 +171,7 @@ public class TrainReal {
      * @param totalPoints
      * @param idRealPoint
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id, RealAgent idRealPoint, double fitnessGivenByTheClassifier) {
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id, RealAgent idRealPoint, double fitnessGivenByTheClassifier, double time) {
         this.id = id;
         this.trainingPoint = trainingPoint;
         this.firstPart = firstPart;
@@ -188,6 +188,7 @@ public class TrainReal {
         this.totalPoints = totalPoints;
         this.idRealPoint = idRealPoint;
         this.fitnessGivenByTheClassifier = fitnessGivenByTheClassifier;
+        this.lastTime = time;
     }
 
 
@@ -463,7 +464,7 @@ public class TrainReal {
      * @return {@link TrainReal} object
      */
     public TrainReal softCopy(){
-        return new TrainReal(this.trainingPoint,this.followingPart);
+        return new TrainReal(this.trainingPoint,this.followingPart, this.lastTime);
     }
 
     /**
@@ -471,7 +472,7 @@ public class TrainReal {
      * @return {@link TrainReal} object
      */
     public TrainReal deepCopy(){
-        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id, this.idRealPoint, this.fitnessGivenByTheClassifier);
+        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id, this.idRealPoint, this.fitnessGivenByTheClassifier, this.lastTime);
     }
 
     /**
@@ -511,7 +512,7 @@ public class TrainReal {
      * @return double value
      */
     public double getLastTime() {
-        return lastTime;
+        return this.lastTime;
     }
 }
 

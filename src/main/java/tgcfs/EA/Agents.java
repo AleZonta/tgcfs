@@ -328,9 +328,10 @@ public class Agents extends Algorithm {
                     OutputNetwork outLocal = new OutputNetwork();
                     outLocal.deserialise(lastOutput);
 
-                    Point toAdd = transformation.singlePointConversion(outLocal);
-                    transformation.setLastPoint(new PointWithBearing(toAdd));
-                    growingTrajectory.add(toAdd);
+                    //TODO if using convolutionary I need to enable the following lines
+                    //Point toAdd = transformation.singlePointConversion(outLocal);
+//                    transformation.setLastPoint(new PointWithBearing(toAdd));
+//                    growingTrajectory.add(toAdd);
 
                     res = inputsNetwork.getIdsaLoader().generatePicture(growingTrajectory);
                     if(!res) throw new Exception("Creation of the pictures did not work out");
@@ -1026,14 +1027,16 @@ public class Agents extends Algorithm {
      * Generate the real last point
      * @param transformation {@link FollowingTheGraph} transformation reference to transform the output in real point //TODO generalise this
      */
-    public void generateRealPoints(FollowingTheGraph transformation){
+    public void generateRealPoints(FollowingTheGraph transformation) throws Exception {
+        boolean time = ReadConfig.Configurations.getTimeAsInput();
+
         for(Individual ind: super.getPopulation()) {
             for (TrainReal train : ind.getMyInputandOutput()) {
                 if(train.getRealPointsOutputComputed() == null) {
                     List<PointWithBearing> generatedPoint = new ArrayList<>();
                     transformation.setLastPoint(train.getLastPoint());
                     for(OutputsNetwork outputsNetwork: train.getOutputComputed()){
-                        generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork)));
+                        generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork, time, train.getLastTime())));
                     }
                     train.setRealPointsOutputComputed(generatedPoint);
                 }
