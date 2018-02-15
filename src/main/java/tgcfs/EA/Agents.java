@@ -887,7 +887,7 @@ public class Agents extends Algorithm {
                                 if(realAgentsId.stream().anyMatch(t -> t == agentId)){
                                     //if TRUE=real
                                     subE.put(agentId, Math.pow(1 - y, 2));
-                                    //TODO * 100
+//                                    subE.put(agentId, Math.pow(1 - y, 2) * 100);
                                 }else{
                                     //if False=False
                                     subE.put(agentId, Math.pow(y, 2));

@@ -419,6 +419,9 @@ public class Feeder {
             this.finished = Boolean.TRUE;
             return this.feeder(idsaLoader);
         }
+        //log the name of the trajectory
+        logger.log(Level.INFO, "Loaded trajectory named: " + this.currentTrajectory.getPath());
+
 
         //save points
         this.points = new ArrayList<>();
