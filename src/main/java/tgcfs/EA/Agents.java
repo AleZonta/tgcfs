@@ -987,6 +987,27 @@ public class Agents extends Algorithm {
         SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(totalList, generationAgent, generationClassifier);
     }
 
+
+    /**
+     * Save in JSON format the trajectory and the generated part of it
+     * @param gen number of generation I am
+     * @throws Exception if something wrong happens in saving everything
+     */
+    public void saveTrajectoriesAfterSelection(int gen) throws Exception {
+        List<TrainReal> totalList = new ArrayList<>();
+
+        for(Individual ind: super.getPopulation()){
+            for(TrainReal train: ind.getMyInputandOutput()){
+                totalList.add(train.deepCopy());
+            }
+        }
+
+        SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(totalList, gen);
+    }
+
+
+
+
     /**
      * Save score of the battle
      * @param generationAgent number of generation for the agent population

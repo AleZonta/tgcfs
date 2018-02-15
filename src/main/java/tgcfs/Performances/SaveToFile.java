@@ -156,6 +156,17 @@ public class SaveToFile {
         }
 
         /**
+         * Save in JSON format the trajectory and the generated part of it
+         * @param combineInputList List of {@link TrainReal}
+         * @param gen number of generation for the agent population
+         * @throws Exception  if the class is not instantiate
+         */
+        public static void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int gen) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.dumpTrajectoryAndGeneratedPart(combineInputList, gen);
+        }
+
+        /**
          * Save in JSON format the scores
          * @param generationAgent number of generation for the agent population
          * @param generationClassifier number of generation for the classifier population
@@ -408,17 +419,26 @@ public class SaveToFile {
 
     /**
      * Save in JSON format the trajectory and the generated part of it
-     * @param generationAgent number of generation for the agent population
-     * @param generationClassifier number of generation for the classifier population
      * @param combineInputList List of {@link TrainReal}
+     * @param gen number of generation
      */
-    private void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int generationAgent, int generationClassifier){
-        String path = this.currentPath + "trajectory-generatedPoints-" + generationAgent + "-" + generationClassifier + ".zip";
+    private void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int gen){
+        String path = this.currentPath + "trajectory-generate-aSs-" + gen + ".zip";
+        this.dumpInfo(combineInputList, path);
+    }
+
+
+    /**
+     * Save in JSON format the trajectory and the generated part of it
+     * @param combineInputList List of {@link TrainReal}
+     * @param path path where to save
+     */
+    private void dumpInfo(List<TrainReal> combineInputList, String path){
         try (FileOutputStream zipFile = new FileOutputStream(new File(path));
              ZipOutputStream zos = new ZipOutputStream(zipFile);
              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
         ){
-            ZipEntry csvFile = new ZipEntry(  "trajectory-generatedPoints-" + generationAgent + "-" + generationClassifier + ".json");
+            ZipEntry csvFile = new ZipEntry(  "trajectory-generatedPoints.json");
             zos.putNextEntry(csvFile);
 
             JSONObject totalObj = new JSONObject();
@@ -455,13 +475,24 @@ public class SaveToFile {
                 writer.write(totalObj.toJSONString());
                 writer.newLine();
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Error appending line to trajectory-generatedPoints CSV File-" + generationAgent + "-" + generationClassifier + " " + e.getMessage());
+                logger.log(Level.WARNING, "Error appending line to trajectory-generatedPoints CSV File-" + path + " " + e.getMessage());
                 e.printStackTrace();
             }
 
         }catch (Exception e){
-            logger.log(Level.WARNING, "Error with trajectory-generatedPoints Zip File-" + generationAgent + "-" + generationClassifier + " " + e.getMessage());
+            logger.log(Level.WARNING, "Error with trajectory-generatedPoints Zip File-" + path + " " + e.getMessage());
         }
+    }
+
+    /**
+     * Save in JSON format the trajectory and the generated part of it
+     * @param generationAgent number of generation for the agent population
+     * @param generationClassifier number of generation for the classifier population
+     * @param combineInputList List of {@link TrainReal}
+     */
+    private void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int generationAgent, int generationClassifier){
+        String path = this.currentPath + "trajectory-generatedPoints-" + generationAgent + "-" + generationClassifier + ".zip";
+        this.dumpInfo(combineInputList, path);
     }
 
 

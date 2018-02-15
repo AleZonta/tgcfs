@@ -440,6 +440,14 @@ public class TuringLearning implements Framework{
                     e.printStackTrace();
                 }
 
+
+                //I need to generate this dataset for testing the classifiers and understand visually what is happening
+                //this is happening only in the last generation
+                if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
+                    logger.log(Level.INFO, "Dump agent after survival selection");
+                    this.agents.saveTrajectoriesAfterSelection(generationAgent);
+                }
+
             } catch (ReachedMaximumNumberException e) {
                 logger.log(Level.INFO, e.getMessage());
                 reachedEndTrajectory = Boolean.TRUE;
