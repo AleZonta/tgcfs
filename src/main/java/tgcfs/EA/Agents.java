@@ -628,7 +628,6 @@ public class Agents extends Algorithm {
             private Individual classifier;
             private List<Individual> adersarialPopulation;
             private Map<Integer, Map<UUID, Double>> Tik;
-            private Map<Integer, Map<UUID, Double>> realTik;
 
 
             /**
@@ -641,7 +640,6 @@ public class Agents extends Algorithm {
                 this.classifier = classifier;
                 this.adersarialPopulation = adersarialPopulation;
                 this.Tik = new HashMap<>();
-                this.realTik = new HashMap<>();
             }
 
             /**
@@ -668,14 +666,6 @@ public class Agents extends Algorithm {
              */
             private Map<Integer, Map<UUID, Double>> getResults(){
                 return this.Tik;
-            }
-
-            /**
-             * Getter for the results from the classification
-             * @return Map<Integer, Map<UUID, Double>> containing id agent and his classification
-             */
-            private Map<Integer, Map<UUID, Double>> getOnlyRealResults(){
-                return this.realTik;
             }
 
             /**
@@ -731,7 +721,6 @@ public class Agents extends Algorithm {
                     }
                     //update the main result with the agent id
                     this.Tik.put(realAgentId, Tj);
-                    this.realTik.put(realAgentId, Tj);
                 }
                 latch.countDown();
             }
@@ -799,7 +788,6 @@ public class Agents extends Algorithm {
 
                 //classifier id, agent id, trajectory id, result
                 HashMap<Integer, Map<Integer, Map<UUID, Double>>> results = new HashMap<>();
-                HashMap<Integer, Map<Integer, Map<UUID, Double>>> resultsReal = new HashMap<>();
 
                 //launch the threads for the computations
                 ExecutorService exec = Executors.newFixedThreadPool(96);
@@ -823,7 +811,6 @@ public class Agents extends Algorithm {
                     for (ComputeSelmarFitnessUnit runnable : runnables) {
                         //all the i, j fixed -> classifier_j(agent_i))
                         results.put(runnable.getClassifierID(), runnable.getResults());
-                        resultsReal.put(runnable.getClassifierID(), runnable.getResults());
                     }
 
 
@@ -954,12 +941,6 @@ public class Agents extends Algorithm {
 
 
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                try {
-                    SaveToFile.Saver.saveResultRealClassifier(resultsReal);
-                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
