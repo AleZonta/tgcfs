@@ -19,11 +19,12 @@ import tgcfs.NN.InputsNetwork;
  * This class Implements the input of the agents
  */
 public class InputNetwork implements InputsNetwork {
-    protected double directionAPF;
-    protected double speed;
-    protected double bearing;
+    private double directionAPF;
+    private double speed;
+    private double bearing;
+    private double time;
     private Point targetPoint;
-    public static final int inputSize = 3; //the size of the input corresponding to the three fields here
+    public static final int inputSize = 4; //the size of the input corresponding to the three fields here
 
     /**
      * Constructor zero parameter
@@ -46,6 +47,39 @@ public class InputNetwork implements InputsNetwork {
         }
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.targetPoint = null;
+        this.speed = -99;
+    }
+
+    /**
+     * Constructor with three parameters. all the inputs
+     * It is also normalising the input in the range ±1 for the NN
+     * @param directionAPF Double number corresponding to the direction retrieved form the apf
+     * @param speed Double number corresponding to the speed
+     * @param bearing Double number corresponding to the bearing
+     * @param time time next prediction
+     */
+    public InputNetwork(double directionAPF, double speed, double bearing, double time){
+        this.bearing = Normalisation.convertAngularSpeed(bearing);
+        try {
+            this.speed = Normalisation.convertSpeed(speed);
+        } catch (Exception e) {
+            throw new Error("Error with speed.");
+        }
+        this.directionAPF = Normalisation.convertDirectionData(directionAPF);
+        this.targetPoint = null;
+        this.time = Normalisation.convertTime(time);
+    }
+
+    /**
+     * Constructor two parameters
+     * @param indArray {@link INDArray} containing serialisation another {@link InputNetwork}
+     * @param time time next prediction
+     */
+    public InputNetwork(INDArray indArray, double time){
+        this.speed = indArray.getDouble(0);
+        this.bearing = indArray.getDouble(1);
+        this.directionAPF = indArray.getDouble(2);
+        this.time = Normalisation.convertTime(time);
     }
 
 
@@ -84,6 +118,7 @@ public class InputNetwork implements InputsNetwork {
         array.putScalar(0, this.speed);
         array.putScalar(1, this.bearing);
         array.putScalar(2, this.directionAPF);
+        array.putScalar(3, this.time);
         return array;
     }
 
@@ -114,8 +149,17 @@ public class InputNetwork implements InputsNetwork {
         return array;
     }
 
+    /**
+     * Return the time
+     * @return double value
+     */
+    public double getTime() {
+        return this.time;
+    }
+
     @Override
     public String toString() {
-        return "{" + this.speed + ", " + this.bearing + "}";
+        return "{" + this.speed + ", " + this.bearing + ", " + this.time + "}";
     }
+
 }

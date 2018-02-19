@@ -10,7 +10,6 @@ import lgds.trajectories.Point;
 import lgds.trajectories.Trajectories;
 import lgds.trajectories.Trajectory;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.InputNetworkTime;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.Normalisation;
@@ -223,9 +222,10 @@ public class Feeder {
         PointToSpeedBearing conversion = new PointToSpeedBearing();
 
         //Am I using the time in the generator?
-        boolean usingTime = false;
+        boolean isDdsa = false;
         try {
-            usingTime = ReadConfig.Configurations.getTimeAsInput();
+            if(ReadConfig.Configurations.getTrajectoriesType() == 0 || ReadConfig.Configurations.getTrajectoriesType() == 3)
+                isDdsa = true;
         } catch (Exception ignored) { }
 
 
@@ -239,15 +239,9 @@ public class Feeder {
         List<PointWithBearing> updatedPoints = new ArrayList<>();
 
         //add the first point. No speed, no bearing and no space since it was still
-        if(!usingTime){
-            InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d);
-            firstInputNetwork.setTargetPoint(possibleTarget);
-            totalList.add(firstInputNetwork);
-        }else {
-            InputNetworkTime firstInputNetwork = new InputNetworkTime(attraction, 0d, 0d, 0d);
-            firstInputNetwork.setTargetPoint(possibleTarget);
-            totalList.add(firstInputNetwork);
-        }
+        InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d, 0d);
+        firstInputNetwork.setTargetPoint(possibleTarget);
+        totalList.add(firstInputNetwork);
         updatedPoints.add(new PointWithBearing(points.get(0), 0.0));
 
         double previousBearing = 0.0;
@@ -265,27 +259,19 @@ public class Feeder {
             double angularSpeed;
             PointToSpeedSpeed convertitor = new PointToSpeedSpeed();
 
-            if(!usingTime) {
-                speed = conversion.obtainSpeed(previousPoint, actualPoint);
-                angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing);
-
+            if(isDdsa) {
+                time = Routes.timeBetweenIDSATimesteps;
             }else {
                 time = conversion.obtainTime(previousPoint,actualPoint);
-                allTheTimes.add(time);
-                speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
-                angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
             }
+            allTheTimes.add(time);
+            speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
+            angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
 //            double space = conversion.obtainDistance(previousPoint, actualPoint);
 
-            if(!usingTime) {
-                InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed);
-                inputNetwork.setTargetPoint(possibleTarget);
-                totalList.add(inputNetwork);
-            }else{
-                InputNetworkTime firstInputNetwork = new InputNetworkTime(attraction, speed, angularSpeed, time);
-                firstInputNetwork.setTargetPoint(possibleTarget);
-                totalList.add(firstInputNetwork);
-            }
+            InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, time);
+            inputNetwork.setTargetPoint(possibleTarget);
+            totalList.add(inputNetwork);
             previousBearing = bearing;
         }
         //update the points
@@ -293,25 +279,26 @@ public class Feeder {
         this.points.addAll(updatedPoints);
 
         //If I am using the time I am going to shift all the time in the networks
-        if(usingTime) {
-            //TODO manage to add all the other times if I am going to use more than 1 timestep after the target
+        //TODO manage to add all the other times if I am going to use more than 1 timestep after the target
+        if(isDdsa) {
+            this.lastTime = Routes.timeBetweenIDSATimesteps;
+        }else {
             this.lastTime = conversion.obtainTime(points.get(points.size() - 1), realPoints.get(0));
-            allTheTimes.add(lastTime);
-            logger.log(Level.INFO, allTheTimes.toString());
-
-            List<InputsNetwork> hereNetwork = new ArrayList<>();
-            int i = 0;
-            for(InputsNetwork inputsNetwork: totalList){
-                InputNetworkTime inputNetworkTime = new InputNetworkTime();
-                inputNetworkTime.deserialiseFromNormalInput(inputsNetwork.serialise(), allTheTimes.get(i));
-
-                hereNetwork.add(inputNetworkTime);
-                i+=1;
-            }
-
-            totalList.clear();
-            totalList = hereNetwork;
         }
+        allTheTimes.add(lastTime);
+        logger.log(Level.INFO, allTheTimes.toString());
+
+        List<InputsNetwork> hereNetwork = new ArrayList<>();
+        int i = 0;
+        for(InputsNetwork inputsNetwork: totalList){
+            InputNetwork inputNetworkTime = new InputNetwork(inputsNetwork.serialise(), allTheTimes.get(i));
+            hereNetwork.add(inputNetworkTime);
+            i+=1;
+        }
+
+        totalList.clear();
+        totalList = hereNetwork;
+
         return totalList;
     }
 

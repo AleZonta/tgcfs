@@ -3,7 +3,6 @@ package tgcfs.Framework;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.InputNetworkTime;
 import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
@@ -122,11 +121,7 @@ public class TuringLearning implements Framework{
         //decide which model to implement here
         switch (ReadConfig.Configurations.getValueModel()){
             case 0:
-                if(ReadConfig.Configurations.getTimeAsInput()) {
-                    agentModel = new LSTMAgent(InputNetworkTime.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
-                }else{
-                    agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
-                }
+                agentModel = new LSTMAgent(InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsAgent(), OutputNetwork.outputSize);
                 break;
             case 1:
                 // fixed size for now

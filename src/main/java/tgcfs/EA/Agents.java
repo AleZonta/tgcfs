@@ -7,7 +7,6 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
-import tgcfs.Agents.InputNetworkTime;
 import tgcfs.Agents.Models.Clax;
 import tgcfs.Agents.Models.ConvAgent;
 import tgcfs.Agents.Models.LSTMAgent;
@@ -111,15 +110,13 @@ public class Agents extends Algorithm {
         class ComputeUnit implements Runnable {
             private CountDownLatch latch;
             private Individual agent;
-            private boolean time;
 
             /**
              * Constructor
              * @param agent agent
              */
-            private ComputeUnit(Individual agent, boolean time) {
+            private ComputeUnit(Individual agent) {
                 this.agent = agent;
-                this.time = time;
             }
 
             /**
@@ -183,12 +180,7 @@ public class Agents extends Algorithm {
                     List<InputsNetwork> in = currentInputsNetwork.getTrainingPoint();
                     int size = in.size();
 
-                    int inputSize;
-                    if(!this.time){
-                        inputSize = InputNetwork.inputSize;
-                    }else{
-                        inputSize = InputNetworkTime.inputSize;
-                    }
+                    int inputSize = InputNetwork.inputSize;
 
                     INDArray features = Nd4j.create(new int[]{1, inputSize, size}, 'f');
                     for (int j = 0; j < size; j++) {
@@ -204,7 +196,7 @@ public class Agents extends Algorithm {
                     if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + realLastOut.toString());
                     this.addOutput(realLastOut, outputsNetworks);
 
-                    if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM transformed ->" + outputsNetworks.toString());
+                    logger.log(Level.INFO, inputsNetwork.getId() + " Output LSTM transformed ->" + outputsNetworks.toString());
 
                     //output has only two fields, input needs three
                     //I am using the last direction present into input I am adding that one to the last output
@@ -224,7 +216,7 @@ public class Agents extends Algorithm {
                     currentInputsNetwork.setOutputComputed(outputsNetworks);
 
                     //create the output already computed
-                    currentInputsNetwork.createRealOutputConverted(this.time);
+                    currentInputsNetwork.createRealOutputConverted();
                     individual.addMyInputandOutput(currentInputsNetwork.deepCopy());
 
                     ((LSTMAgent)model).clearPreviousState();
@@ -253,10 +245,9 @@ public class Agents extends Algorithm {
         ExecutorService exec = Executors.newFixedThreadPool(16);
         CountDownLatch latch = new CountDownLatch(super.getPopulationWithHallOfFame().size());
         ComputeUnit[] runnables = new ComputeUnit[super.getPopulationWithHallOfFame().size()];
-        boolean time = ReadConfig.Configurations.getTimeAsInput();
 
         for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
-            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i), time);
+            runnables[i] = new ComputeUnit(super.getPopulationWithHallOfFame().get(i));
         }
         for(ComputeUnit r : runnables) {
             r.setLatch(latch);
@@ -451,7 +442,7 @@ public class Agents extends Algorithm {
             currentInputsNetwork.setOutputComputed(outputsNetworks);
 
             //create the output already computed
-            currentInputsNetwork.createRealOutputConverted(false);
+            currentInputsNetwork.createRealOutputConverted();
             individual.addMyInputandOutput(currentInputsNetwork);
 
             ((LSTMAgent)model).clearPreviousState();
@@ -885,12 +876,27 @@ public class Agents extends Algorithm {
 
 
                                 if(realAgentsId.stream().anyMatch(t -> t == agentId)){
-                                    //if TRUE=real
-                                    subE.put(agentId, Math.pow(1 - y, 2));
+                                    //if point is a real point
+//                                    subE.put(agentId, Math.pow(1 - y, 2));
+                                    if(y > 0.5) {
+                                        //if point real point and it is classified as a real
+                                        subE.put(agentId, Math.pow(1 - y, 2) * 100);
+                                    }else {
+                                        //if point is a real point and it is classified as fake
+                                        subE.put(agentId, Math.pow(1 - y, 2));
+                                    }
 //                                    subE.put(agentId, Math.pow(1 - y, 2) * 100);
                                 }else{
-                                    //if False=False
+                                    ///if point is a generated point
                                     subE.put(agentId, Math.pow(y, 2));
+                                    if(y > 0.5) {
+                                        //if point is a generated point and it is classified as real
+                                        subE.put(agentId, Math.pow(y, 2) * 100);
+                                    }else {
+                                        //if point is a generated point and it is classified as fake
+                                        subE.put(agentId, Math.pow(y, 2));
+                                    }
+
                                 }
 
                             }
@@ -932,7 +938,7 @@ public class Agents extends Algorithm {
                             HashMap<Integer, Double> allTheI = Eij.get(id);
 
                             for(int agentId: allTheI.keySet()){
-                                fitness += (1 - allTheI.get(agentId));
+                                fitness += (Math.abs(1 - allTheI.get(agentId)));
                             }
                         }
                         classifier.setFitness(fitness);
@@ -1030,7 +1036,6 @@ public class Agents extends Algorithm {
      * @param transformation {@link FollowingTheGraph} transformation reference to transform the output in real point //TODO generalise this
      */
     public void generateRealPoints(FollowingTheGraph transformation) throws Exception {
-        boolean time = ReadConfig.Configurations.getTimeAsInput();
 
         for(Individual ind: super.getPopulation()) {
             for (TrainReal train : ind.getMyInputandOutput()) {
@@ -1038,7 +1043,7 @@ public class Agents extends Algorithm {
                     List<PointWithBearing> generatedPoint = new ArrayList<>();
                     transformation.setLastPoint(train.getLastPoint());
                     for(OutputsNetwork outputsNetwork: train.getOutputComputed()){
-                        generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork, time, train.getLastTime())));
+                        generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork, train.getLastTime())));
                     }
                     train.setRealPointsOutputComputed(generatedPoint);
                 }

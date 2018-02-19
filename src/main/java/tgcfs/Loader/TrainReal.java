@@ -103,6 +103,32 @@ public class TrainReal {
     }
 
     /**
+     * Constructor with three parameters
+     * @param trainingPoint list of inputNetwork
+     * @param followingPart list of points
+     */
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> followingPart, double lastTime, UUID id){
+        this.id = id;
+        this.trainingPoint = trainingPoint;
+        this.followingPart = followingPart;
+        this.firstPart = null;
+        //the conditional image path is hardcoded -> has to be in the same directory of the program
+        this.conditionalImage = null;
+        this.normalImage = null;
+        this.idsaLoader = null;
+        this.outputComputed = null;
+        this.realPointsOutputComputed = null;
+        this.totalPoints = null;
+        this.followingPartTransformed = null;
+        this.allThePartTransformedFake = null;
+        this.allThePartTransformedReal = null;
+        this.realOutput = null;
+        this.idRealPoint = null;
+        this.fitnessGivenByTheClassifier = 0;
+        this.lastTime = lastTime;
+    }
+
+    /**
      * Constructor with four parameters
      * @param trainingPoint list of inputNetwork
      * @param followingPart list of points
@@ -208,15 +234,9 @@ public class TrainReal {
     public List<InputsNetwork> getTrainingPointSettedForTheClassifier(){
         List<InputsNetwork> newlist = new ArrayList<>();
         for(InputsNetwork tr: this.trainingPoint){
-            if(tr.getClass().equals(tgcfs.Agents.InputNetwork.class)) {
-                INDArray ind = ((tgcfs.Agents.InputNetwork) tr).serialiseAsInputClassifier();
-                InputNetwork in = new InputNetwork(ind.getDouble(0), ind.getDouble(1), false);
-                newlist.add(in);
-            }else{
-                INDArray ind = ((tgcfs.Agents.InputNetworkTime) tr).serialiseAsInputClassifier();
-                InputNetwork in = new InputNetwork(ind.getDouble(0), ind.getDouble(1), false);
-                newlist.add(in);
-            }
+            INDArray ind = ((tgcfs.Agents.InputNetwork) tr).serialiseAsInputClassifier();
+            InputNetwork in = new InputNetwork(ind.getDouble(0), ind.getDouble(1), false);
+            newlist.add(in);
         }
         return newlist;
     }
@@ -426,7 +446,7 @@ public class TrainReal {
     /**
      * Transform the real point given as real output into an {@link OutputNetwork} for the classifier
      */
-    public void createRealOutputConverted(boolean isTime){
+    public void createRealOutputConverted(){
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
         List<OutputsNetwork> totalList = new ArrayList<>();
@@ -441,18 +461,12 @@ public class TrainReal {
             Point previousPoint = herePoint.get(i - 1);
             Point actualPoint = herePoint.get(i);
 
-            if(!isTime) {
-                double bearing = conversion.obtainBearing(previousPoint, actualPoint);
-                double speed = conversion.obtainSpeed(previousPoint, actualPoint);
+            double bearing = conversion.obtainBearing(previousPoint, actualPoint);
+            double speed = conversion.obtainSpeed(previousPoint, actualPoint, this.lastTime);
 
-                totalList.add(new OutputNetwork(speed, bearing));
-            }else {
-                double bearing = conversion.obtainBearing(previousPoint, actualPoint);
-                double speed = conversion.obtainSpeed(previousPoint, actualPoint, this.lastTime);
-
-                totalList.add(new OutputNetwork(speed, bearing));
+            totalList.add(new OutputNetwork(speed, bearing));
 //                totalList.add(new OutputNetworkTime(speed, bearing, time));
-            }
+
         }
 
         this.realOutput = new ArrayList<>();
@@ -464,7 +478,7 @@ public class TrainReal {
      * @return {@link TrainReal} object
      */
     public TrainReal softCopy(){
-        return new TrainReal(this.trainingPoint,this.followingPart, this.lastTime);
+        return new TrainReal(this.trainingPoint,this.followingPart, this.lastTime, this.id);
     }
 
     /**
