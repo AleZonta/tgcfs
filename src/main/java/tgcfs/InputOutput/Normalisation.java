@@ -129,6 +129,7 @@ public class Normalisation {
      * @return double real value
      */
     public static double decodeSpeed(double toBeConverted) {
+        if(toBeConverted < 0) return 0;
         return toBeConverted; //linear conversion
 //        return convertToSomething(1.0, -1.0, ReadConfig.Configurations.getMaxSpeed(), min_speed, toBeConverted);
     }
