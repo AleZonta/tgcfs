@@ -96,7 +96,7 @@ public class ENN extends Models implements Network {
                 .biasInit(0.0)
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(input + HiddenNeurons).nOut(HiddenNeurons)
-                        .activation(Activation.TANH)
+                        .activation(Activation.SIGMOID)
                         .build())
                 .layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).nIn(HiddenNeurons).nOut(output)
                         .activation(Activation.SIGMOID)
