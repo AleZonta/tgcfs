@@ -832,6 +832,12 @@ public class Feeder {
             //logger.log(Level.INFO, "TrainReal sit size not correct, adding one more example");
         }
 
+        for(TrainReal tr: totalList){
+            //create the output already computed
+            tr.createRealOutputConverted();
+            logger.log(Level.INFO, tr.getId() + " Real point transformed ->" + tr.getRealOutput().toString());
+        }
+
         return totalList;
     }
 

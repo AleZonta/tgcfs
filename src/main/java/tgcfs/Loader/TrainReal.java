@@ -107,7 +107,7 @@ public class TrainReal {
      * @param trainingPoint list of inputNetwork
      * @param followingPart list of points
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> followingPart, double lastTime, UUID id){
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> followingPart, double lastTime, UUID id, List<OutputsNetwork> realOutput){
         this.id = id;
         this.trainingPoint = trainingPoint;
         this.followingPart = followingPart;
@@ -122,7 +122,7 @@ public class TrainReal {
         this.followingPartTransformed = null;
         this.allThePartTransformedFake = null;
         this.allThePartTransformedReal = null;
-        this.realOutput = null;
+        this.realOutput = realOutput;
         this.idRealPoint = null;
         this.fitnessGivenByTheClassifier = 0;
         this.lastTime = lastTime;
@@ -447,30 +447,32 @@ public class TrainReal {
      * Transform the real point given as real output into an {@link OutputNetwork} for the classifier
      */
     public void createRealOutputConverted(){
-        //class that compute the conversion point -> speed/bearing
-        PointToSpeedBearing conversion = new PointToSpeedBearing();
-        List<OutputsNetwork> totalList = new ArrayList<>();
+        if(this.realOutput == null) {
+            //class that compute the conversion point -> speed/bearing
+            PointToSpeedBearing conversion = new PointToSpeedBearing();
+            List<OutputsNetwork> totalList = new ArrayList<>();
 
-        //add the last point to the end to enable the computation of the output
-        List<Point> herePoint = new ArrayList<>();
-        herePoint.add(this.firstPart.get(this.firstPart.size() - 1));
-        herePoint.addAll(this.followingPart);
+            //add the last point to the end to enable the computation of the output
+            List<Point> herePoint = new ArrayList<>();
+            herePoint.add(this.firstPart.get(this.firstPart.size() - 1));
+            herePoint.addAll(this.followingPart);
 
-        for(int i=1; i<herePoint.size(); i++){
+            for (int i = 1; i < herePoint.size(); i++) {
 
-            Point previousPoint = herePoint.get(i - 1);
-            Point actualPoint = herePoint.get(i);
+                Point previousPoint = herePoint.get(i - 1);
+                Point actualPoint = herePoint.get(i);
 
-            double bearing = conversion.obtainBearing(previousPoint, actualPoint);
-            double speed = conversion.obtainSpeed(previousPoint, actualPoint, this.lastTime);
+                double bearing = conversion.obtainBearing(previousPoint, actualPoint);
+                double speed = conversion.obtainSpeed(previousPoint, actualPoint, this.lastTime);
 
-            totalList.add(new OutputNetwork(speed, bearing));
+                totalList.add(new OutputNetwork(speed, bearing));
 //                totalList.add(new OutputNetworkTime(speed, bearing, time));
 
-        }
+            }
 
-        this.realOutput = new ArrayList<>();
-        this.realOutput.addAll(totalList);
+            this.realOutput = new ArrayList<>();
+            this.realOutput.addAll(totalList);
+        }
     }
 
     /**
@@ -478,7 +480,7 @@ public class TrainReal {
      * @return {@link TrainReal} object
      */
     public TrainReal softCopy(){
-        return new TrainReal(this.trainingPoint,this.followingPart, this.lastTime, this.id);
+        return new TrainReal(this.trainingPoint,this.followingPart, this.lastTime, this.id, this.realOutput);
     }
 
     /**
