@@ -894,7 +894,7 @@ public class Agents extends Algorithm {
 //                                    subE.put(agentId, Math.pow(1 - y, 2));
                                     if(y > 0.5) {
                                         //if point real point and it is classified as a real
-                                        subE.put(agentId, Math.pow(1 - y, 2)*50);
+                                        subE.put(agentId, Math.pow(1 - y, 2)*100);
                                     }else {
                                         //if point is a real point and it is classified as fake
                                         subE.put(agentId, Math.pow(1 - y, 2));
