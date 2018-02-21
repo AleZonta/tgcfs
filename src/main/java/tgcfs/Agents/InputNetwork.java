@@ -47,7 +47,7 @@ public class InputNetwork implements InputsNetwork {
         }
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.targetPoint = null;
-        this.speed = -99;
+        this.time = -99;
     }
 
     /**

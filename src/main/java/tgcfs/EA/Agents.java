@@ -157,9 +157,8 @@ public class Agents extends Algorithm {
              * @param input the input of the model
              * @param model the model LSTM used
              * @param individual the individual under evaluation
-             * @throws Exception if something bad happened
              */
-            private void runLSTM(List<TrainReal> input, EvolvableModel model, Individual individual) throws Exception {
+            private void runLSTM(List<TrainReal> input, EvolvableModel model, Individual individual) {
                 //compute Output of the network
                 INDArray lastOutput = null;
 
@@ -206,7 +205,7 @@ public class Agents extends Algorithm {
                         //transform output into input and add the direction
                         OutputNetwork outLocal = new OutputNetwork();
                         outLocal.deserialise(lastOutput);
-                        InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
+                        InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing(), currentInputsNetwork.getLastTime());
                         lastOutput = model.computeOutput(inputLocal.serialise());
 
                         if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
@@ -215,6 +214,8 @@ public class Agents extends Algorithm {
                     //assign the output to this individual
                     currentInputsNetwork.setOutputComputed(outputsNetworks);
                     individual.addMyInputandOutput(currentInputsNetwork.deepCopy());
+
+
 
                     ((LSTMAgent)model).clearPreviousState();
                 }
@@ -256,6 +257,22 @@ public class Agents extends Algorithm {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+
+//        for(Individual agent: super.getPopulationWithHallOfFame()){
+//            //retrieve model from the individual
+//            EvolvableModel model = agent.getModel();
+//            //set the weights
+//            model.setWeights(agent.getObjectiveParameters());
+//            //select which model I am using
+//            if (model.getClass().equals(LSTMAgent.class)) {
+//                this.runLSTM(input, model, agent);
+//            } else {
+//                throw new Exception("Not yet Implemented");
+//            }
+//        }
+
 
     }
 
@@ -401,6 +418,7 @@ public class Agents extends Algorithm {
 
             List<InputsNetwork> in = currentInputsNetwork.getTrainingPoint();
             int size = in.size();
+
             INDArray features = Nd4j.create(new int[]{1, InputNetwork.inputSize, size}, 'f');
             for (int j = 0; j < size; j++) {
                 INDArray vector = in.get(j).serialise();
@@ -416,7 +434,7 @@ public class Agents extends Algorithm {
             OutputNetwork out = new OutputNetwork();
             out.deserialise(realLastOut);
             outputsNetworks.add(out);
-            if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM transformed ->" + outputsNetworks.toString());
+            logger.log(Level.INFO, "Output LSTM transformed ->" + outputsNetworks.toString());
 
             //output has only two fields, input needs three
             //I am using the last direction present into input I am adding that one to the last output
@@ -426,7 +444,7 @@ public class Agents extends Algorithm {
                 //transform output into input and add the direction
                 OutputNetwork outLocal = new OutputNetwork();
                 outLocal.deserialise(lastOutput);
-                InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing());
+                InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing(), currentInputsNetwork.getLastTime());
                 lastOutput = model.computeOutput(inputLocal.serialise());
 
                 if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
@@ -439,7 +457,6 @@ public class Agents extends Algorithm {
             currentInputsNetwork.setOutputComputed(outputsNetworks);
 
             //create the output already computed
-            currentInputsNetwork.createRealOutputConverted();
             individual.addMyInputandOutput(currentInputsNetwork);
 
             ((LSTMAgent)model).clearPreviousState();
@@ -877,10 +894,10 @@ public class Agents extends Algorithm {
 //                                    subE.put(agentId, Math.pow(1 - y, 2));
                                     if(y > 0.5) {
                                         //if point real point and it is classified as a real
-                                        subE.put(agentId, Math.pow(1 - y, 2) * 5);
+                                        subE.put(agentId, Math.pow(1 - y, 2) * 100);
                                     }else {
                                         //if point is a real point and it is classified as fake
-                                        subE.put(agentId, Math.pow(1 - y, 2) * 0.5);
+                                        subE.put(agentId, Math.pow(1 - y, 2) * 2);
                                     }
 //                                    subE.put(agentId, Math.pow(1 - y, 2) * 100);
                                 }else{
@@ -888,10 +905,10 @@ public class Agents extends Algorithm {
                                     subE.put(agentId, Math.pow(y, 2));
                                     if(y > 0.5) {
                                         //if point is a generated point and it is classified as real
-                                        subE.put(agentId, Math.pow(y, 2) * 20);
+                                        subE.put(agentId, Math.pow(y, 2) * 100);
                                     }else {
                                         //if point is a generated point and it is classified as fake
-                                        subE.put(agentId, Math.pow(y, 2) * 0.05);
+                                        subE.put(agentId, Math.pow(y, 2) * 10);
                                     }
 
                                 }

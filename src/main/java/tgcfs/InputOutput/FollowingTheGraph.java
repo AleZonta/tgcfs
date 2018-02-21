@@ -165,10 +165,7 @@ public class FollowingTheGraph implements Transformation {
 
         for(int j = 0; j<i; j++){
             OutputsNetwork output = out.get(j);
-            Point position;
-//                OutputNetworkTime outputTime = (OutputNetworkTime) output;
-            OutputNetwork outputTime = (OutputNetwork) output;
-            position = this.feeder.getNextLocationNoGraph(this.lastPoint, outputTime.getSpeed(), outputTime.getBearing(), trainReal.getLastTime());
+            Point position = trainReal.getFollowingPart().get(j);
             InputNetwork inputNetwork = new InputNetwork(output.getSpeed(), convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), trainReal.getLastTime()));
 
             convertedInputReal.add(inputNetwork);

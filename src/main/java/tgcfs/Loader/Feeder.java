@@ -720,6 +720,7 @@ public class Feeder {
 
 
     private Point getNextLocation(Point whereIam, Double speed, Double direction, double time){
+        if (speed == 0.0) return whereIam;
         double distance = speed * time;
 
         //distance in kilometers
