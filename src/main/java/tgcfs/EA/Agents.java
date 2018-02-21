@@ -894,7 +894,7 @@ public class Agents extends Algorithm {
 //                                    subE.put(agentId, Math.pow(1 - y, 2));
                                     if(y > 0.5) {
                                         //if point real point and it is classified as a real
-                                        subE.put(agentId, Math.pow(1 - y, 2));
+                                        subE.put(agentId, Math.pow(1 - y, 2)*50);
                                     }else {
                                         //if point is a real point and it is classified as fake
                                         subE.put(agentId, Math.pow(1 - y, 2));
@@ -905,7 +905,7 @@ public class Agents extends Algorithm {
                                     subE.put(agentId, Math.pow(y, 2));
                                     if(y > 0.5) {
                                         //if point is a generated point and it is classified as real
-                                        subE.put(agentId, Math.pow(y, 2));
+                                        subE.put(agentId, Math.pow(y, 2)*100);
                                     }else {
                                         //if point is a generated point and it is classified as fake
                                         subE.put(agentId, Math.pow(y, 2));
