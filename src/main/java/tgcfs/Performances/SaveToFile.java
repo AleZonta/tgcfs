@@ -425,8 +425,34 @@ public class SaveToFile {
     private void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int gen){
         String path = this.currentPath + "trajectory-generate-aSs-" + gen + ".zip";
         this.dumpInfo(combineInputList, path);
+        path = this.currentPath + "statistic.csv";
+        this.saveStatistics(combineInputList, path);
     }
 
+
+    /**
+     * Save all the statistic related the points generated
+     * @param combineInputList  List of {@link TrainReal}
+     * @param path path where to save
+     */
+    private void saveStatistics(List<TrainReal> combineInputList, String path){
+        try {
+            BufferedWriter outputWriter = new BufferedWriter(new FileWriter(path, true));
+            for(TrainReal trainReal: combineInputList){
+                String stat = trainReal.getStatistics().toString();
+                outputWriter.write(stat);
+                outputWriter.write(", ");
+            }
+            outputWriter.newLine();
+
+            logger.log(Level.INFO, "Successfully Added Line to " + path + " CSV File");
+
+            outputWriter.flush();
+            outputWriter.close();
+        }catch (Exception e){
+            logger.log(Level.WARNING, "Error with " + path + " CSV File " + e.getMessage());
+        }
+    }
 
     /**
      * Save in JSON format the trajectory and the generated part of it

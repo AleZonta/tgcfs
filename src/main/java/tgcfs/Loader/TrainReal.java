@@ -1,5 +1,6 @@
 package tgcfs.Loader;
 
+import lgds.Distance.Distance;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -11,6 +12,7 @@ import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
+import tgcfs.Performances.Statistics;
 import tgcfs.Utils.PointWithBearing;
 
 import java.nio.file.Paths;
@@ -50,6 +52,7 @@ public class TrainReal {
     private double fitnessGivenByTheClassifier;
     private RealAgent idRealPoint;
     private double lastTime;
+    private Statistics statistics;
 
     /**
      * Constructor with two parameters
@@ -74,6 +77,7 @@ public class TrainReal {
         this.realOutput = null;
         this.idRealPoint = null;
         this.fitnessGivenByTheClassifier = 0;
+        this.statistics = null;
     }
 
     /**
@@ -100,6 +104,7 @@ public class TrainReal {
         this.idRealPoint = null;
         this.fitnessGivenByTheClassifier = 0;
         this.lastTime = lastTime;
+        this.statistics = null;
     }
 
     /**
@@ -126,6 +131,7 @@ public class TrainReal {
         this.idRealPoint = null;
         this.fitnessGivenByTheClassifier = 0;
         this.lastTime = lastTime;
+        this.statistics = null;
     }
 
     /**
@@ -151,6 +157,7 @@ public class TrainReal {
         this.realOutput = null;
         this.idRealPoint = null;
         this.fitnessGivenByTheClassifier = 0;
+        this.statistics = null;
     }
 
 
@@ -177,6 +184,7 @@ public class TrainReal {
         this.realOutput = null;
         this.idRealPoint = null;
         this.fitnessGivenByTheClassifier = 0;
+        this.statistics = null;
     }
 
 
@@ -197,7 +205,7 @@ public class TrainReal {
      * @param totalPoints
      * @param idRealPoint
      */
-    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id, RealAgent idRealPoint, double fitnessGivenByTheClassifier, double time) {
+    public TrainReal(List<InputsNetwork> trainingPoint, List<PointWithBearing> firstPart, List<PointWithBearing> followingPart, List<InputsNetwork> followingPartTransformed, List<OutputsNetwork> realOutput, List<InputsNetwork> allThePartTransformedFake, List<InputsNetwork> allThePartTransformedReal, String conditionalImage, String normalImage, List<OutputsNetwork> outputComputed, List<PointWithBearing> realPointsOutputComputed, IdsaLoader idsaLoader, List<Point> totalPoints, UUID id, RealAgent idRealPoint, double fitnessGivenByTheClassifier, double time, Statistics statistics) {
         this.id = id;
         this.trainingPoint = trainingPoint;
         this.firstPart = firstPart;
@@ -215,6 +223,7 @@ public class TrainReal {
         this.idRealPoint = idRealPoint;
         this.fitnessGivenByTheClassifier = fitnessGivenByTheClassifier;
         this.lastTime = time;
+        this.statistics = statistics;
     }
 
 
@@ -488,7 +497,7 @@ public class TrainReal {
      * @return {@link TrainReal} object
      */
     public TrainReal deepCopy(){
-        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id, this.idRealPoint, this.fitnessGivenByTheClassifier, this.lastTime);
+        return new TrainReal(this.trainingPoint, this.firstPart, this.followingPart, this.followingPartTransformed, this.realOutput, this.allThePartTransformedFake, this.allThePartTransformedReal, this.conditionalImage, this.normalImage, this.outputComputed, this.realPointsOutputComputed, this.idsaLoader, this.totalPoints, this.id, this.idRealPoint, this.fitnessGivenByTheClassifier, this.lastTime, this.statistics);
     }
 
     /**
@@ -529,6 +538,36 @@ public class TrainReal {
      */
     public double getLastTime() {
         return this.lastTime;
+    }
+
+
+    /**
+     * Compute the statistics for this point
+     * - distance between generated point and real point
+     * - difference between original bearing and generated bearing
+     * TODO generalise for more than one point
+     */
+    public void computeStatistic() {
+        //compute distance real point to generated point
+        //* 1000 so it is going to be in metres
+        Distance distance = new Distance();
+        double distancePoint = distance.compute(this.followingPart.get(0), this.realPointsOutputComputed.get(0));
+
+        PointToSpeedBearing convertitor = new PointToSpeedBearing();
+
+        double realBearing = convertitor.obtainBearing(this.getLastPoint(), this.followingPart.get(0));
+        double computeBearing = convertitor.obtainBearing(this.getLastPoint(), this.realPointsOutputComputed.get(0));
+
+        double differenceBearing = 180 - Math.abs(Math.abs(realBearing - computeBearing) - 180);
+        this.statistics = new Statistics(distancePoint, differenceBearing, this.id);
+    }
+
+    /**
+     * Getter for the statistics of this point
+     * @return {@link Statistics object}
+     */
+    public Statistics getStatistics() {
+        return statistics;
     }
 }
 

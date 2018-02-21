@@ -1060,6 +1060,7 @@ public class Agents extends Algorithm {
                         generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork, train.getLastTime())));
                     }
                     train.setRealPointsOutputComputed(generatedPoint);
+                    train.computeStatistic();
                 }
             }
         }
