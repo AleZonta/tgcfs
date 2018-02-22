@@ -633,6 +633,7 @@ public class Agents extends Algorithm {
             private Individual classifier;
             private List<Individual> adersarialPopulation;
             private Map<Integer, Map<UUID, Double>> Tik;
+            private Map<Integer, UUID> toForget;
 
 
             /**
@@ -645,6 +646,7 @@ public class Agents extends Algorithm {
                 this.classifier = classifier;
                 this.adersarialPopulation = adersarialPopulation;
                 this.Tik = new HashMap<>();
+                this.toForget = new HashMap<>();
             }
 
             /**
@@ -662,6 +664,15 @@ public class Agents extends Algorithm {
              */
             private int getClassifierID(){
                 return this.classifier.getModel().getId();
+            }
+
+
+            /**
+             * Getting to forget elements
+             * @return Map<Integer, UUID>> containing id agent and id trajectory
+             */
+            private Map<Integer, UUID> getToForget(){
+                return this.toForget;
             }
 
 
@@ -685,47 +696,105 @@ public class Agents extends Algorithm {
                 for(Individual agent: this.adersarialPopulation){
                     List<TrainReal> inputOutput = agent.getMyInputandOutput();
 
+//                    //agent id is always the same for all the trajectories
+//                    int agentId = agent.getModel().getId();
+//
+//                    // trajectory result
+//                    Map<UUID, Double> Tj = new HashMap<>();
+//
+//                    for(TrainReal example: inputOutput) {
+//                        //run the classifier for the Fake trajectory
+//                        try {
+//                            tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedFake());
+//                            if (ReadConfig.debug) logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
+//                            //save all the results
+//                            Tj.put(example.getId(), result.getRealValue());
+//                        } catch (Exception e) {
+//                            logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    //update the main result with the agent id
+//                    this.Tik.put(agentId, Tj);
+//
+//                    //also this one is going to be always the same. Lets use only the first real one
+//                    int realAgentId = inputOutput.get(0).getIdRealPoint().getId();
+//                    // trajectory result
+//                    Map<UUID, Double> T2j = new HashMap<>();
+//
+//                    for(TrainReal example: inputOutput){
+//                        //run the classifier for the Real trajectory
+//                        try {
+//                            tgcfs.Classifiers.OutputNetwork resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedReal());
+//                            if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue());
+//                            //save all the results
+//                            T2j.put(example.getId(), resultReal.getRealValue());
+//
+//                        } catch (Exception e) {
+//                            logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    //update the main result with the agent id
+//                    this.Tik.put(realAgentId, T2j);
+
+
+
+
                     //agent id is always the same for all the trajectories
                     int agentId = agent.getModel().getId();
-
+                    //also this one is going to be always the same. Lets use only the first real one
+                    int realAgentId = inputOutput.get(0).getIdRealPoint().getId();
                     // trajectory result
                     Map<UUID, Double> Tj = new HashMap<>();
-
+                    // trajectory result
+                    Map<UUID, Double> T2j = new HashMap<>();
                     for(TrainReal example: inputOutput) {
                         //run the classifier for the Fake trajectory
+                        tgcfs.Classifiers.OutputNetwork result = null;
                         try {
-                            tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedFake());
-                            if (ReadConfig.debug) logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
+                            result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedFake());
+                            if (ReadConfig.debug)
+                                logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
                             //save all the results
-                            Tj.put(example.getId(), result.getRealValue());
+
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
                             e.printStackTrace();
                         }
-                    }
-                    //update the main result with the agent id
-                    this.Tik.put(agentId, Tj);
 
-                    //also this one is going to be always the same. Lets use only the first real one
-                    int realAgentId = inputOutput.get(0).getIdRealPoint().getId();
-                    // trajectory result
-                    Tj = new HashMap<>();
-
-                    for(TrainReal example: inputOutput){
+                        tgcfs.Classifiers.OutputNetwork resultReal = null;
                         //run the classifier for the Real trajectory
                         try {
-                            tgcfs.Classifiers.OutputNetwork resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedReal());
+                            resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedReal());
                             if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue());
                             //save all the results
-                            Tj.put(example.getId(), resultReal.getRealValue());
 
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
                             e.printStackTrace();
                         }
+                        Tj.put(example.getId(), result.getRealValue());
+                        T2j.put(example.getId(), resultReal.getRealValue());
+
+                        //fake point classified fake | real point classified real = okay
+                        //fake point classified fake | real point classified fake = 0
+                        //fake point classified real | real point classified real = okay
+                        //fake point classified real | real point classified fake = 0
+                        if((result.getRealValue() <= 0.5 && resultReal.getRealValue() > 0.5) || (result.getRealValue() > 0.5 && resultReal.getRealValue() > 0.5)){
+                            //ok
+                        }else{
+                            //save the ids
+                            this.toForget.put(agentId, example.getId());
+                            this.toForget.put(realAgentId, example.getId());
+                        }
+
+
                     }
                     //update the main result with the agent id
-                    this.Tik.put(realAgentId, Tj);
+                    this.Tik.put(agentId, Tj);
+                    //update the main result with the agent id
+                    this.Tik.put(realAgentId, T2j);
                 }
                 latch.countDown();
             }
@@ -794,6 +863,9 @@ public class Agents extends Algorithm {
                 //classifier id, agent id, trajectory id, result
                 HashMap<Integer, Map<Integer, Map<UUID, Double>>> results = new HashMap<>();
 
+                //id to not use in fitness
+                HashMap<Integer, Map<Integer, UUID>> toAvoid = new HashMap<>();
+
                 //launch the threads for the computations
                 ExecutorService exec = Executors.newFixedThreadPool(96);
                 CountDownLatch latch = new CountDownLatch(competingPopulation.getPopulationWithHallOfFame().size());
@@ -816,6 +888,7 @@ public class Agents extends Algorithm {
                     for (ComputeSelmarFitnessUnit runnable : runnables) {
                         //all the i, j fixed -> classifier_j(agent_i))
                         results.put(runnable.getClassifierID(), runnable.getResults());
+                        toAvoid.put(runnable.getClassifierID(), runnable.getToForget());
                     }
 
 
@@ -894,7 +967,7 @@ public class Agents extends Algorithm {
 //                                    subE.put(agentId, Math.pow(1 - y, 2));
                                     if(y > 0.5) {
                                         //if point real point and it is classified as a real
-                                        subE.put(agentId, Math.pow(1 - y, 2)*100);
+                                        subE.put(agentId, Math.pow(1 - y, 2));
                                     }else {
                                         //if point is a real point and it is classified as fake
                                         subE.put(agentId, Math.pow(1 - y, 2));
@@ -905,7 +978,7 @@ public class Agents extends Algorithm {
                                     subE.put(agentId, Math.pow(y, 2));
                                     if(y > 0.5) {
                                         //if point is a generated point and it is classified as real
-                                        subE.put(agentId, Math.pow(y, 2)*100);
+                                        subE.put(agentId, Math.pow(y, 2));
                                     }else {
                                         //if point is a generated point and it is classified as fake
                                         subE.put(agentId, Math.pow(y, 2));
@@ -930,9 +1003,14 @@ public class Agents extends Algorithm {
                         //need to find all the values with that id and with all the trajectories
                         for(UUID uuid: Eijk.keySet()){
                             HashMap<Integer, HashMap<Integer, Double>> Eij = Eijk.get(uuid);
+
                             //need to find all the values with that id
                             for(int classifierID: Eij.keySet()){
-                                fitness += Eij.get(classifierID).get(id);
+                                //find values to avoid
+                                Map<Integer, UUID> toNotUse = toAvoid.get(classifierID);
+                                if(!(toNotUse.containsKey(id) && toNotUse.get(id)==uuid)){
+                                    fitness += Eij.get(classifierID).get(id);
+                                }
                             }
                         }
                         agent.setFitness(fitness);
@@ -946,13 +1024,20 @@ public class Agents extends Algorithm {
                     for(Individual classifier: competingPopulation.getPopulationWithHallOfFame()){
                         int id = classifier.getModel().getId();
 
+                        //find values to avoid
+                        Map<Integer, UUID> toNotUse = toAvoid.get(id);
+
                         double fitness = 0;
                         for(UUID uuid: Eijk.keySet()){
                             HashMap<Integer, HashMap<Integer, Double>> Eij = Eijk.get(uuid);
                             HashMap<Integer, Double> allTheI = Eij.get(id);
 
                             for(int agentId: allTheI.keySet()){
-                                fitness += (Math.abs(1 - allTheI.get(agentId)));
+
+
+                                if(!(toNotUse.containsKey(agentId) && toNotUse.get(agentId)==uuid)){
+                                    fitness += (Math.abs(1 - allTheI.get(agentId)));
+                                }
                             }
                         }
                         classifier.setFitness(fitness);
