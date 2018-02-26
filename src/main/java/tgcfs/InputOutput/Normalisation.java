@@ -21,7 +21,7 @@ import tgcfs.NN.InputsNetwork;
 public class Normalisation {
     private static double min_speed = 0.0;
     private static double max_angular_speed = 1.5; //radiant per second
-    private static double min_angular_speed = 0.0;
+    private static double min_angular_speed = -1.5;
     private static double max_distance = 555.0;
     private static double min_distance = 0.0;
     private static double max_time = 21.0;
