@@ -44,7 +44,7 @@ public class PointToSpeedSpeed {
     /**
      * Obtain angular speed current second point
      *
-     * https://gamedev.stackexchange.com/questions/4467/comparing-angles-and-working-out-the-difference
+     *
      *
      *
      * @param previousBearing previous bearing
@@ -54,7 +54,12 @@ public class PointToSpeedSpeed {
      */
     public double obtainAngularSpeed(double previousBearing, double actualBearing, double time){
 
-        double angle = 180 - Math.abs(Math.abs(previousBearing - actualBearing) - 180);
+        double angle = previousBearing - actualBearing;
+        if(angle < -180) angle += 360;
+        if(angle > 180) angle -= 360;
+
+
+//        double angle = 180 - Math.abs(Math.abs(previousBearing - actualBearing) - 180);
 
         return Math.toRadians(angle) / time;
     }

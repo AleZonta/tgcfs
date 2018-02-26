@@ -1046,7 +1046,7 @@ public class Agents extends Algorithm {
                                 //find values to avoid
                                 Map<Integer, UUID> toNotUse = toAvoid.get(classifierID);
                                 if(!(toNotUse.containsKey(id) && toNotUse.get(id)==uuid)){
-                                    fitness += (Eij.get(classifierID).get(id) * subMultiplier.get(classifierID).get(id));
+                                    fitness += (Eij.get(classifierID).get(id) + subMultiplier.get(classifierID).get(id));
                                 }
                             }
                         }
@@ -1074,7 +1074,7 @@ public class Agents extends Algorithm {
 
 
                                 if(!(toNotUse.containsKey(agentId) && toNotUse.get(agentId)==uuid)){
-                                    fitness += (Math.abs(1 - allTheI.get(agentId)) * subMultiplier.get(agentId));
+                                    fitness += (Math.abs(1 - allTheI.get(agentId)) + subMultiplier.get(agentId));
                                 }
                             }
                         }
