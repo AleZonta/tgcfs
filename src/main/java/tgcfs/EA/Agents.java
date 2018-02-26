@@ -634,7 +634,7 @@ public class Agents extends Algorithm {
             private List<Individual> adersarialPopulation;
             private Map<Integer, Map<UUID, Double>> Tik;
             private Map<Integer, UUID> toForget;
-
+            private Map<Integer, Map<UUID, Double>> onlyRealClassifications;
 
             /**
              * Constructor
@@ -647,6 +647,7 @@ public class Agents extends Algorithm {
                 this.adersarialPopulation = adersarialPopulation;
                 this.Tik = new HashMap<>();
                 this.toForget = new HashMap<>();
+                this.onlyRealClassifications = new HashMap<>();
             }
 
             /**
@@ -675,10 +676,18 @@ public class Agents extends Algorithm {
                 return this.toForget;
             }
 
+            /**
+             * Return only how I am classifying the real points
+             * @return Map<Integer, Map<UUID, Double>> containing id agent and its classification
+             */
+            private Map<Integer, Map<UUID, Double>> getOnlyRealClassifications(){
+                return this.onlyRealClassifications;
+            }
+
 
             /**
              * Getter for the results from the classification
-             * @return Map<Integer, Map<UUID, Double>> containing id agent and his classification
+             * @return Map<Integer, Map<UUID, Double>> containing id agent and its classification
              */
             private Map<Integer, Map<UUID, Double>> getResults(){
                 return this.Tik;
@@ -790,11 +799,14 @@ public class Agents extends Algorithm {
                         }
 
 
+                        this.onlyRealClassifications.put(example.getIdRealPoint().getId(), T2j);
                     }
                     //update the main result with the agent id
                     this.Tik.put(agentId, Tj);
                     //update the main result with the agent id
                     this.Tik.put(realAgentId, T2j);
+
+
                 }
                 latch.countDown();
             }
@@ -863,6 +875,10 @@ public class Agents extends Algorithm {
                 //classifier id, agent id, trajectory id, result
                 HashMap<Integer, Map<Integer, Map<UUID, Double>>> results = new HashMap<>();
 
+
+                //realClassification
+                HashMap<Integer, Map<Integer, Map<UUID, Double>>> realClassification = new HashMap<>();
+
                 //id to not use in fitness
                 HashMap<Integer, Map<Integer, UUID>> toAvoid = new HashMap<>();
 
@@ -889,7 +905,11 @@ public class Agents extends Algorithm {
                         //all the i, j fixed -> classifier_j(agent_i))
                         results.put(runnable.getClassifierID(), runnable.getResults());
                         toAvoid.put(runnable.getClassifierID(), runnable.getToForget());
+                        realClassification.put(runnable.getClassifierID(), runnable.getOnlyRealClassifications());
                     }
+
+
+                    logger.log(Level.INFO, realClassification.toString());
 
 
                     //find list of trajectories id
@@ -1041,8 +1061,9 @@ public class Agents extends Algorithm {
                             }
                         }
                         classifier.setFitness(fitness);
-
                     }
+
+
 
 
                 } catch (InterruptedException e) {
