@@ -951,9 +951,13 @@ public class Agents extends Algorithm {
                     HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Yijk = new HashMap<>();
                     HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Eijk = new HashMap<>();
 
+                    HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> multiplier = new HashMap<>();
+
                     for(UUID traID: trajectoriesID){
                         HashMap<Integer, HashMap<Integer, Double>> Yij = new HashMap<>();
                         HashMap<Integer, HashMap<Integer, Double>> Eij = new HashMap<>();
+
+                        HashMap<Integer, HashMap<Integer, Double>> subMultiplier = new HashMap<>();
                         for(int classifierID: results.keySet()){
                             //classifierID is the classifier id -> i
                             Map<Integer, Map<UUID, Double>> classifierResults = results.get(classifierID);
@@ -963,6 +967,9 @@ public class Agents extends Algorithm {
                             HashMap<Integer, Double> subE = new HashMap<>();
                             //for debug, remove this hashmap, it is redundant
                             HashMap<Integer, Double> subY = new HashMap<>();
+
+
+                            HashMap<Integer, Double> subSubMultiplier = new HashMap<>();
 
 
                             for(int agentId: classifierResults.keySet()){
@@ -988,9 +995,11 @@ public class Agents extends Algorithm {
                                     if(y > 0.5) {
                                         //if point real point and it is classified as a real
                                         subE.put(agentId, Math.pow(1 - y, 2));
+                                        subSubMultiplier.put(agentId, 100.0);
                                     }else {
                                         //if point is a real point and it is classified as fake
                                         subE.put(agentId, Math.pow(1 - y, 2));
+                                        subSubMultiplier.put(agentId, 1.0);
                                     }
 //                                    subE.put(agentId, Math.pow(1 - y, 2) * 100);
                                 }else{
@@ -999,9 +1008,11 @@ public class Agents extends Algorithm {
                                     if(y > 0.5) {
                                         //if point is a generated point and it is classified as real
                                         subE.put(agentId, Math.pow(y, 2));
+                                        subSubMultiplier.put(agentId, 100.0);
                                     }else {
                                         //if point is a generated point and it is classified as fake
                                         subE.put(agentId, Math.pow(y, 2));
+                                        subSubMultiplier.put(agentId, 1.0);
                                     }
 
                                 }
@@ -1011,9 +1022,13 @@ public class Agents extends Algorithm {
                             Eij.put(classifierID, subE);
                             //for debug, remove this hashmap, it is redundant
                             Yij.put(classifierID, subY);
+
+                            subMultiplier.put(classifierID, subSubMultiplier);
                         }
                         Yijk.put(traID, Yij);
                         Eijk.put(traID, Eij);
+
+                        multiplier.put(traID, subMultiplier);
                     }
 
                     //FitnessAgent = sum_k(sum_j( E_jik ))
@@ -1024,12 +1039,14 @@ public class Agents extends Algorithm {
                         for(UUID uuid: Eijk.keySet()){
                             HashMap<Integer, HashMap<Integer, Double>> Eij = Eijk.get(uuid);
 
+                            HashMap<Integer, HashMap<Integer, Double>> subMultiplier = multiplier.get(uuid);
+
                             //need to find all the values with that id
                             for(int classifierID: Eij.keySet()){
                                 //find values to avoid
                                 Map<Integer, UUID> toNotUse = toAvoid.get(classifierID);
                                 if(!(toNotUse.containsKey(id) && toNotUse.get(id)==uuid)){
-                                    fitness += Eij.get(classifierID).get(id);
+                                    fitness += (Eij.get(classifierID).get(id) * subMultiplier.get(classifierID).get(id));
                                 }
                             }
                         }
@@ -1049,14 +1066,15 @@ public class Agents extends Algorithm {
 
                         double fitness = 0;
                         for(UUID uuid: Eijk.keySet()){
-                            HashMap<Integer, HashMap<Integer, Double>> Eij = Eijk.get(uuid);
-                            HashMap<Integer, Double> allTheI = Eij.get(id);
+                            HashMap<Integer, Double> allTheI = Eijk.get(uuid).get(id);
+                            HashMap<Integer, Double> subMultiplier = multiplier.get(uuid).get(id);
+
 
                             for(int agentId: allTheI.keySet()){
 
 
                                 if(!(toNotUse.containsKey(agentId) && toNotUse.get(agentId)==uuid)){
-                                    fitness += (Math.abs(1 - allTheI.get(agentId)));
+                                    fitness += (Math.abs(1 - allTheI.get(agentId)) * subMultiplier.get(agentId));
                                 }
                             }
                         }
