@@ -267,6 +267,9 @@ public class Feeder {
             allTheTimes.add(time);
             speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
             angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
+            if(ReadConfig.debug) logger.log(Level.INFO, "angularSpeed = " + angularSpeed);
+
+
 //            double space = conversion.obtainDistance(previousPoint, actualPoint);
 
             InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, time);

@@ -425,8 +425,8 @@ public class SaveToFile {
     private void dumpTrajectoryAndGeneratedPart(List<TrainReal> combineInputList, int gen){
         String path = this.currentPath + "trajectory-generate-aSs-" + gen + ".zip";
         this.dumpInfo(combineInputList, path);
-        path = this.currentPath + "statistic.csv";
-        this.saveStatistics(combineInputList, path);
+//        path = this.currentPath + "statistic.csv";
+//        this.saveStatistics(combineInputList, path);
     }
 
 

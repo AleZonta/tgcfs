@@ -147,6 +147,7 @@ public class FollowingTheGraph implements Transformation {
 
             OutputNetwork output = (OutputNetwork) outputsNetwork;
             angularSpeed = convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), trainReal.getLastTime());
+            if(ReadConfig.debug) logger.log(Level.INFO, "angularSpeed = " + angularSpeed);
             InputNetwork inputNetwork = new InputNetwork(outputsNetwork.getSpeed(), angularSpeed);
             convertedInput.add(inputNetwork);
 

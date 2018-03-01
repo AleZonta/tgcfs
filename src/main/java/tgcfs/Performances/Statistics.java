@@ -13,19 +13,22 @@ import java.util.UUID;
  * a.zonta@vu.nl
  */
 public class Statistics {
-    private double distance;
+    private double distanceReal;
+    private double euclideanDistance;
     private double bearing;
     private UUID idTra;
 
     /**
      * Contructor two parameters
-     * @param distance double var for the distance
+     * @param distanceReal double var for the distance
+     * @param euclideanDistance double var for the euclideanDistance
      * @param bearing double var for the bearing difference
      * @param uuid id trajectory
      */
-    public Statistics(double distance, double bearing, UUID uuid){
+    public Statistics(double distanceReal, double euclideanDistance, double bearing, UUID uuid){
         this.bearing = bearing;
-        this.distance = distance;
+        this.distanceReal = distanceReal;
+        this.euclideanDistance = euclideanDistance;
         this.idTra = uuid;
     }
 
@@ -35,6 +38,6 @@ public class Statistics {
      */
     @Override
     public String toString() {
-        return "{ Trajectory: " + this.idTra.toString() + " DistanceBetweenPoints: " + distance + "; DifferenceInBearing: " + bearing + " }";
+        return "{ Trajectory: " + this.idTra.toString() + " DistanceBetweenPointsReal: " + this.distanceReal + "; DistanceBetweenPointsEuclidean: " + this.euclideanDistance +"; DifferenceInBearing: " + this.bearing + " }";
     }
 }

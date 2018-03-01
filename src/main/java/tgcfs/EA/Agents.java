@@ -635,6 +635,9 @@ public class Agents extends Algorithm {
             private Map<Integer, Map<UUID, Double>> Tik;
             private Map<Integer, UUID> toForget;
             private Map<Integer, Map<UUID, Double>> onlyRealClassifications;
+            private Map<Integer, Map<UUID, Double>> onlyFakeClassifications;
+            private Map<Integer, Map<UUID, Double>> toForgetWithValues;
+
 
             /**
              * Constructor
@@ -648,6 +651,8 @@ public class Agents extends Algorithm {
                 this.Tik = new HashMap<>();
                 this.toForget = new HashMap<>();
                 this.onlyRealClassifications = new HashMap<>();
+                this.onlyFakeClassifications = new HashMap<>();
+                this.toForgetWithValues = new HashMap<>();
             }
 
             /**
@@ -682,6 +687,12 @@ public class Agents extends Algorithm {
              */
             private Map<Integer, Map<UUID, Double>> getOnlyRealClassifications(){
                 return this.onlyRealClassifications;
+            }
+            private Map<Integer, Map<UUID, Double>> getOnlyFakeClassifications(){
+                return this.onlyFakeClassifications;
+            }
+            private Map<Integer, Map<UUID, Double>> getToForgetWithValues(){
+                return this.toForgetWithValues;
             }
 
 
@@ -758,6 +769,11 @@ public class Agents extends Algorithm {
                     Map<UUID, Double> Tj = new HashMap<>();
                     // trajectory result
                     Map<UUID, Double> T2j = new HashMap<>();
+
+                    // trajectory result
+                    Map<UUID, Double> TjContraint = new HashMap<>();
+                    // trajectory result
+                    Map<UUID, Double> T2jContraint = new HashMap<>();
                     for(TrainReal example: inputOutput) {
                         //run the classifier for the Fake trajectory
                         tgcfs.Classifiers.OutputNetwork result = null;
@@ -786,25 +802,39 @@ public class Agents extends Algorithm {
                         Tj.put(example.getId(), result.getRealValue());
                         T2j.put(example.getId(), resultReal.getRealValue());
 
-                        //fake point classified fake | real point classified real = okay
-                        //fake point classified fake | real point classified fake = 0
-                        //fake point classified real | real point classified real = okay
-                        //fake point classified real | real point classified fake = 0
-                        if((result.getRealValue() <= 0.5 && resultReal.getRealValue() > 0.5) || (result.getRealValue() > 0.5 && resultReal.getRealValue() > 0.5)){
-                            //ok
+                        //fake point classified fake | real point classified real = *1
+                        //fake point classified fake | real point classified fake = *0.5
+                        //fake point classified real | real point classified real = *0.5
+                        //fake point classified real | real point classified fake = *0.25
+                        if(result.getRealValue() <= 0.5 && resultReal.getRealValue() > 0.5){
+                            TjContraint.put(example.getId(), 1.0);
+                        }else if(result.getRealValue() <= 0.5 && resultReal.getRealValue() <= 0.5){
+                            TjContraint.put(example.getId(), 0.5);
+                        }else if(result.getRealValue() > 0.5 && resultReal.getRealValue() > 0.5){
+                            TjContraint.put(example.getId(), 0.5);
                         }else{
-                            //save the ids
-                            this.toForget.put(agentId, example.getId());
-                            this.toForget.put(realAgentId, example.getId());
+                            TjContraint.put(example.getId(), 0.25);
                         }
 
+//                        if((result.getRealValue() <= 0.5 && resultReal.getRealValue() > 0.5) || (result.getRealValue() > 0.5 && resultReal.getRealValue() > 0.5)){
+//                            //ok
+//                        }else{
+//                            //save the ids
+//                            this.toForget.put(agentId, example.getId());
+//                            this.toForget.put(realAgentId, example.getId());
+//                        }
 
+                        this.onlyFakeClassifications.put(agent.getModel().getId(),Tj);
                         this.onlyRealClassifications.put(example.getIdRealPoint().getId(), T2j);
                     }
                     //update the main result with the agent id
                     this.Tik.put(agentId, Tj);
                     //update the main result with the agent id
                     this.Tik.put(realAgentId, T2j);
+
+                    this.toForgetWithValues.put(agentId , TjContraint);
+                    this.toForgetWithValues.put(realAgentId , TjContraint);
+
 
 
                 }
@@ -878,9 +908,13 @@ public class Agents extends Algorithm {
 
                 //realClassification
                 HashMap<Integer, Map<Integer, Map<UUID, Double>>> realClassification = new HashMap<>();
+                HashMap<Integer, Map<Integer, Map<UUID, Double>>> fakeClassification = new HashMap<>();
 
                 //id to not use in fitness
                 HashMap<Integer, Map<Integer, UUID>> toAvoid = new HashMap<>();
+
+                //multipliers
+                HashMap<Integer, Map<Integer, Map<UUID, Double>>> multiplierData = new HashMap<>();
 
                 //launch the threads for the computations
                 ExecutorService exec = Executors.newFixedThreadPool(96);
@@ -906,9 +940,13 @@ public class Agents extends Algorithm {
                         results.put(runnable.getClassifierID(), runnable.getResults());
                         toAvoid.put(runnable.getClassifierID(), runnable.getToForget());
                         realClassification.put(runnable.getClassifierID(), runnable.getOnlyRealClassifications());
+                        fakeClassification.put(runnable.getClassifierID(), runnable.getOnlyFakeClassifications());
+                        multiplierData.put(runnable.getClassifierID(), runnable.getToForgetWithValues());
                     }
 
 
+                    logger.log(Level.INFO, fakeClassification.toString());
+                    logger.log(Level.INFO, "----------");
                     logger.log(Level.INFO, realClassification.toString());
 
 
@@ -951,7 +989,7 @@ public class Agents extends Algorithm {
                     HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Yijk = new HashMap<>();
                     HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Eijk = new HashMap<>();
 
-                    HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> multiplier = new HashMap<>();
+//                    HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> multiplier = new HashMap<>();
 
                     for(UUID traID: trajectoriesID){
                         HashMap<Integer, HashMap<Integer, Double>> Yij = new HashMap<>();
@@ -969,7 +1007,7 @@ public class Agents extends Algorithm {
                             HashMap<Integer, Double> subY = new HashMap<>();
 
 
-                            HashMap<Integer, Double> subSubMultiplier = new HashMap<>();
+//                            HashMap<Integer, Double> subSubMultiplier = new HashMap<>();
 
 
                             for(int agentId: classifierResults.keySet()){
@@ -995,11 +1033,11 @@ public class Agents extends Algorithm {
                                     if(y > 0.5) {
                                         //if point real point and it is classified as a real
                                         subE.put(agentId, Math.pow(1 - y, 2));
-                                        subSubMultiplier.put(agentId, 100.0);
+//                                        subSubMultiplier.put(agentId, 1.0);
                                     }else {
                                         //if point is a real point and it is classified as fake
                                         subE.put(agentId, Math.pow(1 - y, 2));
-                                        subSubMultiplier.put(agentId, 1.0);
+//                                        subSubMultiplier.put(agentId, 1.0);
                                     }
 //                                    subE.put(agentId, Math.pow(1 - y, 2) * 100);
                                 }else{
@@ -1008,11 +1046,11 @@ public class Agents extends Algorithm {
                                     if(y > 0.5) {
                                         //if point is a generated point and it is classified as real
                                         subE.put(agentId, Math.pow(y, 2));
-                                        subSubMultiplier.put(agentId, 100.0);
+//                                        subSubMultiplier.put(agentId, 100.0);
                                     }else {
                                         //if point is a generated point and it is classified as fake
                                         subE.put(agentId, Math.pow(y, 2));
-                                        subSubMultiplier.put(agentId, 1.0);
+//                                        subSubMultiplier.put(agentId, 1.0);
                                     }
 
                                 }
@@ -1023,12 +1061,12 @@ public class Agents extends Algorithm {
                             //for debug, remove this hashmap, it is redundant
                             Yij.put(classifierID, subY);
 
-                            subMultiplier.put(classifierID, subSubMultiplier);
+//                            subMultiplier.put(classifierID, subSubMultiplier);
                         }
                         Yijk.put(traID, Yij);
                         Eijk.put(traID, Eij);
 
-                        multiplier.put(traID, subMultiplier);
+//                        multiplier.put(traID, subMultiplier);
                     }
 
                     //FitnessAgent = sum_k(sum_j( E_jik ))
@@ -1039,15 +1077,19 @@ public class Agents extends Algorithm {
                         for(UUID uuid: Eijk.keySet()){
                             HashMap<Integer, HashMap<Integer, Double>> Eij = Eijk.get(uuid);
 
-                            HashMap<Integer, HashMap<Integer, Double>> subMultiplier = multiplier.get(uuid);
+//                            HashMap<Integer, HashMap<Integer, Double>> subMultiplier = multiplier.get(uuid);
 
                             //need to find all the values with that id
                             for(int classifierID: Eij.keySet()){
                                 //find values to avoid
-                                Map<Integer, UUID> toNotUse = toAvoid.get(classifierID);
-                                if(!(toNotUse.containsKey(id) && toNotUse.get(id)==uuid)){
-                                    fitness += (Eij.get(classifierID).get(id) + subMultiplier.get(classifierID).get(id));
-                                }
+//                                Map<Integer, UUID> toNotUse = toAvoid.get(classifierID);
+//                                fitness += Eij.get(classifierID).get(id);
+//                                if(!(toNotUse.containsKey(id) && toNotUse.get(id)==uuid)){
+
+                                fitness += (Eij.get(classifierID).get(id) * multiplierData.get(classifierID).get(id).get(uuid));
+                                //subMultiplier.get(classifierID).get(id));
+//                                    fitness += (Eij.get(classifierID).get(id));
+//                                }
                             }
                         }
                         agent.setFitness(fitness);
@@ -1062,20 +1104,21 @@ public class Agents extends Algorithm {
                         int id = classifier.getModel().getId();
 
                         //find values to avoid
-                        Map<Integer, UUID> toNotUse = toAvoid.get(id);
+//                        Map<Integer, UUID> toNotUse = toAvoid.get(id);
 
                         double fitness = 0;
                         for(UUID uuid: Eijk.keySet()){
                             HashMap<Integer, Double> allTheI = Eijk.get(uuid).get(id);
-                            HashMap<Integer, Double> subMultiplier = multiplier.get(uuid).get(id);
+//                            HashMap<Integer, Double> subMultiplier = multiplier.get(uuid).get(id);
 
 
                             for(int agentId: allTheI.keySet()){
-
-
-                                if(!(toNotUse.containsKey(agentId) && toNotUse.get(agentId)==uuid)){
-                                    fitness += (Math.abs(1 - allTheI.get(agentId)) + subMultiplier.get(agentId));
-                                }
+//                                fitness += Math.abs(1 - allTheI.get(agentId));
+//                                if(!(toNotUse.containsKey(agentId) && toNotUse.get(agentId)==uuid)){
+                              fitness += (Math.abs(1 - allTheI.get(agentId)) * multiplierData.get(id).get(agentId).get(uuid));
+                                //subMultiplier.get(agentId));
+//                                fitness += (Math.abs(1 - allTheI.get(agentId)));
+//                                }
                             }
                         }
                         classifier.setFitness(fitness);

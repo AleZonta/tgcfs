@@ -553,13 +553,16 @@ public class TrainReal {
         Distance distance = new Distance();
         double distancePoint = distance.compute(this.followingPart.get(0), this.realPointsOutputComputed.get(0));
 
+        double euclideanDistance = this.followingPart.get(0).euclideanDistance(this.realPointsOutputComputed.get(0));
+
+
         PointToSpeedBearing convertitor = new PointToSpeedBearing();
 
         double realBearing = convertitor.obtainBearing(this.getLastPoint(), this.followingPart.get(0));
         double computeBearing = convertitor.obtainBearing(this.getLastPoint(), this.realPointsOutputComputed.get(0));
 
         double differenceBearing = 180 - Math.abs(Math.abs(realBearing - computeBearing) - 180);
-        this.statistics = new Statistics(distancePoint, differenceBearing, this.id);
+        this.statistics = new Statistics(distancePoint, euclideanDistance, differenceBearing, this.id);
     }
 
     /**

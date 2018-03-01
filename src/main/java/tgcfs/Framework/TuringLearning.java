@@ -150,6 +150,7 @@ public class TuringLearning implements Framework{
         //INITIALISE population EA with random candidate solution
         //check if I am loading the population from file or not
         if(ReadConfig.Configurations.getLoadDumpPop()){
+            logger.log(Level.INFO, "Loading external population");
             LoadExternalPopulation load = new LoadExternalPopulation(logger);
             load.readFile();
             this.agents.generatePopulation(agentModel, load.getAgents());
