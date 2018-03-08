@@ -69,5 +69,15 @@ public class RandomGenerator {
         return rand.nextGaussian();
     }
 
+    /**
+     * Return next gaussian value with specific std and mean
+     * @param std std
+     * @param mean mean
+     * @return double value
+     */
+    public static double getNextXavier(double std, double mean){
+        return rand.nextGaussian()*std+mean;
+    }
+
 
 }

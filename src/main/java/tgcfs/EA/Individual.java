@@ -5,6 +5,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.primitives.AtomicDouble;
+import tgcfs.Agents.InputNetwork;
+import tgcfs.Agents.OutputNetwork;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
@@ -105,13 +107,18 @@ public abstract class Individual {
      * One parameter constructor
      * It is loading the objective parameters list with random number
      * and the mutation strengths list with 1.0
+     *
+     * Xavier initialization formula. We need to pick the weights from a Gaussian distribution with zero mean
+     *  and a variance of (Nin + Nout)/2, where Nin specifies the number of input neurons and Nout the output ones
+     *
+     *
      * @param size size of the objectiveParameter
      * @exception Exception if there are problems with the reading of the seed information
      */
     public Individual(int size) throws Exception {
         List<Double> random = new ArrayList<>();
         for(int j = 0; j< size; j++){
-            random.add(RandomGenerator.getNextDouble(-4,4));
+            random.add(RandomGenerator.getNextXavier((InputNetwork.inputSize + OutputNetwork.outputSize) / 2, 0.0));
         }
         this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
         this.fitness = new AtomicDouble(0);
@@ -125,6 +132,11 @@ public abstract class Individual {
      * One parameter constructor
      * It is loading the objective parameters list with random number
      * and the mutation strengths list with 1.0
+     *
+     * Xavier initialization formula. We need to pick the weights from a Gaussian distribution with zero mean
+     *  and a variance of (Nin + Nout)/2, where Nin specifies the number of input neurons and Nout the output ones
+     *
+     *
      * @param size size of the objectiveParameter
      * @param ind kind of individual I am creating
      * @exception Exception if there are problems with the reading of the seed information
@@ -132,7 +144,7 @@ public abstract class Individual {
     public Individual(int size, IndividualStatus ind) throws Exception {
         List<Double> random = new ArrayList<>();
         for(int j = 0; j< size; j++){
-            random.add(RandomGenerator.getNextDouble(-4,4));
+            random.add(RandomGenerator.getNextXavier((InputNetwork.inputSize + OutputNetwork.outputSize) / 2, 0.0));
         }
         this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
         this.fitness = new AtomicDouble(0);
@@ -146,6 +158,10 @@ public abstract class Individual {
      * One parameter constructor
      * It is loading the objective parameters list with random number
      * and the mutation strengths list with 1.0
+     *
+     * Xavier initialization formula. We need to pick the weights from a Gaussian distribution with zero mean
+     *  and a variance of (Nin + Nout)/2, where Nin specifies the number of input neurons and Nout the output ones
+     *
      * @param size size of the objectiveParameter
      * @param model model to assign to the individual
      * @param ind kind of individual I am creating
@@ -154,7 +170,7 @@ public abstract class Individual {
     public Individual(int size, EvolvableModel model, IndividualStatus ind) throws Exception {
         List<Double> random = new ArrayList<>();
         for(int j = 0; j< size; j++){
-            random.add(RandomGenerator.getNextDouble(-4,4));
+            random.add(RandomGenerator.getNextXavier((InputNetwork.inputSize + OutputNetwork.outputSize) / 2, 0.0));
         }
         this.objectiveParameters = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
         this.fitness = new AtomicDouble(0);
