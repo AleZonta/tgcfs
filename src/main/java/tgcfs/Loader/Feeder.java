@@ -42,17 +42,17 @@ import java.util.logging.Logger;
 public class Feeder {
     private final System graph; //loader of the graph
     private final Routes routes; //loader of the trajectories
-    private int position; //I need to remember the position where I am now
-    private boolean finished; //If the current trajectory is ended
-    private Trajectory currentTrajectory; //current trajectory under investigation
+    protected int position; //I need to remember the position where I am now
+    protected boolean finished; //If the current trajectory is ended
+    protected Trajectory currentTrajectory; //current trajectory under investigation
     private int maximumNumberOfTrajectories;
     private int actualNumberOfTrajectory;
-    private List<PointWithBearing> points;
+    protected List<PointWithBearing> points;
     private final DatabaseCoordNode db; //database saving all the already visited nodes
-    private Boolean isNewTrajectory;
-    private Point lastTimeUsed;
-    private static Logger logger; //logger for this class
-    private double lastTime;
+    protected Boolean isNewTrajectory;
+    protected Point lastTimeUsed;
+    protected static Logger logger; //logger for this class
+    protected double lastTime;
 
     /**
      * Constructor with zero parameter
@@ -239,7 +239,7 @@ public class Feeder {
         List<PointWithBearing> updatedPoints = new ArrayList<>();
 
         //add the first point. No speed, no bearing and no space since it was still
-        InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d, 0d);
+        InputNetwork firstInputNetwork = new InputNetwork(attraction, 0d, 0d, 0d, 0d);
         firstInputNetwork.setTargetPoint(possibleTarget);
         totalList.add(firstInputNetwork);
         updatedPoints.add(new PointWithBearing(points.get(0), 0.0));
@@ -253,26 +253,24 @@ public class Feeder {
             double bearing = conversion.obtainBearing(previousPoint, actualPoint);
             updatedPoints.add(new PointWithBearing(points.get(i), bearing));
 
-            double time = 0.0;
-            //speed is the speed I arrived here from previous point
-            double speed;
-            double angularSpeed;
-            PointToSpeedSpeed convertitor = new PointToSpeedSpeed();
 
+            //speed is the speed I arrived here from previous point
+            PointToSpeedSpeed convertitor = new PointToSpeedSpeed();
+            double time = 0.0;
             if(isDdsa) {
                 time = Routes.timeBetweenIDSATimesteps;
             }else {
                 time = conversion.obtainTime(previousPoint,actualPoint);
             }
             allTheTimes.add(time);
-            speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
-            angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
+            double speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
+            double angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
             if(ReadConfig.debug) logger.log(Level.INFO, "angularSpeed = " + angularSpeed);
 
 
 //            double space = conversion.obtainDistance(previousPoint, actualPoint);
 
-            InputNetwork inputNetwork = new InputNetwork(attraction, speed, angularSpeed, time);
+            InputNetwork inputNetwork = new InputNetwork(attraction, speed, bearing, time, angularSpeed);
             inputNetwork.setTargetPoint(possibleTarget);
             totalList.add(inputNetwork);
             previousBearing = bearing;
@@ -294,7 +292,7 @@ public class Feeder {
         List<InputsNetwork> hereNetwork = new ArrayList<>();
         int i = 0;
         for(InputsNetwork inputsNetwork: totalList){
-            InputNetwork inputNetworkTime = new InputNetwork(inputsNetwork.serialise(), allTheTimes.get(i));
+            InputNetwork inputNetworkTime = new InputNetwork(inputsNetwork.serialise(), allTheTimes.get(i), ((InputNetwork)inputsNetwork).getAngularSpeed());
             hereNetwork.add(inputNetworkTime);
             i+=1;
         }

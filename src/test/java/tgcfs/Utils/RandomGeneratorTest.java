@@ -67,4 +67,14 @@ public class RandomGeneratorTest {
             System.out.println(num);
         }
     }
+
+    @Test
+    public void getNextDouble2() throws Exception {
+        new ReadConfig.Configurations();
+        new RandomGenerator();
+        for (int i = 0; i < 100; i++){
+            double num = RandomGenerator.getNextDouble(-4,+4);
+            System.out.println(num);
+        }
+    }
 }

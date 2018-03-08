@@ -23,6 +23,7 @@ public class InputNetwork implements InputsNetwork {
     private double speed;
     private double bearing;
     private double time;
+    private double angularSpeed;
     private Point targetPoint;
     public static final int inputSize = 4; //the size of the input corresponding to the three fields here
 
@@ -39,7 +40,7 @@ public class InputNetwork implements InputsNetwork {
      * @param bearing Double number corresponding to the bearing
      */
     public InputNetwork(double directionAPF, double speed, double bearing){
-        this.bearing = Normalisation.convertAngularSpeed(bearing);
+        this.bearing = Normalisation.convertDirectionData(bearing);
         try {
             this.speed = Normalisation.convertSpeed(speed);
         } catch (Exception e) {
@@ -48,6 +49,7 @@ public class InputNetwork implements InputsNetwork {
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.targetPoint = null;
         this.time = -99;
+        this.angularSpeed = -99;
     }
 
     /**
@@ -59,7 +61,29 @@ public class InputNetwork implements InputsNetwork {
      * @param time time next prediction
      */
     public InputNetwork(double directionAPF, double speed, double bearing, double time){
-        this.bearing = Normalisation.convertAngularSpeed(bearing);
+        this.bearing = Normalisation.convertDirectionData(bearing);
+        try {
+            this.speed = Normalisation.convertSpeed(speed);
+        } catch (Exception e) {
+            throw new Error("Error with speed.");
+        }
+        this.directionAPF = Normalisation.convertDirectionData(directionAPF);
+        this.targetPoint = null;
+        this.time = Normalisation.convertTime(time);
+        this.angularSpeed = -99;
+    }
+
+    /**
+     * Constructor with three parameters. all the inputs
+     * It is also normalising the input in the range ±1 for the NN
+     * @param directionAPF Double number corresponding to the direction retrieved form the apf
+     * @param speed Double number corresponding to the speed
+     * @param bearing Double number corresponding to the bearing
+     * @param time time next prediction
+     * @param angularSpeed angular speed
+     */
+    public InputNetwork(double directionAPF, double speed, double bearing, double time, double angularSpeed){
+        this.bearing = Normalisation.convertDirectionData(bearing);
         try {
             this.speed = Normalisation.convertSpeed(speed);
         } catch (Exception e) {
@@ -80,6 +104,20 @@ public class InputNetwork implements InputsNetwork {
         this.bearing = indArray.getDouble(1);
         this.directionAPF = indArray.getDouble(2);
         this.time = Normalisation.convertTime(time);
+        this.angularSpeed = -99;
+    }
+
+    /**
+     * Constructor two parameters
+     * @param indArray {@link INDArray} containing serialisation another {@link InputNetwork}
+     * @param time time next prediction
+     */
+    public InputNetwork(INDArray indArray, double time, double angularSpeed){
+        this.speed = indArray.getDouble(0);
+        this.bearing = indArray.getDouble(1);
+        this.directionAPF = indArray.getDouble(2);
+        this.time = Normalisation.convertTime(time);
+        this.angularSpeed = angularSpeed;
     }
 
 
@@ -139,13 +177,21 @@ public class InputNetwork implements InputsNetwork {
     }
 
     /**
+     * Getter for the angular speed
+     * @return angular speed
+     */
+    public double getAngularSpeed() {
+        return this.angularSpeed;
+    }
+
+    /**
      * Serialise object ready for the classifier
      * @return {@link INDArray} vector
      */
     public INDArray serialiseAsInputClassifier(){
         INDArray array = Nd4j.zeros(2);
         array.putScalar(0, this.speed);
-        array.putScalar(1, this.bearing);
+        array.putScalar(1, this.angularSpeed);
         return array;
     }
 
@@ -159,7 +205,7 @@ public class InputNetwork implements InputsNetwork {
 
     @Override
     public String toString() {
-        return "{" + this.speed + ", " + this.bearing + ", " + this.time + "}";
+        return "{" + this.speed + ", " + this.bearing + ", " + this.time + ", " + this.angularSpeed + "}";
     }
 
 }

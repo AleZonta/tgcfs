@@ -21,20 +21,27 @@ public class NormalisationTest {
     @Test
     public void fromDirectionToBearing() throws Exception {
 
-        double i = 0;
-        while (i < 180) {
+//        double i = 0;
+//        while (i < 180) {
+//
+//            double ret = Normalisation.fromDirectionToBearing(i);
+//            System.out.println(ret);
+//            i += 0.5;
+//        }
+//        i = 0;
+//        while (i > -180) {
+//
+//            double ret = Normalisation.fromDirectionToBearing(i);
+//            System.out.println(ret);
+//            i -= 0.5;
+//        }
+//
+        double a = -4.727666854858398;
+        double b = -6.5977983474731445;
+        System.out.println(Normalisation.decodeDirectionData(a));
+        System.out.println(Normalisation.decodeDirectionData(b));
 
-            double ret = Normalisation.fromDirectionToBearing(i);
-            System.out.println(ret);
-            i += 0.5;
-        }
-        i = 0;
-        while (i > -180) {
 
-            double ret = Normalisation.fromDirectionToBearing(i);
-            System.out.println(ret);
-            i -= 0.5;
-        }
     }
 
     @Test
@@ -185,6 +192,8 @@ public class NormalisationTest {
         }catch (Error e){
             assertEquals("Wrong range in input" , e.getMessage());
         }
+
+
     }
 
     @Test

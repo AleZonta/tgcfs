@@ -216,6 +216,7 @@ public class TuringLearning implements Framework{
         logger.log(Level.INFO,"Run Agents...");
         //run the agents
         this.agents.runIndividuals(combineInputList);
+        this.agents.generateRealPoints(new FollowingTheGraph(this.feeder, logger));
         //classifier are executed and evaluated during agents evaluations
         logger.log(Level.INFO,"Run Classifiers...");
         this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, logger));

@@ -83,7 +83,7 @@ public class UncorrelatedMutation extends Individual {
         super(size);
         List<Double> random = new ArrayList<>();
         for(int j = 0; j < 1; j++){
-            random.add(RandomGenerator.getNextDouble(0.0001, 0.5));
+            random.add(RandomGenerator.getNextDouble(0.0001, 0.01));
         }
         this.mutationStrengths = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
     }
@@ -100,7 +100,7 @@ public class UncorrelatedMutation extends Individual {
         super(size, ind);
         List<Double> random = new ArrayList<>();
         for(int j = 0; j < 1; j++){
-            random.add(RandomGenerator.getNextDouble(0.0001, 0.5));
+            random.add(RandomGenerator.getNextDouble(0.0001, 0.01));
         }
         this.mutationStrengths = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
     }
@@ -118,7 +118,7 @@ public class UncorrelatedMutation extends Individual {
         super(size, model, ind);
         List<Double> random = new ArrayList<>();
         for(int j = 0; j < size; j++){
-            random.add(RandomGenerator.getNextDouble(0.0001, 0.5));
+            random.add(RandomGenerator.getNextDouble(0.0001, 0.01));
         }
         this.mutationStrengths = Nd4j.create(random.stream().mapToDouble(Double::doubleValue).toArray());
     }

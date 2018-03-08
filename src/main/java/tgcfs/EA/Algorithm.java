@@ -17,7 +17,10 @@ import tgcfs.NN.OutputsNetwork;
 import tgcfs.Utils.IndividualStatus;
 import tgcfs.Utils.RandomGenerator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -261,6 +264,7 @@ public abstract class Algorithm {
      * @throws Exception if the parents have not the same length
      */
     public void generateOffspringOnlyWithMutation(int generation, boolean hallOfFame) throws Exception {
+        long startTime = System.nanoTime();
         //check which class is calling this method
         int size = 0;
         int tournamentSize = 0;
@@ -284,6 +288,7 @@ public abstract class Algorithm {
                 ind.isParent();
             }
         }
+
 
         //create offspring_size offspring
         for(int i = 0; i < size; i ++) {
@@ -344,10 +349,20 @@ public abstract class Algorithm {
             //IntStream.range(0, 10).forEach(it -> son.mutate(son.getObjectiveParameters().columns()));
             if(mutationType == 2){
                 son.mutate(generation);
-
             }else {
                 son.mutate(son.getObjectiveParameters().columns());
             }
+            double val = RandomGenerator.getNextGaussian();
+            if(val <= 0.1){
+                for(int k = 0; k < 9; k ++){
+                    if(mutationType == 2){
+                        son.mutate(generation);
+                    }else {
+                        son.mutate(son.getObjectiveParameters().columns());
+                    }
+                }
+            }
+
             logger.log(Level.FINE, "Son: \n" + son.getObjectiveParameters());
             //set model to the son
             son.setModel(parent.getModel().deepCopy());
@@ -358,6 +373,8 @@ public abstract class Algorithm {
 
         //resetting the fitness of everyone
         this.resetFitness();
+        long estimatedTime = System.nanoTime() - startTime;
+        logger.log(Level.WARNING, "-------->Time passed for generating the offspring " + (double)estimatedTime / 1000000000.0);
     }
 
 

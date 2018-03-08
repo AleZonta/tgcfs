@@ -159,9 +159,6 @@ public class Agents extends Algorithm {
              * @param individual the individual under evaluation
              */
             private void runLSTM(List<TrainReal> input, EvolvableModel model, Individual individual) {
-                //compute Output of the network
-                INDArray lastOutput = null;
-
                 int number;
                 try{
                     number = ReadConfig.Configurations.getAgentTimeSteps();
@@ -187,13 +184,20 @@ public class Agents extends Algorithm {
                         features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
                     }
                     if(ReadConfig.debug) logger.log(Level.INFO, "Input LSTM ->" + features.toString());
-                    lastOutput = model.computeOutput(features);
+                    INDArray lastOutput = model.computeOutput(features);
 
                     int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
                     INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
 
-                    if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + realLastOut.toString());
-                    this.addOutput(realLastOut, outputsNetworks);
+                    if(ReadConfig.debug) {
+                        List<Double> realOutput = new ArrayList<>();
+                        INDArray flat = Nd4j.toFlattened(realLastOut);
+                        for(int j=0; j<flat.columns(); j++){
+                            realOutput.add(flat.getDouble(j));
+                        }
+                        logger.log(Level.INFO, "Output LSTM ->" + realOutput.toString());
+                    }
+                    this.addOutput(Nd4j.toFlattened(realLastOut), outputsNetworks);
 
                     logger.log(Level.INFO, inputsNetwork.getId() + " Output LSTM transformed ->" + outputsNetworks.toString());
 
@@ -209,15 +213,13 @@ public class Agents extends Algorithm {
                         lastOutput = model.computeOutput(inputLocal.serialise());
 
                         if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
-                        this.addOutput(realLastOut, outputsNetworks);
+                        this.addOutput(Nd4j.toFlattened(realLastOut), outputsNetworks);
                     }
                     //assign the output to this individual
                     currentInputsNetwork.setOutputComputed(outputsNetworks);
                     individual.addMyInputandOutput(currentInputsNetwork.deepCopy());
 
-
-
-                    ((LSTMAgent)model).clearPreviousState();
+                    ((LSTMAgent) model).clearPreviousState();
                 }
             }
 
@@ -227,15 +229,9 @@ public class Agents extends Algorithm {
              * @param outputsNetworks collection of outputs
              */
             private void addOutput(INDArray realLastOut, List<OutputsNetwork> outputsNetworks){
-//                if(!this.time){
-                    OutputNetwork out = new OutputNetwork();
-                    out.deserialise(realLastOut);
-                    outputsNetworks.add(out);
-//                }else{
-//                    OutputNetworkTime out = new OutputNetworkTime();
-//                    out.deserialise(realLastOut);
-//                    outputsNetworks.add(out);
-//                }
+                OutputNetwork out = new OutputNetwork();
+                out.deserialise(realLastOut);
+                outputsNetworks.add(out);
             }
 
         }
@@ -633,9 +629,9 @@ public class Agents extends Algorithm {
             private Individual classifier;
             private List<Individual> adersarialPopulation;
             private Map<Integer, Map<UUID, Double>> Tik;
-            private Map<Integer, UUID> toForget;
-            private Map<Integer, Map<UUID, Double>> onlyRealClassifications;
-            private Map<Integer, Map<UUID, Double>> onlyFakeClassifications;
+//            private Map<Integer, UUID> toForget;
+//            private Map<Integer, Map<UUID, Double>> onlyRealClassifications;
+//            private Map<Integer, Map<UUID, Double>> onlyFakeClassifications;
             private Map<Integer, Map<UUID, Double>> toForgetWithValues;
 
 
@@ -649,9 +645,9 @@ public class Agents extends Algorithm {
                 this.classifier = classifier;
                 this.adersarialPopulation = adersarialPopulation;
                 this.Tik = new HashMap<>();
-                this.toForget = new HashMap<>();
-                this.onlyRealClassifications = new HashMap<>();
-                this.onlyFakeClassifications = new HashMap<>();
+//                this.toForget = new HashMap<>();
+//                this.onlyRealClassifications = new HashMap<>();
+//                this.onlyFakeClassifications = new HashMap<>();
                 this.toForgetWithValues = new HashMap<>();
             }
 
@@ -677,20 +673,20 @@ public class Agents extends Algorithm {
              * Getting to forget elements
              * @return Map<Integer, UUID>> containing id agent and id trajectory
              */
-            private Map<Integer, UUID> getToForget(){
-                return this.toForget;
-            }
+//            private Map<Integer, UUID> getToForget(){
+//                return this.toForget;
+//            }
 
             /**
              * Return only how I am classifying the real points
              * @return Map<Integer, Map<UUID, Double>> containing id agent and its classification
              */
-            private Map<Integer, Map<UUID, Double>> getOnlyRealClassifications(){
-                return this.onlyRealClassifications;
-            }
-            private Map<Integer, Map<UUID, Double>> getOnlyFakeClassifications(){
-                return this.onlyFakeClassifications;
-            }
+//            private Map<Integer, Map<UUID, Double>> getOnlyRealClassifications(){
+//                return this.onlyRealClassifications;
+//            }
+//            private Map<Integer, Map<UUID, Double>> getOnlyFakeClassifications(){
+//                return this.onlyFakeClassifications;
+//            }
             private Map<Integer, Map<UUID, Double>> getToForgetWithValues(){
                 return this.toForgetWithValues;
             }
@@ -809,11 +805,11 @@ public class Agents extends Algorithm {
                         if(result.getRealValue() <= 0.5 && resultReal.getRealValue() > 0.5){
                             TjContraint.put(example.getId(), 1.0);
                         }else if(result.getRealValue() <= 0.5 && resultReal.getRealValue() <= 0.5){
-                            TjContraint.put(example.getId(), 0.5);
+                            TjContraint.put(example.getId(), 1.0);
                         }else if(result.getRealValue() > 0.5 && resultReal.getRealValue() > 0.5){
-                            TjContraint.put(example.getId(), 0.5);
+                            TjContraint.put(example.getId(), 1.0);
                         }else{
-                            TjContraint.put(example.getId(), 0.25);
+                            TjContraint.put(example.getId(), 1.0);
                         }
 
 //                        if((result.getRealValue() <= 0.5 && resultReal.getRealValue() > 0.5) || (result.getRealValue() > 0.5 && resultReal.getRealValue() > 0.5)){
@@ -824,8 +820,8 @@ public class Agents extends Algorithm {
 //                            this.toForget.put(realAgentId, example.getId());
 //                        }
 
-                        this.onlyFakeClassifications.put(agent.getModel().getId(),Tj);
-                        this.onlyRealClassifications.put(example.getIdRealPoint().getId(), T2j);
+//                        this.onlyFakeClassifications.put(agent.getModel().getId(),Tj);
+//                        this.onlyRealClassifications.put(example.getIdRealPoint().getId(), T2j);
                     }
                     //update the main result with the agent id
                     this.Tik.put(agentId, Tj);
@@ -907,13 +903,13 @@ public class Agents extends Algorithm {
 
 
                 //realClassification
-                HashMap<Integer, Map<Integer, Map<UUID, Double>>> realClassification = new HashMap<>();
-                HashMap<Integer, Map<Integer, Map<UUID, Double>>> fakeClassification = new HashMap<>();
-
-                //id to not use in fitness
-                HashMap<Integer, Map<Integer, UUID>> toAvoid = new HashMap<>();
-
-                //multipliers
+//                HashMap<Integer, Map<Integer, Map<UUID, Double>>> realClassification = new HashMap<>();
+//                HashMap<Integer, Map<Integer, Map<UUID, Double>>> fakeClassification = new HashMap<>();
+//
+//                //id to not use in fitness
+//                HashMap<Integer, Map<Integer, UUID>> toAvoid = new HashMap<>();
+//
+//                //multipliers
                 HashMap<Integer, Map<Integer, Map<UUID, Double>>> multiplierData = new HashMap<>();
 
                 //launch the threads for the computations
@@ -938,16 +934,16 @@ public class Agents extends Algorithm {
                     for (ComputeSelmarFitnessUnit runnable : runnables) {
                         //all the i, j fixed -> classifier_j(agent_i))
                         results.put(runnable.getClassifierID(), runnable.getResults());
-                        toAvoid.put(runnable.getClassifierID(), runnable.getToForget());
-                        realClassification.put(runnable.getClassifierID(), runnable.getOnlyRealClassifications());
-                        fakeClassification.put(runnable.getClassifierID(), runnable.getOnlyFakeClassifications());
+//                        toAvoid.put(runnable.getClassifierID(), runnable.getToForget());
+//                        realClassification.put(runnable.getClassifierID(), runnable.getOnlyRealClassifications());
+//                        fakeClassification.put(runnable.getClassifierID(), runnable.getOnlyFakeClassifications());
                         multiplierData.put(runnable.getClassifierID(), runnable.getToForgetWithValues());
                     }
 
 
-                    logger.log(Level.INFO, fakeClassification.toString());
-                    logger.log(Level.INFO, "----------");
-                    logger.log(Level.INFO, realClassification.toString());
+//                    logger.log(Level.INFO, fakeClassification.toString());
+//                    logger.log(Level.INFO, "----------");
+//                    logger.log(Level.INFO, realClassification.toString());
 
 
                     //find list of trajectories id

@@ -106,32 +106,18 @@ public class OutputNetwork implements OutputsNetwork {
      */
     @Override
     public void deserialise(INDArray out) {
-
         if (out.columns() != outputSize) {
-            if (out.rows() != outputSize) {
-                throw new Error("List size is not correct");
-            }
+            throw new Error("List size is not correct");
         }
-        if(out.columns() == outputSize) {
-            try {
+        try {
 //                this.speed = out.getDouble(0);
-                //linear activation lets keep the speed as normal
-                //this.speed = Normalisation.decodeSpeed(out.getDouble(0));
-                this.speed = Normalisation.decodeSpeed(out.getDouble(0));
-            } catch (Exception e) {
-                throw new Error("Erro with speed.");
-            }
-
-            this.bearing = Normalisation.decodeDirectionData(out.getDouble(1));
-        }else{
-            try {
-                this.speed = Normalisation.decodeSpeed(out.getDouble(0));
-            } catch (Exception e) {
-                throw new Error("Erro with speed.");
-            }
-
-            this.bearing = Normalisation.decodeDirectionData(out.getRow(1).getDouble(0));
+            //linear activation lets keep the speed as normal
+            //this.speed = Normalisation.decodeSpeed(out.getDouble(0));
+            this.speed = Normalisation.decodeSpeed(out.getDouble(0));
+        } catch (Exception e) {
+            throw new Error("Erro with speed.");
         }
+        this.bearing = Normalisation.decodeDirectionData(out.getDouble(1));
     }
 
     /**
