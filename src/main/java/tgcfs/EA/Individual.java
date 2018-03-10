@@ -44,6 +44,11 @@ public abstract class Individual {
         return this.objectiveParameters;
     }
 
+
+    public void setObjectiveParameters(INDArray obj){
+        this.objectiveParameters = obj;
+    }
+
     /**
      * Getter fot the fitness
      * @return Integer value

@@ -17,19 +17,19 @@ import java.lang.reflect.Field;
  * <p>
  * a.zonta@vu.nl
  *
- * This class will implement the object speed and direction that will be the input of the classifier network
+ * This class will implement the object linearSpeed and angularSpeed that will be the input of the classifier network
  */
 public class InputNetwork implements InputsNetwork{
-    private Double speed; //speed of the movement
-    private Double direction; //direction of the movement
+    private Double linearSpeed; //linearSpeed of the movement
+    private Double angularSpeed; //angularSpeed of the movement
     public static final Integer inputSize = 2; //the size of the input corresponding to the two fields here
 
     /**
      * Constructor zero parameter = everything to null
      */
     public InputNetwork(){
-        this.direction = null;
-        this.speed = null;
+        this.angularSpeed = null;
+        this.linearSpeed = null;
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
         if (allFields.length != inputSize + 1){
@@ -39,16 +39,16 @@ public class InputNetwork implements InputsNetwork{
 
     /**
      * Constructor two parameters
-     * @param speed speed parameter
-     * @param direction direction parameter
+     * @param linearSpeed linearSpeed parameter
+     * @param angularSpeed angularSpeed parameter
      */
-    public InputNetwork(double speed, double direction){
+    public InputNetwork(double linearSpeed, double angularSpeed){
         try {
-            this.speed = Normalisation.convertSpeed(speed);
+            this.linearSpeed = Normalisation.convertSpeed(linearSpeed);
         } catch (Exception e) {
-            throw new Error("Error with speed.");
+            throw new Error("Error with linearSpeed.");
         }
-        this.direction = Normalisation.convertAngularSpeed(direction);
+        this.angularSpeed = Normalisation.convertAngularSpeed(angularSpeed);
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
         if (allFields.length != inputSize + 1){
@@ -58,21 +58,21 @@ public class InputNetwork implements InputsNetwork{
 
     /**
      * Constructor two parameters
-     * @param speed speed parameter
-     * @param direction direction parameter
+     * @param linearSpeed linearSpeed parameter
+     * @param angularSpeed angularSpeed parameter
      * @param translation if the data needs to be translated
      */
-    public InputNetwork(double speed, double direction, boolean translation){
+    public InputNetwork(double linearSpeed, double angularSpeed, boolean translation){
         if(translation){
             try {
-                this.speed = Normalisation.convertSpeed(speed);
+                this.linearSpeed = Normalisation.convertSpeed(linearSpeed);
             } catch (Exception e) {
-                throw new Error("Error with speed.");
+                throw new Error("Error with linearSpeed.");
             }
-            this.direction = Normalisation.convertAngularSpeed(direction);
+            this.angularSpeed = Normalisation.convertAngularSpeed(angularSpeed);
         }else {
-            this.speed = speed;
-            this.direction = direction;
+            this.linearSpeed = linearSpeed;
+            this.angularSpeed = angularSpeed;
         }
 
         Field[] allFields = InputNetwork.class.getDeclaredFields();
@@ -82,19 +82,19 @@ public class InputNetwork implements InputsNetwork{
     }
 
     /**
-     * Getter for the speed variable
+     * Getter for the linearSpeed variable
      * @return Double number
      */
-    public double getSpeed() {
-        return this.speed;
+    public double getLinearSpeed() {
+        return this.linearSpeed;
     }
 
     /**
-     * Getter for the direction variable
+     * Getter for the angularSpeed variable
      * @return Double variable
      */
-    public double getDirection() {
-        return this.direction;
+    public double getAngularSpeed() {
+        return this.angularSpeed;
     }
 
 
@@ -105,9 +105,14 @@ public class InputNetwork implements InputsNetwork{
     @Override
     public INDArray serialise(){
         INDArray array = Nd4j.zeros(2);
-        array.putScalar(0, this.speed);
-        array.putScalar(1, this.direction);
+        array.putScalar(0, this.linearSpeed);
+        array.putScalar(1, this.angularSpeed);
         return array;
+    }
+
+    @Override
+    public InputsNetwork deepCopy() {
+        return new InputNetwork(this.linearSpeed, this.angularSpeed, false);
     }
 
     /**
@@ -117,8 +122,8 @@ public class InputNetwork implements InputsNetwork{
     @Override
     public String toString() {
         return "InputNetwork{" + " " +
-                "speed=" + this.speed + ", " +
-                "bearing=" + this.direction + " " +
+                "linearSpeed=" + this.linearSpeed + ", " +
+                "angularSpeed=" + this.angularSpeed + " " +
                 '}';
     }
 }

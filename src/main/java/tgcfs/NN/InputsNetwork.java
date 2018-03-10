@@ -21,4 +21,11 @@ public interface InputsNetwork {
      * @return list containing all the fields
      */
     INDArray serialise();
+
+
+    /**
+     * Deep copy of the element
+     * @return copy of the object
+     */
+    InputsNetwork deepCopy();
 }

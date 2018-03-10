@@ -21,13 +21,13 @@ public class InputNetworkTest {
     @Test
     public void getSpeed() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
-        assertTrue(Normalisation.convertSpeed(10.0) == inputNetwork.getSpeed());
+        assertTrue(Normalisation.convertSpeed(10.0) == inputNetwork.getLinearSpeed());
     }
 
     @Test
     public void getDirection() throws Exception {
         InputNetwork inputNetwork = new InputNetwork(10.0,30.0);
-        assertTrue(Normalisation.convertDirectionData(30.0) == inputNetwork.getDirection());
+        assertTrue(Normalisation.convertDirectionData(30.0) == inputNetwork.getAngularSpeed());
     }
 
     @Test

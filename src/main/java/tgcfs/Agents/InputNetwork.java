@@ -92,6 +92,7 @@ public class InputNetwork implements InputsNetwork {
         this.directionAPF = Normalisation.convertDirectionData(directionAPF);
         this.targetPoint = null;
         this.time = Normalisation.convertTime(time);
+        this.angularSpeed = angularSpeed;
     }
 
     /**
@@ -120,6 +121,23 @@ public class InputNetwork implements InputsNetwork {
         this.angularSpeed = angularSpeed;
     }
 
+    /**
+     * Deep Copy constructor with no conversions
+     * @param directionAPF
+     * @param speed
+     * @param bearing
+     * @param time
+     * @param angularSpeed
+     * @param targetPoint
+     */
+    public InputNetwork(double directionAPF, double speed, double bearing, double time, double angularSpeed, Point targetPoint) {
+        this.directionAPF = directionAPF;
+        this.speed = speed;
+        this.bearing = bearing;
+        this.time = time;
+        this.angularSpeed = angularSpeed;
+        this.targetPoint = targetPoint;
+    }
 
     /**
      * Getter for the direction of the APF
@@ -158,6 +176,11 @@ public class InputNetwork implements InputsNetwork {
         array.putScalar(2, this.directionAPF);
         array.putScalar(3, this.time);
         return array;
+    }
+
+    @Override
+    public InputsNetwork deepCopy() {
+        return new InputNetwork(this.directionAPF, this.speed, this.bearing, this.time, this.angularSpeed, this.targetPoint);
     }
 
     /**

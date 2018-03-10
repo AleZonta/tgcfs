@@ -264,7 +264,6 @@ public abstract class Algorithm {
      * @throws Exception if the parents have not the same length
      */
     public void generateOffspringOnlyWithMutation(int generation, boolean hallOfFame) throws Exception {
-        long startTime = System.nanoTime();
         //check which class is calling this method
         int size = 0;
         int tournamentSize = 0;
@@ -373,8 +372,6 @@ public abstract class Algorithm {
 
         //resetting the fitness of everyone
         this.resetFitness();
-        long estimatedTime = System.nanoTime() - startTime;
-        logger.log(Level.WARNING, "-------->Time passed for generating the offspring " + (double)estimatedTime / 1000000000.0);
     }
 
 

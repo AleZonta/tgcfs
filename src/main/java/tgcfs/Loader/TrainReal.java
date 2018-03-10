@@ -1,6 +1,5 @@
 package tgcfs.Loader;
 
-import lgds.Distance.Distance;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -229,10 +228,15 @@ public class TrainReal {
 
     /**
      * Getter for the input part of the trajectory
+     * deepCopy of the list
      * @return list of inputNetworks
      */
     public List<InputsNetwork> getTrainingPoint() {
-        return this.trainingPoint;
+        List<InputsNetwork> copyOfTheList = new ArrayList<>();
+        for(InputsNetwork in: this.trainingPoint){
+            copyOfTheList.add(in.deepCopy());
+        }
+        return copyOfTheList;
     }
 
     /**
@@ -548,21 +552,11 @@ public class TrainReal {
      * TODO generalise for more than one point
      */
     public void computeStatistic() {
+        //compute MSE for the point to the real point
         //compute distance real point to generated point
         //* 1000 so it is going to be in metres
-        Distance distance = new Distance();
-        double distancePoint = distance.compute(this.followingPart.get(0), this.realPointsOutputComputed.get(0));
-
-        double euclideanDistance = this.followingPart.get(0).euclideanDistance(this.realPointsOutputComputed.get(0));
-
-
-        PointToSpeedBearing convertitor = new PointToSpeedBearing();
-
-        double realBearing = convertitor.obtainBearing(this.getLastPoint(), this.followingPart.get(0));
-        double computeBearing = convertitor.obtainBearing(this.getLastPoint(), this.realPointsOutputComputed.get(0));
-
-        double differenceBearing = 180 - Math.abs(Math.abs(realBearing - computeBearing) - 180);
-        this.statistics = new Statistics(distancePoint, euclideanDistance, differenceBearing, this.id);
+        double euclideanDistance = this.followingPart.get(0).euclideanDistance(this.realPointsOutputComputed.get(0)) * 100000;
+        this.statistics = new Statistics(this.id, Math.pow(euclideanDistance, 2));
     }
 
     /**

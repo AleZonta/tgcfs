@@ -111,7 +111,7 @@ public class FollowingTheGraph implements Transformation {
         //this is for the fake part
         for(OutputsNetwork outputsNetwork: outputs){
 
-            //Point position = this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+            //Point position = this.feeder.getNextLocation(this.lastPoint, output.getLinearSpeed(), output.getDistance(), output.getBearing());
             Point position = null;
             try {
                 if(ReadConfig.Configurations.getConversionWithGraph()){
@@ -156,6 +156,7 @@ public class FollowingTheGraph implements Transformation {
             i++;
         }
         //save the entire trajectory for future works
+        convertedInput.remove(0); //remove the first one
         trainReal.setAllThePartTransformedFake(convertedInput);
         if(ReadConfig.debug) logger.log(Level.INFO, "fake ->" + trainReal.getAllThePartTransformedFake().get(trainReal.getAllThePartTransformedFake().size() -1).toString());
 
@@ -174,6 +175,7 @@ public class FollowingTheGraph implements Transformation {
             //upgrade position
             this.lastPoint = new PointWithBearing(position);
         }
+        convertedInputReal.remove(0); //remove the first one
         trainReal.setAllThePartTransformedReal(convertedInputReal);
 
         return convertedInput;
@@ -207,6 +209,6 @@ public class FollowingTheGraph implements Transformation {
         OutputNetwork output = (OutputNetwork) outputsNetwork;
         return this.feeder.getNextLocationNoGraph(this.lastPoint, output.getSpeed(), output.getBearing(), time);
 
-//        return this.feeder.getNextLocation(this.lastPoint, output.getSpeed(), output.getDistance(), output.getBearing());
+//        return this.feeder.getNextLocation(this.lastPoint, output.getLinearSpeed(), output.getDistance(), output.getBearing());
     }
 }

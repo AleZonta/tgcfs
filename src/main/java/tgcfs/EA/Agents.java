@@ -14,6 +14,7 @@ import tgcfs.Agents.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.FollowingTheGraph;
+import tgcfs.InputOutput.Normalisation;
 import tgcfs.InputOutput.Transformation;
 import tgcfs.Loader.TrainReal;
 import tgcfs.NN.EvolvableModel;
@@ -174,6 +175,7 @@ public class Agents extends Algorithm {
                     List<OutputsNetwork> outputsNetworks = new ArrayList<>();
 
                     List<InputsNetwork> in = currentInputsNetwork.getTrainingPoint();
+                    in.remove(0);
                     int size = in.size();
 
                     int inputSize = InputNetwork.inputSize;
@@ -769,7 +771,7 @@ public class Agents extends Algorithm {
                     // trajectory result
                     Map<UUID, Double> TjContraint = new HashMap<>();
                     // trajectory result
-                    Map<UUID, Double> T2jContraint = new HashMap<>();
+//                    Map<UUID, Double> T2jContraint = new HashMap<>();
                     for(TrainReal example: inputOutput) {
                         //run the classifier for the Fake trajectory
                         tgcfs.Classifiers.OutputNetwork result = null;
@@ -981,24 +983,25 @@ public class Agents extends Algorithm {
                     //Creation matrix Yij
                     //Y_jik = (R * classifier_j(agent_i) / T_j)k
                     //E_jik = ({ i = real : 1 - Y_ij, i = fake: Y_ij } ^ 2)k
+                    double maxValue = 0;
+
 
                     HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Yijk = new HashMap<>();
-                    HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Eijk = new HashMap<>();
 
 //                    HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> multiplier = new HashMap<>();
 
                     for(UUID traID: trajectoriesID){
                         HashMap<Integer, HashMap<Integer, Double>> Yij = new HashMap<>();
-                        HashMap<Integer, HashMap<Integer, Double>> Eij = new HashMap<>();
+//                        HashMap<Integer, HashMap<Integer, Double>> Eij = new HashMap<>();
 
-                        HashMap<Integer, HashMap<Integer, Double>> subMultiplier = new HashMap<>();
+//                        HashMap<Integer, HashMap<Integer, Double>> subMultiplier = new HashMap<>();
                         for(int classifierID: results.keySet()){
                             //classifierID is the classifier id -> i
                             Map<Integer, Map<UUID, Double>> classifierResults = results.get(classifierID);
 
 
                             //Creation id agent,classifier
-                            HashMap<Integer, Double> subE = new HashMap<>();
+//                            HashMap<Integer, Double> subE = new HashMap<>();
                             //for debug, remove this hashmap, it is redundant
                             HashMap<Integer, Double> subY = new HashMap<>();
 
@@ -1007,63 +1010,99 @@ public class Agents extends Algorithm {
 
 
                             for(int agentId: classifierResults.keySet()){
-                                Map<UUID, Double> traMap = classifierResults.get(agentId);
+//                                Map<UUID, Double> traMap = classifierResults.get(agentId).get(traID);
                                 //now I have classifier j and looping over agent i
 
 
-                                double singleValue = traMap.get(traID);
+                                double singleValue = classifierResults.get(agentId).get(traID);
                                 double y = R * singleValue / Tjk.get(traID).get(classifierID);
 
-                                if(Double.isNaN(y)){
-                                    y = 0.0;
-                                }
-                                if(y > 1.0) y = 1.0;
-                                if(y < 0.0) y = 0.0;
+                                if(Double.isNaN(y)) y = 0.0;
+                                //save the max value for y
+                                if(maxValue < y) maxValue = y;
 
                                 subY.put(agentId, y);
 
 
-                                if(realAgentsId.stream().anyMatch(t -> t == agentId)){
-                                    //if point is a real point
-//                                    subE.put(agentId, Math.pow(1 - y, 2));
-                                    if(y > 0.5) {
-                                        //if point real point and it is classified as a real
-                                        subE.put(agentId, Math.pow(1 - y, 2));
-//                                        subSubMultiplier.put(agentId, 1.0);
-                                    }else {
-                                        //if point is a real point and it is classified as fake
-                                        subE.put(agentId, Math.pow(1 - y, 2));
-//                                        subSubMultiplier.put(agentId, 1.0);
-                                    }
-//                                    subE.put(agentId, Math.pow(1 - y, 2) * 100);
-                                }else{
-                                    ///if point is a generated point
-                                    subE.put(agentId, Math.pow(y, 2));
-                                    if(y > 0.5) {
-                                        //if point is a generated point and it is classified as real
-                                        subE.put(agentId, Math.pow(y, 2));
-//                                        subSubMultiplier.put(agentId, 100.0);
-                                    }else {
-                                        //if point is a generated point and it is classified as fake
-                                        subE.put(agentId, Math.pow(y, 2));
-//                                        subSubMultiplier.put(agentId, 1.0);
-                                    }
-
-                                }
+//                                if(realAgentsId.stream().anyMatch(t -> t == agentId)){
+//                                    //if point is a real point
+////                                    subE.put(agentId, Math.pow(1 - y, 2));
+//                                    if(y > 0.5) {
+//                                        //if point real point and it is classified as a real
+//                                        subE.put(agentId, Math.pow(1 - y, 2));
+////                                        subSubMultiplier.put(agentId, 1.0);
+//                                    }else {
+//                                        //if point is a real point and it is classified as fake
+//                                        subE.put(agentId, Math.pow(1 - y, 2));
+////                                        subSubMultiplier.put(agentId, 1.0);
+//                                    }
+////                                    subE.put(agentId, Math.pow(1 - y, 2) * 100);
+//                                }else{
+//                                    ///if point is a generated point
+//                                    subE.put(agentId, Math.pow(y, 2));
+//                                    if(y > 0.5) {
+//                                        //if point is a generated point and it is classified as real
+//                                        subE.put(agentId, Math.pow(y, 2));
+////                                        subSubMultiplier.put(agentId, 100.0);
+//                                    }else {
+//                                        //if point is a generated point and it is classified as fake
+//                                        subE.put(agentId, Math.pow(y, 2));
+////                                        subSubMultiplier.put(agentId, 1.0);
+//                                    }
+//
+//                                }
 
                             }
 
-                            Eij.put(classifierID, subE);
+//                            Eij.put(classifierID, subE);
                             //for debug, remove this hashmap, it is redundant
                             Yij.put(classifierID, subY);
 
 //                            subMultiplier.put(classifierID, subSubMultiplier);
                         }
                         Yijk.put(traID, Yij);
-                        Eijk.put(traID, Eij);
+//                        Eijk.put(traID, Eij);
 
 //                        multiplier.put(traID, subMultiplier);
                     }
+
+
+
+                    HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Eijk = new HashMap<>();
+                    for(UUID traID: trajectoriesID){
+                        HashMap<Integer, HashMap<Integer, Double>> Eij = new HashMap<>();
+                        HashMap<Integer, HashMap<Integer, Double>> Yij = Yijk.get(traID);
+
+                        for(int classifierID: Yij.keySet()){
+                            HashMap<Integer, Double> subY = Yij.get(classifierID);
+                            HashMap<Integer, Double> subE = new HashMap<>();
+
+                            for(int agentId: subY.keySet()){
+
+                                double y = subY.get(agentId);
+                                double realY = Normalisation.convertToSomething(maxValue, 0.0,1.0,0.0, y);
+
+                                if(realAgentsId.stream().anyMatch(t -> t == agentId)){
+                                    //if point is a real point
+                                    subE.put(agentId, Math.pow(1 - realY, 2));
+                                }else{
+                                    ///if point is a generated point
+                                    subE.put(agentId, Math.pow(realY, 2));
+                                }
+                            }
+                            Eij.put(classifierID, subE);
+                        }
+                        Eijk.put(traID, Eij);
+                    }
+
+
+
+
+
+
+
+
+
 
                     //FitnessAgent = sum_k(sum_j( E_jik ))
                     for(Individual agent : super.getPopulationWithHallOfFame()){
@@ -1213,7 +1252,6 @@ public class Agents extends Algorithm {
      * @param transformation {@link FollowingTheGraph} transformation reference to transform the output in real point //TODO generalise this
      */
     public void generateRealPoints(FollowingTheGraph transformation) throws Exception {
-
         for(Individual ind: super.getPopulation()) {
             for (TrainReal train : ind.getMyInputandOutput()) {
                 if(train.getRealPointsOutputComputed() == null) {
