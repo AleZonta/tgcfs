@@ -477,7 +477,7 @@ public class TrainReal {
 
                 double bearing = conversion.obtainBearing(previousPoint, actualPoint);
                 double speed = conversion.obtainSpeed(previousPoint, actualPoint, this.lastTime);
-
+                if(ReadConfig.isETH) speed = conversion.obtainSpeedEuclideanDistance(previousPoint, actualPoint, this.lastTime);
                 totalList.add(new OutputNetwork(speed, bearing));
 //                totalList.add(new OutputNetworkTime(speed, bearing, time));
 

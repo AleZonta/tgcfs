@@ -29,6 +29,7 @@ public class Routes {
     private static Logger logger; //logger for this class
     private static int number; //number of trajectories analysed
     public static double timeBetweenIDSATimesteps = 0.2;
+    public static double timeBetweenETHTimesteps = 0.4;
 
     /**
      * Constructor with one parameter

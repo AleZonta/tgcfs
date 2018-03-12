@@ -95,6 +95,7 @@ public class ReadConfig {
     private Integer keepBestNElement;
     private Integer howManyAmIChangingBetweenGeneration;
     public static boolean debug;
+    public static boolean isETH;
     private Boolean score;
 
     private Double maxSpeed;
@@ -194,6 +195,7 @@ public class ReadConfig {
         this.fitnessFunction = null;
         this.timeAsInput = null;
         debug = false;
+        isETH = false;
     }
 
     /**
@@ -323,6 +325,7 @@ public class ReadConfig {
         try {
             // 0 means IDSA, 1 means Geosat
             this.trajectoriesType = ((Long) jsonObject.get("trajectoriesType")).intValue();
+            if(this.trajectoriesType == 5) isETH = true;
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("TrajectoriesType is wrong or missing.");
         }

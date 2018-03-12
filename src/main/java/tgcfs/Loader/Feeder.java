@@ -110,6 +110,9 @@ public class Feeder {
         if(tra.getSize() <= split){
             split = 2; //I only split in half
         }
+        if(ReadConfig.Configurations.getTrajectoriesType() == 5){
+            split = 1;
+        }
         return (int) Math.floor(tra.getSize() / split);
     }
 
@@ -259,11 +262,16 @@ public class Feeder {
             double time = 0.0;
             if(isDdsa) {
                 time = Routes.timeBetweenIDSATimesteps;
-            }else {
+            }else if (ReadConfig.isETH) {
+                time = Routes.timeBetweenETHTimesteps;
+            }else{
                 time = conversion.obtainTime(previousPoint,actualPoint);
             }
             allTheTimes.add(time);
             double speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
+            if (ReadConfig.isETH) {
+                speed = conversion.obtainSpeedEuclideanDistance(previousPoint, actualPoint, time);
+            }
             double angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
             if(ReadConfig.debug) logger.log(Level.INFO, "angularSpeed = " + angularSpeed);
 
@@ -283,7 +291,9 @@ public class Feeder {
         //TODO manage to add all the other times if I am going to use more than 1 timestep after the target
         if(isDdsa) {
             this.lastTime = Routes.timeBetweenIDSATimesteps;
-        }else {
+        }else if (ReadConfig.isETH) {
+            this.lastTime = Routes.timeBetweenETHTimesteps;
+        }else{
             this.lastTime = conversion.obtainTime(points.get(points.size() - 1), realPoints.get(0));
         }
         allTheTimes.add(lastTime);
@@ -385,7 +395,7 @@ public class Feeder {
         for(int i = 0; i< actualPoint.size(); i++){
             Point actualSinglePoint = actualPoint.get(i);
             Point toAdd;
-            if(ReadConfig.Configurations.getTrajectoriesType() == 1 || ReadConfig.Configurations.getTrajectoriesType() == 4){
+            if(ReadConfig.Configurations.getTrajectoriesType() == 1 || ReadConfig.Configurations.getTrajectoriesType() == 4 || ReadConfig.Configurations.getTrajectoriesType() == 5){
                 toAdd = new Point(actualSinglePoint.getLatitude(), actualSinglePoint.getLongitude(), actualSinglePoint.getAltitude(),actualSinglePoint.getDated(), actualSinglePoint.getDates(), actualSinglePoint.getTime());
                 this.lastTimeUsed = toAdd;
             }else{
@@ -423,10 +433,11 @@ public class Feeder {
 
         //check how many points I want to analise
         int timesteps = ReadConfig.Configurations.getNumberOfTimestepConsidered();
+        int futureTimeSteps = ReadConfig.Configurations.getAgentTimeSteps();
         //if it is zero I do not care and use all the timesteps
         if(timesteps != 0){
-            //keep only the timesteps that I need
-            while(actualPoint.size() > timesteps){
+            //keep only the timesteps that I need + the next ones
+            while(actualPoint.size() > timesteps + futureTimeSteps){
                 //remove the first one till I reach the size I want
                 actualPoint.remove(0);
             }
@@ -435,10 +446,21 @@ public class Feeder {
         //I have trajectory and I have current position.
         //I just need to retrieve next n position
         List<PointWithBearing> realPoint = new ArrayList<>();
-        for(int i = this.position; i < this.position + ReadConfig.Configurations.getAgentTimeSteps(); i++){
-            Point nextPoint = this.getNextPoint(this.currentTrajectory);
-            if (nextPoint != null){
-                realPoint.add(new PointWithBearing(nextPoint));
+        //If I have already the points, remove them from the list and place in the next point list
+        if(actualPoint.size() == timesteps + futureTimeSteps){
+            for(int i = 0; i < futureTimeSteps; i++){
+                realPoint.add(new PointWithBearing(actualPoint.remove(actualPoint.size() - 1)));
+            }
+        }
+
+        if(realPoint.size() < futureTimeSteps) {
+            for (int i = this.position; i < this.position + futureTimeSteps; i++) {
+                Point nextPoint = this.getNextPoint(this.currentTrajectory);
+                if (nextPoint != null) {
+                    realPoint.add(new PointWithBearing(nextPoint));
+                } else {
+                    throw new Exception("Next Point is missing");
+                }
             }
         }
 

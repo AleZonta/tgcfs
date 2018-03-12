@@ -58,21 +58,22 @@ public class PointToSpeedBearing {
         //speed = distance / time
         Distance dis = new Distance();
         double distance = dis.compute(firstPoint, secondPoint);
-        try {
-            if (ReadConfig.Configurations.getTrajectoriesType() != 0) {
-                try {
-                    time = new Double(secondPoint.differenceInTime(firstPoint));
-                } catch (Exception e) {
-                    //I do not have time, so time will be the one I set before. I do not print the stack trace
-                    //e.printStackTrace();
-                }
-            }
-        }catch (Exception e) {
-            //e.printStackTrace();
-        }
-
         return distance / time;
     }
+
+    /**
+     * Compute speed between two points using the Time in the two points -> with euclidean distance
+     * @param firstPoint first position
+     * @param secondPoint second position
+     * @param time time between the two points
+     * @return speed of the movement between the two points
+     */
+    public double obtainSpeedEuclideanDistance(Point firstPoint, Point secondPoint, double time){
+        //speed = distance / time
+        double distance = firstPoint.euclideanDistance(secondPoint);
+        return distance / time;
+    }
+
 
     /**
      * Compute the time between the two points
