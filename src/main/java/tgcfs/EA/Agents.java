@@ -495,6 +495,87 @@ public class Agents extends Algorithm {
          * Class for multithreading
          * Run one agent against all the classifiers
          * Compute the fitness function in this way:
+         * If the classifier is classifying the fake point as correct the agent fitness increases by one
+         * If the classifier is able to classify the fake point as a fake, it earns one point
+         * If the classifier is able to classify the real point as a real, it earns a point
+         */
+        class BaseFitness implements Runnable {
+            private CountDownLatch latch;
+            private Individual agent;
+            private List<Individual> adersarialPopulation;
+
+            /**
+             * Constructor
+             * @param agent current agent
+             * @param adersarialPopulation adversarial population
+             */
+            private BaseFitness(Individual agent, List<Individual> adersarialPopulation) {
+                this.agent = agent;
+                this.adersarialPopulation = adersarialPopulation;
+            }
+
+            /**
+             * CountDownLatch is a java class in the java.util.concurrent package. It is a mechanism to safely handle
+             * counting the number of completed tasks. You should call latch.countDown() whenever the run method competes.
+             * @param latch {@link CountDownLatch}
+             */
+            private void setLatch(CountDownLatch latch) {
+                this.latch = latch;
+            }
+
+            /**
+             * Override method run
+             * run the classifier over the agent
+             */
+            @Override
+            public void run() {
+                List<TrainReal> inputOutput = this.agent.getMyInputandOutput();
+                for(Individual opponent: this.adersarialPopulation){
+                    for(TrainReal example: inputOutput){
+                        //run the classifier for the Fake trajectory
+                        try {
+                            tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(opponent, example.getAllThePartTransformedFake());
+                            if (ReadConfig.debug) logger.log(Level.INFO, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + Boolean.FALSE);
+                            double decision = result.getRealValue();
+                            if( decision > 0.5 ) {
+                                //it is saying it is true
+                                this.agent.increaseFitness(1.0);
+                            }else{
+                                //it is false
+                                opponent.increaseFitness(1.0);
+                            }
+
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error Classifier Fake Input" + e.getMessage());
+                            e.printStackTrace();
+                        }
+
+                        //run the classifier for the Real trajectory
+                        try {
+                            tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(opponent, example.getAllThePartTransformedReal());
+                            if (ReadConfig.debug) logger.log(Level.INFO, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + Boolean.TRUE);
+                            double decision = result.getRealValue();
+                            if( decision > 0.5 ) {
+                                //it is saying it is true
+                                opponent.increaseFitness(1.0);
+                            }
+
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error Classifier Real Input" + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+                latch.countDown();
+            }
+
+        }
+
+        /**
+         * Class for multithreading
+         * Run one agent against all the classifiers
+         * Compute the fitness function in this way:
          * Now if the classifier (ENN) is returning the value x (>=0.5 -> true) as output, the fitness is computed in this way:
          * - agent fitness is x, classifier is (1-x)
          * In the other case, output x (<0.5 -> false), the fitness is:
@@ -619,11 +700,6 @@ public class Agents extends Algorithm {
          *
          * FitnessAgent = sum_k sum_j( E_ijk )
          * FitnessClassifier = sum_k sum_i( 1 - E_ijk)
-         *
-         *
-         *
-         *
-         *
          *
          */
         class ComputeSelmarFitnessUnit implements Runnable{
@@ -867,6 +943,28 @@ public class Agents extends Algorithm {
 
         switch (fitnessTypology){
             case 0:
+                //  fitness function from paper
+                //launch my way to compute the fitness
+                ExecutorService execBase = Executors.newFixedThreadPool(16);
+                CountDownLatch latchBase= new CountDownLatch(super.getPopulationWithHallOfFame().size());
+                BaseFitness[] runnablesBase = new BaseFitness[super.getPopulationWithHallOfFame().size()];
+                for(int i = 0; i < super.getPopulationWithHallOfFame().size(); i ++){
+                    runnablesBase[i] = new BaseFitness(super.getPopulationWithHallOfFame().get(i), competingPopulation.getPopulationWithHallOfFame());
+                }
+                for(BaseFitness r : runnablesBase) {
+                    r.setLatch(latchBase);
+                    execBase.execute(r);
+                }
+                try {
+                    latchBase.await();
+                    execBase.shutdown();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+            case 1:
 
                 // original fitness function implemented
                 boolean score = false;
@@ -895,7 +993,7 @@ public class Agents extends Algorithm {
                 }
 
                 break;
-            case 1:
+            case 2:
                 // selmar fitness function
                 // number real trajectories = total number of trajectories said as real = # trajectories trained * # individuals
                 int R = super.getPopulationWithHallOfFame().size();
@@ -943,7 +1041,7 @@ public class Agents extends Algorithm {
                     }
 
 
-//                    logger.log(Level.INFO, fakeClassification.toString());
+                    logger.log(Level.INFO, results.toString());
 //                    logger.log(Level.INFO, "----------");
 //                    logger.log(Level.INFO, realClassification.toString());
 
@@ -1066,8 +1164,6 @@ public class Agents extends Algorithm {
 //                        multiplier.put(traID, subMultiplier);
                     }
 
-
-
                     HashMap<UUID, HashMap<Integer, HashMap<Integer, Double>>> Eijk = new HashMap<>();
                     for(UUID traID: trajectoriesID){
                         HashMap<Integer, HashMap<Integer, Double>> Eij = new HashMap<>();
@@ -1080,7 +1176,13 @@ public class Agents extends Algorithm {
                             for(int agentId: subY.keySet()){
 
                                 double y = subY.get(agentId);
-                                double realY = Normalisation.convertToSomething(maxValue, 0.0,1.0,0.0, y);
+                                double realY;
+
+                                if(maxValue > 1){
+                                    realY = Normalisation.convertToSomething(maxValue, 0.0,1.0,0.0, y);
+                                }else{
+                                    realY = y;
+                                }
 
                                 if(realAgentsId.stream().anyMatch(t -> t == agentId)){
                                     //if point is a real point
@@ -1095,15 +1197,6 @@ public class Agents extends Algorithm {
                         Eijk.put(traID, Eij);
                     }
 
-
-
-
-
-
-
-
-
-
                     //FitnessAgent = sum_k(sum_j( E_jik ))
                     for(Individual agent : super.getPopulationWithHallOfFame()){
                         int id = agent.getModel().getId();
@@ -1113,7 +1206,7 @@ public class Agents extends Algorithm {
                             HashMap<Integer, HashMap<Integer, Double>> Eij = Eijk.get(uuid);
 
 //                            HashMap<Integer, HashMap<Integer, Double>> subMultiplier = multiplier.get(uuid);
-
+                            double traFitness = 0;
                             //need to find all the values with that id
                             for(int classifierID: Eij.keySet()){
                                 //find values to avoid
@@ -1122,16 +1215,20 @@ public class Agents extends Algorithm {
 //                                if(!(toNotUse.containsKey(id) && toNotUse.get(id)==uuid)){
 
                                 fitness += (Eij.get(classifierID).get(id) * multiplierData.get(classifierID).get(id).get(uuid));
+                                traFitness += (Eij.get(classifierID).get(id) * multiplierData.get(classifierID).get(id).get(uuid));
                                 //subMultiplier.get(classifierID).get(id));
 //                                    fitness += (Eij.get(classifierID).get(id));
 //                                }
                             }
+
+                            double finalTraFitness = traFitness;
+                            agent.getMyInputandOutput().stream().filter(ex -> ex.getId().equals(uuid)).findAny().ifPresent(el -> el.setFitnessGivenByTheClassifier(finalTraFitness));
                         }
                         agent.setFitness(fitness);
                         //setting the fitness for the examples of this agent
-                        for(TrainReal example: agent.getMyInputandOutput()){
-                            example.setFitnessGivenByTheClassifier(fitness);
-                        }
+//                        for(TrainReal example: agent.getMyInputandOutput()){
+//                            example.setFitnessGivenByTheClassifier(fitness);
+//                        }
                     }
 
 

@@ -75,6 +75,9 @@ public class Routes {
                 if(!ReadConfig.Configurations.getTimeAsInput())
                     throw new Exception("Trying to use the GeoLife dataset without taking into account the time");
                 break;
+            case 5:
+                this.storage = new LoadETHPedestrian();
+                break;
             default:
                 throw new Exception("Typology not yet implemented");
         }

@@ -196,9 +196,12 @@ public class TuringLearning implements Framework{
         int fitnessTypology = ReadConfig.Configurations.getFitnessFunction();
         switch (fitnessTypology) {
             case 0:
-                logger.log(Level.INFO, "Original Fitness Function Selected");
+                logger.log(Level.INFO, "Fitness Function from Paper Selected");
                 break;
             case 1:
+                logger.log(Level.INFO, "Modified Fitness Function Selected");
+                break;
+            case 2:
                 logger.log(Level.INFO, "Selmar Fitness Function Selected");
                 break;
             default:
