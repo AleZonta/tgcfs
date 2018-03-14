@@ -104,21 +104,39 @@ public class FeederTest {
 //        System.out.println(result);
 //        System.out.println(result.getTime());
 
-        Point myLocation = new Point(52.320961, 4.869281, 0d,12345.6, "123456", "14:20:10");
-        double speed = 10;
-        double bearing = 358.31;
+//        Point myLocation = new Point(52.320961, 4.869281, 0d,12345.6, "123456", "14:20:10");
+//        double speed = 10;
+//        double bearing = 358.31;
+//        new ReadConfig.Configurations();
+//
+//        Logger log =  Logger.getLogger(FeederTest.class.getName());
+//        Feeder system = new Feeder(log);
+//        system.loadSystem();
+//        Point result = system.getNextLocationNoGraph(myLocation,speed,bearing);
+//        System.out.println(result);
+//
+//        result = system.getNextLocationNoGraph(myLocation, -10.0,bearing);
+//        System.out.println(result);
+
+        Point myLocation = new Point(1.6049956, -8.0676865, 0d,12345.6, "123456", "14:20:10");
+        double speed = 1.6713278182451559;
+        double bearing = 274.83141497299533;
         new ReadConfig.Configurations();
 
         Logger log =  Logger.getLogger(FeederTest.class.getName());
         Feeder system = new Feeder(log);
         system.loadSystem();
-        Point result = system.getNextLocationNoGraph(myLocation,speed,bearing);
+//        Point result = system.getNextLocationNoGraph(myLocation,speed,bearing, 0.4);
+//        System.out.println(result);
+
+        Point result = system.getNextLocationNoGraph(myLocation, 1.4405680847816191,259.1645363810223, 0.4);
         System.out.println(result);
-
-        result = system.getNextLocationNoGraph(myLocation, -10.0,bearing);
+        result = system.getNextLocationNoGraph(myLocation, 1.4405680847816191,3.0574673069991687, 0.4);
         System.out.println(result);
-
-
+        result = system.getNextLocationNoGraph(myLocation, 1.5,3.0574673069991687, 0.4);
+        System.out.println(result);
+        result = system.getNextLocationNoGraph(myLocation, 1.6713278182451559,3.0574673069991687, 0.4);
+        System.out.println(result);
 
 //        OutputNetwork{ speed=100.58245211839676, bearing=-37.51176595687866, } -> (52.0461027, 4.3312338)
 //

@@ -201,7 +201,7 @@ public class Agents extends Algorithm {
                     }
                     this.addOutput(Nd4j.toFlattened(realLastOut), outputsNetworks);
 
-                    logger.log(Level.INFO, inputsNetwork.getId() + " Output LSTM transformed ->" + outputsNetworks.toString());
+                    if(ReadConfig.debug) logger.log(Level.INFO, inputsNetwork.getId() + " Output LSTM transformed ->" + outputsNetworks.toString());
 
                     //output has only two fields, input needs three
                     //I am using the last direction present into input I am adding that one to the last output

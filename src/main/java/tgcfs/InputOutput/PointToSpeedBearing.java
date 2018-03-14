@@ -43,7 +43,7 @@ public class PointToSpeedBearing {
         }catch (Exception e) {
             //e.printStackTrace();
         }
-
+        if(ReadConfig.isETH) time = Routes.timeBetweenETHTimesteps;
         return distance / time;
     }
 
@@ -96,6 +96,21 @@ public class PointToSpeedBearing {
      */
     public double obtainBearing(Point firstPoint, Point secondPoint){
         return this.bearing(firstPoint.getLatitude(), firstPoint.getLongitude(), secondPoint.getLatitude(), secondPoint.getLongitude());
+    }
+
+    /**
+     * Compute the bearing between two points
+     * @param firstPoint first position
+     * @param secondPoint second position
+     * @return bearing of the movement
+     */
+    public double obtainBearingPlane(Point firstPoint, Point secondPoint){
+        double angle = Math.atan2(secondPoint.getLatitude() - firstPoint.getLatitude(), secondPoint.getLongitude() - firstPoint.getLongitude());
+        if(angle > 0){
+            return angle;
+        }else{
+            return 360 + angle;
+        }
     }
 
 

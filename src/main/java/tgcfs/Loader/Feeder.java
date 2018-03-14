@@ -269,9 +269,7 @@ public class Feeder {
             }
             allTheTimes.add(time);
             double speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
-            if (ReadConfig.isETH) {
-                speed = conversion.obtainSpeedEuclideanDistance(previousPoint, actualPoint, time);
-            }
+
             double angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
             if(ReadConfig.debug) logger.log(Level.INFO, "angularSpeed = " + angularSpeed);
 
@@ -328,15 +326,21 @@ public class Feeder {
 //            this.finished = Boolean.TRUE;
 //            this.position = 0;
 //        }
-        for(int i = this.position; i < this.position + count; i++){
-            Point p = this.getNextPoint(trajectory);
-            //If it not null I add the element to the list
-            if(p != null){
-                point.add(p);
-            }else{
-                //if it is null I have finished the trajectory
-                this.finished = Boolean.TRUE;
+        try{
+            for(int i = this.position; i < this.position + count; i++){
+                Point p = this.getNextPoint(trajectory);
+                //If it not null I add the element to the list
+                if(p != null){
+                    point.add(p);
+                }else{
+                    //if it is null I have finished the trajectory
+                    this.finished = Boolean.TRUE;
+                }
             }
+        }catch (Exception e){
+            this.finished = Boolean.TRUE;
+            this.position = 0;
+            throw new Exception(e);
         }
         if(this.finished){
             this.position = 0;
@@ -391,6 +395,8 @@ public class Feeder {
         //TODO check this part for the point and the timing
         //retrieve section form the trajectory
         List<Point> actualPoint = this.obtainSectionTrajectory(this.currentTrajectory);
+
+
         List<Point> pointWithTime = new ArrayList<>();
         for(int i = 0; i< actualPoint.size(); i++){
             Point actualSinglePoint = actualPoint.get(i);
@@ -742,7 +748,7 @@ public class Feeder {
     }
 
 
-    private Point getNextLocation(Point whereIam, Double speed, Double direction, double time){
+    private Point getNextLocation(Point whereIam, double speed, double direction, double time){
         if (speed == 0.0) return whereIam;
         double distance = speed * time;
 
@@ -764,6 +770,20 @@ public class Feeder {
         distance = distance * 1000;
         double plusTime = distance / speed;
         return new Point(latDeg, longDeg, whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(plusTime));
+    }
+
+
+    private Point getNextLocationPlane(Point whereIam, double speed, double direction, double time){
+        if (speed == 0.0) return whereIam;
+        double distance = speed * time;
+
+        //x1=x+ncosθ
+        //y1=y+nsinθ
+        double x = whereIam.getLatitude() + distance * Math.cos(direction);
+        double y = whereIam.getLongitude() + distance * Math.sin(direction);
+//        if(whereIam.getLatitude() < 0) x = -x;
+//        if(whereIam.getLongitude() < 0) y = -y;
+        return new Point(x, y, whereIam.getAltitude(), whereIam.getDated(), whereIam.getDates(), whereIam.addTimeToPoint(time));
     }
 
 
@@ -859,7 +879,7 @@ public class Feeder {
         for(TrainReal tr: totalList){
             //create the output already computed
             tr.createRealOutputConverted();
-            logger.log(Level.INFO, tr.getId() + " Real point transformed ->" + tr.getRealOutput().toString());
+            if(ReadConfig.debug) logger.log(Level.INFO, tr.getId() + " Real point transformed ->" + tr.getRealOutput().toString());
         }
 
         return totalList;
