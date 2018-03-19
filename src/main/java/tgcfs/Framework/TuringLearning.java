@@ -9,6 +9,7 @@ import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.Models.ENNClassifier;
 import tgcfs.Classifiers.Models.LSTMClassifier;
+import tgcfs.Classifiers.Models.NNClassifier;
 import tgcfs.Config.PropertiesFileReader;
 import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Agents;
@@ -145,6 +146,10 @@ public class TuringLearning implements Framework{
                 break;
             default:
                 throw new NoSuchMethodError("Model not yet implemented");
+        }
+        if(ReadConfig.tryNNclassifier) {
+            tgcfs.Classifiers.InputNetwork.inputSize = 4;
+            classifierModel = new NNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
         }
         //generate population
         //INITIALISE population EA with random candidate solution

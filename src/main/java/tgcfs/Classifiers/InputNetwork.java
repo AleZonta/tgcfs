@@ -2,10 +2,9 @@ package tgcfs.Classifiers;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import tgcfs.Config.ReadConfig;
 import tgcfs.InputOutput.Normalisation;
 import tgcfs.NN.InputsNetwork;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by Alessandro Zonta on 24/05/2017.
@@ -22,7 +21,9 @@ import java.lang.reflect.Field;
 public class InputNetwork implements InputsNetwork{
     private Double linearSpeed; //linearSpeed of the movement
     private Double angularSpeed; //angularSpeed of the movement
-    public static final Integer inputSize = 2; //the size of the input corresponding to the two fields here
+    private Double averageLinearSpeed;
+    private Double averageAngularSpeed;
+    public static Integer inputSize = 2; //the size of the input corresponding to the two fields here
 
     /**
      * Constructor zero parameter = everything to null
@@ -30,11 +31,14 @@ public class InputNetwork implements InputsNetwork{
     public InputNetwork(){
         this.angularSpeed = null;
         this.linearSpeed = null;
+        this.averageLinearSpeed = null;
+        this.averageAngularSpeed = null;
+        if(ReadConfig.tryNNclassifier) inputSize = 4;
 
-        Field[] allFields = InputNetwork.class.getDeclaredFields();
-        if (allFields.length != inputSize + 1){
-            throw new Error("Number of fields and variable expressing that do not correspond.");
-        }
+//        Field[] allFields = InputNetwork.class.getDeclaredFields();
+//        if (allFields.length != inputSize + 1){
+//            throw new Error("Number of fields and variable expressing that do not correspond.");
+//        }
     }
 
     /**
@@ -50,10 +54,13 @@ public class InputNetwork implements InputsNetwork{
         }
         this.angularSpeed = Normalisation.convertAngularSpeed(angularSpeed);
 
-        Field[] allFields = InputNetwork.class.getDeclaredFields();
-        if (allFields.length != inputSize + 1){
-            throw new Error("Number of fields and variable expressing that do not correspond.");
-        }
+        this.averageLinearSpeed = 0.0;
+        this.averageAngularSpeed = 0.0;
+        if(ReadConfig.tryNNclassifier) inputSize = 4;
+//        Field[] allFields = InputNetwork.class.getDeclaredFields();
+//        if (allFields.length != inputSize + 1){
+//            throw new Error("Number of fields and variable expressing that do not correspond.");
+//        }
     }
 
     /**
@@ -74,12 +81,58 @@ public class InputNetwork implements InputsNetwork{
             this.linearSpeed = linearSpeed;
             this.angularSpeed = angularSpeed;
         }
-
-        Field[] allFields = InputNetwork.class.getDeclaredFields();
-        if (allFields.length != inputSize + 1){
-            throw new Error("Number of fields and variable expressing that do not correspond.");
-        }
+        this.averageLinearSpeed = 0.0;
+        this.averageAngularSpeed = 0.0;
+        if(ReadConfig.tryNNclassifier) inputSize = 4;
+//        Field[] allFields = InputNetwork.class.getDeclaredFields();
+//        if (allFields.length != inputSize + 1){
+//            throw new Error("Number of fields and variable expressing that do not correspond.");
+//        }
     }
+
+    /**
+     * Constructor two parameters
+     * @param linearSpeed linearSpeed parameter
+     * @param angularSpeed angularSpeed parameter
+     */
+    public InputNetwork(double linearSpeed, double angularSpeed, double averageLinearSpeed, double averageAngularSpeed){
+        try {
+            this.linearSpeed = Normalisation.convertSpeed(linearSpeed);
+            this.averageLinearSpeed = Normalisation.convertSpeed(averageLinearSpeed);
+        } catch (Exception e) {
+            throw new Error("Error with linearSpeed.");
+        }
+        this.angularSpeed = Normalisation.convertAngularSpeed(angularSpeed);
+        this.averageAngularSpeed = Normalisation.convertAngularSpeed(averageAngularSpeed);
+        if(ReadConfig.tryNNclassifier) inputSize = 4;
+    }
+
+    /**
+     * Constructor two parameters
+     * @param linearSpeed linearSpeed parameter
+     * @param angularSpeed angularSpeed parameter
+     */
+    public InputNetwork(double linearSpeed, double angularSpeed, double averageLinearSpeed, double averageAngularSpeed, boolean translation){
+        if(translation){
+            try {
+                this.linearSpeed = Normalisation.convertSpeed(linearSpeed);
+                this.averageLinearSpeed = Normalisation.convertSpeed(averageLinearSpeed);
+            } catch (Exception e) {
+                throw new Error("Error with linearSpeed.");
+            }
+            this.angularSpeed = Normalisation.convertAngularSpeed(angularSpeed);
+            this.averageAngularSpeed = Normalisation.convertAngularSpeed(averageAngularSpeed);
+        }else{
+            this.linearSpeed = linearSpeed;
+            this.averageLinearSpeed = averageLinearSpeed;
+            this.angularSpeed = angularSpeed;
+            this.averageAngularSpeed = averageAngularSpeed;
+
+        }
+
+        if(ReadConfig.tryNNclassifier) inputSize = 4;
+    }
+
 
     /**
      * Getter for the linearSpeed variable
@@ -104,15 +157,24 @@ public class InputNetwork implements InputsNetwork{
      */
     @Override
     public INDArray serialise(){
-        INDArray array = Nd4j.zeros(2);
-        array.putScalar(0, this.linearSpeed);
-        array.putScalar(1, this.angularSpeed);
-        return array;
+        if(inputSize == 2) {
+            INDArray array = Nd4j.zeros(2);
+            array.putScalar(0, this.linearSpeed);
+            array.putScalar(1, this.angularSpeed);
+            return array;
+        }else{
+            INDArray array = Nd4j.zeros(4);
+            array.putScalar(0, this.linearSpeed);
+            array.putScalar(1, this.angularSpeed);
+            array.putScalar(2, this.averageLinearSpeed);
+            array.putScalar(3, this.averageAngularSpeed);
+            return array;
+        }
     }
 
     @Override
     public InputsNetwork deepCopy() {
-        return new InputNetwork(this.linearSpeed, this.angularSpeed, false);
+        return new InputNetwork(this.linearSpeed, this.angularSpeed, this.averageLinearSpeed, this.averageAngularSpeed, false);
     }
 
     /**
@@ -125,5 +187,13 @@ public class InputNetwork implements InputsNetwork{
                 "linearSpeed=" + this.linearSpeed + ", " +
                 "angularSpeed=" + this.angularSpeed + " " +
                 '}';
+    }
+
+    public Double getAverageLinearSpeed() {
+        return averageLinearSpeed;
+    }
+
+    public Double getAverageAngularSpeed() {
+        return averageAngularSpeed;
     }
 }

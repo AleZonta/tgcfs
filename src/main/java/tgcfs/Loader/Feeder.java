@@ -106,6 +106,7 @@ public class Feeder {
     private int selectPositionInTrajectory(Trajectory tra) throws Exception{
         //decide how many time to analise the trajectory
         int split = ReadConfig.Configurations.getHowManySplitting();
+        if(split == 0) return tra.getSize();
         //need to check if the trajectory is shorter than the split number
         if(tra.getSize() <= split){
             split = 2; //I only split in half

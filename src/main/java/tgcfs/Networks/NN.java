@@ -29,6 +29,13 @@ public class NN extends Models implements Network{
     protected int outputSize;
 
     /**
+     * Default constructor
+     */
+    public NN(){
+
+    }
+
+    /**
      * Building of the Neural NN.Network
      * @param inputSize integer value containing the size of the input
      * @param hiddenLayers integer value containing how many hidden layers the network will have
@@ -68,7 +75,7 @@ public class NN extends Models implements Network{
         OutputLayer.Builder outputLayerBuilder = new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD);
         outputLayerBuilder.nIn(hiddenNeurons);
         outputLayerBuilder.nOut(outputSize);
-        outputLayerBuilder.activation(Activation.IDENTITY);
+        outputLayerBuilder.activation(Activation.SIGMOID);
         listBuilder.layer(hiddenLayers, outputLayerBuilder.build());
 
 
@@ -104,5 +111,13 @@ public class NN extends Models implements Network{
     @Override
     public int getNumPar() {
         return this.net.numParams();
+    }
+
+    public INDArray getParameters() {
+        return this.net.params();
+    }
+
+    public void setWeight(INDArray par) {
+        this.net.setParameters(par);
     }
 }

@@ -206,16 +206,16 @@ public class Agents extends Algorithm {
                     //output has only two fields, input needs three
                     //I am using the last direction present into input I am adding that one to the last output
 
-                    Double directionAPF = ((InputNetwork) currentInputsNetwork.getTrainingPoint().get(currentInputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF();
+                    Double directionAPF = Normalisation.decodeDirectionData(((InputNetwork) currentInputsNetwork.getTrainingPoint().get(currentInputsNetwork.getTrainingPoint().size() - 1)).getDirectionAPF());
                     for (int i = 0; i < number - 1; i++) {
                         //transform output into input and add the direction
                         OutputNetwork outLocal = new OutputNetwork();
-                        outLocal.deserialise(lastOutput);
+                        outLocal.deserialise((Nd4j.toFlattened(realLastOut)));
                         InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing(), currentInputsNetwork.getLastTime());
                         lastOutput = model.computeOutput(inputLocal.serialise());
 
                         if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
-                        this.addOutput(Nd4j.toFlattened(realLastOut), outputsNetworks);
+                        this.addOutput(Nd4j.toFlattened(lastOutput), outputsNetworks);
                     }
                     //assign the output to this individual
                     currentInputsNetwork.setOutputComputed(outputsNetworks);
@@ -1041,7 +1041,8 @@ public class Agents extends Algorithm {
                     }
 
 
-                    logger.log(Level.INFO, results.toString());
+//                    logger.log(Level.INFO, results.toString());
+//                    logger.log(Level.INFO, "realAgentsIDs -> " + realAgentsId.toString());
 //                    logger.log(Level.INFO, "----------");
 //                    logger.log(Level.INFO, realClassification.toString());
 
@@ -1355,7 +1356,9 @@ public class Agents extends Algorithm {
                     List<PointWithBearing> generatedPoint = new ArrayList<>();
                     transformation.setLastPoint(train.getLastPoint());
                     for(OutputsNetwork outputsNetwork: train.getOutputComputed()){
-                        generatedPoint.add(new PointWithBearing(transformation.singlePointConversion(outputsNetwork, train.getLastTime())));
+                        PointWithBearing genP = new PointWithBearing(transformation.singlePointConversion(outputsNetwork, train.getLastTime()));
+                        generatedPoint.add(genP);
+                        transformation.setLastPoint(genP);
                     }
                     train.setRealPointsOutputComputed(generatedPoint);
                     train.computeStatistic();

@@ -8,6 +8,7 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 import tgcfs.Agents.InputNetwork;
 import tgcfs.Agents.Models.RealAgent;
 import tgcfs.Classifiers.Models.ENNClassifier;
+import tgcfs.Classifiers.Models.LSTMClassifier;
 import tgcfs.Classifiers.OutputNetwork;
 import tgcfs.Config.ReadConfig;
 import tgcfs.InputOutput.Transformation;
@@ -120,30 +121,49 @@ public class Classifiers extends Algorithm {
 
         INDArray lastOutput = null;
         OutputNetwork out = new OutputNetwork();
-        if(model.getClass().equals(ENNClassifier.class)){
-            //if the model is ENN
-            for (InputsNetwork inputsNetwork : input) {
-                lastOutput = model.computeOutput(inputsNetwork.serialise());
+
+        if(ReadConfig.tryNNclassifier){
+
+            List<Double> linearSpeeds = new ArrayList<>();
+            List<Double> angularSpeeds = new ArrayList<>();
+            for (int i=0; i < input.size()-1 ; i++) {
+                INDArray array = input.get(i).serialise();
+                linearSpeeds.add(array.getDouble(0));
+                angularSpeeds.add(array.getDouble(1));
             }
+            tgcfs.Classifiers.InputNetwork newInput = new tgcfs.Classifiers.InputNetwork(linearSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), angularSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), input.get(input.size()-1).serialise().getDouble(0), input.get(input.size()-1).serialise().getDouble(1), false);
+            lastOutput = model.computeOutput(newInput.serialise());
             //I am interested only in the last output of this network
             out.deserialise(lastOutput);
-            ((ENNClassifier)model).cleanParam();
-        }else {
-            //else
-            //if it is a lstm
-            int size = input.size();
-            INDArray features = Nd4j.create(new int[]{1, tgcfs.Classifiers.InputNetwork.inputSize, size}, 'f');
-            for (int j = 0; j < size; j++) {
-                INDArray vector = input.get(j).serialise();
-                features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
-            }
-            lastOutput = model.computeOutput(features);
-            int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
-            INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
+        }else{
+            if(model.getClass().equals(ENNClassifier.class)){
+                //if the model is ENN
+                for (InputsNetwork inputsNetwork : input) {
+                    lastOutput = model.computeOutput(inputsNetwork.serialise());
+                }
+                //I am interested only in the last output of this network
+                out.deserialise(lastOutput);
+                ((ENNClassifier)model).cleanParam();
+            }else {
+                //else
+                //if it is a lstm
+                int size = input.size();
+                INDArray features = Nd4j.create(new int[]{1, tgcfs.Classifiers.InputNetwork.inputSize, size}, 'f');
+                for (int j = 0; j < size; j++) {
+                    INDArray vector = input.get(j).serialise();
+                    features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
+                }
+                lastOutput = model.computeOutput(features);
+                int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
+                INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
 
-            //I am interested only in the last output of this network
-            out.deserialise(realLastOut);
+                //I am interested only in the last output of this network
+                out.deserialise(realLastOut);
+                ((LSTMClassifier)model).clearPreviousState();
+            }
+
         }
+
 
         return out;
     }

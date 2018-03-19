@@ -3,7 +3,6 @@ package tgcfs.Config;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import tgcfs.Classifiers.OutputNetwork;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -30,6 +29,11 @@ public class ReadConfig {
     private Integer agentPopulationSize;
     private Integer agentOffspringSize;
     private Double agentAlpha;
+
+    public void setAgentTimeSteps(Integer agentTimeSteps) {
+        this.agentTimeSteps = agentTimeSteps;
+    }
+
     private Integer agentTimeSteps;
 
     private Integer classifierPopulationSize;
@@ -96,6 +100,7 @@ public class ReadConfig {
     private Integer howManyAmIChangingBetweenGeneration;
     public static boolean debug;
     public static boolean isETH;
+    public static boolean tryNNclassifier = true;
     private Boolean score;
 
     private Double maxSpeed;
@@ -534,7 +539,7 @@ public class ReadConfig {
 
         if(this.ENN) this.valueClassifier = 0;
         if(this.LSTMClassifier) this.valueClassifier = 1;
-        if(this.LSTMClassifier) OutputNetwork.setOutputSize(2);
+//        if(this.LSTMClassifier) OutputNetwork.setOutputSize(2);
         if(countTrueClassifier > 1) throw new Exception("More models are set as true, only one is allowed");
 
         try {
@@ -1894,6 +1899,10 @@ public class ReadConfig {
          */
         public static boolean getTimeAsInput() throws Exception {
             return config.getTimeAsInput();
+        }
+
+        public static void setAgentTimeSteps(Integer agentTimeSteps) {
+            config.setAgentTimeSteps(agentTimeSteps);
         }
     }
 

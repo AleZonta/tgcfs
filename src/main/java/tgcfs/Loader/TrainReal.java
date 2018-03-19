@@ -548,14 +548,19 @@ public class TrainReal {
      * Compute the statistics for this point
      * - distance between generated point and real point
      * - difference between original bearing and generated bearing
-     * TODO generalise for more than one point
      */
     public void computeStatistic() {
         //compute MSE for the point to the real point
         //compute distance real point to generated point
         //* 1000 so it is going to be in metres
-        double euclideanDistance = this.followingPart.get(0).euclideanDistance(this.realPointsOutputComputed.get(0)) * 100000;
-        this.statistics = new Statistics(this.id, Math.pow(euclideanDistance, 2));
+        List<Double> distances = new ArrayList<>();
+        for(int i = 0; i < this.realPointsOutputComputed.size(); i++){
+            distances.add(Math.pow(this.followingPart.get(i).euclideanDistance(this.realPointsOutputComputed.get(i)) * 100000, 2));
+        }
+
+        double error = distances.stream().mapToDouble(a -> a).average().getAsDouble();
+
+        this.statistics = new Statistics(this.id, error);
     }
 
     /**
