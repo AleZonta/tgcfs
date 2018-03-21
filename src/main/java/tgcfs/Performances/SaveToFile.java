@@ -4,8 +4,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.PropertiesFileReader;
+import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
+import tgcfs.Utils.PointWithBearing;
 import tgcfs.Utils.Scores;
 
 import java.io.*;
@@ -32,6 +34,8 @@ import java.util.zip.ZipOutputStream;
 public class SaveToFile {
     private String currentPath;
     private static Logger logger; //logger for this class
+    private static int counter;
+    private List<TrainReal> uuids;
 
 
     /**
@@ -197,6 +201,15 @@ public class SaveToFile {
             if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
             instance.saveResultRealClassifier(resultsRealTrajectories);
         }
+
+        /**
+         * Save only the trace of the trajectories
+         * @param trajectories {@link TrainReal} object with the info of the trajectories
+         */
+        public static void saveTrajectory(List<TrainReal> trajectories) throws Exception {
+            if(instance == null) throw new Exception("Cannot save, the class is not instantiate");
+            instance.saveTrajectory(trajectories);
+        }
     }
 
 
@@ -217,6 +230,8 @@ public class SaveToFile {
         this.currentPath += "/" + experiment;
         new File(this.currentPath).mkdirs();
         this.currentPath += "/";
+        counter = 0;
+        this.uuids = new ArrayList<>();
     }
 
 
@@ -235,6 +250,8 @@ public class SaveToFile {
         this.currentPath += "/" + experiment;
         new File(this.currentPath).mkdirs();
         this.currentPath += "/";
+        counter = 0;
+        this.uuids = new ArrayList<>();
     }
 
 
@@ -248,7 +265,7 @@ public class SaveToFile {
             outputWriter.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
             outputWriter.newLine();
 
-            logger.log(Level.INFO, "Successfully Added git-sha-1 to " + name + " CSV File");
+            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added git-sha-1 to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -274,7 +291,7 @@ public class SaveToFile {
             });
             outputWriter.newLine();
 
-            logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -295,7 +312,7 @@ public class SaveToFile {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        logger.log(Level.INFO, "Successfully saved " + name + " config File");
+        if(ReadConfig.debug) logger.log(Level.INFO, "Successfully saved " + name + " config File");
     }
 
 
@@ -306,7 +323,7 @@ public class SaveToFile {
             outputWriter.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
             outputWriter.newLine();
 
-            logger.log(Level.INFO, "Successfully Added git-sha-1 to " + name + " CSV File");
+            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added git-sha-1 to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -331,7 +348,7 @@ public class SaveToFile {
             }
             outputWriter.write(list.toString());
             outputWriter.newLine();
-            logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -359,7 +376,7 @@ public class SaveToFile {
 
             outputWriter.write(list.toString());
             outputWriter.newLine();
-            logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -445,7 +462,7 @@ public class SaveToFile {
             }
             outputWriter.newLine();
 
-            logger.log(Level.INFO, "Successfully Added Line to " + path + " CSV File");
+            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added Line to " + path + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -460,6 +477,7 @@ public class SaveToFile {
      * @param path path where to save
      */
     private void dumpInfo(List<TrainReal> combineInputList, String path){
+
         try (FileOutputStream zipFile = new FileOutputStream(new File(path));
              ZipOutputStream zos = new ZipOutputStream(zipFile);
              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
@@ -474,17 +492,17 @@ public class SaveToFile {
                 TrainReal el = combineInputList.get(i);
 
                 JSONObject obj = new JSONObject();
-                JSONArray trajectory = new JSONArray();
-                //put the trajectory
-                trajectory.addAll(el.getPoints());
-                obj.put("trajectory", trajectory);
 
                 JSONArray generated = new JSONArray();
-                generated.addAll(el.getRealPointsOutputComputed());
+                for(PointWithBearing p: el.getRealPointsOutputComputed()){
+                    generated.add(p.toJson());
+                }
                 obj.put("generated", generated);
 
                 JSONArray real = new JSONArray();
-                real.addAll(el.getFollowingPart());
+                for(PointWithBearing p: el.getFollowingPart()){
+                    real.add(p.toJson());
+                }
                 obj.put("real", real);
 
                 obj.put("classification", el.getFitnessGivenByTheClassifier());
@@ -494,10 +512,9 @@ public class SaveToFile {
                 String name = "trajectory-" + i;
                 totalObj.put(name, obj);
             }
-
+            totalObj.put("git-sha-1=", PropertiesFileReader.getGitSha1());
             totalObj.put("size", combineInputList.size());
             try {
-                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
                 writer.write(totalObj.toJSONString());
                 writer.newLine();
             } catch (IOException e) {
@@ -543,10 +560,10 @@ public class SaveToFile {
             for(Scores s: scores){
                 allTheScores.add(s.toString());
             }
+            obj.put("git-sha-1=", PropertiesFileReader.getGitSha1());
             obj.put("scores", allTheScores);
 
             try {
-                writer.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
                 writer.write(obj.toJSONString());
                 writer.newLine();
             } catch (IOException e) {
@@ -613,5 +630,79 @@ public class SaveToFile {
             logger.log(Level.WARNING, "Error in saving the classificationRealTrajectories " + e.getMessage());
         }
     }
+
+
+    /**
+     * Save only the trajectories
+     * @param trajectories all the {@link TrainReal} files
+     */
+    private void saveTrajectory(List<TrainReal> trajectories) {
+        //do I have to save it?
+        boolean save = false;
+        if (this.uuids.isEmpty()) {
+            this.uuids.addAll(trajectories);
+            save = true;
+        } else {
+            for (TrainReal tr : trajectories) {
+                UUID uuid = tr.getId();
+                if (this.uuids.stream().noneMatch(id -> id.getId().equals(uuid))) {
+                    save = true;
+                    this.uuids.add(tr);
+                }
+            }
+        }
+        if (save) {
+            String path = this.currentPath + "trajectory.zip";
+            File f = new File(path);
+            //if exist erase
+            if (f.exists() && !f.isDirectory()) {
+                try {
+                    Files.delete(Paths.get(path));
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Error deleting file 'trajectory.zip' " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+
+            try (FileOutputStream zipFile = new FileOutputStream(new File(path));
+                 ZipOutputStream zos = new ZipOutputStream(zipFile);
+                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(zos, "UTF-8"))
+            ){
+                ZipEntry csvFile = new ZipEntry(  "trajectory.json");
+                zos.putNextEntry(csvFile);
+
+
+
+                JSONObject obj = new JSONObject();
+                JSONArray allTheTra = new JSONArray();
+
+                for(TrainReal tr: this.uuids){
+                    JSONObject subObj = new JSONObject();
+                    subObj.put("id", tr.getId().toString());
+                    JSONArray allThePoints = new JSONArray();
+                    for(PointWithBearing p: tr.getPoints()){
+                        allThePoints.add(p.toJson());
+                    }
+                    subObj.put("points", allThePoints);
+                    allTheTra.add(subObj);
+                }
+                obj.put("git-sha-1=", PropertiesFileReader.getGitSha1());
+                obj.put("trajectories", allTheTra);
+
+
+                try {
+                    writer.write(obj.toJSONString());
+                    writer.newLine();
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Error appending line to trajectory.json-" + path + " " + e.getMessage());
+                    e.printStackTrace();
+                }
+
+            }catch (Exception e){
+                logger.log(Level.WARNING, "Error with trajectory.json Zip File-" + path + " " + e.getMessage());
+            }
+        }
+    }
+
 
 }

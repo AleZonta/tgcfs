@@ -93,57 +93,67 @@ public class Classifiers extends Algorithm {
 
     /**
      * @implNote Implementation from Abstract class Algorithm
-     * @param individual individual with the parameter of the classifier
+     * @param classifierIndividual individual with the parameter of the classifier
      * @param input input to assign to the classifier
      * @return the output of the classifier
      * @throws Exception if the nn has problem an exception is raised
      */
     @Override
-    public synchronized OutputsNetwork runIndividual(Individual individual, List<InputsNetwork> input) throws Exception {
+    public synchronized OutputsNetwork runIndividual(Individual classifierIndividual, List<InputsNetwork> input) throws Exception {
         //retrive model from the individual
-        EvolvableModel model = individual.getModel();
+        EvolvableModel modelClassifier = classifierIndividual.getModel();
         //set the weights
 
         List<Double> a = new ArrayList<>();
-        for (int i = 0; i < individual.getObjectiveParameters().columns(); i++){
-            a.add(individual.getObjectiveParameters().getDouble(i));
+        for (int i = 0; i < classifierIndividual.getObjectiveParameters().columns(); i++){
+            a.add(classifierIndividual.getObjectiveParameters().getDouble(i));
         }
 
-        model.setWeights(individual.getObjectiveParameters());
+        modelClassifier.setWeights(classifierIndividual.getObjectiveParameters());
         //compute Output of the network
 
         List<Double> b = new ArrayList<>();
-        for (int i = 0; i < model.getWeights().columns(); i++){
-            b.add(model.getWeights().getDouble(i));
+        for (int i = 0; i < modelClassifier.getWeights().columns(); i++){
+            b.add(modelClassifier.getWeights().getDouble(i));
         }
         if(ReadConfig.debug) logger.log(Level.INFO, "Weights ---------- \n" + a.toString() + "\n" + b.toString());
-        if(ReadConfig.debug) logger.log(Level.INFO, "model ID ---------- " + model.getId());
+        if(ReadConfig.debug) logger.log(Level.INFO, "model ID ---------- " + modelClassifier.getId());
 
         INDArray lastOutput = null;
         OutputNetwork out = new OutputNetwork();
 
         if(ReadConfig.tryNNclassifier){
 
-            List<Double> linearSpeeds = new ArrayList<>();
-            List<Double> angularSpeeds = new ArrayList<>();
-            for (int i=0; i < input.size()-1 ; i++) {
-                INDArray array = input.get(i).serialise();
-                linearSpeeds.add(array.getDouble(0));
-                angularSpeeds.add(array.getDouble(1));
+            List<INDArray> outputs = new ArrayList<>();
+            for(int points = 0; points < ReadConfig.Configurations.getAgentTimeSteps(); points++){
+
+                int nextPoints = ReadConfig.Configurations.getAgentTimeSteps() - points;
+                List<Double> linearSpeeds = new ArrayList<>();
+                List<Double> angularSpeeds = new ArrayList<>();
+                for (int i=0; i < input.size() - nextPoints ; i++) {
+                    INDArray array = input.get(i).serialise();
+                    linearSpeeds.add(array.getDouble(0));
+                    angularSpeeds.add(array.getDouble(1));
+                }
+
+                tgcfs.Classifiers.InputNetwork newInput = new tgcfs.Classifiers.InputNetwork(linearSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), angularSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), input.get(input.size()-nextPoints).serialise().getDouble(0), input.get(input.size()-nextPoints).serialise().getDouble(1), false);
+                INDArray outHere = modelClassifier.computeOutput(newInput.serialise());
+                outputs.add(outHere);
             }
-            tgcfs.Classifiers.InputNetwork newInput = new tgcfs.Classifiers.InputNetwork(linearSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), angularSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), input.get(input.size()-1).serialise().getDouble(0), input.get(input.size()-1).serialise().getDouble(1), false);
-            lastOutput = model.computeOutput(newInput.serialise());
+            INDArray average = Nd4j.create(1);
+            average.putScalar(0, outputs.stream().mapToDouble(ind -> ind.getDouble(0)).average().getAsDouble());
+
             //I am interested only in the last output of this network
-            out.deserialise(lastOutput);
+            out.deserialise(average);
         }else{
-            if(model.getClass().equals(ENNClassifier.class)){
+            if(modelClassifier.getClass().equals(ENNClassifier.class)){
                 //if the model is ENN
                 for (InputsNetwork inputsNetwork : input) {
-                    lastOutput = model.computeOutput(inputsNetwork.serialise());
+                    lastOutput = modelClassifier.computeOutput(inputsNetwork.serialise());
                 }
                 //I am interested only in the last output of this network
                 out.deserialise(lastOutput);
-                ((ENNClassifier)model).cleanParam();
+                ((ENNClassifier)modelClassifier).cleanParam();
             }else {
                 //else
                 //if it is a lstm
@@ -153,13 +163,13 @@ public class Classifiers extends Algorithm {
                     INDArray vector = input.get(j).serialise();
                     features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
                 }
-                lastOutput = model.computeOutput(features);
+                lastOutput = modelClassifier.computeOutput(features);
                 int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
                 INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
 
                 //I am interested only in the last output of this network
                 out.deserialise(realLastOut);
-                ((LSTMClassifier)model).clearPreviousState();
+                ((LSTMClassifier)modelClassifier).clearPreviousState();
             }
 
         }

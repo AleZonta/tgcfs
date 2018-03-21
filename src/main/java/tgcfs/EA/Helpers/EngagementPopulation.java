@@ -216,14 +216,14 @@ public class EngagementPopulation {
                         //reduce virulence for the agent
                         this.reduceVirulence(this.virulenceAgents, population);
                     }else {
-                        logger.log(Level.INFO, "Disengagement countermeasures non enabled");
+                        logger.log(Level.INFO, "Disengagement countermeasures not enabled");
                     }
                 }else {
                     if(this.usingVirulenceClassifiers){
                         //reduce virulence for the classifier
                         this.reduceVirulence(this.virulenceClassifiers, population);
                     }else {
-                        logger.log(Level.INFO, "Disengagement countermeasures non enabled");
+                        logger.log(Level.INFO, "Disengagement countermeasures not enabled");
                     }
                 }
                 break;

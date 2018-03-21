@@ -50,15 +50,16 @@ public class OutputNetwork implements OutputsNetwork{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(this.kindOfClassifier == 1){ //1 means LSTM
-            if (allFields.length != outputSize + 2){
-                throw new Error("Number of fields and variable expressing that do not correspond.");
-            }
-        }else{
-            if (allFields.length != outputSize + 3){
-                throw new Error("Number of fields and variable expressing that do not correspond.");
-            }
-        }
+//        if(this.kindOfClassifier == 1){ //1 means LSTM
+////            if (allFields.length != outputSize + 2){
+////                throw new Error("Number of fields and variable expressing that do not correspond.");
+////            outputSize = 2;
+//        }
+//        }else{
+//            if (allFields.length != outputSize + 3){
+//                throw new Error("Number of fields and variable expressing that do not correspond.");
+//            }
+//        }
     }
 
 
@@ -92,6 +93,7 @@ public class OutputNetwork implements OutputsNetwork{
             }
         }else{
             //lstm
+            this.realValue = out.getDouble(0);
             if(out.getDouble(0) >= out.getDouble(1)){
                 this.real = Boolean.TRUE;
             }else{

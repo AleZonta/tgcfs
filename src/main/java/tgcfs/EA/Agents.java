@@ -705,7 +705,7 @@ public class Agents extends Algorithm {
         class ComputeSelmarFitnessUnit implements Runnable{
             private CountDownLatch latch;
             private Individual classifier;
-            private List<Individual> adersarialPopulation;
+            private List<Individual> agentAdversarialPopulation;
             private Map<Integer, Map<UUID, Double>> Tik;
 //            private Map<Integer, UUID> toForget;
 //            private Map<Integer, Map<UUID, Double>> onlyRealClassifications;
@@ -721,7 +721,7 @@ public class Agents extends Algorithm {
              */
             private ComputeSelmarFitnessUnit(Individual classifier, List<Individual> adersarialPopulation) {
                 this.classifier = classifier;
-                this.adersarialPopulation = adersarialPopulation;
+                this.agentAdversarialPopulation = adersarialPopulation;
                 this.Tik = new HashMap<>();
 //                this.toForget = new HashMap<>();
 //                this.onlyRealClassifications = new HashMap<>();
@@ -787,7 +787,7 @@ public class Agents extends Algorithm {
              */
             @Override
             public void run() {
-                for(Individual agent: this.adersarialPopulation){
+                for(Individual agent: this.agentAdversarialPopulation){
                     List<TrainReal> inputOutput = agent.getMyInputandOutput();
 
 //                    //agent id is always the same for all the trajectories
@@ -852,7 +852,7 @@ public class Agents extends Algorithm {
                         //run the classifier for the Fake trajectory
                         tgcfs.Classifiers.OutputNetwork result = null;
                         try {
-                            result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedFake());
+                            result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(this.classifier, example.getAllThePartTransformedFake());
                             if (ReadConfig.debug)
                                 logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
                             //save all the results
@@ -865,7 +865,7 @@ public class Agents extends Algorithm {
                         tgcfs.Classifiers.OutputNetwork resultReal = null;
                         //run the classifier for the Real trajectory
                         try {
-                            resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(classifier, example.getAllThePartTransformedReal());
+                            resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(this.classifier, example.getAllThePartTransformedReal());
                             if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue());
                             //save all the results
 
@@ -1298,9 +1298,14 @@ public class Agents extends Algorithm {
     public void saveTrajectoriesAndPointGenerated(int generationAgent, int generationClassifier) throws Exception {
         List<TrainReal> totalList = new ArrayList<>();
 
+//        int maxValues = 2;
+
         for(Individual ind: super.getPopulation()){
+//            int count = 0;
             for(TrainReal train: ind.getMyInputandOutput()){
-                totalList.add(train.deepCopy());
+//                if (count < maxValues)
+                    totalList.add(train.deepCopy());
+//                count++;
             }
         }
 
@@ -1315,17 +1320,13 @@ public class Agents extends Algorithm {
      */
     public void saveTrajectoriesAfterSelection(int gen) throws Exception {
         List<TrainReal> totalList = new ArrayList<>();
-
         for(Individual ind: super.getPopulation()){
             for(TrainReal train: ind.getMyInputandOutput()){
                 totalList.add(train.deepCopy());
             }
         }
-
         SaveToFile.Saver.dumpTrajectoryAndGeneratedPart(totalList, gen);
     }
-
-
 
 
     /**

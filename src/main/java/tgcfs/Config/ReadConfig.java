@@ -100,7 +100,7 @@ public class ReadConfig {
     private Integer howManyAmIChangingBetweenGeneration;
     public static boolean debug;
     public static boolean isETH;
-    public static boolean tryNNclassifier = true;
+    public static boolean tryNNclassifier = false;
     private Boolean score;
 
     private Double maxSpeed;

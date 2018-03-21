@@ -6,7 +6,6 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import tgcfs.Agents.Models.LSTMAgent;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.LSTM;
@@ -84,7 +83,7 @@ public class LSTMClassifier extends LSTM implements EvolvableModel {
      */
     @Override
     public EvolvableModel deepCopy() {
-        return new LSTMAgent(this.inputSize, this.hiddenLayers, this.hiddenNeurons, this.outputSize);
+        return new LSTMClassifier(this.inputSize, this.hiddenLayers, this.hiddenNeurons, this.outputSize);
     }
 
     /**

@@ -142,6 +142,7 @@ public class TuringLearning implements Framework{
                 classifierModel = new ENNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
                 break;
             case 1:
+                tgcfs.Classifiers.OutputNetwork.setOutputSize(2);
                 classifierModel = new LSTMClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
                 break;
             default:
@@ -343,10 +344,10 @@ public class TuringLearning implements Framework{
                 //I need to generate this dataset for testing the classifiers and understand visually what is happening
                 //this is happening only in the last generation
                 if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
-                    logger.log(Level.INFO, "Dump agent generation and real");
+//                    logger.log(Level.INFO, "Dump agent generation and real");
 //                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
-                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier);
-                    if(ReadConfig.Configurations.getScore()) this.agents.saveScoresBattle(generationAgent, generationClassifier);
+//                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier);
+//                    if(ReadConfig.Configurations.getScore()) this.agents.saveScoresBattle(generationAgent, generationClassifier);
                 }
 
                 //countermeasures system against disengagement
@@ -449,7 +450,8 @@ public class TuringLearning implements Framework{
                 //I need to generate this dataset for testing the classifiers and understand visually what is happening
                 //this is happening only in the last generation
                 if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
-                    logger.log(Level.INFO, "Dump agent after survival selection");
+                    logger.log(Level.INFO, "Dump trajectories and point generated");
+                    SaveToFile.Saver.saveTrajectory(combineInputList);
                     this.agents.saveTrajectoriesAfterSelection(generationAgent);
                 }
 

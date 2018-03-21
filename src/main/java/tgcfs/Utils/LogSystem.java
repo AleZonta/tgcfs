@@ -23,6 +23,7 @@ public class LogSystem {
      */
     public LogSystem(Class c, String name, String experiment, String path) throws IOException {
         this.logger = Logger.getLogger(c.getName()); //logger for this class
+//        this.logger.setLevel(Level.OFF);
         Handler consoleHandler = new ConsoleHandler();
 
         String finalPath = path + "/Experiment-" + name;

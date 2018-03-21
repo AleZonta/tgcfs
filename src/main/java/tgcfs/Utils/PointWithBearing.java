@@ -1,6 +1,7 @@
 package tgcfs.Utils;
 
 import lgds.trajectories.Point;
+import org.json.simple.JSONObject;
 
 /**
  * Created by Alessandro Zonta on 11/10/2017.
@@ -91,5 +92,18 @@ public class PointWithBearing extends Point {
     @Override
     public String toString() {
         return "(" + this.getLatitude() + ", " + this.getLongitude()  + ", " + this.bearing+ ")";
+    }
+
+    /**
+     * To JSON object
+     * print latitude longitude and bearing in a JSON format
+     * @return {@link JSONObject} containing the info
+     */
+    public JSONObject toJson(){
+        JSONObject obj = new JSONObject();
+        obj.put("Latitude", this.getLatitude());
+        obj.put("Longitude", this.getLongitude());
+        obj.put("Bearing", this.bearing);
+        return obj;
     }
 }
