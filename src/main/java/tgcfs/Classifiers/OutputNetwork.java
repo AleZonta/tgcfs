@@ -50,16 +50,7 @@ public class OutputNetwork implements OutputsNetwork{
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        if(this.kindOfClassifier == 1){ //1 means LSTM
-////            if (allFields.length != outputSize + 2){
-////                throw new Error("Number of fields and variable expressing that do not correspond.");
-////            outputSize = 2;
-//        }
-//        }else{
-//            if (allFields.length != outputSize + 3){
-//                throw new Error("Number of fields and variable expressing that do not correspond.");
-//            }
-//        }
+
     }
 
 
@@ -83,8 +74,8 @@ public class OutputNetwork implements OutputsNetwork{
                 throw new Error("List size is not correct");
             }
         }
-        //enn
-        if(this.kindOfClassifier == 0){
+        //ENN and NN
+        if(this.kindOfClassifier == 0 || this.kindOfClassifier == 2){
             this.realValue = out.getDouble(0);
             if(out.getDouble(0) >= 0.5){
                 this.real = Boolean.TRUE;

@@ -87,7 +87,7 @@ public class Feeder {
         logger.log(Level.INFO, "Loading system...");
         this.routes.readTrajectories();
         boolean loadGraph = ReadConfig.Configurations.getConversionWithGraph();
-        logger.log(Level.INFO, "Am I loading the graph? -> " + loadGraph);
+        logger.log(Level.CONFIG, "Am I loading the graph? -> " + loadGraph);
         if (loadGraph) this.graph.loadGraph();
         if(this.maximumNumberOfTrajectories == 99999){
             this.maximumNumberOfTrajectories = this.routes.getTra().getTrajectories().size();
@@ -272,7 +272,7 @@ public class Feeder {
             double speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
 
             double angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
-            if(ReadConfig.debug) logger.log(Level.INFO, "angularSpeed = " + angularSpeed);
+            logger.log(Level.FINER, "angularSpeed = " + angularSpeed);
 
 
 //            double space = conversion.obtainDistance(previousPoint, actualPoint);
@@ -425,7 +425,7 @@ public class Feeder {
             return this.feeder(idsaLoader);
         }
         //log the name of the trajectory
-        logger.log(Level.INFO, "Loaded trajectory named: " + this.currentTrajectory.getPath());
+        logger.log(Level.SEVERE, "Loaded trajectory named: " + this.currentTrajectory.getPath());
 
 
         //save points
@@ -880,7 +880,7 @@ public class Feeder {
         for(TrainReal tr: totalList){
             //create the output already computed
             tr.createRealOutputConverted();
-            if(ReadConfig.debug) logger.log(Level.INFO, tr.getId() + " Real point transformed ->" + tr.getRealOutput().toString());
+            logger.log(Level.FINE, tr.getId() + " Real point transformed ->" + tr.getRealOutput().toString());
         }
 
         return totalList;
@@ -905,7 +905,7 @@ public class Feeder {
             if(!tr.getFollowingPart().isEmpty()) totalList.add(tr);
             if(Objects.equals(ReadConfig.Configurations.getValueModel(), ReadConfig.Configurations.Convolution)) tr.setIdsaLoader(idsaLoader);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Error in loading the trajectories :" + e.getMessage());
+            logger.log(Level.SEVERE, "Error in loading the trajectories :" + e.getMessage());
         }
     }
 

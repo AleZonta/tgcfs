@@ -35,7 +35,7 @@
   "ClassifierAlphaIntermediateRecombination": 0.5,
   "ClassifierTimeStepsExplanation": "Not implemented now",
   "ClassifierTimeSteps": 1,
-  "MaxGenerations": 100,
+  "MaxGenerations": 10,
   "Seed": 1,
   "TournamentSizeAgents": 2,
   "TournamentSizeClassifiers": 2,
@@ -81,8 +81,8 @@
   "TimeAsInputExplanation": "true: I am using the Time between time steps as a input for the generator (for geolife), false: not using it",
   "TimeAsInput": true,
   "_____________________________Sixth section": "Settings for where to save the performances",
-  "Name": "testNewWayToSave",
-  "Experiment": "5",
+  "Name": "testtest",
+  "Experiment": "3",
   "Path": "/Users/alessandrozonta/Desktop",
   "DumpPopulationExplanation": "Save the entire population on file.",
   "DumpPopulation" : false,
@@ -103,6 +103,7 @@
   "ENN": false,
   "NN": false,
   "_____________________________Debug Mode": "Enable Debug mode",
-  "Debug": false,
+  "LevelDebugExplanation": "0=SEVERE, 1=WARNING, 2=INFO, 3=CONFIG, 4=FINE, 5=FINER, 6=FINEST, 7=OFF",
+  "LevelDebug": 0,
   "Score": false
 }

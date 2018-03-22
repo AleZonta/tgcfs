@@ -185,23 +185,23 @@ public class Agents extends Algorithm {
                         INDArray vector = in.get(j).serialise();
                         features.put(new INDArrayIndex[]{NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(j)}, vector);
                     }
-                    if(ReadConfig.debug) logger.log(Level.INFO, "Input LSTM ->" + features.toString());
+                    logger.log(Level.FINER, "Input LSTM ->" + features.toString());
                     INDArray lastOutput = model.computeOutput(features);
 
                     int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
                     INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
 
-                    if(ReadConfig.debug) {
-                        List<Double> realOutput = new ArrayList<>();
-                        INDArray flat = Nd4j.toFlattened(realLastOut);
-                        for(int j=0; j<flat.columns(); j++){
-                            realOutput.add(flat.getDouble(j));
-                        }
-                        logger.log(Level.INFO, "Output LSTM ->" + realOutput.toString());
+
+                    List<Double> realOutput = new ArrayList<>();
+                    INDArray flat = Nd4j.toFlattened(realLastOut);
+                    for(int j=0; j<flat.columns(); j++){
+                        realOutput.add(flat.getDouble(j));
                     }
+                    logger.log(Level.FINER, "Output LSTM ->" + realOutput.toString());
+
                     this.addOutput(Nd4j.toFlattened(realLastOut), outputsNetworks);
 
-                    if(ReadConfig.debug) logger.log(Level.INFO, inputsNetwork.getId() + " Output LSTM transformed ->" + outputsNetworks.toString());
+                    logger.log(Level.FINER, inputsNetwork.getId() + " Output LSTM transformed ->" + outputsNetworks.toString());
 
                     //output has only two fields, input needs three
                     //I am using the last direction present into input I am adding that one to the last output
@@ -214,7 +214,7 @@ public class Agents extends Algorithm {
                         InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing(), currentInputsNetwork.getLastTime());
                         lastOutput = model.computeOutput(inputLocal.serialise());
 
-                        if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
+                        logger.log(Level.FINER, "Output LSTM ->" + lastOutput.toString());
                         this.addOutput(Nd4j.toFlattened(lastOutput), outputsNetworks);
                     }
                     //assign the output to this individual
@@ -426,7 +426,7 @@ public class Agents extends Algorithm {
 
             int timeSeriesLength = lastOutput.size(2);		//Size of time dimension
             INDArray realLastOut = lastOutput.get(NDArrayIndex.point(0), NDArrayIndex.all(), NDArrayIndex.point(timeSeriesLength-1));
-            if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + realLastOut.toString());
+            logger.log(Level.FINE, "Output LSTM ->" + realLastOut.toString());
 
 
             OutputNetwork out = new OutputNetwork();
@@ -445,7 +445,7 @@ public class Agents extends Algorithm {
                 InputNetwork inputLocal = new InputNetwork(directionAPF, outLocal.getSpeed(), outLocal.getBearing(), currentInputsNetwork.getLastTime());
                 lastOutput = model.computeOutput(inputLocal.serialise());
 
-                if(ReadConfig.debug) logger.log(Level.INFO, "Output LSTM ->" + lastOutput.toString());
+                logger.log(Level.FINE, "Output LSTM ->" + lastOutput.toString());
 
                 out = new OutputNetwork();
                 out.deserialise(lastOutput);
@@ -535,7 +535,7 @@ public class Agents extends Algorithm {
                         //run the classifier for the Fake trajectory
                         try {
                             tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(opponent, example.getAllThePartTransformedFake());
-                            if (ReadConfig.debug) logger.log(Level.INFO, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + Boolean.FALSE);
+                            logger.log(Level.FINER, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + Boolean.FALSE);
                             double decision = result.getRealValue();
                             if( decision > 0.5 ) {
                                 //it is saying it is true
@@ -553,7 +553,7 @@ public class Agents extends Algorithm {
                         //run the classifier for the Real trajectory
                         try {
                             tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(opponent, example.getAllThePartTransformedReal());
-                            if (ReadConfig.debug) logger.log(Level.INFO, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + Boolean.TRUE);
+                            logger.log(Level.FINER, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + Boolean.TRUE);
                             double decision = result.getRealValue();
                             if( decision > 0.5 ) {
                                 //it is saying it is true
@@ -657,7 +657,7 @@ public class Agents extends Algorithm {
                     input = totalInput.getAllThePartTransformedReal();
                 }
                  tgcfs.Classifiers.OutputNetwork result = (tgcfs.Classifiers.OutputNetwork) model.runIndividual(classifier, input);
-                if (ReadConfig.debug) logger.log(Level.INFO, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + real);
+                logger.log(Level.FINER, "Output network ->" + result.toString() + " realValue -> " + result.getRealValue() + " -->" + real);
 
 
                 double decision = result.getRealValue();
@@ -853,8 +853,7 @@ public class Agents extends Algorithm {
                         tgcfs.Classifiers.OutputNetwork result = null;
                         try {
                             result = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(this.classifier, example.getAllThePartTransformedFake());
-                            if (ReadConfig.debug)
-                                logger.log(Level.INFO, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
+                            logger.log(Level.FINER, "Fake Output network ->" + result.toString() + " realValue -> " + result.getRealValue());
                             //save all the results
 
                         } catch (Exception e) {
@@ -866,7 +865,7 @@ public class Agents extends Algorithm {
                         //run the classifier for the Real trajectory
                         try {
                             resultReal = (tgcfs.Classifiers.OutputNetwork) competingPopulation.runIndividual(this.classifier, example.getAllThePartTransformedReal());
-                            if (ReadConfig.debug) logger.log(Level.INFO, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue());
+                            logger.log(Level.FINER, "Real Output network ->" + resultReal.toString() + " realValue -> " + resultReal.getRealValue());
                             //save all the results
 
                         } catch (Exception e) {
@@ -931,7 +930,7 @@ public class Agents extends Algorithm {
             }
         }
 
-        logger.log(Level.SEVERE, "Start real classification");
+        logger.log(Level.INFO, "Start real classification");
 
 
         //set the default fitness as the normal fitness

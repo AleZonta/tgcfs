@@ -116,37 +116,16 @@ public class Classifiers extends Algorithm {
         for (int i = 0; i < modelClassifier.getWeights().columns(); i++){
             b.add(modelClassifier.getWeights().getDouble(i));
         }
-        if(ReadConfig.debug) logger.log(Level.INFO, "Weights ---------- \n" + a.toString() + "\n" + b.toString());
-        if(ReadConfig.debug) logger.log(Level.INFO, "model ID ---------- " + modelClassifier.getId());
+        logger.log(Level.FINEST, "Weights ---------- \n" + a.toString() + "\n" + b.toString());
+        logger.log(Level.FINEST, "model ID ---------- " + modelClassifier.getId());
 
         INDArray lastOutput = null;
         OutputNetwork out = new OutputNetwork();
 
-        if(ReadConfig.tryNNclassifier){
 
-            List<INDArray> outputs = new ArrayList<>();
-            for(int points = 0; points < ReadConfig.Configurations.getAgentTimeSteps(); points++){
-
-                int nextPoints = ReadConfig.Configurations.getAgentTimeSteps() - points;
-                List<Double> linearSpeeds = new ArrayList<>();
-                List<Double> angularSpeeds = new ArrayList<>();
-                for (int i=0; i < input.size() - nextPoints ; i++) {
-                    INDArray array = input.get(i).serialise();
-                    linearSpeeds.add(array.getDouble(0));
-                    angularSpeeds.add(array.getDouble(1));
-                }
-
-                tgcfs.Classifiers.InputNetwork newInput = new tgcfs.Classifiers.InputNetwork(linearSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), angularSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), input.get(input.size()-nextPoints).serialise().getDouble(0), input.get(input.size()-nextPoints).serialise().getDouble(1), false);
-                INDArray outHere = modelClassifier.computeOutput(newInput.serialise());
-                outputs.add(outHere);
-            }
-            INDArray average = Nd4j.create(1);
-            average.putScalar(0, outputs.stream().mapToDouble(ind -> ind.getDouble(0)).average().getAsDouble());
-
-            //I am interested only in the last output of this network
-            out.deserialise(average);
-        }else{
-            if(modelClassifier.getClass().equals(ENNClassifier.class)){
+        int typeClassifier = ReadConfig.Configurations.getValueClassifier();
+        switch (typeClassifier){
+            case 0: //ENN
                 //if the model is ENN
                 for (InputsNetwork inputsNetwork : input) {
                     lastOutput = modelClassifier.computeOutput(inputsNetwork.serialise());
@@ -154,7 +133,8 @@ public class Classifiers extends Algorithm {
                 //I am interested only in the last output of this network
                 out.deserialise(lastOutput);
                 ((ENNClassifier)modelClassifier).cleanParam();
-            }else {
+                break;
+            case 1: //LSTM
                 //else
                 //if it is a lstm
                 int size = input.size();
@@ -170,10 +150,33 @@ public class Classifiers extends Algorithm {
                 //I am interested only in the last output of this network
                 out.deserialise(realLastOut);
                 ((LSTMClassifier)modelClassifier).clearPreviousState();
-            }
+                break;
+            case 2: //
+                List<INDArray> outputs = new ArrayList<>();
+                for(int points = 0; points < ReadConfig.Configurations.getAgentTimeSteps(); points++){
 
+                    int nextPoints = ReadConfig.Configurations.getAgentTimeSteps() - points;
+                    List<Double> linearSpeeds = new ArrayList<>();
+                    List<Double> angularSpeeds = new ArrayList<>();
+                    for (int i=0; i < input.size() - nextPoints ; i++) {
+                        INDArray array = input.get(i).serialise();
+                        linearSpeeds.add(array.getDouble(0));
+                        angularSpeeds.add(array.getDouble(1));
+                    }
+
+                    tgcfs.Classifiers.InputNetwork newInput = new tgcfs.Classifiers.InputNetwork(linearSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), angularSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), input.get(input.size()-nextPoints).serialise().getDouble(0), input.get(input.size()-nextPoints).serialise().getDouble(1), false);
+                    INDArray outHere = modelClassifier.computeOutput(newInput.serialise());
+                    outputs.add(outHere);
+                }
+                INDArray average = Nd4j.create(1);
+                average.putScalar(0, outputs.stream().mapToDouble(ind -> ind.getDouble(0)).average().getAsDouble());
+
+                //I am interested only in the last output of this network
+                out.deserialise(average);
+                break;
+            default:
+                throw new Exception("Classifier not defined");
         }
-
 
         return out;
     }

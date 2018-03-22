@@ -4,7 +4,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.PropertiesFileReader;
-import tgcfs.Config.ReadConfig;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
 import tgcfs.Utils.PointWithBearing;
@@ -265,7 +264,7 @@ public class SaveToFile {
             outputWriter.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
             outputWriter.newLine();
 
-            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added git-sha-1 to " + name + " CSV File");
+            logger.log(Level.FINE, "Successfully Added git-sha-1 to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -286,12 +285,12 @@ public class SaveToFile {
                 try {
                     outputWriter.write(Double.toString(fitness) + ", ");
                 } catch (IOException e) {
-                    logger.log(Level.WARNING, "Error appending line to" + name + " CSV File " + e.getMessage());
+                    logger.log(Level.SEVERE, "Error appending line to" + name + " CSV File " + e.getMessage());
                 }
             });
             outputWriter.newLine();
 
-            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+            logger.log(Level.FINE, "Successfully Added Line to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -312,7 +311,7 @@ public class SaveToFile {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        if(ReadConfig.debug) logger.log(Level.INFO, "Successfully saved " + name + " config File");
+        logger.log(Level.FINE, "Successfully saved " + name + " config File");
     }
 
 
@@ -323,7 +322,7 @@ public class SaveToFile {
             outputWriter.write("git-sha-1=" + PropertiesFileReader.getGitSha1());
             outputWriter.newLine();
 
-            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added git-sha-1 to " + name + " CSV File");
+            logger.log(Level.FINE, "Successfully Added git-sha-1 to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -348,7 +347,7 @@ public class SaveToFile {
             }
             outputWriter.write(list.toString());
             outputWriter.newLine();
-            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+            logger.log(Level.FINE, "Successfully Added Line to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -376,7 +375,7 @@ public class SaveToFile {
 
             outputWriter.write(list.toString());
             outputWriter.newLine();
-            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added Line to " + name + " CSV File");
+            logger.log(Level.FINE, "Successfully Added Line to " + name + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();
@@ -462,7 +461,7 @@ public class SaveToFile {
             }
             outputWriter.newLine();
 
-            if(ReadConfig.debug) logger.log(Level.INFO, "Successfully Added Line to " + path + " CSV File");
+            logger.log(Level.FINE, "Successfully Added Line to " + path + " CSV File");
 
             outputWriter.flush();
             outputWriter.close();

@@ -3,6 +3,8 @@ package tgcfs.Config;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import tgcfs.Classifiers.InputNetwork;
+import tgcfs.Classifiers.OutputNetwork;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -29,11 +31,6 @@ public class ReadConfig {
     private Integer agentPopulationSize;
     private Integer agentOffspringSize;
     private Double agentAlpha;
-
-    public void setAgentTimeSteps(Integer agentTimeSteps) {
-        this.agentTimeSteps = agentTimeSteps;
-    }
-
     private Integer agentTimeSteps;
 
     private Integer classifierPopulationSize;
@@ -76,6 +73,7 @@ public class ReadConfig {
     private Integer valueClassifier;
     private Boolean LSTMClassifier;
     private Boolean ENN;
+    private Boolean NN;
 
     private Integer pictureSize;
 
@@ -98,9 +96,8 @@ public class ReadConfig {
     private Integer differentSelectionForAgent;
     private Integer keepBestNElement;
     private Integer howManyAmIChangingBetweenGeneration;
-    public static boolean debug;
     public static boolean isETH;
-    public static boolean tryNNclassifier = false;
+    public static boolean tryNNclassifier = true;
     private Boolean score;
 
     private Double maxSpeed;
@@ -114,6 +111,8 @@ public class ReadConfig {
 
     private Integer fitnessFunction;
     private Boolean timeAsInput;
+
+    private Integer debugLevel;
 
     /**
      * Constructor with zero parameter
@@ -164,7 +163,7 @@ public class ReadConfig {
         this.valueClassifier = null;
         this.LSTMClassifier = null;
         this.ENN = null;
-
+        this.NN = null;
 
         this.pictureSize = null;
         this.checkAlsoPast = null;
@@ -199,8 +198,9 @@ public class ReadConfig {
 
         this.fitnessFunction = null;
         this.timeAsInput = null;
-        debug = false;
         isETH = false;
+
+        this.debugLevel = null;
     }
 
     /**
@@ -328,7 +328,7 @@ public class ReadConfig {
         }
         //reading the settings
         try {
-            // 0 means IDSA, 1 means Geosat
+            // "0 idsa, 1 geolife, 2 both, 3 idsaJSON, 4 geolifeJSON, 5 ETH"
             this.trajectoriesType = ((Long) jsonObject.get("trajectoriesType")).intValue();
             if(this.trajectoriesType == 5) isETH = true;
         }catch (ClassCastException | NullPointerException e) {
@@ -339,6 +339,9 @@ public class ReadConfig {
             this.howManySplitting = ((Long) jsonObject.get("HowManySplitting")).intValue();
             if(this.howManySplitting % 2 != 0){
                 throw new Exception("HowManySplitting must be even!");
+            }
+            if(this.trajectoriesType == 5 && this.howManySplitting != 0) {
+                throw new Exception("With ETH the number of splitting must be 0!");
             }
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("HowManySplitting is wrong or missing.");
@@ -516,15 +519,22 @@ public class ReadConfig {
             throw new Exception("LSTMClassifier is wrong or missing.");
         }
         try {
-            // convolution
+            // Elman neural network
             this.ENN = ((Boolean) jsonObject.get("ENN"));
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("ENN is wrong or missing.");
+        }
+        try {
+            // neural network
+            this.NN = ((Boolean) jsonObject.get("NN"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("NN is wrong or missing.");
         }
         //check that only one between LSTM / Convolution / Clax can be true
         int countTrue = this.LSTM ? 1 : 0;
         countTrue += this.convolution ? 1 : 0;
         countTrue += this.clax ? 1 : 0;
+
 
         if(this.LSTM) this.valueModel = 0;
         if(this.convolution) this.valueModel = 1;
@@ -536,10 +546,24 @@ public class ReadConfig {
         //check that only one between LSTM / Convolution / Clax can be true
         int countTrueClassifier = this.LSTMClassifier ? 1 : 0;
         countTrueClassifier += this.ENN ? 1 : 0;
+        countTrueClassifier += this.NN ? 1 : 0;
 
-        if(this.ENN) this.valueClassifier = 0;
-        if(this.LSTMClassifier) this.valueClassifier = 1;
-//        if(this.LSTMClassifier) OutputNetwork.setOutputSize(2);
+        if(this.ENN) {
+            this.valueClassifier = 0;
+            tryNNclassifier = false;
+        }
+        if(this.LSTMClassifier) {
+            this.valueClassifier = 1;
+            //set a differnet output size if I am using the LSTM as an output
+            OutputNetwork.setOutputSize(2);
+            tryNNclassifier = false;
+        }
+        if(this.NN) {
+            this.valueClassifier = 2;
+            InputNetwork.inputSize = 4;
+            tryNNclassifier = true;
+        }
+
         if(countTrueClassifier > 1) throw new Exception("More models are set as true, only one is allowed");
 
         try {
@@ -663,13 +687,6 @@ public class ReadConfig {
             throw new Exception("Score is wrong or missing.");
         }
 
-        try {
-            // debug
-            debug = ((Boolean) jsonObject.get("Debug"));
-        }catch (ClassCastException | NullPointerException e) {
-            debug = false;
-        }
-
 
         //ConversionOutputWithGraph
         try {
@@ -726,6 +743,13 @@ public class ReadConfig {
 
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("TimeAsInput is wrong or missing.");
+        }
+
+        try {
+            // debugLevel
+            this.debugLevel = ((Long) jsonObject.get("LevelDebug")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("LevelDebug is wrong or missing.");
         }
 
     }
@@ -940,6 +964,7 @@ public class ReadConfig {
                 "Clax=" + clax + ",\n" +
                 "LSTMClassifier=" + LSTMClassifier + ",\n" +
                 "ENN=" + ENN + ",\n" +
+                "NN=" + NN + ",\n" +
                 "VirulenceAgents=" + virulenceAgents + ",\n" +
                 "VirulenceClassifiers=" + virulenceClassifiers + ",\n" +
                 "UsingReducedVirulenceMethodOnAgents=" + usingReducedVirulenceMethodOnAgents + ",\n" +
@@ -959,6 +984,7 @@ public class ReadConfig {
                 "HallOfFameSample=" + hallOfFameSample + ",\n" +
                 "FitnessFunction=" + fitnessFunction + ",\n" +
                 "TimeAsInput=" + timeAsInput + ",\n" +
+                "LevelDebug=" + debugLevel + ",\n" +
                 '}';
     }
 
@@ -1321,6 +1347,36 @@ public class ReadConfig {
         if(this.timeAsInput == null) throw new Exception("Try to access config file before reading it.");
         return this.timeAsInput;
     }
+
+    /**
+     * Getter if I am using the simple NN as an output
+     * @return boolean value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public boolean getNN() throws Exception {
+        if(this.NN == null) throw new Exception("Try to access config file before reading it.");
+        return this.NN;
+    }
+
+    /**
+     * Getter if I am using the simple NN as an output
+     * @return boolean value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getDebugLevel() throws Exception {
+        if(this.debugLevel == null) throw new Exception("Try to access config file before reading it.");
+        return this.debugLevel;
+    }
+
+    /**
+     * Setter for the number of agent timesteps
+     * used only if I am doing the incremental learning
+     * @param agentTimeSteps number of timesteps
+     */
+    public void setAgentTimeSteps(Integer agentTimeSteps) {
+        this.agentTimeSteps = agentTimeSteps;
+    }
+
 
     /**
      * Static class offering all the info read from file
@@ -1901,8 +1957,31 @@ public class ReadConfig {
             return config.getTimeAsInput();
         }
 
-        public static void setAgentTimeSteps(Integer agentTimeSteps) {
+        /**
+         * Getter if I am using the simple NN as an output
+         * @return boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static boolean getNN() throws Exception {
+            return config.getNN();
+        }
+
+        /**
+         * Setter for the number of agent timesteps
+         * used only if I am doing the incremental learning
+         * @param agentTimeSteps number of timesteps
+         */
+        public static void setAgentTimeSteps(int agentTimeSteps) {
             config.setAgentTimeSteps(agentTimeSteps);
+        }
+
+        /**
+         * Getter if I am using the simple NN as an output
+         * @return boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getDebugLevel() throws Exception {
+            return config.getDebugLevel();
         }
     }
 

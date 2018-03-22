@@ -136,7 +136,7 @@ public class FollowingTheGraph implements Transformation {
             } catch (Exception e) {
                  logger.log(Level.INFO, " -> " + e.getMessage() );
             }
-            if(ReadConfig.debug) logger.log(Level.INFO,outputsNetwork.toString() + " -> " + position );
+            logger.log(Level.FINE,outputsNetwork.toString() + " -> " + position );
             //this input network has speed and bearing
             //InputNetwork inputNetwork = new InputNetwork(converterPointSB.obtainSpeed(this.lastPoint, position), converterPointSB.obtainBearing(this.lastPoint, position));
             //the new one has velocity and angular speed
@@ -147,7 +147,7 @@ public class FollowingTheGraph implements Transformation {
 
             OutputNetwork output = (OutputNetwork) outputsNetwork;
             angularSpeed = convertToAgularSpeed.obtainAngularSpeedTime(this.lastPoint, output.getBearing(), trainReal.getLastTime());
-            if(ReadConfig.debug) logger.log(Level.INFO, "angularSpeed = " + angularSpeed);
+            logger.log(Level.FINE, "angularSpeed = " + angularSpeed);
             InputNetwork inputNetwork = new InputNetwork(outputsNetwork.getSpeed(), angularSpeed);
             convertedInput.add(inputNetwork);
 
@@ -158,7 +158,7 @@ public class FollowingTheGraph implements Transformation {
         //save the entire trajectory for future works
         convertedInput.remove(0); //remove the first one
         trainReal.setAllThePartTransformedFake(convertedInput);
-        if(ReadConfig.debug) logger.log(Level.INFO, "fake ->" + trainReal.getAllThePartTransformedFake().get(trainReal.getAllThePartTransformedFake().size() -1).toString());
+        logger.log(Level.FINE, "fake ->" + trainReal.getAllThePartTransformedFake().get(trainReal.getAllThePartTransformedFake().size() -1).toString());
 
 
         //this is for the real part

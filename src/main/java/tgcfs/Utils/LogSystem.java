@@ -1,5 +1,7 @@
 package tgcfs.Utils;
 
+import tgcfs.Config.ReadConfig;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
@@ -21,9 +23,39 @@ public class LogSystem {
      * Initialise the log
      * @throws IOException
      */
-    public LogSystem(Class c, String name, String experiment, String path) throws IOException {
+    public LogSystem(Class c, String name, String experiment, String path) throws Exception {
         this.logger = Logger.getLogger(c.getName()); //logger for this class
-//        this.logger.setLevel(Level.OFF);
+
+        int level = ReadConfig.Configurations.getDebugLevel();
+        switch (level){
+            case 0:
+                this.logger.setLevel(Level.SEVERE);
+                break;
+            case 1:
+                this.logger.setLevel(Level.WARNING);
+                break;
+            case 2:
+                this.logger.setLevel(Level.INFO);
+                break;
+            case 3:
+                this.logger.setLevel(Level.CONFIG);
+                break;
+            case 4:
+                this.logger.setLevel(Level.FINE);
+                break;
+            case 5:
+                this.logger.setLevel(Level.FINER);
+                break;
+            case 6:
+                this.logger.setLevel(Level.FINEST);
+                break;
+            case 7:
+                this.logger.setLevel(Level.OFF);
+                break;
+            default:
+                this.logger.setLevel(Level.SEVERE);
+        }
+
         Handler consoleHandler = new ConsoleHandler();
 
         String finalPath = path + "/Experiment-" + name;

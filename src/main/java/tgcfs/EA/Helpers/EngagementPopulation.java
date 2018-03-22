@@ -216,21 +216,21 @@ public class EngagementPopulation {
                         //reduce virulence for the agent
                         this.reduceVirulence(this.virulenceAgents, population);
                     }else {
-                        logger.log(Level.INFO, "Disengagement countermeasures not enabled");
+                        logger.log(Level.FINE, "Disengagement countermeasures not enabled");
                     }
                 }else {
                     if(this.usingVirulenceClassifiers){
                         //reduce virulence for the classifier
                         this.reduceVirulence(this.virulenceClassifiers, population);
                     }else {
-                        logger.log(Level.INFO, "Disengagement countermeasures not enabled");
+                        logger.log(Level.FINE, "Disengagement countermeasures not enabled");
                     }
                 }
                 break;
             case STEP_SIZE:
                 meas = this.computeMeasure(population, status);
                 stepsize = this.dynamicStepSizeOne(meas);
-                logger.log(Level.INFO, status.toString() + " new step size -> " + stepsize);
+                logger.log(Level.FINE, status.toString() + " new step size -> " + stepsize);
                 //now I have val, need to update the step size following some direction.
                 switch (this.pop){
                     case AGENTS:
@@ -250,7 +250,7 @@ public class EngagementPopulation {
             case VIRULENCE:
                 meas = this.computeMeasure(population, status);
                 virulence = this.dynamicVirulenceOne(meas);
-                logger.log(Level.INFO, status.toString() + " new virulence -> " + virulence);
+                logger.log(Level.FINE, status.toString() + " new virulence -> " + virulence);
                 switch (this.pop){
                     case AGENTS:
                         if(status == IndividualStatus.AGENT) this.reduceVirulence(virulence, population);
@@ -269,8 +269,8 @@ public class EngagementPopulation {
                 meas = this.computeMeasure(population, status);
                 virulence = this.dynamicVirulenceOne(meas);
                 stepsize = this.dynamicStepSizeOne(meas);
-                logger.log(Level.INFO, status.toString() + " new step size -> " + stepsize);
-                logger.log(Level.INFO, status.toString() + " new virulence -> " + virulence);
+                logger.log(Level.FINE, status.toString() + " new step size -> " + stepsize);
+                logger.log(Level.FINE, status.toString() + " new virulence -> " + virulence);
                 switch (this.pop){
                     case AGENTS:
                         if(status == IndividualStatus.AGENT){
@@ -481,14 +481,14 @@ public class EngagementPopulation {
                     sb.append("; Something really wrong happened");
                     break;
             }
-            logger.log(Level.INFO, sb.toString());
+            logger.log(Level.FINE, sb.toString());
             //reset counting time
             caller.setCountingTime(0);
         }else{
             int number = ReadConfig.Configurations.getTimestepEvolveAgentOverClassifier();
             if(number == 0){
                 //no calibration needed
-                logger.log(Level.INFO, "No Calibration Needed");
+                logger.log(Level.FINE, "No Calibration Needed");
                 this.evolveAgent = Boolean.TRUE;
                 this.evolveClassifier = Boolean.TRUE;
             }else{
@@ -496,12 +496,12 @@ public class EngagementPopulation {
                 if(caller.getCountingTime() == number){
                     caller.setCountingTime(0);
                     //if I evolved the agent the times required return okay to evolve both
-                    logger.log(Level.INFO, "Finished Fixed Calibration");
+                    logger.log(Level.FINE, "Finished Fixed Calibration");
                     this.evolveAgent = Boolean.TRUE;
                     this.evolveClassifier = Boolean.TRUE;
                 }else {
                     //otherwise return evolve only Agents
-                    logger.log(Level.INFO, "Agents need more evolutions");
+                    logger.log(Level.FINE, "Agents need more evolutions");
                     this.evolveAgent = Boolean.TRUE;
                     this.evolveClassifier = Boolean.FALSE;
                 }

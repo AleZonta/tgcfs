@@ -87,7 +87,7 @@ public class TuringLearning implements Framework{
         //initialise the saving class
         new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), logger);
         SaveToFile.Saver.dumpSetting(ReadConfig.Configurations.getConfig());
-        logger.log(Level.INFO, PropertiesFileReader.getGitSha1());
+        logger.log(Level.WARNING, PropertiesFileReader.getGitSha1());
 
         //back up for convolution, in java there are some problems
         if(Objects.equals(ReadConfig.Configurations.getValueModel(), ReadConfig.Configurations.Convolution)) Nd4j.enableFallbackMode(Boolean.TRUE);
@@ -142,15 +142,13 @@ public class TuringLearning implements Framework{
                 classifierModel = new ENNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
                 break;
             case 1:
-                tgcfs.Classifiers.OutputNetwork.setOutputSize(2);
                 classifierModel = new LSTMClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenLayersAgent(), ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
+                break;
+            case 2:
+                classifierModel = new NNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
                 break;
             default:
                 throw new NoSuchMethodError("Model not yet implemented");
-        }
-        if(ReadConfig.tryNNclassifier) {
-            tgcfs.Classifiers.InputNetwork.inputSize = 4;
-            classifierModel = new NNClassifier(tgcfs.Classifiers.InputNetwork.inputSize, ReadConfig.Configurations.getHiddenNeuronsClassifier(), tgcfs.Classifiers.OutputNetwork.outputSize);
         }
         //generate population
         //INITIALISE population EA with random candidate solution
@@ -166,8 +164,8 @@ public class TuringLearning implements Framework{
             this.classifiers.generatePopulation(classifierModel);
         }
 
-        logger.log(Level.INFO, agentModel.getSummary());
-        logger.log(Level.INFO, classifierModel.getSummary());
+        logger.log(Level.CONFIG, agentModel.getSummary());
+        logger.log(Level.CONFIG, classifierModel.getSummary());
         logger.log(Level.INFO, "Framework online!");
 
         //save the sha-1 info in the output files
@@ -202,13 +200,13 @@ public class TuringLearning implements Framework{
         int fitnessTypology = ReadConfig.Configurations.getFitnessFunction();
         switch (fitnessTypology) {
             case 0:
-                logger.log(Level.INFO, "Fitness Function from Paper Selected");
+                logger.log(Level.CONFIG, "Fitness Function from Paper Selected");
                 break;
             case 1:
-                logger.log(Level.INFO, "Modified Fitness Function Selected");
+                logger.log(Level.CONFIG, "Modified Fitness Function Selected");
                 break;
             case 2:
-                logger.log(Level.INFO, "Selmar Fitness Function Selected");
+                logger.log(Level.CONFIG, "Selmar Fitness Function Selected");
                 break;
             default:
                 throw new Exception("Fitness Function Not implemented");
@@ -217,7 +215,7 @@ public class TuringLearning implements Framework{
         int generationAgent = 0;
         int generationClassifier = 0;
         /* { EVALUATE each candidate } */
-        logger.log(Level.INFO, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
+        logger.log(Level.SEVERE, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
 
         //load several pieces of trajectory
         List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader, null);
@@ -326,7 +324,7 @@ public class TuringLearning implements Framework{
             }
 
 
-            logger.log(Level.INFO, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
+            logger.log(Level.SEVERE, "Evaluation agent generation " + generationAgent + " and classifier generation " + generationClassifier);
             /* { EVALUATE new candidate } */
             try {
                 logger.log(Level.INFO,"Loading new trajectories...");
@@ -456,10 +454,10 @@ public class TuringLearning implements Framework{
                 }
 
             } catch (ReachedMaximumNumberException e) {
-                logger.log(Level.INFO, e.getMessage());
+                logger.log(Level.SEVERE, e.getMessage());
                 reachedEndTrajectory = Boolean.TRUE;
             } catch (Exception e){
-                logger.log(Level.WARNING, "Error concluded the main loop -> " + e.getMessage());
+                logger.log(Level.SEVERE, "Error concluded the main loop -> " + e.getMessage());
                 e.printStackTrace();
                 randomError = Boolean.TRUE;
             }

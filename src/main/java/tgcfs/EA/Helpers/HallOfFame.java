@@ -76,7 +76,7 @@ public class HallOfFame {
             this.hallOfFame.add(newBorn);
         }
         this.sample = new ArrayList<>();
-        if(ReadConfig.debug) logger.log(Level.INFO, "--- Creation Hall of Fame (" + this.caller.toString() + ") ---");
+        logger.log(Level.FINE, "--- Creation Hall of Fame (" + this.caller.toString() + ") ---");
     }
 
     /**
@@ -114,7 +114,7 @@ public class HallOfFame {
             this.hallOfFame.add(newBorn);
         }
         this.sample = new ArrayList<>();
-        if(ReadConfig.debug) logger.log(Level.INFO, "--- Creation Hall of Fame (" + this.caller.toString() + ") ---");
+        logger.log(Level.FINE, "--- Creation Hall of Fame (" + this.caller.toString() + ") ---");
     }
 
     /**
@@ -134,7 +134,7 @@ public class HallOfFame {
             i = this.rand.nextInt(this.hallOfFame.size());
         }
         this.hallOfFame.set(i, individual.deepCopy());
-        if(ReadConfig.debug) logger.log(Level.INFO, "--- Individual added to the Hall of Fame (" + this.caller.toString() + ") ---");
+        logger.log(Level.FINE, "--- Individual added to the Hall of Fame (" + this.caller.toString() + ") ---");
     }
 
     /**
@@ -169,8 +169,7 @@ public class HallOfFame {
 
         List<Integer> ids = new ArrayList<>();
         returnList.forEach(individual -> ids.add(individual.getModel().getId()));
-        if(ReadConfig.debug) logger.log(Level.INFO, "--- Hall of Fame sample created (" + this.caller.toString() + ") ---" + "\n" + ids.toString());
-
+        logger.log(Level.FINE, "--- Hall of Fame sample created (" + this.caller.toString() + ") ---" + "\n" + ids.toString());
     }
 
     /**
@@ -186,7 +185,7 @@ public class HallOfFame {
      * @return  list of {@link Individual}
      */
     public List<Individual> getSample() {
-        if(ReadConfig.debug) logger.log(Level.INFO, "--- Hall of Fame sample requested (" + this.caller.toString() + ") ---");
+        logger.log(Level.FINE, "--- Hall of Fame sample requested (" + this.caller.toString() + ") ---");
         if(this.sample.isEmpty()){
             this.createSample();
         }
