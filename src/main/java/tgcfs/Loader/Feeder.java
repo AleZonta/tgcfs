@@ -842,7 +842,7 @@ public class Feeder {
         List<TrainReal> totalList = new ArrayList<>();
         int start = 0;
 
-        if(oldList!= null) {
+        if(oldList != null) {
             //for now I am keeping half of the old trajectories, random selectionsystem.
             int total = oldList.size();
             int percent = (int)((total / 100f) * ReadConfig.Configurations.getHowManyAmIChangingBetweenGeneration());
@@ -865,6 +865,7 @@ public class Feeder {
             }
             start = totalList.size();
         }
+
 
 
         for(int i = start; i < ReadConfig.Configurations.getTrajectoriesTrained(); i++){

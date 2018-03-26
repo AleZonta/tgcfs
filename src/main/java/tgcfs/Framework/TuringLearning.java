@@ -219,6 +219,23 @@ public class TuringLearning implements Framework{
 
         //load several pieces of trajectory
         List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader, null);
+
+
+
+        // I load with all the points, If it is incremental learning I keep the point in memory so I am not force to
+        // load the trajectories again
+        boolean incrementalLearning = ReadConfig.Configurations.getIncrementalLearningPoints();
+        int pointToGenerate = ReadConfig.Configurations.getAgentTimeSteps();
+        if (incrementalLearning && pointToGenerate > 1){
+            // now I will evolve the generator with only one point generate
+            ReadConfig.Configurations.setAgentTimeSteps(1);
+            //I will remember this choice and after few evaluation I will give them a new point.
+            // TODO this is not gonna work with changing the number of trajectories over time
+            if(ReadConfig.Configurations.getHowManyAmIChangingBetweenGeneration() > 0) throw new Exception("Not yet implemented");
+        }
+
+
+
         //execution agents
         logger.log(Level.INFO,"Run Agents...");
         //run the agents
@@ -241,7 +258,8 @@ public class TuringLearning implements Framework{
         boolean randomError = Boolean.FALSE;
         boolean evolveAgent = Boolean.TRUE;
         boolean evolveClassifier = Boolean.TRUE;
-        Integer maxGeneration = ReadConfig.Configurations.getMaxGenerations();
+        int maxGeneration = ReadConfig.Configurations.getMaxGenerations();
+        int afterHowManyGenerationIncreaseThePoints = ReadConfig.Configurations.getHowManyGenBeforeNewPoint();
         while(!reachedEndTrajectory && !randomError && generationAgent <= maxGeneration && generationClassifier <= maxGeneration) {
             if(evolveAgent) generationAgent++;
             if(evolveClassifier) generationClassifier++;
@@ -250,6 +268,13 @@ public class TuringLearning implements Framework{
                { RECOMBINE parents }
                { MUTATE offspring } */
 
+            //check how many generation passed and if it is time to introduce a new point
+            int currentPointsToGenerate = ReadConfig.Configurations.getAgentTimeSteps();
+            if(incrementalLearning && generationAgent % afterHowManyGenerationIncreaseThePoints == 0 && currentPointsToGenerate < pointToGenerate){
+                ReadConfig.Configurations.setAgentTimeSteps(currentPointsToGenerate + 1);
+                // erase the current set of trajectories, in order to load a new set with two different points
+                combineInputList = null;
+            }
 
             class ComputeGenerationOffspring implements Runnable {
                 private CountDownLatch latch;
@@ -341,12 +366,12 @@ public class TuringLearning implements Framework{
 
                 //I need to generate this dataset for testing the classifiers and understand visually what is happening
                 //this is happening only in the last generation
-                if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
+//                if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
 //                    logger.log(Level.INFO, "Dump agent generation and real");
 //                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
 //                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier);
 //                    if(ReadConfig.Configurations.getScore()) this.agents.saveScoresBattle(generationAgent, generationClassifier);
-                }
+//                }
 
                 //countermeasures system against disengagement
                 this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);

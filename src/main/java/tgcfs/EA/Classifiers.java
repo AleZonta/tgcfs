@@ -165,7 +165,9 @@ public class Classifiers extends Algorithm {
                     }
 
                     tgcfs.Classifiers.InputNetwork newInput = new tgcfs.Classifiers.InputNetwork(linearSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), angularSpeeds.stream().mapToDouble(i->i).average().getAsDouble(), input.get(input.size()-nextPoints).serialise().getDouble(0), input.get(input.size()-nextPoints).serialise().getDouble(1), false);
+
                     INDArray outHere = modelClassifier.computeOutput(newInput.serialise());
+                    // considering the single output
                     outputs.add(outHere);
                 }
                 INDArray average = Nd4j.create(1);

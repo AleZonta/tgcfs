@@ -113,6 +113,8 @@ public class ReadConfig {
     private Boolean timeAsInput;
 
     private Integer debugLevel;
+    private Boolean incrementalLearningPoints;
+    private Integer howManyGenBeforeNewPoint;
 
     /**
      * Constructor with zero parameter
@@ -201,6 +203,8 @@ public class ReadConfig {
         isETH = false;
 
         this.debugLevel = null;
+        this.incrementalLearningPoints = null;
+        this.howManyGenBeforeNewPoint = null;
     }
 
     /**
@@ -752,6 +756,18 @@ public class ReadConfig {
             throw new Exception("LevelDebug is wrong or missing.");
         }
 
+        try {
+            // this.incrementalLearningPoints
+            this.incrementalLearningPoints = ((Boolean) jsonObject.get("IncrementalLearningPoints"));
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("IncrementalLearningPoints is wrong or missing.");
+        }
+        try {
+            // howManyGenBeforeNewPoint
+            this.howManyGenBeforeNewPoint = ((Long) jsonObject.get("HowManyGenBeforeNewPoint")).intValue();
+        }catch (ClassCastException | NullPointerException e) {
+            throw new Exception("HowManyGenBeforeNewPoint is wrong or missing.");
+        }
     }
 
 
@@ -985,6 +1001,8 @@ public class ReadConfig {
                 "FitnessFunction=" + fitnessFunction + ",\n" +
                 "TimeAsInput=" + timeAsInput + ",\n" +
                 "LevelDebug=" + debugLevel + ",\n" +
+                "IncrementalLearningPoints=" + incrementalLearningPoints + ",\n" +
+                "HowManyGenBeforeNewPoint=" + howManyGenBeforeNewPoint + ",\n" +
                 '}';
     }
 
@@ -1375,6 +1393,26 @@ public class ReadConfig {
      */
     public void setAgentTimeSteps(Integer agentTimeSteps) {
         this.agentTimeSteps = agentTimeSteps;
+    }
+
+    /**
+     * Getter for the value if I am using incrementing learning for the points
+     * @return boolean value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public boolean getIncrementalLearningPoints() throws Exception {
+        if(this.incrementalLearningPoints == null) throw new Exception("Try to access config file before reading it.");
+        return this.incrementalLearningPoints;
+    }
+
+    /**
+     * Getter for after how many generation I will increase the number of points
+     * @return int value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getHowManyGenBeforeNewPoint() throws Exception {
+        if(this.incrementalLearningPoints == null) throw new Exception("Try to access config file before reading it.");
+        return this.howManyGenBeforeNewPoint;
     }
 
 
@@ -1982,6 +2020,24 @@ public class ReadConfig {
          */
         public static int getDebugLevel() throws Exception {
             return config.getDebugLevel();
+        }
+
+        /**
+         * Getter for the value if I am using incrementing learning for the points
+         * @return boolean value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static boolean getIncrementalLearningPoints() throws Exception {
+            return config.getIncrementalLearningPoints();
+        }
+
+        /**
+         * Getter for after how many generation I will increase the number of points
+         * @return int value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getHowManyGenBeforeNewPoint() throws Exception {
+            return config.getHowManyGenBeforeNewPoint();
         }
     }
 
