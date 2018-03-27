@@ -220,8 +220,6 @@ public class TuringLearning implements Framework{
         //load several pieces of trajectory
         List<TrainReal> combineInputList = this.feeder.multiFeeder(this.idsaLoader, null);
 
-
-
         // I load with all the points, If it is incremental learning I keep the point in memory so I am not force to
         // load the trajectories again
         boolean incrementalLearning = ReadConfig.Configurations.getIncrementalLearningPoints();
@@ -273,7 +271,7 @@ public class TuringLearning implements Framework{
             if(incrementalLearning && generationAgent % afterHowManyGenerationIncreaseThePoints == 0 && currentPointsToGenerate < pointToGenerate){
                 ReadConfig.Configurations.setAgentTimeSteps(currentPointsToGenerate + 1);
                 // erase the current set of trajectories, in order to load a new set with two different points
-                combineInputList = null;
+//                combineInputList = null;
             }
 
             class ComputeGenerationOffspring implements Runnable {
