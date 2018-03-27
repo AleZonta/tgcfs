@@ -47,4 +47,7 @@ public interface OutputsNetwork {
      * @return double value
      */
     double getBearing();
+
+
+    INDArray serialise();
 }

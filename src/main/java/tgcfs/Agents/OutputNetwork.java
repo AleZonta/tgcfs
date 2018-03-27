@@ -99,6 +99,18 @@ public class OutputNetwork implements OutputsNetwork {
         return bearing;
     }
 
+    @Override
+    public INDArray serialise() {
+        INDArray array = Nd4j.zeros(outputSize);
+        try {
+            array.putScalar(0, Normalisation.convertSpeed(this.speed));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        array.putScalar(1, Normalisation.convertDirectionData(this.bearing));
+        return array;
+    }
+
     /**
      * @implNote Implementation from Abstract class Algorithm
      * If the list in input does not have the right length an error is thrown

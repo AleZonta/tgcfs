@@ -70,7 +70,7 @@ public class Feeder {
         this.finished = Boolean.TRUE;
         this.actualNumberOfTrajectory = 0;
         this.maximumNumberOfTrajectories = ReadConfig.Configurations.getHowManyTrajectories();
-        this.points = null;
+        this.points = new ArrayList<>();
         this.db = new DatabaseCoordNode();
         this.isNewTrajectory = null;
         this.lastTimeUsed = null;
@@ -924,6 +924,12 @@ public class Feeder {
      */
     public Set<InfoNode> retAllNodes(){
         return this.graph.getNodesSet();
+    }
+
+
+
+    public void createDatasetWithTrajectories(IdsaLoader idsaLoader){
+
     }
 
 

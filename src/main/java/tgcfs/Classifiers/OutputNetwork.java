@@ -136,4 +136,9 @@ public class OutputNetwork implements OutputsNetwork{
     public double getBearing() {
         return 0;
     }
+
+    @Override
+    public INDArray serialise() {
+        return null;
+    }
 }
