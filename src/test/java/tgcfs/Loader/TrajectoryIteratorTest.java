@@ -45,7 +45,5 @@ public class TrajectoryIteratorTest {
         TrajectoryIterator iteratorTest = new TrajectoryIterator(10,15,loader,system, false);
         DataSet nextDatasetTest = iteratorTest.next();
 
-        String check = "";
-
     }
 }

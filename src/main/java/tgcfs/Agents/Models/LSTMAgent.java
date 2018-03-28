@@ -3,8 +3,8 @@ package tgcfs.Agents.Models;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.LSTM;
@@ -103,8 +103,14 @@ public class LSTMAgent extends LSTM implements EvolvableModel {
 
     @Override
     public void fit(DataSet dataSet) {
-        throw new NotImplementedException();
+        this.net.fit(dataSet);
     }
+
+    @Override
+    public void evaluate(DataSetIterator dataSet){
+        this.net.evaluate(dataSet);
+    }
+
 
 
     public int getId(){

@@ -3,7 +3,9 @@ package tgcfs.Classifiers.Models;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Classifiers.InputNetwork;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
@@ -147,6 +149,11 @@ public class ENNClassifier extends ElmanNeuralNetwork implements EvolvableModel 
             result = this.computeOutput(Nd4j.toFlattened(array.getColumn(i)));
         }
         return result;
+    }
+
+    @Override
+    public void evaluate(DataSetIterator dataSet){
+        throw new NotImplementedException();
     }
 
 

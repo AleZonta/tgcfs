@@ -2,6 +2,7 @@ package tgcfs.Agents.Models;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Loader.Feeder;
 import tgcfs.NN.EvolvableModel;
@@ -85,6 +86,11 @@ public class ConvAgent extends Convolutionary implements EvolvableModel {
 
     @Override
     public void fit(DataSet dataSet) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void evaluate(DataSetIterator dataSet){
         throw new NotImplementedException();
     }
 

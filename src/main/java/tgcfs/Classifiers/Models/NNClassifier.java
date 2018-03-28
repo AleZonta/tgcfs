@@ -3,6 +3,8 @@ package tgcfs.Classifiers.Models;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.Networks.NN;
@@ -66,5 +68,10 @@ public class NNClassifier  extends NN implements EvolvableModel {
     @Override
     public void fit(DataSet dataSet) {
         throw new Error("Not implemented yet");
+    }
+
+    @Override
+    public void evaluate(DataSetIterator dataSet){
+        throw new NotImplementedException();
     }
 }

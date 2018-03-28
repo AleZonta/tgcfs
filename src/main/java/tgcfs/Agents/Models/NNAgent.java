@@ -3,6 +3,7 @@ package tgcfs.Agents.Models;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.NN.EvolvableModel;
 import tgcfs.NN.InputsNetwork;
@@ -69,5 +70,9 @@ public class NNAgent extends NN implements EvolvableModel {
 
     public int getId(){
         return super.getId();
+    }
+    @Override
+    public void evaluate(DataSetIterator dataSet){
+        throw new NotImplementedException();
     }
 }

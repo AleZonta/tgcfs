@@ -3,6 +3,7 @@ package tgcfs.NN;
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
 import java.util.List;
 
@@ -60,6 +61,12 @@ public interface EvolvableModel {
      * @param dataSet Dataset to train
      */
     void fit(DataSet dataSet);
+
+    /**
+     * Evaluate the Network
+     * @param dataSet Dataset to train
+     */
+    void evaluate(DataSetIterator dataSet);
 
     /**
      * Compute the output of the network given the input
