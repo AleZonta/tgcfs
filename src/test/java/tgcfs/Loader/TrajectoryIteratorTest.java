@@ -30,12 +30,14 @@ public class TrajectoryIteratorTest {
         new SaveToFile.Saver(ReadConfig.Configurations.getName(), ReadConfig.Configurations.getExperiment(), ReadConfig.Configurations.getPath(), log);
         Feeder system = new Feeder(log);
 
+        system.loadSystem();
+
         Routes routes = new Routes(log);
         routes.readTrajectories();
 
         IdsaLoader loader = new IdsaLoader(routes.getTra().getTrajectories().size(), log);
 
-        TrajectoryIterator iterator = new TrajectoryIterator(20,15,routes,loader,system);
+        TrajectoryIterator iterator = new TrajectoryIterator(20,15,loader,system);
         DataSet nextDataset = iterator.next();
 
     }

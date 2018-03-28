@@ -942,7 +942,7 @@ public class ReadConfig {
                 "trajectoriesType=" + trajectoriesType + ",\n" +
                 "howManySplitting=" + howManySplitting + ",\n" +
                 "howManyTrajectories=" + howManyTrajectories + ",\n" +
-                "howManyTrajectories=" + numberOfTimestepConsidered + ",\n" +
+                "numberOfTimestepConsidered=" + numberOfTimestepConsidered + ",\n" +
                 "agentPopulationSize=" + agentPopulationSize + ",\n" +
                 "agentOffspringSize=" + agentOffspringSize + ",\n" +
                 "agentAlpha=" + agentAlpha + ",\n" +

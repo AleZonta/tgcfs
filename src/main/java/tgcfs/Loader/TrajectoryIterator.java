@@ -16,7 +16,6 @@ import tgcfs.Idsa.IdsaLoader;
 import tgcfs.InputOutput.PointToSpeedBearing;
 import tgcfs.NN.InputsNetwork;
 import tgcfs.NN.OutputsNetwork;
-import tgcfs.Routing.Routes;
 import tgcfs.Utils.PointWithBearing;
 
 import java.time.LocalDateTime;
@@ -38,17 +37,15 @@ import java.util.NoSuchElementException;
 public class TrajectoryIterator implements DataSetIterator {
     private final int batchSize;
     private final int lengthExample;
-    private final Routes routes;
     private final Feeder feeder;
     private final IdsaLoader idsaLoader;
     private final int numberTrajectories;
     private int cursor = 0;
 
-    public TrajectoryIterator(int batchSize, int lengthExample, Routes routes, IdsaLoader idsaLoader, Feeder feeder){
+    public TrajectoryIterator(int batchSize, int lengthExample , IdsaLoader idsaLoader, Feeder feeder){
         this.batchSize = batchSize;
         this.lengthExample = lengthExample;
-        this.routes = routes;
-        this.numberTrajectories = this.routes.getTra().getTrajectories().size();
+        this.numberTrajectories = feeder.getTrajectories().getTrajectories().size();
         this.idsaLoader = idsaLoader;
         this.feeder = feeder;
     }
@@ -77,13 +74,13 @@ public class TrajectoryIterator implements DataSetIterator {
         int count = 0;
         for( int l=0; count<num && this.cursor<100; l++ ){
             //load trajectories
-            Trajectory tra = this.routes.getNextTrajectory();
+            Trajectory tra = this.feeder.getTrajectory();
             //new trajectory new apf
             try {
                 this.idsaLoader.resetAPF();
             }catch (Exception ignored){ }
             //init potential field with new elements from the current trajectory
-            this.idsaLoader.InitPotentialField(this.routes.getTra());
+            this.idsaLoader.InitPotentialField(this.feeder.getTrajectories());
             // obtain section trajectory
             int start = 0;
 
@@ -92,7 +89,7 @@ public class TrajectoryIterator implements DataSetIterator {
             while (!trajectoryEnded) {
                 List<Point> points = new ArrayList<>();
                 for (int i = start; i < this.lengthExample + 1; i++) {
-                    Point p = this.routes.getNextPosition(tra);
+                    Point p = this.feeder.getNextPoint(tra);
                     if (p != null) points.add(p);
                 }
                 //check if the trajectory is long enough
