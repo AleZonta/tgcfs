@@ -31,14 +31,21 @@ public class TrajectoryIteratorTest {
         Feeder system = new Feeder(log);
 
         system.loadSystem();
+        system.getTrajectories().createTrainingAndTest();
+
 
         Routes routes = new Routes(log);
         routes.readTrajectories();
 
         IdsaLoader loader = new IdsaLoader(routes.getTra().getTrajectories().size(), log);
 
-        TrajectoryIterator iterator = new TrajectoryIterator(20,15,loader,system);
+        TrajectoryIterator iterator = new TrajectoryIterator(20,15,loader,system, true);
         DataSet nextDataset = iterator.next();
+
+        TrajectoryIterator iteratorTest = new TrajectoryIterator(10,15,loader,system, false);
+        DataSet nextDatasetTest = iteratorTest.next();
+
+        String check = "";
 
     }
 }

@@ -42,12 +42,18 @@ public class TrajectoryIterator implements DataSetIterator {
     private final int numberTrajectories;
     private int cursor = 0;
 
-    public TrajectoryIterator(int batchSize, int lengthExample , IdsaLoader idsaLoader, Feeder feeder){
+    public TrajectoryIterator(int batchSize, int lengthExample , IdsaLoader idsaLoader, Feeder feeder, boolean training) throws Exception {
         this.batchSize = batchSize;
         this.lengthExample = lengthExample;
         this.numberTrajectories = feeder.getTrajectories().getTrajectories().size();
         this.idsaLoader = idsaLoader;
         this.feeder = feeder;
+        if(training){
+            this.feeder.getTrajectories().switchToTrain();
+        }else{
+            this.feeder.getTrajectories().switchToTest();
+        }
+
     }
 
 
