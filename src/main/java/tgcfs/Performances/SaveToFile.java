@@ -6,6 +6,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import tgcfs.Config.PropertiesFileReader;
 import tgcfs.EA.Individual;
 import tgcfs.Loader.TrainReal;
+import tgcfs.NN.InputsNetwork;
 import tgcfs.Utils.PointWithBearing;
 import tgcfs.Utils.Scores;
 
@@ -489,7 +490,6 @@ public class SaveToFile {
             for(int i = 0; i < combineInputList.size(); i ++){
 
                 TrainReal el = combineInputList.get(i);
-
                 JSONObject obj = new JSONObject();
 
                 JSONArray generated = new JSONArray();
@@ -503,6 +503,12 @@ public class SaveToFile {
                     real.add(p.toJson());
                 }
                 obj.put("real", real);
+
+                JSONArray computed = new JSONArray();
+                for(InputsNetwork p: el.getFollowingPartTransformed()){
+                    computed.add(p.toJson());
+                }
+                obj.put("following", computed);
 
                 obj.put("classification", el.getFitnessGivenByTheClassifier());
 
@@ -683,6 +689,11 @@ public class SaveToFile {
                         allThePoints.add(p.toJson());
                     }
                     subObj.put("points", allThePoints);
+                    JSONArray allTheInputs = new JSONArray();
+                    for(InputsNetwork in: tr.getTrainingPoint()){
+                        allTheInputs.add(in.toJson());
+                    }
+                    subObj.put("inputs", allTheInputs);
                     allTheTra.add(subObj);
                 }
                 obj.put("git-sha-1=", PropertiesFileReader.getGitSha1());

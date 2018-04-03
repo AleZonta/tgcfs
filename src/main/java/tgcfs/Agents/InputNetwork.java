@@ -1,6 +1,7 @@
 package tgcfs.Agents;
 
 import lgds.trajectories.Point;
+import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.InputOutput.Normalisation;
@@ -229,6 +230,20 @@ public class InputNetwork implements InputsNetwork {
     @Override
     public String toString() {
         return "{" + this.speed + ", " + this.bearing + ", " + this.time + ", " + this.angularSpeed + "}";
+    }
+
+    /**
+     * To JSON object
+     * print speed bearing time and angularSpeed in a JSON format
+     * @return {@link JSONObject} containing the info
+     */
+    public JSONObject toJson(){
+        JSONObject obj = new JSONObject();
+        obj.put("Speed", this.speed);
+        obj.put("Bearing", this.bearing);
+        obj.put("Time", this.time);
+        obj.put("AngularSpeed", this.angularSpeed);
+        return obj;
     }
 
 }

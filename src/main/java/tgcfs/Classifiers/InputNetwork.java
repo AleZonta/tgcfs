@@ -1,5 +1,6 @@
 package tgcfs.Classifiers;
 
+import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import tgcfs.Config.ReadConfig;
@@ -175,6 +176,14 @@ public class InputNetwork implements InputsNetwork{
     @Override
     public InputsNetwork deepCopy() {
         return new InputNetwork(this.linearSpeed, this.angularSpeed, this.averageLinearSpeed, this.averageAngularSpeed, false);
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject obj = new JSONObject();
+        obj.put("LinearSpeed", this.linearSpeed);
+        obj.put("AngularSpeed", this.angularSpeed);
+        return obj;
     }
 
     /**

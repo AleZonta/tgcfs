@@ -1,5 +1,6 @@
 package tgcfs.NN;
 
+import org.json.simple.JSONObject;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 /**
@@ -28,4 +29,10 @@ public interface InputsNetwork {
      * @return copy of the object
      */
     InputsNetwork deepCopy();
+
+    /**
+     * Save the network to Json
+     * @return Json object
+     */
+    JSONObject toJson();
 }

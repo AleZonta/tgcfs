@@ -91,6 +91,8 @@ public class FollowingTheGraph implements Transformation {
         List<OutputsNetwork> outputs = trainReal.getOutputComputed();
 
         List<InputsNetwork> convertedInput = new ArrayList<>();
+        List<InputsNetwork> onlyTheInput = new ArrayList<>();
+
         List<InputsNetwork> convertedInputReal = new ArrayList<>();
 
         PointToSpeedSpeed convertToAgularSpeed = new PointToSpeedSpeed();
@@ -150,6 +152,7 @@ public class FollowingTheGraph implements Transformation {
             logger.log(Level.FINE, "angularSpeed = " + angularSpeed);
             InputNetwork inputNetwork = new InputNetwork(outputsNetwork.getSpeed(), angularSpeed);
             convertedInput.add(inputNetwork);
+            onlyTheInput.add(inputNetwork);
 
             //upgrade position
             this.lastPoint = new PointWithBearing(position);
@@ -158,6 +161,7 @@ public class FollowingTheGraph implements Transformation {
         //save the entire trajectory for future works
         convertedInput.remove(0); //remove the first one
         trainReal.setAllThePartTransformedFake(convertedInput);
+        trainReal.setFollowingPartTransformed(onlyTheInput);
         logger.log(Level.FINE, "fake ->" + trainReal.getAllThePartTransformedFake().get(trainReal.getAllThePartTransformedFake().size() -1).toString());
 
 

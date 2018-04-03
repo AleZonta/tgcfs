@@ -2,7 +2,6 @@ package tgcfs.Loader;
 
 import lgds.trajectories.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import tgcfs.Agents.Models.RealAgent;
 import tgcfs.Agents.OutputNetwork;
 import tgcfs.Classifiers.InputNetwork;
@@ -409,8 +408,13 @@ public class TrainReal {
      */
     public List<InputsNetwork> getFollowingPartTransformed() {
         //return number of outputcomputed position
-        throw new NotImplementedException();
-       // return this.followingPartTransformed;
+       return this.followingPartTransformed;
+    }
+
+
+    public void setFollowingPartTransformed(List<InputsNetwork> inputsNetworks) {
+        //return number of outputcomputed position
+        this.followingPartTransformed = inputsNetworks;
     }
 
     /**
