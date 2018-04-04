@@ -221,7 +221,7 @@ public class Feeder {
      * @param realPoints list real points
      * @return list of speeddirection objects
      */
-    public List<InputsNetwork> obtainInput(List<Point> points, double attraction, Point possibleTarget, List<PointWithBearing> realPoints){
+    public List<InputsNetwork> obtainInput(List<Point> points, double attraction, Point possibleTarget, List<PointWithBearing> realPoints) throws Exception {
         //class that compute the conversion point -> speed/bearing
         PointToSpeedBearing conversion = new PointToSpeedBearing();
 
@@ -269,6 +269,7 @@ public class Feeder {
                 time = conversion.obtainTime(previousPoint,actualPoint);
             }
             allTheTimes.add(time);
+
             double speed = conversion.obtainSpeed(previousPoint, actualPoint, time);
 
             double angularSpeed = convertitor.obtainAngularSpeed(previousBearing, bearing, time);
@@ -282,20 +283,35 @@ public class Feeder {
             totalList.add(inputNetwork);
             previousBearing = bearing;
         }
+
         //update the points
         this.points.clear();
         this.points.addAll(updatedPoints);
 
         //If I am using the time I am going to shift all the time in the networks
         //TODO manage to add all the other times if I am going to use more than 1 timestep after the target
+        int futureTimesteps = 1;
+        try {
+            futureTimesteps = ReadConfig.Configurations.getMoreTimeAhead();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if(isDdsa) {
-            this.lastTime = Routes.timeBetweenIDSATimesteps;
+            this.lastTime = Routes.timeBetweenIDSATimesteps * futureTimesteps;
         }else if (ReadConfig.isETH) {
-            this.lastTime = Routes.timeBetweenETHTimesteps;
+            this.lastTime = Routes.timeBetweenETHTimesteps * futureTimesteps;
         }else{
             this.lastTime = conversion.obtainTime(points.get(points.size() - 1), realPoints.get(0));
         }
         allTheTimes.add(lastTime);
+
+        //check the time.
+        //now maximum time allowed is 21 seconds
+        if(allTheTimes.stream().anyMatch(d -> d > Normalisation.max_time)){
+            throw new Exception("Trajectory with time bigger than the one allowed by normalisation methods");
+        }
+
+
         logger.log(Level.INFO, allTheTimes.toString());
 
         List<InputsNetwork> hereNetwork = new ArrayList<>();
@@ -441,13 +457,31 @@ public class Feeder {
         //check how many points I want to analise
         int timesteps = ReadConfig.Configurations.getNumberOfTimestepConsidered();
         int futureTimeSteps = ReadConfig.Configurations.getAgentTimeSteps();
+        int howManyTimestepsInFuture = ReadConfig.Configurations.getMoreTimeAhead();
         //if it is zero I do not care and use all the timesteps
         if(timesteps != 0){
             //keep only the timesteps that I need + the next ones
-            while(actualPoint.size() > timesteps + futureTimeSteps){
+            while(actualPoint.size() > timesteps + futureTimeSteps * howManyTimestepsInFuture){
                 //remove the first one till I reach the size I want
                 actualPoint.remove(0);
             }
+
+            //if howManyTimestepsInFuture bigger than one, I have to erase the point I do not need
+            if (howManyTimestepsInFuture > 1){
+                int startTimeStep = timesteps;
+                for(int i = 0; i < futureTimeSteps; i ++ ) {
+                    int endTimesteps = timesteps + i + howManyTimestepsInFuture;
+                    int countTimesteps = endTimesteps;
+                    while (countTimesteps > startTimeStep + futureTimeSteps) {
+                        actualPoint.remove(startTimeStep);
+                        countTimesteps -= 1;
+                    }
+                }
+            }
+
+
+
+
         }
 
         //I have trajectory and I have current position.

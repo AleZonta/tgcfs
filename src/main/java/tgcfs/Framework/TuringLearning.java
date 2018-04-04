@@ -362,15 +362,6 @@ public class TuringLearning implements Framework{
                 //classifier are executed and evaluated during agents evaluations
                 this.agents.evaluateIndividuals(this.classifiers, new FollowingTheGraph(this.feeder, logger));
 
-                //I need to generate this dataset for testing the classifiers and understand visually what is happening
-                //this is happening only in the last generation
-//                if (ReadConfig.Configurations.getDumpTrajectoryPointAndMeaning()){
-//                    logger.log(Level.INFO, "Dump agent generation and real");
-//                    this.saveTrajectoryAndGeneratedPoints(combineInputList, new FollowingTheGraph(this.feeder), generationAgent, generationClassifier);
-//                    this.agents.saveTrajectoriesAndPointGenerated(generationAgent, generationClassifier);
-//                    if(ReadConfig.Configurations.getScore()) this.agents.saveScoresBattle(generationAgent, generationClassifier);
-//                }
-
                 //countermeasures system against disengagement
                 this.countermeasures.checkEvolutionOnlyOnePopulation(this.agents.getFittestIndividual().getFitness(), this.classifiers.getFittestIndividual().getFitness(), this.agents.getMaxFitnessAchievable(), this.classifiers.getMaxFitnessAchievable(), this);
 

@@ -24,7 +24,7 @@ public class Normalisation {
     private static double min_angular_speed = -1.5;
     private static double max_distance = 555.0;
     private static double min_distance = 0.0;
-    private static double max_time = 21.0;
+    public static double max_time = 21.0;
     private static double min_time = 0;
 
 

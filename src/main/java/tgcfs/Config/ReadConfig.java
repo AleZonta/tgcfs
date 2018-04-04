@@ -116,6 +116,8 @@ public class ReadConfig {
     private Boolean incrementalLearningPoints;
     private Integer howManyGenBeforeNewPoint;
 
+    private Integer moreTimeAhead;
+
     /**
      * Constructor with zero parameter
      * Everything is set to null.
@@ -205,6 +207,8 @@ public class ReadConfig {
         this.debugLevel = null;
         this.incrementalLearningPoints = null;
         this.howManyGenBeforeNewPoint = null;
+
+        this.moreTimeAhead = null;
     }
 
     /**
@@ -768,6 +772,14 @@ public class ReadConfig {
         }catch (ClassCastException | NullPointerException e) {
             throw new Exception("HowManyGenBeforeNewPoint is wrong or missing.");
         }
+
+        try {
+            // MoreTimeAhead
+            this.moreTimeAhead = ((Long) jsonObject.get("MoreTimeAhead")).intValue();
+            if (this.moreTimeAhead <= 0) throw new Exception("MoreTimeAhead can only be positive");
+        }catch (ClassCastException | NullPointerException e) {
+            this.moreTimeAhead = 1;
+        }
     }
 
 
@@ -1003,6 +1015,7 @@ public class ReadConfig {
                 "LevelDebug=" + debugLevel + ",\n" +
                 "IncrementalLearningPoints=" + incrementalLearningPoints + ",\n" +
                 "HowManyGenBeforeNewPoint=" + howManyGenBeforeNewPoint + ",\n" +
+                "MoreTimeAhead=" + moreTimeAhead + ",\n" +
                 '}';
     }
 
@@ -1413,6 +1426,16 @@ public class ReadConfig {
     public int getHowManyGenBeforeNewPoint() throws Exception {
         if(this.incrementalLearningPoints == null) throw new Exception("Try to access config file before reading it.");
         return this.howManyGenBeforeNewPoint;
+    }
+
+    /**
+     * Getter for how many time steps ahead I am to generate
+     * @return int value
+     * @throws Exception if I am trying to access it before reading it
+     */
+    public int getMoreTimeAhead() throws Exception {
+        if(this.moreTimeAhead == null) throw new Exception("Try to access config file before reading it.");
+        return this.moreTimeAhead;
     }
 
 
@@ -2038,6 +2061,15 @@ public class ReadConfig {
          */
         public static int getHowManyGenBeforeNewPoint() throws Exception {
             return config.getHowManyGenBeforeNewPoint();
+        }
+
+        /**
+         * Getter for how many time steps ahead I am to generate
+         * @return int value
+         * @throws Exception if I am trying to access it before reading it
+         */
+        public static int getMoreTimeAhead() throws Exception {
+            return config.getMoreTimeAhead();
         }
     }
 
